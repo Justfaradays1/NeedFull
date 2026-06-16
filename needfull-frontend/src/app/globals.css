@@ -1,0 +1,187 @@
+/* WHAT: Global styles, typography, and Tailwind integration */
+/* WHY: Centralised colour tokens, custom utilities, consistent spacing and animations */
+/* FUTURE: Add dark mode colour variants, add RTL support, add print styles */
+
+@import "tailwindcss";
+
+/* WHAT: Root CSS variables for colour palette and typography */
+/* WHY: Enables Tailwind integration and allows runtime theme changes */
+:root {
+  /* Brand colours */
+  --color-brand: #1a6b4a;
+  --color-brand-light: #e6f5ee;
+  --color-brand-dark: #0d4f35;
+  --color-brand-mid: #2d9e6b;
+
+  /* Accent gold for CTAs and urgent badges */
+  --color-gold: #eaa325;
+  --color-gold-light: #fff4df;
+  --color-gold-dark: #9a5c00;
+
+  /* Status colours */
+  --color-danger: #e74c3c;
+  --color-danger-light: #fdecea;
+  --color-info: #2563eb;
+  --color-info-light: #eff6ff;
+
+  /* Typography */
+  --font-syne: "Syne", sans-serif;
+  --font-plus-jakarta: "Plus Jakarta Sans", sans-serif;
+
+  /* Neutral scales */
+  --color-background: #ffffff;
+  --color-foreground: #171717;
+  --color-border: #e5e7eb;
+  --color-muted: #6b7280;
+  --color-success: #10b981;
+}
+
+/* WHAT: Base reset and mobile-first styling */
+/* WHY: Removes inconsistent browser defaults, optimises for low-end Android devices */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-plus-jakarta);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* WHAT: Scrollbar hide utility for cleaner mobile appearance */
+/* WHY: Hides scrollbars on low-bandwidth devices, maintains accessibility */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* WHAT: Safe area padding utilities for notched devices */
+/* WHY: Ensures content doesn't overlap with notches or status bars on mobile */
+.safe-top {
+  padding-top: max(var(--safe-area-inset-top, 0px), 1rem);
+}
+.safe-bottom {
+  padding-bottom: max(var(--safe-area-inset-bottom, 0px), 1rem);
+}
+.safe-left {
+  padding-left: max(var(--safe-area-inset-left, 0px), 1rem);
+}
+.safe-right {
+  padding-right: max(var(--safe-area-inset-right, 0px), 1rem);
+}
+.safe-all {
+  padding: max(var(--safe-area-inset-top, 0px), 1rem)
+    max(var(--safe-area-inset-right, 0px), 1rem)
+    max(var(--safe-area-inset-bottom, 0px), 1rem)
+    max(var(--safe-area-inset-left, 0px), 1rem);
+}
+
+/* WHAT: Tap target minimum size for touch accessibility */
+/* WHY: 44px × 44px meets accessibility standards (WCAG 2.5.5), prevents accidental taps */
+.tap-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* WHAT: Skeleton screen placeholder animation */
+/* WHY: Improves perceived performance while loading content */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-border) 0%,
+    var(--color-background) 50%,
+    var(--color-border) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* WHAT: Bottom padding for fixed navigation overlay */
+/* WHY: Prevents content from being hidden under fixed nav bar */
+.pb-nav {
+  padding-bottom: 80px;
+}
+
+/* WHAT: Heading typography with display font */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-syne);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* WHAT: Responsive text sizes */
+h1 {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+}
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+}
+h3 {
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+}
+
+/* WHAT: Link and button defaults */
+a {
+  color: var(--color-brand);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+a:hover {
+  color: var(--color-brand-mid);
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-plus-jakarta);
+  transition: all 150ms ease;
+}
+
+/* WHAT: Image optimization for slow networks */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* WHAT: Form element defaults */
+input,
+textarea,
+select {
+  font-family: var(--font-plus-jakarta);
+  font-size: 16px; /* Prevents zoom on iOS */
+  border-color: var(--color-border);
+  border-radius: 8px;
+}
+
+/* WHAT: Prevent layout shift during font loading */
+@supports (font-display: swap) {
+  @font-face {
+    font-family: "Syne";
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plus Jakarta Sans";
+    font-display: swap;
+  }
+}

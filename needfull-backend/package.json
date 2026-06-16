@@ -1,0 +1,63 @@
+{
+  "name": "needfull-backend",
+  "version": "0.1.0",
+  "description": "NeedFull backend - Student task marketplace API. WHAT: Core Express.js TypeScript server with wallet, authentication, task management, and real-time features. WHY: Structured foundation for scalable student marketplace. FUTURE: Add database connection pooling, caching layer (Redis), job queue (Bull), API documentation (Swagger).",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "student",
+    "marketplace",
+    "tasks",
+    "errand",
+    "wallet"
+  ],
+  "author": "NeedFull Team",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.40.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.0.0",
+    "express-validator": "^7.0.0",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.2",
+    "nodemailer": "^6.9.6",
+    "pg": "^8.11.2",
+    "socket.io": "^4.7.2",
+    "uuid": "^9.0.1",
+    "xss": "^1.0.14",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/compression": "^1.7.4",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.9",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.8.0",
+    "@types/node-cron": "^3.0.11",
+    "@types/nodemailer": "^6.4.14",
+    "@types/pg": "^8.20.0",
+    "@types/uuid": "^9.0.7",
+    "tsx": "^4.0.0",
+    "typescript": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
