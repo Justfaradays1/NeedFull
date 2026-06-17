@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { create } from 'zustand';
 import apiClient, { post, get as apiGet } from '@/lib/apiClient';
 
@@ -93,12 +94,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 export function useAuthInit(): void {
   const fetchUser = useAuthStore((s) => s.fetchUser);
-  const token = typeof window !== 'undefined' ? localStorage.getItem('nf_access_token') : null;
-  const { isAuthenticated, user } = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((s) => s.user);
 
-  if (token && !isAuthenticated && !user) {
-    fetchUser();
-  }
+  useEffect(() => {
+    const token = localStorage.getItem('nf_access_token');
+    if (token && !isAuthenticated && !user) {
+      fetchUser();
+    }
+  }, [fetchUser, isAuthenticated, user]);
 }
 
 export const useIsAuthenticated = (): boolean => useAuthStore((s) => s.isAuthenticated);

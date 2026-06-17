@@ -10,8 +10,6 @@ export const metadata: Metadata = {
   title: 'NeedFull - Student Task Marketplace',
   description:
     'Post tasks, earn money, build trust. NeedFull is a student-focused marketplace at FUOYE.',
-  viewport:
-    'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -20,6 +18,14 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({

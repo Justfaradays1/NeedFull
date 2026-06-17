@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -20,6 +20,33 @@ import {
 type PageState = "loading" | "form" | "success" | "error";
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <ResetPasswordForm />
+    </Suspense>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="flex min-h-screen flex-col bg-white safe-all">
+      <div className="border-b border-gray-200 px-4 py-6 sm:px-6">
+        <Link href="/" className="inline-block">
+          <h1 className="font-display text-2xl font-bold text-brand">NeedFull</h1>
+        </Link>
+      </div>
+      <div className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6">
+        <div className="text-center">
+          <Loader2 className="mx-auto h-12 w-12 animate-spin text-brand" />
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+      <div className="h-safe-bottom" />
+    </div>
+  );
+}
+
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [pageState, setPageState] = useState<PageState>("loading");
@@ -158,7 +185,7 @@ export default function ResetPasswordPage() {
 
             {/* WHAT: Manual redirect link */}
             <Link
-              href="/auth/login"
+              href="/login"
               className="tap-target inline-block rounded-lg border-2 border-brand px-6 py-3 font-semibold text-brand transition-colors hover:bg-brand-light"
             >
               Go to Sign In
@@ -206,7 +233,7 @@ export default function ResetPasswordPage() {
 
             {/* WHAT: Link back to login */}
             <Link
-              href="/auth/login"
+              href="/login"
               className="tap-target block rounded-lg border-2 border-brand px-4 py-3 font-semibold text-brand transition-colors hover:bg-brand-light"
             >
               Back to Sign In

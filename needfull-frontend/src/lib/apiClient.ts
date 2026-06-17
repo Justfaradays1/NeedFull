@@ -129,18 +129,9 @@ apiClient.interceptors.response.use(
         localStorage.removeItem('nf_access_token');
         localStorage.removeItem('nf_refresh_token');
 
-        // WHAT: Import auth store and call logout
-        // NOTE: Using dynamic import to avoid circular dependency
-        try {
-          const { useAuthStore } = await import('@/store');
-          useAuthStore.getState().logout();
-        } catch (importError) {
-          console.error('Failed to logout:', importError);
-        }
-
         // WHAT: Redirect to login page if in browser
         if (typeof window !== 'undefined') {
-          window.location.href = '/auth/login';
+          window.location.href = '/login';
         }
 
         processQueue(refreshError as AxiosError, undefined);
