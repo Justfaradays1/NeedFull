@@ -1,9 +1,4 @@
-// WHAT: Root layout with app providers and global configuration
-// WHY: Sets up React Query, toast notifications, auth store hydration
-// FUTURE: Add analytics provider, add error boundary, add feature flags provider
-
 import type { Metadata } from 'next';
-import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -49,31 +44,6 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className="bg-white text-gray-900">
-        {/* WHAT: Toast notification container */}
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#1A6B4A',
-              color: '#ffffff',
-            },
-            success: {
-              style: {
-                background: '#10b981',
-              },
-            },
-            error: {
-              style: {
-                background: '#E74C3C',
-              },
-              duration: 5000,
-            },
-          }}
-        />
-
-        {/* WHAT: App content with provider setup */}
         {children}
       </body>
     </html>
