@@ -10,7 +10,7 @@ export default function proxy(request: NextRequest) {
   const token = request.cookies.get('nf_access_token')?.value;
 
   const isAuthRoute = pathname === '/login' || pathname === '/register' || pathname === '/forgot-password' || pathname === '/reset-password' || pathname === '/verify-email';
-  const isProtectedRoute = !isAuthRoute && pathname !== '/' && !pathname.startsWith('/_next') && !pathname.startsWith('/api') && !pathname.endsWith('.json') && !pathname.endsWith('.ico');
+  const isProtectedRoute = !isAuthRoute && pathname !== '/' && !pathname.startsWith('/_next') && !pathname.startsWith('/api') && !/\.(json|ico|png|jpg|jpeg|gif|svg|webp|avif)$/i.test(pathname);
 
   // Redirect to dashboard if logged in and trying to access auth pages
   if (isAuthRoute && token) {
@@ -36,6 +36,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.json).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:json|png|jpg|jpeg|gif|svg|webp|avif|ico)).*)',
   ],
 };
