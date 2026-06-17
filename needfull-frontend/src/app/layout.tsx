@@ -1,8 +1,5 @@
 import type { Metadata } from 'next';
-import dynamic from 'next/dynamic';
 import './globals.css';
-
-const Toaster = dynamic(() => import('react-hot-toast').then(m => m.Toaster), { ssr: false });
 
 export const metadata: Metadata = {
   title: 'NeedFull - Student Task Marketplace',
@@ -47,16 +44,6 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className="bg-white text-gray-900">
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-          toastOptions={{
-            duration: 4000,
-            style: { background: '#1A6B4A', color: '#ffffff' },
-            success: { style: { background: '#10b981' } },
-            error: { style: { background: '#E74C3C' }, duration: 5000 },
-          }}
-        />
         {children}
       </body>
     </html>
