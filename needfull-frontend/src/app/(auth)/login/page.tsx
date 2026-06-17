@@ -1,7 +1,3 @@
-// WHAT: Login page (route: /auth/login)
-// WHY: Entry point for user authentication, mobile-first responsive design
-// FUTURE: Add OAuth options, add passwordless login, add session recovery
-
 'use client';
 
 import { useEffect } from 'react';
@@ -15,8 +11,6 @@ export default function LoginPage() {
   const isAuthenticated = useIsAuthenticated();
   useAuthInit();
 
-  // WHAT: Redirect to /feed if already logged in
-  // WHY: Prevent logged-in users from accessing login page
   useEffect(() => {
     if (isAuthenticated) {
       router.push('/feed');
@@ -25,7 +19,6 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white safe-all">
-      {/* WHAT: Header with logo and branding */}
       <div className="border-b border-gray-200 px-4 py-6 sm:px-6">
         <Link href="/" className="inline-block">
           <h1 className="font-display text-2xl font-bold text-brand">
@@ -37,10 +30,8 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* WHAT: Main login form container */}
       <div className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6">
         <div className="w-full max-w-md space-y-6">
-          {/* WHAT: Page title and description */}
           <div className="space-y-2 text-center">
             <h2 className="font-display text-2xl font-bold text-gray-900">
               Welcome back
@@ -50,10 +41,8 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* WHAT: Login form component */}
           <LoginForm />
 
-          {/* WHAT: Divider with "or" text */}
           <div className="relative py-4">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300" />
@@ -65,7 +54,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* WHAT: Call-to-action for registration */}
           <Link
             href="/register"
             className="tap-target block w-full rounded-lg border-2 border-brand px-4 py-3 text-center font-semibold text-brand transition-colors hover:bg-brand-light"
@@ -73,7 +61,6 @@ export default function LoginPage() {
             Create account
           </Link>
 
-          {/* WHAT: Footer with links */}
           <div className="space-y-2 border-t border-gray-200 pt-6 text-center text-sm text-gray-600">
             <p>
               By signing in, you agree to our{' '}
@@ -90,7 +77,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* WHAT: Bottom safe area spacing for notched devices */}
       <div className="h-safe-bottom" />
     </div>
   );

@@ -110,12 +110,7 @@ export function RegisterForm() {
       };
 
       // WHAT: Call register endpoint
-      await registerUser({
-        fullName: payload.fullName,
-        email: payload.email,
-        password: payload.password,
-        phone: payload.phone,
-      });
+      await registerUser(payload.fullName, payload.email, payload.password, payload.phone);
 
       // WHAT: Call verify-email endpoint with OTP
       await post('/auth/verify-email', {

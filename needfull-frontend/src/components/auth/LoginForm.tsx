@@ -1,7 +1,3 @@
-// WHAT: Login form component with email, password, and loading states
-// WHY: Reusable form for login page, handles validation and submission logic
-// FUTURE: Add biometric login option, add social login buttons, add remember-me checkbox
-
 'use client';
 
 import { useState } from 'react';
@@ -11,11 +7,9 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '@/store';
+import { useAuth } from '@/hooks/useAuthHooks';
 import { loginSchema, type LoginFormData } from '@/lib/schemas/loginSchema';
 
-// WHAT: Login form component
-// WHY: Centralised login form with validation and error handling
 export function LoginForm() {
   const router = useRouter();
   const { login, isLoading, error } = useAuth();
@@ -30,16 +24,12 @@ export function LoginForm() {
     mode: 'onBlur',
   });
 
-  // WHAT: Handle login form submission
-  // WHY: Call auth store login, handle errors, redirect on success
   async function onSubmit(data: LoginFormData) {
     try {
       await login(data.email, data.password);
-      // WHAT: Redirect to feed on successful login
       router.push('/feed');
       toast.success('Welcome back to NeedFull!');
     } catch (err: unknown) {
-      // WHAT: Error already set in auth store, show toast
       if (error) {
         toast.error(error);
       } else {
@@ -50,7 +40,6 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      {/* WHAT: Email input field */}
       <div className="space-y-2">
         <label htmlFor="email" className="block text-sm font-medium">
           Email address
@@ -68,7 +57,6 @@ export function LoginForm() {
         )}
       </div>
 
-      {/* WHAT: Password input with visibility toggle */}
       <div className="space-y-2">
         <label htmlFor="password" className="block text-sm font-medium">
           Password
@@ -82,7 +70,6 @@ export function LoginForm() {
             className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 pr-12 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 disabled:text-gray-500"
             {...register('password')}
           />
-          {/* WHAT: Password visibility toggle button */}
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
@@ -102,7 +89,6 @@ export function LoginForm() {
         )}
       </div>
 
-      {/* WHAT: Forgot password link */}
       <div className="flex justify-end">
         <Link
           href="/forgot-password"
@@ -112,7 +98,6 @@ export function LoginForm() {
         </Link>
       </div>
 
-      {/* WHAT: Submit button with loading state */}
       <button
         type="submit"
         disabled={isLoading}
@@ -128,7 +113,6 @@ export function LoginForm() {
         )}
       </button>
 
-      {/* WHAT: Link to register page */}
       <p className="text-center text-sm text-gray-600">
         Don't have an account?{' '}
         <Link
