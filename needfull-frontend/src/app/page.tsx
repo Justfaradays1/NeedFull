@@ -1,15 +1,21 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useIsAuthenticated, useAuthInit } from '@/store';
 
 export default function RootPage() {
+  const router = useRouter();
   const isAuthenticated = useIsAuthenticated();
   useAuthInit();
 
-  return (
-    <div className="p-8 text-center">
-      <div className="text-xl font-bold text-brand mb-4">NeedFull</div>
-      <div className="text-gray-600">Auth: {isAuthenticated ? 'Logged in' : 'Guest'}</div>
-    </div>
-  );
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/feed');
+    } else {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
+
+  return null;
 }
