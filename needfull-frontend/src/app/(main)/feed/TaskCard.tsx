@@ -105,10 +105,10 @@ export default function TaskCard({ task, onPress }: TaskCardProps) {
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       className={`
-        cursor-pointer select-none rounded-xl border border-gray-200 bg-white
-        border-l-[3px] px-4 pb-3 pt-3.5 shadow-sm transition-all
-        active:scale-[0.98] active:shadow-md
-        hover:border-brand/30 hover:shadow-md
+        cursor-pointer select-none rounded-2xl border border-gray-100 bg-white
+        border-l-[3px] px-4 pb-3 pt-3.5 shadow-card transition-shadow duration-200
+        active:scale-[0.99]
+        hover:border-brand/30 hover:shadow-lifted
         ${borderAccent}
       `}
     >

@@ -1,15 +1,23 @@
-'use client';
+import { Navbar } from '@/components/landing/Navbar';
+import { HeroSection } from '@/components/landing/HeroSection';
+import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
+import { EarnSection } from '@/components/landing/EarnSection';
+import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
+import { PosterSection } from '@/components/landing/PosterSection';
+import { CtaSection } from '@/components/landing/CtaSection';
+import { FooterSection } from '@/components/landing/FooterSection';
 
-import { useIsAuthenticated, useAuthInit } from '@/store';
-
-export default function RootPage() {
-  const isAuthenticated = useIsAuthenticated();
-  useAuthInit();
-
+export default function LandingPage() {
   return (
-    <div className="p-8 text-center">
-      <div className="text-xl font-bold text-brand mb-4">NeedFull</div>
-      <div className="text-gray-600">Auth: {isAuthenticated ? 'Logged in' : 'Guest'}</div>
-    </div>
+    <>
+      <Navbar />
+      <HeroSection />
+      <HowItWorksSection />
+      <EarnSection />
+      <TestimonialsSection />
+      <PosterSection />
+      <CtaSection />
+      <FooterSection />
+    </>
   );
 }

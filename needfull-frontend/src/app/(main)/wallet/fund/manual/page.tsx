@@ -184,7 +184,7 @@ export default function ManualFundPage() {
           formData.append('receipt', receiptFile);
 
           const uploadRes = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/upload/receipt`,
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/upload/receipt`,
             {
               method: 'POST',
               headers: {
@@ -291,7 +291,7 @@ export default function ManualFundPage() {
           </div>
 
           {/* Info card */}
-          <div className="mb-6 space-y-1 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="mb-6 space-y-1 rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
             <p className="text-center text-sm font-medium text-gray-900">
               Transfer submitted successfully!
             </p>
@@ -304,7 +304,7 @@ export default function ManualFundPage() {
           </div>
 
           {/* Status tracking card */}
-          <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
             <h3 className="mb-3 font-display text-sm font-bold text-gray-900">
               Tracking Details
             </h3>
@@ -398,11 +398,16 @@ export default function ManualFundPage() {
 
       {/* WHAT: Step 1 — Bank details */}
       <div className="mx-4 -mt-4 sm:mx-6">
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
           <div className="mb-1 flex items-center justify-between">
-            <h2 className="font-display text-sm font-bold text-gray-900">
-              Transfer to this account
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-display text-sm font-bold text-gray-900">
+                Transfer to this account
+              </h2>
+              <span className="inline-flex items-center rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
+                Recommended
+              </span>
+            </div>
             <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-bold text-green-700">
               FREE
             </span>
@@ -460,7 +465,7 @@ export default function ManualFundPage() {
 
       {/* WHAT: Step 2 — Submission form */}
       <form onSubmit={handleSubmit} className="mt-4 space-y-4 px-4 pb-8 sm:px-6">
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
           <h2 className="font-display text-sm font-bold text-gray-900">
             Confirm your transfer
           </h2>

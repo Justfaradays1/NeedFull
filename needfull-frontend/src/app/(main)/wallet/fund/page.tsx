@@ -37,7 +37,7 @@ function FundingCard({ href, icon, title, description, badge, fee, feeWarning, h
   return (
     <Link
       href={href}
-      className="tap-target group flex w-full items-start gap-4 rounded-xl border border-gray-200 bg-white p-5 text-left shadow-sm transition-all hover:border-brand/30 hover:shadow-md active:scale-[0.98]"
+      className="tap-target group flex w-full items-start gap-4 rounded-2xl border border-gray-100 bg-white p-5 text-left shadow-card transition-shadow duration-200 hover:border-brand/30 hover:shadow-lifted active:scale-[0.99]"
     >
       {/* Icon container */}
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-light text-brand">

@@ -41,12 +41,9 @@ const envSchema = z.object({
   MONNIFY_CONTRACT_CODE: z.string().min(1),
   MONNIFY_BASE_URL: z.string().url("Invalid MONNIFY_BASE_URL"),
 
-  // SMTP
-  SMTP_HOST: z.string().min(1),
-  SMTP_PORT: z.coerce.number().int().min(1).max(65535),
-  SMTP_USER: z.string().min(1),
-  SMTP_PASS: z.string().min(1),
-  EMAIL_FROM: z.string().email("Invalid EMAIL_FROM"),
+  // Resend
+  RESEND_API_KEY: z.string().min(1),
+  EMAIL_FROM: z.string().min(1),
 
   // Platform config
   PLATFORM_FEE_PERCENT: z.coerce.number().min(0).max(100).default(10),
@@ -86,3 +83,4 @@ try {
 // WHAT: Export fully typed and validated environment config
 // WHY: Single source of truth for all env vars across the application
 export default env;
+export { env };

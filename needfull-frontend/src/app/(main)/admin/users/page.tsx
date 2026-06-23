@@ -152,7 +152,7 @@ export default function AdminUsersPage() {
             const trustColor = u.trustScore >= 70 ? 'bg-green-500' : u.trustScore >= 40 ? 'bg-amber-500' : 'bg-red-500';
 
             return (
-              <div key={u.id} className="rounded-xl border border-gray-100 bg-white shadow-sm">
+              <div key={u.id} className="rounded-2xl border border-gray-100 bg-white shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
                 {/* Card header — always visible */}
                 <button type="button" onClick={() => setExpandedId(isExpanded ? null : u.id)}
                   className="tap-target flex w-full items-center gap-3 p-3 text-left"

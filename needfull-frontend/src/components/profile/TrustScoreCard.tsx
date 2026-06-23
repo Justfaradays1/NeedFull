@@ -76,7 +76,7 @@ export function TrustScoreCard({
   const clampedScore = Math.max(0, Math.min(100, Math.round(score)));
 
   return (
-    <div className={`rounded-lg border border-gray-200 overflow-hidden shadow-sm ${className}`}>
+    <div className={`rounded-2xl border border-gray-100 overflow-hidden shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99] ${className}`}>
       {/* Header with gradient background */}
       <div className={`bg-gradient-to-br ${gradient} p-6`}>
         <div className="flex items-start justify-between gap-4">

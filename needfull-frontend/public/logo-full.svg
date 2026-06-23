@@ -1,0 +1,30 @@
+<svg width="320" height="90" viewBox="0 0 320 90" xmlns="http://www.w3.org/2000/svg">
+  <!-- Step platform -->
+  <rect x="28" y="52" width="38" height="7" rx="3.5" fill="#1a6b4a" opacity="0.18"/>
+  <rect x="4" y="59" width="62" height="8" rx="4" fill="#1a6b4a" opacity="0.28"/>
+
+  <!-- Person on step (being helped up, right) -->
+  <circle cx="52" cy="20" r="9" fill="#1a6b4a"/>
+  <path d="M52 29 L52 52" stroke="#1a6b4a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M52 48 L44 59" stroke="#1a6b4a" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M52 48 L55 59" stroke="#1a6b4a" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M52 36 L36 44" stroke="#1a6b4a" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- Helper (left, lower) -->
+  <circle cx="16" cy="32" r="9" fill="#2d9e72"/>
+  <path d="M16 41 L16 60" stroke="#2d9e72" stroke-width="4" stroke-linecap="round"/>
+  <path d="M16 56 L10 68" stroke="#2d9e72" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M16 56 L22 68" stroke="#2d9e72" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M16 46 L36 44" stroke="#2d9e72" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- Clasped hands -->
+  <circle cx="36" cy="44" r="5.5" fill="#1a6b4a"/>
+  <circle cx="36" cy="44" r="3" fill="white"/>
+
+  <!-- Wordmark -->
+  <text x="86" y="44" font-family="Nunito, Arial Rounded MT Bold, sans-serif" font-weight="800" font-size="34" fill="#1a6b4a" letter-spacing="-0.5">Need</text>
+  <text x="176" y="44" font-family="Nunito, Arial Rounded MT Bold, sans-serif" font-weight="800" font-size="34" fill="#2d9e72" letter-spacing="-0.5">full</text>
+
+  <!-- Tagline -->
+  <text x="87" y="64" font-family="DM Sans, Arial, sans-serif" font-weight="500" font-size="13" fill="#1a6b4a" opacity="0.65" letter-spacing="0.3">Every need finds its helper.</text>
+</svg>

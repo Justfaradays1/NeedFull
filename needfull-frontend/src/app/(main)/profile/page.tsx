@@ -56,7 +56,7 @@ function TrustScoreCard({ score }: { score: number }) {
   const seg = Math.round((score / 100) * 100);
   const color = score >= 70 ? 'text-brand' : score >= 40 ? 'text-gold' : 'text-danger';
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm">
+    <div className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
       <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
         <svg className="h-12 w-12 -rotate-90" viewBox="0 0 36 36">
           <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" strokeWidth="3" />
@@ -306,7 +306,7 @@ export default function ProfilePage() {
             ) : (
               <div className="space-y-3">
                 {reviews.map((r) => (
-                  <div key={r.id} className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm">
+                  <div key={r.id} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-light text-[10px] font-bold text-brand">
@@ -336,7 +336,7 @@ export default function ProfilePage() {
             ) : (
               <div className="space-y-2">
                 {activity.map((t) => (
-                  <div key={t.id} className="flex items-center justify-between rounded-xl border border-gray-100 bg-white p-3 shadow-sm">
+                  <div key={t.id} className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold text-gray-900 truncate">{t.title}</p>
                       <p className="text-[11px] text-gray-500">{t.category?.name || 'General'} · {new Date(t.createdAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}</p>
@@ -436,7 +436,7 @@ function ToggleRow({ label, enabled, onToggle, disabled, disabledHint }: {
   label: string; enabled: boolean; onToggle: () => void; disabled?: boolean; disabledHint?: string;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-white p-3 shadow-sm">
+    <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
       <div>
         <span className={`text-sm font-semibold ${disabled ? 'text-gray-400' : 'text-gray-700'}`}>{label}</span>
         {disabled && disabledHint && <p className="text-[10px] text-gray-400">{disabledHint}</p>}
@@ -452,7 +452,7 @@ function VerificationRow({ icon, label, verified, detail, onVerify, uploading }:
   icon: React.ReactNode; label: string; verified: boolean; detail?: string; onVerify?: () => void; uploading?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-white p-3 shadow-sm">
+    <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
       <div className="flex items-center gap-3">
         <div className={`flex h-8 w-8 items-center justify-center rounded-full ${verified ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
           {icon}

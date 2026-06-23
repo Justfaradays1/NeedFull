@@ -6,27 +6,15 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
-import nodemailer from "nodemailer";
 import { query, queryOne, withTransaction } from "../config/db.js";
 import env from "../config/env.js";
 import { onTrustEvent } from "../services/trust.service.js";
-
-// WHAT: Configure SMTP transporter for sending emails
-// WHY: Sends verification OTPs and password reset links
-const transporter = nodemailer.createTransport({
-  host: env.SMTP_HOST,
-  port: env.SMTP_PORT,
-  secure: env.SMTP_PORT === 465,
-  auth: {
-    user: env.SMTP_USER,
-    pass: env.SMTP_PASS,
-  },
-});
+import { sendEmail, verificationEmailTemplate } from "../services/email.service.js";
 
 // WHAT: Generate JWT token with specified expiry
 // WHY: Centralises token generation logic, ensures consistent format
 function generateToken(
-  payload: { sub: string; role?: "student" | "admin"; email?: string },
+  payload: { sub: string; role?: "user" | "admin"; email?: string },
   expiresIn: string | number,
 ): string {
   return jwt.sign(payload, env.JWT_SECRET, { expiresIn } as jwt.SignOptions);
@@ -45,14 +33,8 @@ export async function register(req: Request, res: Response): Promise<void> {
   try {
     const { email, password, fullName, phone } = req.body;
 
-    // WHAT: Parse fullName into first_name and last_name
-    // WHY: Database stores separate first/last name columns
-    const nameParts = fullName.trim().split(/\s+/);
-    const first_name = nameParts[0];
-    const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
-
     // WHAT: Validate required fields (express-validator already validated)
-    if (!email || !password || !first_name) {
+    if (!email || !password || !fullName?.trim()) {
       res.status(400).json({
         error: "Bad request",
         message: "Missing required fields: email, password, fullName",
@@ -78,21 +60,20 @@ export async function register(req: Request, res: Response): Promise<void> {
 
     // WHAT: Create user and wallet in a transaction
     // WHY: Ensures consistency — if wallet creation fails, user creation is rolled back
-    let newUser!: { id: string; email: string; role: "student" | "admin" };
+    let newUser!: { id: string; email: string; role: "user" | "admin" };
     await withTransaction(async (client) => {
       // WHAT: Create user (wallet auto-created via DB trigger)
       const userResult = await client.query(
-        `INSERT INTO users (id, email, password_hash, first_name, last_name, phone, role, email_verified_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, NULL)
+        `INSERT INTO users (id, email, password_hash, full_name, phone, role, email_verified_at)
+         VALUES ($1, $2, $3, $4, $5, $6, NULL)
          RETURNING id, email, role`,
         [
           uuidv4(),
           email,
           hashedPassword,
-          first_name,
-          last_name,
+          fullName.trim(),
           phone || null,
-          "student",
+          "user",
         ],
       );
 
@@ -110,11 +91,10 @@ export async function register(req: Request, res: Response): Promise<void> {
     );
 
     // WHAT: Send OTP email
-    await transporter.sendMail({
-      from: env.EMAIL_FROM,
+    await sendEmail({
       to: email,
       subject: "Verify your NeedFull email",
-      html: `<p>Your verification code is: <strong>${otp}</strong></p><p>Code expires in 15 minutes.</p>`,
+      html: verificationEmailTemplate(otp, fullName),
     });
 
     // WHAT: Generate JWT tokens for immediate access (optional email verification)
@@ -258,7 +238,7 @@ export async function refresh(req: Request, res: Response): Promise<void> {
     const user = await queryOne<{
       id: string;
       email: string;
-      role: "student" | "admin";
+      role: "user" | "admin";
     }>("SELECT id, email, role FROM users WHERE id = $1", [decoded.sub]);
 
     // WHAT: Issue new token pair
@@ -416,11 +396,10 @@ export async function forgotPassword(
 
     // WHAT: Send password reset email
     const resetUrl = `${env.FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
-    await transporter.sendMail({
-      from: env.EMAIL_FROM,
+    await sendEmail({
       to: email,
       subject: "Reset your NeedFull password",
-      html: `<p>Click the link below to reset your password:</p><a href="${resetUrl}">${resetUrl}</a><p>Link expires in 1 hour.</p>`,
+      html: `<p>Hi,</p><p>Click the link below to reset your password:</p><p><a href="${resetUrl}">${resetUrl}</a></p><p>This link expires in 1 hour.</p>`,
     });
 
     res.status(200).json({
@@ -517,7 +496,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
       email: string;
       first_name: string;
       last_name: string;
-      role: "student" | "admin";
+      role: "user" | "admin";
       email_verified_at: string | null;
       wallet_id: string;
       balance_kobo: number;

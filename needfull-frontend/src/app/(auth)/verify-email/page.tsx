@@ -1,234 +1,103 @@
-// WHAT: Email verification page with token-based verification flow
-// WHY: Confirm user email after registration, provide feedback and error recovery
-// FUTURE: Add resend countdown timer, support QR code scan for mobile verification
-
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, XCircle, Loader2 } from "lucide-react";
-import apiClient from "@/lib/apiClient";
-import toast from "react-hot-toast";
 
 type VerificationState = "loading" | "success" | "error";
-
-export default function VerifyEmailPage() {
-  return (
-    <Suspense fallback={<VerifyLoading />}>
-      <VerifyEmailContent />
-    </Suspense>
-  );
-}
-
-function VerifyLoading() {
-  return (
-    <div className="flex min-h-screen flex-col bg-white safe-all">
-      <div className="flex flex-1 items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-brand" />
-      </div>
-    </div>
-  );
-}
 
 function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
   const [state, setState] = useState<VerificationState>("loading");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isResending, setIsResending] = useState(false);
+  const [message, setMessage] = useState("");
 
-  // WHAT: Get email from localStorage for resend functionality
-  // WHY: User may need to resend if token expires or email not received
-  const getStoredEmail = () => {
-    try {
-      const authData = localStorage.getItem("nf-auth");
-      if (authData) {
-        const parsed = JSON.parse(authData);
-        return parsed.state?.user?.email || "";
-      }
-    } catch {
-      return "";
-    }
-    return "";
-  };
-
-  // WHAT: Verify email on component mount using token from URL
-  // WHY: User clicked link from email, verify immediately without user action
   useEffect(() => {
-    const verifyEmail = async () => {
-      try {
-        const token = searchParams.get("token");
-
-        if (!token) {
-          setState("error");
-          setErrorMessage("Verification link is invalid or missing the token.");
-          return;
-        }
-
-        // WHAT: POST token to backend verification endpoint
-        // WHY: Backend validates token, marks email as verified, prevents token reuse
-        const response = await apiClient.post("/auth/verify-email", { token });
-
-        if (response.status === 200 || response.status === 201) {
-          setState("success");
-          toast.success("Email verified successfully!");
-        }
-      } catch (error) {
-        setState("error");
-
-        // WHAT: Extract error message from API response
-        // WHY: Show user-friendly error instead of generic "Something went wrong"
-        if (error instanceof Error) {
-          if (error.message.includes("401") || error.message.includes("403")) {
-            setErrorMessage(
-              "This verification link has expired. Please request a new one.",
-            );
-          } else if (error.message.includes("already verified")) {
-            setErrorMessage(
-              "Your email is already verified. You can sign in now.",
-            );
-          } else {
-            setErrorMessage(
-              error.message || "Verification failed. Please try again.",
-            );
-          }
-        } else {
-          setErrorMessage("An unexpected error occurred. Please try again.");
-        }
-
-        toast.error("Email verification failed");
-      }
-    };
-
-    verifyEmail();
-  }, [searchParams]);
-
-  // WHAT: Resend verification email to user
-  // WHY: Original email may have been delayed, deleted, or link expired
-  const handleResend = async () => {
-    try {
-      setIsResending(true);
-      const email = getStoredEmail();
-
-      if (!email) {
-        toast.error("Email address not found. Please sign up again.");
-        router.push("/register");
-        return;
-      }
-
-      // WHAT: POST to resend endpoint with user email
-      // WHY: Backend generates new OTP/token and sends new verification email
-      await apiClient.post("/auth/resend-verification", { email });
-
-      toast.success("Verification email sent! Check your inbox.");
-      setIsResending(false);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to resend verification email";
-      toast.error(message);
-      setIsResending(false);
+    if (!token) {
+      setState("error");
+      setMessage("No verification token found in the link.");
+      return;
     }
-  };
+    fetch("/api/auth/verify-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        if (res.ok) {
+          setState("success");
+          setMessage(data.message || "Email verified successfully!");
+        } else {
+          setState("error");
+          setMessage(data.message || "Verification failed. The link may have expired.");
+        }
+      })
+      .catch(() => {
+        setState("error");
+        setMessage("Network error. Please check your connection and try again.");
+      });
+  }, [token]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white safe-all">
-      {/* WHAT: Header with NeedFull branding */}
+    <div className="w-full max-w-sm text-center">
+      {state === "loading" && <p className="text-sm text-gray-500">Verifying your email...</p>}
+      {state === "success" && (
+        <>
+          <h2 className="mb-2 text-xl font-bold text-gray-900">Email verified!</h2>
+          <p className="mb-6 text-sm text-gray-500">{message}</p>
+          <a href="/login" className="inline-block rounded-[10px] bg-brand px-5 py-3 text-sm font-semibold text-white shadow-card transition-all hover:bg-brand-mid">Sign in</a>
+        </>
+      )}
+      {state === "error" && (
+        <>
+          <h2 className="mb-2 text-xl font-bold text-gray-900">Verification failed</h2>
+          <p className="mb-6 text-sm text-gray-500">{message}</p>
+          <a href="/" className="inline-block rounded-[10px] bg-brand px-5 py-3 text-sm font-semibold text-white shadow-card transition-all hover:bg-brand-mid">Go home</a>
+        </>
+      )}
+    </div>
+  );
+}
+
+function VerifyLoading() {
+  return <div className="text-sm text-gray-500">Loading...</div>;
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <div className="auth-page flex min-h-screen flex-col bg-white">
       <div className="border-b border-gray-200 px-4 py-6 sm:px-6">
-        <Link href="/" className="inline-block">
-          <h1 className="font-display text-2xl font-bold text-brand">
-            NeedFull
-          </h1>
+        <Link href="/" className="inline-flex items-center gap-2.5" aria-label="NeedFull home">
+          <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center text-gold">
+            <svg viewBox="0 0 36 36" fill="none" className="w-[19px] h-[19px]">
+              <rect x="12" y="24" width="16" height="2.5" rx="1.25" fill="currentColor" opacity="0.18"/>
+              <rect x="2" y="27.5" width="26" height="3" rx="1.5" fill="currentColor" opacity="0.28"/>
+              <circle cx="23" cy="9" r="4" fill="currentColor"/>
+              <path d="M23 13v8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M23 19.5l-2.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M23 19.5l2.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M23 15.5l-7 2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <circle cx="8" cy="14" r="4" fill="white" fillOpacity="0.9"/>
+              <path d="M8 18v8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.9"/>
+              <path d="M8 24.5l-2 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.9"/>
+              <path d="M8 24.5l2 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.9"/>
+              <path d="M8 20l7.5-1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.9"/>
+              <circle cx="16" cy="21" r="2.5" fill="currentColor"/>
+              <circle cx="16" cy="21" r="1.5" fill="#1A6B4A"/>
+            </svg>
+          </div>
+          <span className="font-bold text-lg font-display text-gray-900">NeedFull</span>
         </Link>
+        <p className="mt-1 text-sm text-gray-500">Student task marketplace at FUOYE</p>
       </div>
-
-      {/* WHAT: Main verification content */}
       <div className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6">
-        <div className="w-full max-w-md text-center">
-          {/* WHAT: Loading state */}
-          {state === "loading" && (
-            <div className="space-y-6">
-              <Loader2 className="mx-auto h-16 w-16 animate-spin text-brand" />
-              <div>
-                <h2 className="font-display text-2xl font-bold text-gray-900">
-                  Verifying your email...
-                </h2>
-                <p className="mt-2 text-gray-600">
-                  Please wait while we confirm your email address.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* WHAT: Success state */}
-          {state === "success" && (
-            <div className="space-y-6">
-              <CheckCircle className="mx-auto h-16 w-16 text-green-500" />
-              <div>
-                <h2 className="font-display text-2xl font-bold text-gray-900">
-                  Email verified!
-                </h2>
-                <p className="mt-2 text-gray-600">
-                  Your account is active. Welcome to NeedFull.
-                </p>
-              </div>
-
-              {/* WHAT: CTA button to dashboard */}
-              <button
-                onClick={() => router.push("/feed")}
-                className="tap-target w-full rounded-lg bg-gold px-4 py-3 font-semibold text-white transition-colors hover:bg-gold-dark active:bg-gold-dark"
-              >
-                Go to Dashboard
-              </button>
-            </div>
-          )}
-
-          {/* WHAT: Error state */}
-          {state === "error" && (
-            <div className="space-y-6">
-              <XCircle className="mx-auto h-16 w-16 text-danger" />
-              <div>
-                <h2 className="font-display text-2xl font-bold text-gray-900">
-                  Verification failed
-                </h2>
-                <p className="mt-2 text-gray-600">{errorMessage}</p>
-              </div>
-
-              {/* WHAT: Resend button for error recovery */}
-              <button
-                onClick={handleResend}
-                disabled={isResending}
-                className="tap-target w-full rounded-lg border-2 border-brand px-4 py-3 font-semibold text-brand transition-colors hover:bg-brand-light disabled:opacity-50"
-              >
-                {isResending ? (
-                  <>
-                    <Loader2 className="mr-2 inline-block h-4 w-4 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  "Resend verification email"
-                )}
-              </button>
-
-              {/* WHAT: Link back to login */}
-              <p className="text-sm text-gray-600">
-                Already verified?{" "}
-                <Link
-                  href="/login"
-                  className="font-semibold text-brand hover:text-brand-mid"
-                >
-                  Sign in
-                </Link>
-              </p>
-            </div>
-          )}
-        </div>
+        <Suspense fallback={<VerifyLoading />}>
+          <VerifyEmailContent />
+        </Suspense>
       </div>
-
-      {/* WHAT: Bottom safe area spacing */}
-      <div className="h-safe-bottom" />
     </div>
   );
 }

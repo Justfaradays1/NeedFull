@@ -267,7 +267,7 @@ export default function WithdrawPage() {
         </div>
 
         <div className="mx-4 -mt-4 sm:mx-6">
-          <div className="rounded-xl border border-gray-200 bg-white p-6 text-center shadow-sm">
+          <div className="rounded-2xl border border-gray-100 bg-white p-5 text-center shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
             <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
               <CheckCircle className="h-10 w-10 text-green-600" />
             </div>
@@ -307,7 +307,7 @@ export default function WithdrawPage() {
         </div>
 
         <div className="mx-4 -mt-4 space-y-4 pb-8 sm:mx-6">
-          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
             <h2 className="font-display text-sm font-bold text-gray-900">Review Details</h2>
             <div className="mt-4 space-y-3">
               <div className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3">
@@ -390,7 +390,7 @@ export default function WithdrawPage() {
 
       <div className="space-y-4 px-4 pb-8 sm:px-6 -mt-2">
         {/* WHAT: Amount input */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
           <h2 className="font-display text-sm font-bold text-gray-900">Amount to withdraw</h2>
 
           <div className="mt-4 space-y-1">
@@ -443,7 +443,7 @@ export default function WithdrawPage() {
         </div>
 
         {/* WHAT: Bank selection — searchable dropdown */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
           <h2 className="font-display text-sm font-bold text-gray-900">Bank account details</h2>
 
           <div className="mt-4 space-y-4">
@@ -566,7 +566,7 @@ export default function WithdrawPage() {
         </div>
 
         {/* WHAT: Withdrawal history */}
-        <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
           <div className="border-b border-gray-100 px-5 py-4">
             <h2 className="font-display text-sm font-bold text-gray-900">Withdrawal History</h2>
           </div>

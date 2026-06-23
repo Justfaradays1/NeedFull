@@ -14,8 +14,8 @@ const nextConfig: NextConfig = {
   },
 
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api",
-    NEXT_PUBLIC_SOCKET_URL: process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000",
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
+    NEXT_PUBLIC_SOCKET_URL: process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000",
   },
 
   async headers() {
@@ -40,6 +40,15 @@ const nextConfig: NextConfig = {
   },
 
   allowedDevOrigins: ["192.168.157.43", "192.168.183.43"],
+
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${process.env.BACKEND_URL || "http://localhost:5000"}/api/:path*`,
+      },
+    ];
+  },
 
   compress: true,
   productionBrowserSourceMaps: false,

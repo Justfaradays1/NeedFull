@@ -40,7 +40,7 @@ function StatCard({ label, value, sub, icon, color }: {
   label: string; value: string | number; sub?: string; icon: React.ReactNode; color: string;
 }) {
   return (
-    <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</p>
@@ -80,7 +80,7 @@ function NavCard({ href, label, Icon, count, badgeColor }: {
   const badgeCls = badgeColor || 'bg-brand-light text-brand';
   return (
     <Link href={href}
-      className="tap-target flex flex-col items-center gap-2 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:border-brand/20 active:scale-[0.97]"
+      className="tap-target flex flex-col items-center gap-2 rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:border-brand/20 active:scale-[0.99]"
     >
       <div className="relative">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-light">

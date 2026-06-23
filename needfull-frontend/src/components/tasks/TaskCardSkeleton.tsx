@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function TaskCardSkeleton() {
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col space-y-4">
+    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99] flex flex-col space-y-4">
       <div className="flex justify-between items-start">
         <div className="space-y-2">
           <Skeleton className="h-5 w-48" />

@@ -30,7 +30,7 @@ function RunnerCard({ runner, onTap }: RunnerCardProps) {
   const topSkill = runner.skills?.[0] || null;
   return (
     <button type="button" onClick={onTap}
-      className="tap-target flex w-[140px] shrink-0 flex-col items-center rounded-xl border border-gray-100 bg-white p-3 text-center shadow-sm transition-all active:scale-[0.97] hover:border-brand/20"
+      className="tap-target flex w-[140px] shrink-0 flex-col items-center rounded-2xl border border-gray-100 bg-white p-4 text-center shadow-card transition-shadow duration-200 active:scale-[0.99] hover:border-brand/20"
     >
       <div className="relative">
         {runner.profilePictureUrl ? (
@@ -102,7 +102,7 @@ function CreditsSection({ balanceKobo }: { balanceKobo: number }) {
   const credits = Math.floor(balanceKobo / 100); // proxy: ₦1 = 1 credit
   const progress = Math.min((credits / 500) * 100, 100);
   return (
-    <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50">
           <Award className="h-5 w-5 text-gold-dark" />

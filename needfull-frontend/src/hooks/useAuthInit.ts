@@ -40,16 +40,4 @@ export function useAuthInit() {
   return { isInitialized: true };
 }
 
-// WHAT: Hook to sync tokens with API client
-// WHY: Ensures API client always has latest token for requests
-export function useSyncAuthTokens() {
-  useEffect(() => {
-    const accessToken = localStorage.getItem("nf_access_token");
-    if (!accessToken) {
-      // WHAT: No token — user not logged in
-      return;
-    }
 
-    // WHAT: Token exists and should be in axios headers (via interceptor)
-  }, []);
-}

@@ -247,7 +247,7 @@ function CardPaymentInner() {
         </div>
 
         {/* WHAT: Amount input card */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
           <h2 className="font-display text-sm font-bold text-gray-900">
             Enter amount
           </h2>

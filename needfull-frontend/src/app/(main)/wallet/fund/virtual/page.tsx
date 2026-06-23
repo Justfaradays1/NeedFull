@@ -229,7 +229,7 @@ export default function VirtualFundPage() {
         <>
           {/* Virtual account card */}
           <div className="mx-4 -mt-4 sm:mx-6">
-            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
               <div className="mb-1 flex items-center justify-between">
                 <h2 className="font-display text-sm font-bold text-gray-900">
                   Your dedicated account
@@ -297,7 +297,7 @@ export default function VirtualFundPage() {
 
           {/* Instructions */}
           <div className="mt-4 px-4 sm:px-6">
-            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
               <h2 className="font-display text-sm font-bold text-gray-900">
                 How to fund your wallet
               </h2>
@@ -347,7 +347,7 @@ export default function VirtualFundPage() {
 
           {/* Transaction history */}
           <div className="mt-4 px-4 pb-8 sm:px-6">
-            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
               <h2 className="font-display text-sm font-bold text-gray-900">
                 Deposit History
               </h2>

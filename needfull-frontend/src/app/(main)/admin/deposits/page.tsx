@@ -159,7 +159,7 @@ export default function AdminDepositsPage() {
           </div>
         ) : (
           deposits.map((d) => (
-            <div key={d.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+            <div key={d.id} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
               <div className="flex items-start justify-between gap-2">
                 {userRow(d)}
                 <div className="text-right shrink-0">

@@ -317,7 +317,7 @@ export default function WalletPage() {
       {/* WHAT: Quick stats */}
       <div className="mx-4 mt-4 sm:mx-6">
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-light">
                 <TrendingUp className="h-4 w-4 text-brand" />
@@ -328,7 +328,7 @@ export default function WalletPage() {
               ₦{formatNaira(earnedThisMonth)}
             </p>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-light">
                 <CheckCircle className="h-4 w-4 text-gold-dark" />
@@ -344,7 +344,7 @@ export default function WalletPage() {
 
       {/* WHAT: Transaction history */}
       <div className="mx-4 mt-4 pb-8 sm:mx-6">
-        <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
           <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
             <h2 className="font-display text-sm font-bold text-gray-900">
               Transaction History

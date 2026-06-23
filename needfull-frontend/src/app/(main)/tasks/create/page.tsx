@@ -591,7 +591,7 @@ export default function CreateTaskPage() {
             </h2>
 
             {/* Summary card */}
-            <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-4">
+            <div className="space-y-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
               {/* Category */}
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Category</span>

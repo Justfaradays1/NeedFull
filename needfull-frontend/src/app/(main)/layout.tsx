@@ -7,52 +7,91 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import {
-  House, Compass, CirclePlus, MessageCircle, User,
-} from 'lucide-react';
-import { useIsAuthenticated, useAuthInit } from '@/store';
-import apiClient from '@/lib/apiClient';
+import { Toaster } from 'react-hot-toast';
 
 const TABS = [
-  { href: '/feed', label: 'Home', Icon: House },
-  { href: '/explore', label: 'Explore', Icon: Compass },
-  { href: '/post', label: 'Post', Icon: CirclePlus, isFab: true },
-  { href: '/chat', label: 'Chat', Icon: MessageCircle },
-  { href: '/profile', label: 'Profile', Icon: User },
+  { href: '/feed', label: 'Home', icon: 'House' },
+  { href: '/explore', label: 'Explore', icon: 'Compass' },
+  { href: '/post', label: 'Post', icon: 'CirclePlus', isFab: true },
+  { href: '/chat', label: 'Chat', icon: 'MessageCircle' },
+  { href: '/profile', label: 'Profile', icon: 'User' },
 ] as const;
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+// WHAT: Defer heavy icon imports to avoid WASM SWC compilation issues
+// WHY: WASM SWC can fail on lucide-react dynamic icon resolution
+function TabIcon({ icon, className }: { icon: string; className?: string }) {
+  const [Icon, setIcon] = useState<React.ComponentType<{ className?: string }> | null>(null);
+
+  useEffect(() => {
+    import('lucide-react').then((mod) => {
+      const Icons: Record<string, React.ComponentType<{ className?: string }>> = {
+        House: mod.House, Compass: mod.Compass, CirclePlus: mod.CirclePlus,
+        MessageCircle: mod.MessageCircle, User: mod.User,
+      };
+      setIcon(() => Icons[icon]);
+    });
+  }, [icon]);
+
+  if (!Icon) return <span style={{ width: className?.includes('h-7') ? 28 : 20, height: className?.includes('h-7') ? 28 : 20 }} />;
+  return <Icon className={className || 'h-5 w-5'} />;
+}
+
+function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    import('@/store').then((mod) => {
+      const authed = mod.useIsAuthenticated();
+      if (!authed) {
+        router.push('/login');
+        setIsAuthed(false);
+      } else {
+        setIsAuthed(true);
+      }
+    });
+  }, [router]);
+
+  if (isAuthed === null) return null;
+  if (!isAuthed) return null;
+
+  return <>{children}</>;
+}
+
+function UnreadBadge() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    import('@/lib/apiClient').then((mod) => {
+      mod.default.get('/notifications/unread-count')
+        .then((res) => setCount(res.data?.data?.count ?? 0))
+        .catch(() => {});
+    });
+  }, []);
+
+  return count > 0 ? (
+    <span className="absolute -right-1.5 -top-1 flex min-w-[16px] items-center justify-center rounded-full bg-danger px-1 py-[1px] text-[9px] font-bold leading-none text-white">
+      {count > 99 ? '99+' : count}
+    </span>
+  ) : null;
+}
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthenticated = useIsAuthenticated();
-  useAuthInit();
-
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    if (!isAuthenticated) router.push('/login');
-  }, [isAuthenticated, router]);
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    apiClient.get('/notifications/unread-count')
-      .then((res) => setUnreadCount(res.data?.data?.count ?? 0))
-      .catch(() => { /* non-blocking */ });
-  }, [isAuthenticated]);
-
-  if (!isAuthenticated) return null;
-
   const showNav = !pathname.startsWith('/auth');
 
   return (
     <div className="min-h-screen bg-gray-50 pb-[72px]">
-      {children}
+      <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
+      <AuthGuard>
+        {children}
+      </AuthGuard>
 
       {showNav && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white px-2 pb-safe-bottom">
           <div className="mx-auto flex max-w-lg items-center justify-around">
             {TABS.map((tab) => {
-              const { href, label, Icon } = tab;
+              const { href, label, icon } = tab;
               const isFab = 'isFab' in tab && tab.isFab;
               const isActive = pathname === href || pathname.startsWith(href + '/');
 
@@ -64,12 +103,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     className="tap-target relative -mt-4 flex h-14 w-14 items-center justify-center rounded-full bg-gold text-white shadow-lg shadow-gold/30 transition-all active:scale-90 hover:shadow-xl hover:shadow-gold/40"
                     aria-label={label}
                   >
-                    <Icon className="h-7 w-7" />
+                    <TabIcon icon={icon} className="h-7 w-7" />
                   </Link>
                 );
               }
-
-              const isChat = label === 'Chat';
 
               return (
                 <Link
@@ -81,12 +118,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   aria-label={label}
                 >
                   <div className="relative">
-                    <Icon className={`h-5 w-5 ${isActive ? 'text-brand' : ''}`} />
-                    {isChat && unreadCount > 0 && (
-                      <span className="absolute -right-1.5 -top-1 flex min-w-[16px] items-center justify-center rounded-full bg-danger px-1 py-[1px] text-[9px] font-bold leading-none text-white">
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                      </span>
-                    )}
+                    <TabIcon icon={icon} className={`h-5 w-5 ${isActive ? 'text-brand' : ''}`} />
+                    {label === 'Chat' && <UnreadBadge />}
                   </div>
                   <span>{label}</span>
                 </Link>
