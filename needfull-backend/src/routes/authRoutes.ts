@@ -14,6 +14,7 @@ import {
   resetPassword,
   getMe,
 } from "../controllers/authController.js";
+import { googleAuth, googleCallback } from "../controllers/googleAuthController.js";
 import { authenticate } from "../middleware/auth.js";
 import { validate } from "../middleware/validate.js";
 import { authLimiter, registerLimiter } from "../middleware/rateLimiter.js";
@@ -53,6 +54,14 @@ authRouter.post(
   validate,
   register,
 );
+
+// WHAT: Initiate Google OAuth login (GET /auth/google)
+// WHY: Redirects user to Google consent screen
+authRouter.get("/google", googleAuth);
+
+// WHAT: Google OAuth callback (GET /auth/google/callback)
+// WHY: Google redirects here after user grants permission
+authRouter.get("/google/callback", googleCallback);
 
 // WHAT: Login with email and password (POST /auth/login)
 // WHY: Authenticate existing user

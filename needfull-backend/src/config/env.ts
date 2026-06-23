@@ -41,6 +41,10 @@ const envSchema = z.object({
   MONNIFY_CONTRACT_CODE: z.string().min(1),
   MONNIFY_BASE_URL: z.string().url("Invalid MONNIFY_BASE_URL"),
 
+  // Google OAuth
+  GOOGLE_CLIENT_ID: z.string().default(""),
+  GOOGLE_CLIENT_SECRET: z.string().default(""),
+
   // Resend
   RESEND_API_KEY: z.string().min(1),
   EMAIL_FROM: z.string().min(1),

@@ -112,6 +112,10 @@ body {
   --color-gray-500: #6b7280;
   --color-gray-400: #9ca3af;
   --color-gray-200: #e5e7eb;
+  color: #171717;
+}
+.auth-page input::placeholder {
+  color: #9ca3af;
 }
 
 /* WHAT: Safe area padding utilities for notched devices */

@@ -13,7 +13,7 @@ import { sendEmail, verificationEmailTemplate } from "../services/email.service.
 
 // WHAT: Generate JWT token with specified expiry
 // WHY: Centralises token generation logic, ensures consistent format
-function generateToken(
+export function generateToken(
   payload: { sub: string; role?: "user" | "admin"; email?: string },
   expiresIn: string | number,
 ): string {
