@@ -504,7 +504,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
       trust_score: number;
     }>(
       `SELECT 
-        u.id, u.email, u.first_name, u.last_name, u.role, u.email_verified_at,
+        u.id, u.email, u.full_name, u.role, u.email_verified_at,
         w.id as wallet_id, w.balance_kobo, w.escrow_kobo,
         COALESCE(u.trust_score, 50) as trust_score
        FROM users u
@@ -517,8 +517,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
       user: {
         id: result.id,
         email: result.email,
-        first_name: result.first_name,
-        last_name: result.last_name,
+        fullName: result.full_name,
         role: result.role,
         email_verified_at: result.email_verified_at,
         trust_score: result.trust_score,
