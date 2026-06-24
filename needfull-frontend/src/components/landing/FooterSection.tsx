@@ -5,8 +5,8 @@ export function FooterSection() {
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <a href="/" className="flex items-center gap-2" aria-label="NeedFull home">
-              <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center text-gold" style={{ boxShadow: 'inset 0 1px 0 rgba(234,163,37,0.3)' }}>
-                <svg viewBox="0 0 36 36" fill="none" className="w-[19px] h-[19px]">
+              <div className="w-10 h-10 bg-brand rounded-[10px] flex items-center justify-center text-gold" style={{ boxShadow: 'inset 0 1px 0 rgba(234,163,37,0.3)' }}>
+                <svg viewBox="0 3 36 30" fill="none" className="w-[26px] h-[26px]">
                   <rect x="12" y="24" width="16" height="2.5" rx="1.25" fill="currentColor" opacity="0.18"/>
                   <rect x="2" y="27.5" width="26" height="3" rx="1.5" fill="currentColor" opacity="0.28"/>
                   <circle cx="23" cy="9" r="4" fill="currentColor"/>

@@ -22,8 +22,8 @@ export function Navbar() {
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-10 lg:px-24 h-20 flex items-center justify-between">
           <a href="/" className="flex items-center gap-3 shrink-0" aria-label="NeedFull home">
-            <div className="w-9 h-9 bg-brand rounded-[10px] flex items-center justify-center text-gold" style={{ boxShadow: 'inset 0 1px 0 rgba(234,163,37,0.3)' }}>
-              <svg viewBox="0 0 36 36" fill="none" className="w-[22px] h-[22px]">
+            <div className="w-11 h-11 bg-brand rounded-[12px] flex items-center justify-center text-gold" style={{ boxShadow: 'inset 0 1px 0 rgba(234,163,37,0.3)' }}>
+              <svg viewBox="0 3 36 30" fill="none" className="w-[28px] h-[28px]">
                 <rect x="12" y="24" width="16" height="2.5" rx="1.25" fill="currentColor" opacity="0.18"/>
                 <rect x="2" y="27.5" width="26" height="3" rx="1.5" fill="currentColor" opacity="0.28"/>
                 <circle cx="23" cy="9" r="4" fill="currentColor"/>
