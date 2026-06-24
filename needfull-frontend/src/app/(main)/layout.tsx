@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from '@/store';
 
 const TABS = [
   { href: '/feed', label: 'Home', icon: 'House' },
@@ -41,15 +42,13 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
 
   useEffect(() => {
-    import('@/store').then((mod) => {
-      const authed = mod.useIsAuthenticated();
-      if (!authed) {
-        router.push('/login');
-        setIsAuthed(false);
-      } else {
-        setIsAuthed(true);
-      }
-    });
+    const authed = useAuthStore.getState().isAuthenticated;
+    if (!authed) {
+      router.push('/login');
+      setIsAuthed(false);
+    } else {
+      setIsAuthed(true);
+    }
   }, [router]);
 
   if (isAuthed === null) return null;

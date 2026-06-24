@@ -1,0 +1,6 @@
+tree f2acf2d541e0e1f4f596557c77fa444f66832aa9
+parent 7ac73c6121c69f05bef337fe0d820bc7f7078cc9
+author JustFaradays1 <feranmiadasofunjo@gmail.com> 1782333319 +0100
+committer JustFaradays1 <feranmiadasofunjo@gmail.com> 1782333319 +0100
+
+fix: square favicon viewBox, enlarge icon elements 12%

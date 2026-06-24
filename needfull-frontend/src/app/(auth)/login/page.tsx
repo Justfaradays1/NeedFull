@@ -31,6 +31,7 @@ export default function LoginPage() {
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLocalError("");
+    clearError();
 
     const formData = new FormData(e.currentTarget);
 
@@ -41,7 +42,7 @@ export default function LoginPage() {
       );
       router.replace("/feed");
     } catch {
-      setLocalError("Login failed. Please try again.");
+      // Error already handled by store — useEffect will display it
     }
   }
 
