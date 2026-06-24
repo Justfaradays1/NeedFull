@@ -1,19 +1,17 @@
-<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-  <rect width="64" height="64" rx="14" fill="#1A6B4A"/>
-  <g transform="translate(4, 5) scale(1.56)">
-    <rect x="12" y="24" width="16" height="2.5" rx="1.25" fill="#EAA325" opacity="0.18"/>
-    <rect x="2" y="27.5" width="26" height="3" rx="1.5" fill="#EAA325" opacity="0.28"/>
-    <circle cx="23" cy="9" r="4" fill="#EAA325"/>
-    <path d="M23 13v8" stroke="#EAA325" stroke-width="2" stroke-linecap="round"/>
-    <path d="M23 19.5l-2.5 4.5" stroke="#EAA325" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M23 19.5l2.5 4.5" stroke="#EAA325" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M23 15.5l-7 2.5" stroke="#EAA325" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="8" cy="14" r="4" fill="rgba(255,255,255,0.9)"/>
-    <path d="M8 18v8" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/>
-    <path d="M8 24.5l-2 4" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M8 24.5l2 4" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M8 20l7.5-1" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="16" cy="21" r="2.5" fill="#EAA325"/>
-    <circle cx="16" cy="21" r="1.5" fill="#1A6B4A"/>
-  </g>
+<svg width="64" height="64" viewBox="0 3 36 30" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="3" width="36" height="30" rx="7" fill="#1A6B4A"/>
+  <rect x="12" y="24" width="16" height="2.5" rx="1.25" fill="#EAA325" opacity="0.18"/>
+  <rect x="2" y="27.5" width="26" height="3" rx="1.5" fill="#EAA325" opacity="0.28"/>
+  <circle cx="23" cy="9" r="4" fill="#EAA325"/>
+  <path d="M23 13v8" stroke="#EAA325" stroke-width="2" stroke-linecap="round"/>
+  <path d="M23 19.5l-2.5 4.5" stroke="#EAA325" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M23 19.5l2.5 4.5" stroke="#EAA325" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M23 15.5l-7 2.5" stroke="#EAA325" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="8" cy="14" r="4" fill="rgba(255,255,255,0.9)"/>
+  <path d="M8 18v8" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/>
+  <path d="M8 24.5l-2 4" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M8 24.5l2 4" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M8 20l7.5-1" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="16" cy="21" r="2.5" fill="#EAA325"/>
+  <circle cx="16" cy="21" r="1.5" fill="#1A6B4A"/>
 </svg>
