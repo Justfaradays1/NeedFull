@@ -111,7 +111,7 @@ export default function RegisterPage() {
           {step === "register" ? (
             <>
               <h2 className="mb-6 text-xl font-bold text-gray-900">Create your account</h2>
-              <form onSubmit={handleRegister} className="space-y-4">
+              <form action="/api/auth/register" method="POST" onSubmit={handleRegister} className="space-y-4">
                 <div className="space-y-1.5">
                   <label htmlFor="fullName" className="text-sm font-medium text-gray-700">Full name</label>
                   <input id="fullName" name="fullName" type="text" required className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="John Doe" />
@@ -154,7 +154,7 @@ export default function RegisterPage() {
               </p>
             </>
           ) : (
-            <form onSubmit={handleVerify} className="space-y-4">
+            <form action="/api/auth/verify-email" method="POST" onSubmit={handleVerify} className="space-y-4">
               <h2 className="text-xl font-bold text-gray-900">Check your email</h2>
               <p className="text-sm text-gray-500">
                 We sent a 6-digit verification code to <strong className="text-gray-700">{email}</strong>

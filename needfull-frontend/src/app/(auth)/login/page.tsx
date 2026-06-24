@@ -80,7 +80,7 @@ export default function LoginPage() {
             </div>
           )}
           <h2 className="mb-6 text-xl font-bold text-gray-900">Welcome back</h2>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form action="/api/auth/login" method="POST" onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
               <input id="email" name="email" type="email" required className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="you@example.com" />

@@ -505,7 +505,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
     }>(
       `SELECT 
         u.id, u.email, u.full_name, u.role, u.email_verified_at,
-        w.id as wallet_id, w.balance_kobo, w.escrow_kobo,
+        w.id as wallet_id, w.balance, w.escrow,
         COALESCE(u.trust_score, 50) as trust_score
        FROM users u
        LEFT JOIN wallets w ON w.user_id = u.id
@@ -524,8 +524,8 @@ export async function getMe(req: Request, res: Response): Promise<void> {
       },
       wallet: {
         id: result.wallet_id,
-        balance_kobo: result.balance_kobo,
-        escrow_kobo: result.escrow_kobo,
+        balanceKobo: result.balance,
+        escrowKobo: result.escrow,
       },
     });
   } catch (error) {
