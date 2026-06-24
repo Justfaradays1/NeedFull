@@ -48,7 +48,7 @@ app.use(compression());
 
 // WHAT: Request logging
 // WHY: Track all requests for debugging and monitoring
-app.use(morgan("combined"));
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms"));
 
 // WHAT: JSON body parser - with 100kb limit for standard requests
 // WHY: Parse JSON bodies, limit size to prevent abuse

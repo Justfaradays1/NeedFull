@@ -11,7 +11,8 @@ const db = new Pool({
   connectionString: env.DATABASE_URL,
   max: env.DATABASE_POOL_MAX,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000,
+  ssl: { rejectUnauthorized: false },
 });
 
 // WHAT: Log pool errors (connection failures, timeout, unexpected errors)

@@ -194,7 +194,7 @@ export function RegisterForm() {
             <input
               id="email"
               type="email"
-              placeholder="you@fuoye.edu.ng"
+              placeholder="you@example.com"
               disabled={isLoading}
               className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50"
               {...detailsForm.register('email')}
