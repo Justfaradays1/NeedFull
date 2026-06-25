@@ -40,11 +40,11 @@ function verifyToken(token: string): {
   email: string;
 } | null {
   try {
-    const decoded = jwt.verify(token, env.JWT_SECRET);
-    return decoded as {
-      id: string;
-      role: "student" | "admin";
-      email: string;
+    const decoded = jwt.verify(token, env.JWT_SECRET) as Record<string, unknown>;
+    return {
+      id: (decoded.sub || decoded.id) as string,
+      role: decoded.role as "student" | "admin",
+      email: decoded.email as string,
     };
   } catch (error) {
     console.error("JWT verification error:", (error as Error).message);
