@@ -23,13 +23,18 @@ function TabIcon({ icon, className }: { icon: string; className?: string }) {
   const [Icon, setIcon] = useState<React.ComponentType<{ className?: string }> | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     import('lucide-react').then((mod) => {
+      if (cancelled) return;
       const Icons: Record<string, React.ComponentType<{ className?: string }>> = {
         House: mod.House, Compass: mod.Compass, CirclePlus: mod.CirclePlus,
         MessageCircle: mod.MessageCircle, User: mod.User,
       };
       setIcon(() => Icons[icon]);
+    }).catch(() => {
+      if (!cancelled) setIcon(() => () => <span style={{ width: className?.includes('h-7') ? 28 : 20, height: className?.includes('h-7') ? 28 : 20 }} />);
     });
+    return () => { cancelled = true; };
   }, [icon]);
 
   if (!Icon) return <span style={{ width: className?.includes('h-7') ? 28 : 20, height: className?.includes('h-7') ? 28 : 20 }} />;

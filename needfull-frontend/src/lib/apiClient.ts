@@ -122,14 +122,10 @@ apiClient.interceptors.response.use(
         // WHAT: Retry original request with new token
         return apiClient(originalRequest);
       } catch (refreshError) {
-        // WHAT: Refresh failed — logout user and redirect to login
-        console.error('Token refresh failed:', refreshError);
-
-        // WHAT: Clear stored tokens
+        // WHAT: Clear stored tokens and redirect to login
         localStorage.removeItem('nf_access_token');
         localStorage.removeItem('nf_refresh_token');
 
-        // WHAT: Redirect to login page if in browser
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
         }
