@@ -71,8 +71,8 @@ export default function VerifyEmailPage() {
     <div className="auth-page flex min-h-screen flex-col bg-white">
       <div className="border-b border-gray-200 px-4 py-6 sm:px-6">
         <Link href="/" className="inline-flex items-center gap-2.5" aria-label="NeedFull home">
-          <div className="w-10 h-10 bg-brand rounded-[10px] flex items-center justify-center text-gold">
-            <svg viewBox="0 3 36 30" fill="none" className="w-[26px] h-[26px]">
+          <div className="w-11 h-11 bg-brand rounded-[12px] flex items-center justify-center text-gold" style={{ boxShadow: 'inset 0 1px 0 rgba(234,163,37,0.3)' }}>
+            <svg viewBox="0 3 36 30" fill="none" className="w-[28px] h-[28px]">
               <rect x="12" y="24" width="16" height="2.5" rx="1.25" fill="currentColor" opacity="0.18"/>
               <rect x="2" y="27.5" width="26" height="3" rx="1.5" fill="currentColor" opacity="0.28"/>
               <circle cx="23" cy="9" r="4" fill="currentColor"/>
@@ -89,9 +89,8 @@ export default function VerifyEmailPage() {
               <circle cx="16" cy="21" r="1.5" fill="#1A6B4A"/>
             </svg>
           </div>
-          <span className="font-bold text-lg font-display text-gray-900">NeedFull</span>
+          <span className="font-bold text-xl font-display text-gray-900">NeedFull</span>
         </Link>
-        <p className="mt-1 text-sm text-gray-500">Student task marketplace at FUOYE</p>
       </div>
       <div className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6">
         <Suspense fallback={<VerifyLoading />}>

@@ -152,7 +152,7 @@ export default function TaskCard({ task, onPress }: TaskCardProps) {
           <span className="inline-flex items-center gap-1">
             <MapPin className="h-3 w-3" />
             {task.locationLabel}
-            {distance && <span className="text-gray-400">({distance})</span>}
+            {distance && <span className="text-gray-500">({distance})</span>}
           </span>
         )}
 
@@ -186,7 +186,7 @@ export default function TaskCard({ task, onPress }: TaskCardProps) {
               )}
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-[11px] text-gray-400">
+              <span className="text-[11px] text-gray-500">
                 {task.poster.trustScore}% rating
               </span>
             </div>

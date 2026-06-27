@@ -37,10 +37,10 @@ export async function notifyNearbyRunners(task: {
        AND u.is_available = true
        AND u.is_banned = false
        AND u.trust_score >= 30
-       AND u.lat IS NOT NULL AND u.lng IS NOT NULL
+       AND u.location IS NOT NULL
        AND ST_DWithin(
-         ST_MakePoint(u.lng, u.lat)::geography,
-         ST_MakePoint($2, $3)::geography,
+         u.location,
+         ST_SetSRID(ST_MakePoint($2, $3), 4326)::geography,
          3000
        )
      LIMIT 20`,
@@ -71,22 +71,23 @@ export async function getAvailableRunnersNear(
   radiusKm: number,
 ): Promise<RunnerProfile[]> {
   const result = await db.query<any>(
-    `SELECT u.id, u.full_name, u.lat, u.lng,
-       ROUND(
-         ST_Distance(
-           ST_MakePoint(u.lng, u.lat)::geography,
-           ST_MakePoint($1, $2)::geography
-         )::numeric, 2
-       )::float as distance_meters
+    `SELECT u.id, u.full_name,
+        ST_X(u.location::geometry) as lat, ST_Y(u.location::geometry) as lng,
+        ROUND(
+          ST_Distance(
+            u.location,
+            ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
+          )::numeric, 2
+        )::float as distance_meters
      FROM users u
      WHERE u.is_runner = true
        AND u.is_available = true
        AND u.is_banned = false
        AND u.trust_score >= 30
-       AND u.lat IS NOT NULL AND u.lng IS NOT NULL
+       AND u.location IS NOT NULL
        AND ST_DWithin(
-         ST_MakePoint(u.lng, u.lat)::geography,
-         ST_MakePoint($1, $2)::geography,
+         u.location,
+         ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
          $3
        )
      ORDER BY distance_meters ASC

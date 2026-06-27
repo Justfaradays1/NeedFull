@@ -81,7 +81,7 @@ export async function recalculateTrustScore(userId: string): Promise<number> {
         COALESCE(COUNT(DISTINCT ta.id), 0) as tasks_total,
         
         -- CANCELLATION: Tasks cancelled as runner
-        COALESCE(SUM(CASE WHEN t.status = 'cancelled' AND t.runner_id = $1 THEN 1 ELSE 0 END), 0) as tasks_cancelled,
+        COALESCE(SUM(CASE WHEN t.status = 'cancelled' AND t.assigned_to = $1 THEN 1 ELSE 0 END), 0) as tasks_cancelled,
         
         -- VERIFICATION: Email, phone, student ID verified
         COALESCE(u.email_verified, false) as email_verified,

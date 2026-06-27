@@ -23,10 +23,9 @@ interface TaskRow {
   is_urgent: boolean;
   status: string;
   location_label: string | null;
-  lat: number | null;
-  lng: number | null;
+  location: any;
   image_url: string | null;
-  runner_id: string | null;
+  assigned_to: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -121,10 +120,10 @@ export async function listTasks(
   let distanceSelect = "NULL::float as distance";
   if (lat !== undefined && lng !== undefined && radiusKm) {
     whereClauses.push(
-      `t.lat IS NOT NULL AND t.lng IS NOT NULL AND
+      `t.location IS NOT NULL AND
        ST_DWithin(
-         ST_MakePoint(t.lng, t.lat)::geography,
-         ST_MakePoint($${paramIndex}, $${paramIndex + 1})::geography,
+         t.location,
+         ST_SetSRID(ST_MakePoint($${paramIndex}, $${paramIndex + 1}), 4326)::geography,
          $${paramIndex + 2}
        )`,
     );
@@ -132,8 +131,8 @@ export async function listTasks(
     paramIndex += 3;
 
     distanceSelect = `ROUND(ST_Distance(
-      ST_MakePoint(t.lng, t.lat)::geography,
-      ST_MakePoint($${paramIndex - 3}, $${paramIndex - 2})::geography
+      t.location,
+      ST_SetSRID(ST_MakePoint($${paramIndex - 3}, $${paramIndex - 2}), 4326)::geography
     )::numeric, 0)::float as distance`;
   }
 
@@ -181,8 +180,9 @@ export async function listTasks(
   const dataSQL = `
     SELECT
       t.id, t.title, t.description, t.budget_kobo, t.deadline,
-      t.is_urgent, t.status, t.location_label, t.lat, t.lng,
-      t.image_url, t.runner_id, t.created_at, t.updated_at,
+      t.is_urgent, t.status, t.location_label,
+      ST_X(t.location::geometry) as lat, ST_Y(t.location::geometry) as lng,
+      t.image_url, t.assigned_to as runner_id, t.created_at, t.updated_at,
       ${distanceSelect},
       jsonb_build_object(
         'id', u.id,
@@ -247,8 +247,8 @@ export async function getTask(
 
   if (currentLat !== undefined && currentLng !== undefined) {
     distanceSelect = `ROUND(ST_Distance(
-      ST_MakePoint(t.lng, t.lat)::geography,
-      ST_MakePoint($${paramIndex}, $${paramIndex + 1})::geography
+      t.location,
+      ST_SetSRID(ST_MakePoint($${paramIndex}, $${paramIndex + 1}), 4326)::geography
     )::numeric, 0)::float as distance`;
     params.push(currentLng, currentLat);
     paramIndex += 2;
@@ -257,8 +257,9 @@ export async function getTask(
   const sql = `
     SELECT
       t.id, t.poster_id, t.title, t.description, t.budget_kobo, t.deadline,
-      t.is_urgent, t.status, t.location_label, t.lat, t.lng,
-      t.image_url, t.runner_id, t.created_at, t.updated_at,
+      t.is_urgent, t.status, t.location_label,
+      ST_X(t.location::geometry) as lat, ST_Y(t.location::geometry) as lng,
+      t.image_url, t.assigned_to as runner_id, t.created_at, t.updated_at,
       ${distanceSelect},
       jsonb_build_object(
         'id', u.id,
@@ -344,10 +345,11 @@ export async function createTask(
     const result = await client.query<TaskRow>(
       `INSERT INTO tasks
        (id, poster_id, category_id, title, description, budget_kobo,
-        deadline, is_urgent, location_label, lat, lng, image_url,
+        deadline, is_urgent, location_label, location, image_url,
         status, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
-        'open', $13, $13)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
+        CASE WHEN $10 IS NOT NULL AND $11 IS NOT NULL THEN ST_SetSRID(ST_MakePoint($11::float, $10::float), 4326)::geography ELSE NULL END,
+        $12, 'open', $13, $13)
        RETURNING *`,
       [
         taskId,
@@ -453,13 +455,18 @@ export async function updateTask(
     setClauses.push(`location_label = $${paramIndex++}`);
     params.push(fields.locationLabel || null);
   }
-  if (fields.lat !== undefined) {
-    setClauses.push(`lat = $${paramIndex++}`);
+  if (fields.lat !== undefined && fields.lng !== undefined) {
+    setClauses.push(`location = ST_SetSRID(ST_MakePoint($${paramIndex}::float, $${paramIndex + 1}::float), 4326)::geography`);
+    params.push(fields.lng, fields.lat);
+    paramIndex += 2;
+  } else if (fields.lat !== undefined) {
+    setClauses.push(`location = ST_SetSRID(ST_MakePoint(COALESCE(ST_X(location::geometry), 0), $${paramIndex}::float), 4326)::geography`);
     params.push(fields.lat);
-  }
-  if (fields.lng !== undefined) {
-    setClauses.push(`lng = $${paramIndex++}`);
+    paramIndex++;
+  } else if (fields.lng !== undefined) {
+    setClauses.push(`location = ST_SetSRID(ST_MakePoint($${paramIndex}::float, COALESCE(ST_Y(location::geometry), 0)), 4326)::geography`);
     params.push(fields.lng);
+    paramIndex++;
   }
 
   if (setClauses.length === 0) {
@@ -490,7 +497,7 @@ export async function cancelTask(
   userRole: string,
 ): Promise<{ status: string; message: string }> {
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, status, budget_kobo, runner_id, title
+    `SELECT id, poster_id, status, budget_kobo, assigned_to as runner_id, title
      FROM tasks WHERE id = $1`,
     [taskId],
   );
@@ -547,7 +554,7 @@ export async function confirmCompletion(
   userId: string,
 ): Promise<any> {
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, runner_id, budget_kobo, title
+    `SELECT id, poster_id, assigned_to as runner_id, budget_kobo, title
      FROM tasks WHERE id = $1`,
     [taskId],
   );

@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import toast from "react-hot-toast";
+import { Callout } from "@/components/ui/callout";
+import { PasswordInput } from "@/components/ui/password-input";
 
 export default function RegisterPage() {
   const [step, setStep] = useState<"register" | "verify">("register");
@@ -8,11 +11,12 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   async function handleRegister(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
     const form = new FormData(e.currentTarget);
     const body = {
@@ -24,9 +28,11 @@ export default function RegisterPage() {
 
     if (body.password !== form.get("confirmPassword")) {
       setError("Passwords do not match");
-      setLoading(false);
       return;
     }
+
+    const loadingToast = toast.loading("Creating your account...");
+    setLoading(true);
 
     try {
       const res = await fetch("/api/auth/register", {
@@ -38,14 +44,18 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
+        toast.dismiss(loadingToast);
         setError(data.message || data.error || "Registration failed");
         setLoading(false);
         return;
       }
 
+      toast.dismiss(loadingToast);
+      toast.success("Account created! Check your email for the verification code.");
       setEmail(body.email as string);
       setStep("verify");
     } catch {
+      toast.dismiss(loadingToast);
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
@@ -55,6 +65,8 @@ export default function RegisterPage() {
   async function handleVerify(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+
+    const loadingToast = toast.loading("Verifying your email...");
     setLoading(true);
 
     try {
@@ -67,13 +79,17 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
+        toast.dismiss(loadingToast);
         setError(data.message || data.error || "Verification failed");
         setLoading(false);
         return;
       }
 
-      window.location.href = "/login?verified=1";
+      toast.dismiss(loadingToast);
+      toast.success("Email verified! You can now sign in.");
+      setTimeout(() => { window.location.href = "/login?verified=1"; }, 1200);
     } catch {
+      toast.dismiss(loadingToast);
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
@@ -84,8 +100,8 @@ export default function RegisterPage() {
     <div className="auth-page flex min-h-screen flex-col bg-white">
       <div className="border-b border-gray-200 px-4 py-6 sm:px-6">
         <a href="/" className="inline-flex items-center gap-2.5" aria-label="NeedFull home">
-          <div className="w-10 h-10 bg-brand rounded-[10px] flex items-center justify-center text-gold">
-            <svg viewBox="0 3 36 30" fill="none" className="w-[26px] h-[26px]">
+          <div className="w-11 h-11 bg-brand rounded-[12px] flex items-center justify-center text-gold" style={{ boxShadow: 'inset 0 1px 0 rgba(234,163,37,0.3)' }}>
+            <svg viewBox="0 3 36 30" fill="none" className="w-[28px] h-[28px]">
               <rect x="12" y="24" width="16" height="2.5" rx="1.25" fill="currentColor" opacity="0.18"/>
               <rect x="2" y="27.5" width="26" height="3" rx="1.5" fill="currentColor" opacity="0.28"/>
               <circle cx="23" cy="9" r="4" fill="currentColor"/>
@@ -102,35 +118,70 @@ export default function RegisterPage() {
               <circle cx="16" cy="21" r="1.5" fill="#1A6B4A"/>
             </svg>
           </div>
-          <span className="font-bold text-lg font-display text-gray-900">NeedFull</span>
+          <span className="font-bold text-xl font-display text-gray-900">NeedFull</span>
         </a>
-        <p className="mt-1 text-sm text-gray-500">Student task marketplace at FUOYE</p>
       </div>
       <div className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6">
         <div className="w-full max-w-md">
           {step === "register" ? (
             <>
-              <h2 className="mb-6 text-xl font-bold text-gray-900">Create your account</h2>
+              <h2 className="mb-3 text-xl font-bold text-gray-900">Create your NeedFull account</h2>
+              <Callout variant="tip" className="mb-4">
+                Complete your profile after signing up to increase trust and get more opportunities.
+              </Callout>
               <form action="/api/auth/register" method="POST" onSubmit={handleRegister} className="space-y-4">
                 <div className="space-y-1.5">
                   <label htmlFor="fullName" className="text-sm font-medium text-gray-700">Full name</label>
-                  <input id="fullName" name="fullName" type="text" required className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="John Doe" />
+                  <input id="fullName" name="fullName" type="text" required autoComplete="off" className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="John Doe" />
                 </div>
                 <div className="space-y-1.5">
                   <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
-                  <input id="email" name="email" type="email" required className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="you@example.com" />
+                  <input id="email" name="email" type="email" required autoComplete="off" className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="your@university.edu.ng" />
                 </div>
                 <div className="space-y-1.5">
                   <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
-                  <input id="password" name="password" type="password" required minLength={8} className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="At least 8 characters" />
+                  <PasswordInput
+                    id="password"
+                    name="password"
+                    placeholder="Create your password"
+                    required
+                    minLength={8}
+                    disabled={loading}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="new-password"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    hint={
+                      password ? (
+                        <span className={password.length >= 8 ? "text-green-600" : "text-gray-500"}>
+                          {password.length >= 8 ? "\u2713 " : ""}At least 8 characters
+                        </span>
+                      ) : undefined
+                    }
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirm password</label>
-                  <input id="confirmPassword" name="confirmPassword" type="password" required minLength={8} className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="Repeat your password" />
+                  <PasswordInput
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    placeholder="Repeat your password"
+                    required
+                    minLength={8}
+                    disabled={loading}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    autoComplete="new-password"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label htmlFor="phone" className="text-sm font-medium text-gray-700">Phone (optional)</label>
-                  <input id="phone" name="phone" type="tel" className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="08012345678" />
+                  <input id="phone" name="phone" type="tel" autoComplete="off" className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="08012345678" />
                 </div>
                 {error && <p className="text-sm text-red-600">{error}</p>}
                 <button type="submit" disabled={loading} className="w-full rounded-[10px] bg-brand px-5 py-3 text-sm font-semibold text-white shadow-card transition-all duration-150 hover:bg-brand-mid active:scale-[0.97] disabled:opacity-50">

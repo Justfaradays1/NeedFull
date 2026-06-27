@@ -230,8 +230,10 @@ export default function AdminDepositsPage() {
 
       {/* Confirm Modal */}
       {confirmId && (
-        <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center">
-          <div className="w-full rounded-t-2xl bg-white p-5 sm:max-w-md sm:rounded-2xl sm:mx-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="glass-overlay fixed inset-0 z-50 flex items-end sm:items-center" onClick={() => setConfirmId(null)}>
+          <div className="glass-white w-full rounded-t-3xl px-4 pb-safe pb-8 pt-1 sm:max-w-md sm:mx-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-gray-300" />
+            <div className="px-4">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-display text-base font-bold text-gray-900">Confirm Transfer</h3>
               <button type="button" onClick={() => setConfirmId(null)} className="tap-target"><X className="h-5 w-5 text-gray-400" /></button>
@@ -264,14 +266,17 @@ export default function AdminDepositsPage() {
                 </>
               );
             })()}
+            </div>
           </div>
         </div>
       )}
 
       {/* Reject Modal */}
       {rejectId && (
-        <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center">
-          <div className="w-full rounded-t-2xl bg-white p-5 sm:max-w-md sm:rounded-2xl sm:mx-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="glass-overlay fixed inset-0 z-50 flex items-end sm:items-center" onClick={() => setRejectId(null)}>
+          <div className="glass-white w-full rounded-t-3xl px-4 pb-safe pb-8 pt-1 sm:max-w-md sm:mx-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-gray-300" />
+            <div className="px-4">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-display text-base font-bold text-gray-900">Reject Transfer</h3>
               <button type="button" onClick={() => setRejectId(null)} className="tap-target"><X className="h-5 w-5 text-gray-400" /></button>
@@ -290,6 +295,7 @@ export default function AdminDepositsPage() {
               >
                 {submitting ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : 'Reject'}
               </button>
+            </div>
             </div>
           </div>
         </div>

@@ -14,7 +14,7 @@ export async function requestWithdrawal(req: Request, res: Response): Promise<vo
     const amountKobo = Math.floor(amountNaira * 100);
     const totalDebit = amountKobo + WITHDRAWAL_FEE_KOBO;
 
-    const walletResult = await db.query<any>("SELECT id, balance_kobo FROM wallets WHERE user_id = $1", [userId]);
+    const walletResult = await db.query<any>("SELECT id, balance AS balance_kobo FROM wallets WHERE user_id = $1", [userId]);
     if (walletResult.rows.length === 0) { res.status(404).json({ success: false, message: "Wallet not found" }); return; }
     if (walletResult.rows[0].balance_kobo < totalDebit) { res.status(400).json({ success: false, message: `Insufficient balance. Need ₦${(totalDebit / 100).toFixed(2)} including ₦${(WITHDRAWAL_FEE_KOBO / 100).toFixed(2)} fee` }); return; }
 

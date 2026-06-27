@@ -13,7 +13,7 @@ export async function createReview(req: Request, res: Response): Promise<void> {
 
     // WHAT: Verify task completion and participation
     const task = await db.query<any>(
-      "SELECT id, poster_id, runner_id, status FROM tasks WHERE id = $1",
+      "SELECT id, poster_id, assigned_to as runner_id, status FROM tasks WHERE id = $1",
       [taskId],
     );
     if (task.rows.length === 0) {

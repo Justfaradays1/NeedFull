@@ -65,7 +65,7 @@ export function TransactionRow({ type, amountKobo, note, createdAt }: Transactio
         <p className={`font-semibold ${getAmountColor()}`}>
           {prefix}{formattedAmount}
         </p>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-gray-500 mt-1">
           {new Date(createdAt).toLocaleDateString()}
         </p>
       </div>

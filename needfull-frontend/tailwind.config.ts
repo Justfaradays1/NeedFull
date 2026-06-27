@@ -45,7 +45,14 @@ const config: Config = {
 
       // WHAT: Custom spacing and utilities
       spacing: {
-        nav: "80px", // Fixed nav height for pb-nav utility
+        nav: "80px",
+      },
+      backdropBlur: {
+        xs: '4px',
+        sm: '8px',
+        md: '12px',
+        lg: '16px',
+        xl: '20px',
       },
 
       // WHAT: Animation definitions for interactive states

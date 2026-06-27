@@ -339,7 +339,7 @@ export default function ManualFundPage() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-gray-500">Wallet Credited</p>
-                  <p className="text-xs text-gray-400">Pending</p>
+                  <p className="text-xs text-gray-500">Pending</p>
                 </div>
               </div>
             </div>
@@ -568,7 +568,7 @@ export default function ManualFundPage() {
             {/* Receipt upload */}
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-gray-700">
-                Receipt image <span className="text-gray-400">(optional)</span>
+                Receipt image <span className="text-gray-500">(optional)</span>
               </label>
 
               {receiptPreview ? (
@@ -599,7 +599,7 @@ export default function ManualFundPage() {
                   <p className="text-sm font-medium text-gray-600">
                     Tap to upload receipt screenshot
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-500">
                     JPEG, PNG, or WebP (max 10MB)
                   </p>
                   <input

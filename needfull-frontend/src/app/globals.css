@@ -14,14 +14,14 @@
   --color-danger: #E74C3C;
   --color-danger-light: #FDECEA;
 
-  --color-gray-50: var(--color-surface-muted);
-  --color-gray-100: var(--color-card-border);
-  --color-gray-200: var(--color-border);
-  --color-gray-400: var(--color-muted);
-  --color-gray-500: var(--color-muted);
-  --color-gray-600: var(--color-foreground);
-  --color-gray-700: var(--color-foreground);
-  --color-gray-900: var(--color-foreground);
+  --color-gray-50: var(--clr-gray-50);
+  --color-gray-100: var(--clr-gray-100);
+  --color-gray-200: var(--clr-gray-200);
+  --color-gray-400: var(--clr-gray-400);
+  --color-gray-500: var(--clr-gray-500);
+  --color-gray-600: var(--clr-gray-600);
+  --color-gray-700: var(--clr-gray-700);
+  --color-gray-900: var(--clr-gray-900);
 
   --shadow-card: 0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
   --shadow-lifted: 0 8px 24px -4px rgb(0 0 0 / 0.12), 0 2px 6px -2px rgb(0 0 0 / 0.06);
@@ -34,6 +34,16 @@
   --color-foreground: #171717;
   --color-border: #e5e7eb;
   --color-muted: #6b7280;
+  --color-surface: #ffffff;
+  --color-surface-2: #f0f2f0;
+  --clr-gray-50: #f9fafb;
+  --clr-gray-100: #f3f4f6;
+  --clr-gray-200: #e5e7eb;
+  --clr-gray-400: #9ca3af;
+  --clr-gray-500: #6b7280;
+  --clr-gray-600: #4b5563;
+  --clr-gray-700: #374151;
+  --clr-gray-900: #111827;
   --color-info: #2563eb;
   --color-info-light: #eff6ff;
   --color-surface: #ffffff;
@@ -50,13 +60,36 @@
   --color-section-alt: #f9fafb;
   --font-syne: "Syne", sans-serif;
   --font-plus-jakarta: "Plus Jakarta Sans", sans-serif;
+
+  /* Feedback / semantic colours */
+  --color-success: #059669;
+  --color-success-light: #ecfdf5;
+  --color-warning: #d97706;
+  --color-warning-light: #fffbeb;
+  --color-error: #dc2626;
+  --color-error-light: #fef2f2;
+  --color-attention: #b45309;
+  --color-attention-light: #fff7ed;
+  --color-processing: #2563eb;
+  --color-processing-light: #eff6ff;
 }
 
-[data-theme="dark"] {
+[data-theme="dark"],
+.dark {
   --color-background: #0a0a0b;
   --color-foreground: #f5f5f4;
   --color-border: #27272a;
   --color-muted: #a1a1aa;
+  --color-surface: #18181b;
+  --color-surface-2: #243828;
+  --clr-gray-50: #09090b;
+  --clr-gray-100: #18181b;
+  --clr-gray-200: #27272a;
+  --clr-gray-400: #a1a1aa;
+  --clr-gray-500: #6b7280;
+  --clr-gray-600: #d1d5db;
+  --clr-gray-700: #e5e7eb;
+  --clr-gray-900: #f5f5f4;
   --color-info: #60a5fa;
   --color-info-light: #172554;
   --color-surface: #18181b;
@@ -71,6 +104,18 @@
   --color-footer-bg: #09090b;
   --color-footer-border: #27272a;
   --color-section-alt: #09090b;
+
+  /* Feedback / semantic colours */
+  --color-success: #34d399;
+  --color-success-light: #052e16;
+  --color-warning: #fbbf24;
+  --color-warning-light: #451a03;
+  --color-error: #f87171;
+  --color-error-light: #450a0a;
+  --color-attention: #fb923c;
+  --color-attention-light: #431407;
+  --color-processing: #60a5fa;
+  --color-processing-light: #172554;
 }
 
 html {
@@ -109,13 +154,13 @@ body {
   --color-gray-900: #171717;
   --color-gray-700: #374151;
   --color-gray-600: #4b5563;
-  --color-gray-500: #6b7280;
-  --color-gray-400: #9ca3af;
+  --color-gray-500: #4b5563;
+  --color-gray-400: #6b7280;
   --color-gray-200: #e5e7eb;
   color: #171717;
 }
 .auth-page input::placeholder {
-  color: #9ca3af;
+  color: #6b7280;
 }
 
 /* WHAT: Safe area padding utilities for notched devices */
@@ -166,6 +211,88 @@ body {
 /* WHY: Prevents content from being hidden under fixed nav bar */
 .pb-nav {
   padding-bottom: 80px;
+}
+
+/* ============================================================
+   FEEDBACK / CALLOUT SYSTEM
+   ============================================================ */
+
+/* ---- Callout / Info Bar variants ---- */
+.callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  border: 1px solid;
+}
+.callout-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  width: 1rem;
+  height: 1rem;
+}
+.callout-info {
+  background: var(--color-processing-light);
+  border-color: #93c5fd;
+  color: #1e40af;
+}
+.callout-info .callout-icon { color: var(--color-processing); }
+.callout-tip {
+  background: var(--color-warning-light);
+  border-color: #fcd34d;
+  color: #92400e;
+}
+.callout-tip .callout-icon { color: var(--color-warning); }
+.callout-attention {
+  background: var(--color-attention-light);
+  border-color: #fdba74;
+  color: #9a3412;
+}
+.callout-attention .callout-icon { color: var(--color-attention); }
+.callout-important {
+  background: var(--color-warning-light);
+  border-color: #fbbf24;
+  color: #78350f;
+}
+.callout-important .callout-icon { color: var(--color-warning); }
+.callout-warning {
+  background: var(--color-error-light);
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+.callout-warning .callout-icon { color: var(--color-error); }
+.callout-success {
+  background: var(--color-success-light);
+  border-color: #6ee7b7;
+  color: #065f46;
+}
+.callout-success .callout-icon { color: var(--color-success); }
+
+/* Dark mode overrides for callouts */
+[data-theme="dark"] .callout-info {
+  background: rgba(37, 99, 235, 0.10);
+  border-color: rgba(96, 165, 250, 0.25);
+  color: #93c5fd;
+}
+[data-theme="dark"] .callout-tip,
+[data-theme="dark"] .callout-attention,
+[data-theme="dark"] .callout-important {
+  background: rgba(217, 119, 6, 0.10);
+  border-color: rgba(251, 191, 36, 0.25);
+  color: #fcd34d;
+}
+[data-theme="dark"] .callout-warning {
+  background: rgba(220, 38, 38, 0.10);
+  border-color: rgba(248, 113, 113, 0.25);
+  color: #fca5a5;
+}
+[data-theme="dark"] .callout-success {
+  background: rgba(5, 150, 105, 0.10);
+  border-color: rgba(52, 211, 153, 0.25);
+  color: #6ee7b7;
 }
 
 /* WHAT: Heading typography with display font */
@@ -230,4 +357,179 @@ select {
     font-family: "Plus Jakarta Sans";
     font-display: swap;
   }
+}
+
+/* ============================================================
+   NEEDFULL GLASSMORPHISM SYSTEM
+   Apply ONLY to: header, bottom-nav, search-bar, FAB, modals, sheets
+   Do NOT apply to: cards, forms, chat bubbles, lists, tables
+   ============================================================ */
+
+/* --- Performance: promote glass elements to their own GPU layer --- */
+.glass,
+.glass-dark,
+.glass-gold,
+.glass-white,
+.glass-card {
+  isolation: isolate;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* --- Green glass (for brand-green headers and top bars) --- */
+.glass-dark {
+  background: rgba(13, 79, 53, 0.72);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+@supports (backdrop-filter: blur(16px)) {
+  .glass-dark {
+    background: rgba(13, 79, 53, 0.55);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+  }
+}
+
+[data-theme="dark"] .glass-dark {
+  background: rgba(13, 79, 53, 0.15);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+@supports (backdrop-filter: blur(16px)) {
+  [data-theme="dark"] .glass-dark {
+    background: rgba(13, 79, 53, 0.08);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+}
+
+/* --- White glass (for bottom nav, modals, bottom sheets) --- */
+.glass-white {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.40);
+  box-shadow:
+    0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.70);
+}
+
+@supports (backdrop-filter: blur(20px)) {
+  .glass-white {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+  }
+}
+
+/* --- Gold glass (for floating action button only) --- */
+.glass-gold {
+  background: rgba(234, 163, 37, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  box-shadow:
+    0 4px 12px rgba(234, 163, 37, 0.30),
+    0 1px 4px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+@supports (backdrop-filter: blur(12px)) {
+  .glass-gold {
+    background: rgba(234, 163, 37, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* --- Search bar glass --- */
+.glass-search {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+@supports (backdrop-filter: blur(8px)) {
+  .glass-search {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
+/* --- Modal/sheet overlay backdrop --- */
+.glass-overlay {
+  background: rgba(0, 0, 0, 0.36);
+}
+
+@supports (backdrop-filter: blur(4px)) {
+  .glass-overlay {
+    background: rgba(0, 0, 0, 0.24);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+}
+
+/* --- Card glass (for content cards in feed, etc.) --- */
+.glass-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.50);
+  box-shadow: var(--shadow-card);
+}
+
+@supports (backdrop-filter: blur(12px)) {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.68);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+  }
+}
+
+[data-theme="dark"] .glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+@supports (backdrop-filter: blur(12px)) {
+  [data-theme="dark"] .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* --- Shared inner highlight (top edge light refraction effect) --- */
+.glass-dark::before,
+.glass-white::before,
+.glass-gold::before,
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.00) 50%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* --- Ensure glass children appear above the ::before pseudo layer --- */
+.glass-dark > *,
+.glass-white > *,
+.glass-gold > *,
+.glass-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* WHAT: Floating animation for decorative elements */
+/* WHY: Subtle vertical motion for illustrations and icons */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
 }

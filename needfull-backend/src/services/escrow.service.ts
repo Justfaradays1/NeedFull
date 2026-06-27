@@ -52,7 +52,7 @@ export async function lockTaskEscrow(
 export async function releaseTaskEscrow(taskId: string): Promise<void> {
   // WHAT: Fetch task details — must be in_progress
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, runner_id, agreed_amount_kobo, budget_kobo, title, status
+    `SELECT id, poster_id, assigned_to as runner_id, agreed_amount_kobo, budget_kobo, title, status
      FROM tasks WHERE id = $1`,
     [taskId],
   );
@@ -125,7 +125,7 @@ export async function refundTaskEscrow(
 ): Promise<void> {
   // WHAT: Fetch task — must have escrow locked
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, runner_id, agreed_amount_kobo, budget_kobo, title, status
+    `SELECT id, poster_id, assigned_to as runner_id, agreed_amount_kobo, budget_kobo, title, status
      FROM tasks WHERE id = $1`,
     [taskId],
   );

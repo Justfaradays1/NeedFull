@@ -101,7 +101,7 @@ export async function getMyAssignedTasks(req: Request, res: Response): Promise<v
         jsonb_build_object('id', c.id, 'name', c.name, 'icon', c.icon) as category,
         jsonb_build_object('id', u.id, 'fullName', u.full_name) as poster
        FROM tasks t JOIN categories c ON t.category_id = c.id JOIN users u ON t.poster_id = u.id
-       WHERE t.runner_id = $1 ORDER BY t.created_at DESC`,
+       WHERE t.assigned_to = $1 ORDER BY t.created_at DESC`,
       [req.user!.id],
     );
     res.json({ success: true, data: result.rows.map((r: any) => ({ id: r.id, title: r.title, budget: { kobo: r.budget_kobo, naira: r.budget_kobo / 100 }, status: r.status, isUrgent: r.is_urgent, createdAt: r.created_at, deadline: r.deadline, category: r.category, poster: r.poster })) });

@@ -168,9 +168,9 @@ export default function ExplorePage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
       {/* Header */}
-      <div className="bg-white px-4 pb-4 pt-3 shadow-sm">
-        <h1 className="font-display text-lg font-bold text-gray-900">Explore</h1>
-        <p className="mt-0.5 text-xs text-gray-500">Discover tasks, runners, and more</p>
+      <div className="glass-dark px-4 pb-4 pt-3">
+        <h1 className="font-display text-xl font-bold text-white">Explore</h1>
+        <p className="mt-0.5 text-xs text-white/70">Discover tasks, runners, and more</p>
       </div>
 
       <div className="px-4 space-y-5 mt-4">
@@ -194,7 +194,7 @@ export default function ExplorePage() {
             <div className="rounded-xl bg-gray-50 p-6 text-center">
               <Compass className="mx-auto h-8 w-8 text-gray-300" />
               <p className="mt-2 text-sm font-medium text-gray-600">No runners available near you right now</p>
-              <p className="text-xs text-gray-400">Check back soon</p>
+              <p className="text-xs text-gray-500">Check back soon</p>
             </div>
           ) : (
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">

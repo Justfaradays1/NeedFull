@@ -143,7 +143,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
       {/* Header */}
-      <div className="bg-gradient-to-br from-brand to-brand-dark px-4 pb-6 pt-4 text-white">
+      <div className="glass-dark px-4 pb-6 pt-4 text-white">
         <h1 className="font-display text-xl font-bold">Admin Dashboard</h1>
         <p className="mt-0.5 text-sm text-white/70">Platform overview and moderation</p>
       </div>

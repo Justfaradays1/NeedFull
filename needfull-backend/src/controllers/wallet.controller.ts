@@ -35,7 +35,7 @@ export async function getTransactions(req: Request, res: Response): Promise<void
 
     const [txns, countRes] = await Promise.all([
       db.query<any>(
-        `SELECT wt.id, wt.type, wt.amount_kobo, wt.balance_before_kobo, wt.balance_after_kobo, wt.reference, wt.task_id, wt.note, wt.created_at, t.title as task_title
+        `SELECT wt.id, wt.type, wt.amount AS amount_kobo, wt.balance_before AS balance_before_kobo, wt.balance_after AS balance_after_kobo, wt.reference, wt.task_id, wt.note, wt.created_at, t.title as task_title
          FROM wallet_transactions wt LEFT JOIN tasks t ON wt.task_id = t.id
          WHERE wt.wallet_id = $1 ORDER BY wt.created_at DESC LIMIT $2 OFFSET $3`,
         [wallet.rows[0].id, perPage, offset],

@@ -5,10 +5,11 @@ export function HowItWorksSection() {
         <div className="mx-auto max-w-2xl text-center">
           <span className="inline-flex items-center rounded-full bg-brand-light px-3.5 py-1 text-[13px] font-semibold text-brand">How it works</span>
           <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>
-            Three steps to your first campus gig
+            Three steps to your first gig
           </h2>
           <p className="mt-3 text-[15px]" style={{ color: 'var(--color-muted)' }}>
-            Whether you&apos;re earning or hiring, the process is simple and secure.
+            Whether you&apos;re earning or hiring, getting started
+            takes less than 5 minutes.
           </p>
         </div>
 
@@ -16,7 +17,7 @@ export function HowItWorksSection() {
           {[
             {
               step: '01', title: 'Sign up & verify',
-              desc: 'Create your account with your FUOYE email. Student verification takes under a minute and unlocks the full marketplace.',
+              desc: 'Sign up with your student email in under 2 minutes. Verify your student status to unlock full access to the NeedFull marketplace.',
               icon: <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>,
             },
             {

@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuthHooks';
 import { loginSchema, type LoginFormData } from '@/lib/schemas/loginSchema';
 
@@ -21,7 +21,7 @@ export function LoginForm() {
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    mode: 'onBlur',
+    mode: 'onChange',
   });
 
   async function onSubmit(data: LoginFormData) {
@@ -39,7 +39,7 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
       <div className="space-y-2">
         <label htmlFor="email" className="block text-sm font-medium">
           Email address
@@ -49,11 +49,17 @@ export function LoginForm() {
           type="email"
           placeholder="you@example.com"
           disabled={isLoading}
-          className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 disabled:text-gray-500"
+          autoComplete="email"
+          className={`tap-target w-full rounded-lg border bg-white px-4 py-3 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 disabled:text-gray-500 ${
+            errors.email ? 'border-danger focus:border-danger' : 'border-gray-300 focus:border-brand'
+          }`}
           {...register('email')}
         />
         {errors.email && (
-          <p className="text-sm text-danger">{errors.email.message}</p>
+          <p className="flex items-center gap-1 text-sm text-danger" role="alert">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            {errors.email.message}
+          </p>
         )}
       </div>
 
@@ -67,7 +73,10 @@ export function LoginForm() {
             type={showPassword ? 'text' : 'password'}
             placeholder="Enter your password"
             disabled={isLoading}
-            className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 pr-12 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 disabled:text-gray-500"
+            autoComplete="current-password"
+            className={`tap-target w-full rounded-lg border bg-white px-4 py-3 pr-12 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 disabled:text-gray-500 ${
+              errors.password ? 'border-danger focus:border-danger' : 'border-gray-300 focus:border-brand'
+            }`}
             {...register('password')}
           />
           <button
@@ -85,7 +94,10 @@ export function LoginForm() {
           </button>
         </div>
         {errors.password && (
-          <p className="text-sm text-danger">{errors.password.message}</p>
+          <p className="flex items-center gap-1 text-sm text-danger" role="alert">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            {errors.password.message}
+          </p>
         )}
       </div>
 
@@ -114,7 +126,7 @@ export function LoginForm() {
       </button>
 
       <p className="text-center text-sm text-gray-600">
-        Don't have an account?{' '}
+        Don&apos;t have an account?{' '}
         <Link
           href="/register"
           className="font-semibold text-brand hover:text-brand-mid"

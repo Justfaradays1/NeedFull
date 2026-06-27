@@ -15,6 +15,10 @@ interface Wallet {
   updated_at: string;
 }
 
+// WHAT: Helper to alias wallet DB columns (balance/escrow → balance_kobo/escrow_kobo)
+// WHY: DB uses `balance`/`escrow` but TypeScript uses `_kobo` suffix for consistency
+const WALLET_SELECT = "id, user_id, balance AS balance_kobo, escrow AS escrow_kobo, updated_at";
+
 // WHAT: Credit wallet with amount (deposit, earnings, refund)
 // WHY: Add funds to user wallet with idempotency protection and audit trail
 export async function creditWallet(
@@ -31,8 +35,8 @@ export async function creditWallet(
     // WHAT: Lock wallet row to prevent concurrent modifications
     // WHY: SELECT FOR UPDATE ensures no race conditions on balance updates
     const wallet = await client.query<Wallet>(
-      `SELECT id, user_id, balance_kobo, escrow_kobo, updated_at
-       FROM wallets WHERE user_id = $1 FOR UPDATE`,
+      `SELECT ${WALLET_SELECT}
+        FROM wallets WHERE user_id = $1 FOR UPDATE`,
       [userId],
     );
 
@@ -63,8 +67,8 @@ export async function creditWallet(
     // WHY: Add amount to balance
     const newBalance = balanceBefore + amountKobo;
     const updated = await client.query<Wallet>(
-      `UPDATE wallets SET balance_kobo = balance_kobo + $1, updated_at = NOW()
-       WHERE id = $2 RETURNING id, user_id, balance_kobo, escrow_kobo, updated_at`,
+      `UPDATE wallets SET balance = balance + $1, updated_at = NOW()
+       WHERE id = $2 RETURNING ${WALLET_SELECT}`,
       [amountKobo, walletRow.id],
     );
 
@@ -72,7 +76,7 @@ export async function creditWallet(
     // WHY: Maintain complete history of all wallet movements
     await client.query(
       `INSERT INTO wallet_transactions 
-       (wallet_id, type, amount_kobo, balance_before_kobo, balance_after_kobo, 
+       (wallet_id, type, amount, balance_before, balance_after, 
         reference, idempotency_key, task_id, note, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
       [
@@ -111,8 +115,8 @@ export async function debitWallet(
     // WHAT: Lock wallet for exclusive access
     // WHY: Prevent concurrent debits that could overdraw
     const wallet = await client.query<Wallet>(
-      `SELECT id, user_id, balance_kobo, escrow_kobo, updated_at
-       FROM wallets WHERE user_id = $1 FOR UPDATE`,
+      `SELECT ${WALLET_SELECT}
+        FROM wallets WHERE user_id = $1 FOR UPDATE`,
       [userId],
     );
 
@@ -149,8 +153,8 @@ export async function debitWallet(
     // WHY: Remove amount from available balance
     const newBalance = balanceBefore - amountKobo;
     const updated = await client.query<Wallet>(
-      `UPDATE wallets SET balance_kobo = balance_kobo - $1, updated_at = NOW()
-       WHERE id = $2 RETURNING id, user_id, balance_kobo, escrow_kobo, updated_at`,
+      `UPDATE wallets SET balance = balance - $1, updated_at = NOW()
+       WHERE id = $2 RETURNING ${WALLET_SELECT}`,
       [amountKobo, walletRow.id],
     );
 
@@ -158,7 +162,7 @@ export async function debitWallet(
     // WHY: Track all debits with timestamps and types
     await client.query(
       `INSERT INTO wallet_transactions 
-       (wallet_id, type, amount_kobo, balance_before_kobo, balance_after_kobo, 
+       (wallet_id, type, amount, balance_before, balance_after, 
         task_id, idempotency_key, note, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
       [
@@ -193,8 +197,8 @@ export async function lockEscrow(
     // WHAT: Lock wallet for exclusive access
     // WHY: Prevent concurrent escrow operations
     const wallet = await client.query<Wallet>(
-      `SELECT id, user_id, balance_kobo, escrow_kobo, updated_at
-       FROM wallets WHERE user_id = $1 FOR UPDATE`,
+      `SELECT ${WALLET_SELECT}
+        FROM wallets WHERE user_id = $1 FOR UPDATE`,
       [posterId],
     );
 
@@ -217,11 +221,11 @@ export async function lockEscrow(
     // WHY: Hold task budget until completion/cancellation
     const updated = await client.query<Wallet>(
       `UPDATE wallets 
-       SET balance_kobo = balance_kobo - $1, 
-           escrow_kobo = escrow_kobo + $1,
+       SET balance = balance - $1, 
+           escrow = escrow + $1,
            updated_at = NOW()
        WHERE id = $2 
-       RETURNING id, user_id, balance_kobo, escrow_kobo, updated_at`,
+       RETURNING ${WALLET_SELECT}`,
       [amountKobo, walletRow.id],
     );
 
@@ -229,7 +233,7 @@ export async function lockEscrow(
     // WHY: Maintain audit trail of escrow movements
     await client.query(
       `INSERT INTO wallet_transactions 
-       (wallet_id, type, amount_kobo, balance_before_kobo, balance_after_kobo, 
+       (wallet_id, type, amount, balance_before, balance_after, 
         task_id, note, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
       [
@@ -270,8 +274,8 @@ export async function releaseEscrow(
     // WHAT: Lock both wallets to prevent concurrent modifications
     // WHY: Atomic operation - both wallets must update together or not at all
     const posterWallet = await client.query<Wallet>(
-      `SELECT id, user_id, balance_kobo, escrow_kobo, updated_at
-       FROM wallets WHERE user_id = $1 FOR UPDATE`,
+      `SELECT ${WALLET_SELECT}
+        FROM wallets WHERE user_id = $1 FOR UPDATE`,
       [posterId],
     );
 
@@ -280,8 +284,8 @@ export async function releaseEscrow(
     }
 
     const runnerWallet = await client.query<Wallet>(
-      `SELECT id, user_id, balance_kobo, escrow_kobo, updated_at
-       FROM wallets WHERE user_id = $1 FOR UPDATE`,
+      `SELECT ${WALLET_SELECT}
+        FROM wallets WHERE user_id = $1 FOR UPDATE`,
       [runnerId],
     );
 
@@ -298,9 +302,9 @@ export async function releaseEscrow(
     // WHY: Remove from escrow hold, funds go to platform
     const posterUpdated = await client.query<Wallet>(
       `UPDATE wallets 
-       SET escrow_kobo = escrow_kobo - $1, updated_at = NOW()
+       SET escrow = escrow - $1, updated_at = NOW()
        WHERE id = $2 
-       RETURNING id, user_id, balance_kobo, escrow_kobo, updated_at`,
+       RETURNING ${WALLET_SELECT}`,
       [amountKobo, posterWalletRow.id],
     );
 
@@ -308,9 +312,9 @@ export async function releaseEscrow(
     // WHY: Give runner their earnings
     const runnerUpdated = await client.query<Wallet>(
       `UPDATE wallets 
-       SET balance_kobo = balance_kobo + $1, updated_at = NOW()
+       SET balance = balance + $1, updated_at = NOW()
        WHERE id = $2 
-       RETURNING id, user_id, balance_kobo, escrow_kobo, updated_at`,
+       RETURNING ${WALLET_SELECT}`,
       [runnerReceives, runnerWalletRow.id],
     );
 
@@ -318,7 +322,7 @@ export async function releaseEscrow(
     // WHY: Show runner what they earned
     await client.query(
       `INSERT INTO wallet_transactions 
-       (wallet_id, type, amount_kobo, balance_before_kobo, balance_after_kobo, 
+       (wallet_id, type, amount, balance_before, balance_after, 
         task_id, note, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
       [
@@ -336,7 +340,7 @@ export async function releaseEscrow(
     // WHY: Track all fees for financial reconciliation
     await client.query(
       `INSERT INTO wallet_transactions 
-       (wallet_id, type, amount_kobo, balance_before_kobo, balance_after_kobo, 
+       (wallet_id, type, amount, balance_before, balance_after, 
         task_id, note, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
       [
@@ -373,8 +377,8 @@ export async function refundEscrow(
     // WHAT: Lock wallet for exclusive access
     // WHY: Prevent concurrent escrow operations
     const wallet = await client.query<Wallet>(
-      `SELECT id, user_id, balance_kobo, escrow_kobo, updated_at
-       FROM wallets WHERE user_id = $1 FOR UPDATE`,
+      `SELECT ${WALLET_SELECT}
+        FROM wallets WHERE user_id = $1 FOR UPDATE`,
       [posterId],
     );
 
@@ -397,11 +401,11 @@ export async function refundEscrow(
     // WHY: Restore available balance when task is cancelled
     const updated = await client.query<Wallet>(
       `UPDATE wallets 
-       SET escrow_kobo = escrow_kobo - $1, 
-           balance_kobo = balance_kobo + $1,
+       SET escrow = escrow - $1, 
+           balance = balance + $1,
            updated_at = NOW()
        WHERE id = $2 
-       RETURNING id, user_id, balance_kobo, escrow_kobo, updated_at`,
+       RETURNING ${WALLET_SELECT}`,
       [amountKobo, walletRow.id],
     );
 
@@ -409,7 +413,7 @@ export async function refundEscrow(
     // WHY: Maintain audit trail of refunds
     await client.query(
       `INSERT INTO wallet_transactions 
-       (wallet_id, type, amount_kobo, balance_before_kobo, balance_after_kobo, 
+       (wallet_id, type, amount, balance_before, balance_after, 
         task_id, note, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
       [
@@ -447,7 +451,7 @@ export async function getWallet(userId: string): Promise<{
       id: string;
       balance_kobo: number;
       escrow_kobo: number;
-    }>(`SELECT id, balance_kobo, escrow_kobo FROM wallets WHERE user_id = $1`, [
+    }>(`SELECT id, balance AS balance_kobo, escrow AS escrow_kobo FROM wallets WHERE user_id = $1`, [
       userId,
     ]);
 

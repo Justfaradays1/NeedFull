@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { useAuthStore } from "@/store";
+import { Callout } from "@/components/ui/callout";
+import { TrustIndicators } from "@/components/ui/trust-badge";
+import { PasswordInput } from "@/components/ui/password-input";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,13 +39,17 @@ export default function LoginPage() {
 
     const formData = new FormData(e.currentTarget);
 
+    const loadingToast = toast.loading("Signing in...");
     try {
       await login(
         formData.get("email") as string,
         formData.get("password") as string,
       );
-      router.replace("/feed");
+      toast.dismiss(loadingToast);
+      toast.success("Welcome back to NeedFull!");
+      setTimeout(() => router.replace("/feed"), 1200);
     } catch {
+      toast.dismiss(loadingToast);
       // Error already handled by store — useEffect will display it
     }
   }
@@ -50,8 +58,8 @@ export default function LoginPage() {
     <div className="auth-page flex min-h-screen flex-col bg-white">
       <div className="border-b border-gray-200 px-4 py-6 sm:px-6">
         <a href="/" className="inline-flex items-center gap-2.5" aria-label="NeedFull home">
-          <div className="w-10 h-10 bg-brand rounded-[10px] flex items-center justify-center text-gold">
-            <svg viewBox="0 3 36 30" fill="none" className="w-[26px] h-[26px]">
+          <div className="w-11 h-11 bg-brand rounded-[12px] flex items-center justify-center text-gold" style={{ boxShadow: 'inset 0 1px 0 rgba(234,163,37,0.3)' }}>
+            <svg viewBox="0 3 36 30" fill="none" className="w-[28px] h-[28px]">
               <rect x="12" y="24" width="16" height="2.5" rx="1.25" fill="currentColor" opacity="0.18"/>
               <rect x="2" y="27.5" width="26" height="3" rx="1.5" fill="currentColor" opacity="0.28"/>
               <circle cx="23" cy="9" r="4" fill="currentColor"/>
@@ -68,26 +76,35 @@ export default function LoginPage() {
               <circle cx="16" cy="21" r="1.5" fill="#1A6B4A"/>
             </svg>
           </div>
-          <span className="font-bold text-lg font-display text-gray-900">NeedFull</span>
+          <span className="font-bold text-xl font-display text-gray-900">NeedFull</span>
         </a>
-        <p className="mt-1 text-sm text-gray-500">Student task marketplace at FUOYE</p>
       </div>
       <div className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6">
         <div className="w-full max-w-sm">
           {verified && (
-            <div className="mb-4 rounded-[10px] border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+            <Callout variant="success">
               Email verified successfully. You can now sign in.
-            </div>
+            </Callout>
           )}
           <h2 className="mb-6 text-xl font-bold text-gray-900">Welcome back</h2>
           <form action="/api/auth/login" method="POST" onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
-              <input id="email" name="email" type="email" required className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="you@example.com" />
+              <input id="email" name="email" type="email" required autoComplete="email" className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="you@example.com" />
             </div>
             <div className="space-y-1.5">
               <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
-              <input id="password" name="password" type="password" required className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="Enter your password" />
+              <PasswordInput
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+                disabled={isLoadingStore}
+                autoComplete="current-password"
+                autoCorrect="on"
+                autoCapitalize="on"
+                spellCheck={true}
+              />
             </div>
             <div className="flex justify-end">
               <a href="/forgot-password" className="text-xs font-medium text-brand hover:underline">Forgot password?</a>
@@ -112,6 +129,9 @@ export default function LoginPage() {
             Don&apos;t have an account?{' '}
             <a href="/register" className="font-semibold text-brand hover:underline">Create one</a>
           </p>
+          <div className="mt-8 border-t border-gray-100 pt-6">
+            <TrustIndicators horizontal />
+          </div>
         </div>
       </div>
     </div>

@@ -10,11 +10,16 @@ export async function listConversations(req: Request, res: Response): Promise<vo
   try {
     const userId = req.user!.id;
     const result = await db.query<any>(
-      `SELECT c.id, c.task_id, c.other_user_id, c.last_message, c.last_message_at, c.created_at,
+      `SELECT c.id, c.task_id,
+        CASE WHEN c.participant_a = $1 THEN c.participant_b ELSE c.participant_a END as other_user_id,
+        (SELECT content FROM messages WHERE conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message,
+        c.last_message_at, c.created_at,
         jsonb_build_object('id', u.id, 'fullName', u.full_name, 'profilePictureUrl', u.profile_picture_url) as other_user,
         (SELECT COUNT(*) FROM messages WHERE conversation_id = c.id AND sender_id != $1 AND is_read = false) as unread_count
-       FROM conversations c JOIN users u ON c.other_user_id = u.id
-       WHERE c.user_id = $1 ORDER BY c.last_message_at DESC NULLS LAST`,
+       FROM conversations c
+       JOIN users u ON (CASE WHEN c.participant_a = $1 THEN c.participant_b ELSE c.participant_a END) = u.id
+       WHERE $1 IN (c.participant_a, c.participant_b)
+       ORDER BY c.last_message_at DESC NULLS LAST`,
       [userId],
     );
     res.json({ success: true, data: result.rows.map((r: any) => ({ id: r.id, taskId: r.task_id, otherUser: r.other_user, lastMessage: r.last_message, lastMessageAt: r.last_message_at, unreadCount: parseInt(r.unread_count, 10), createdAt: r.created_at })) });
@@ -29,26 +34,21 @@ export async function getOrCreateConversation(req: Request, res: Response): Prom
     const userId = req.user!.id;
     const { otherUserId } = req.body;
 
-    // WHAT: Check if conversation already exists
+    // WHAT: Check if conversation already exists (either direction)
     const existing = await db.query<any>(
-      `SELECT id, task_id, other_user_id FROM conversations WHERE user_id = $1 AND other_user_id = $2 LIMIT 1`,
+      `SELECT id, task_id FROM conversations
+       WHERE (participant_a = $1 AND participant_b = $2) OR (participant_a = $2 AND participant_b = $1)
+       LIMIT 1`,
       [userId, otherUserId],
     );
     if (existing.rows.length > 0) { res.json({ success: true, data: { id: existing.rows[0].id, taskId: existing.rows[0].task_id } }); return; }
 
-    // WHAT: Also check reverse direction
-    const reverse = await db.query<any>(
-      `SELECT id, task_id, other_user_id FROM conversations WHERE user_id = $1 AND other_user_id = $2 LIMIT 1`,
-      [otherUserId, userId],
-    );
-    if (reverse.rows.length > 0) { res.json({ success: true, data: { id: reverse.rows[0].id, taskId: reverse.rows[0].task_id } }); return; }
-
-    // WHAT: Create new conversation (bidirectional entries for easy querying)
+    // WHAT: Create new conversation with single row (participant_a/b)
     const conversationId = uuidv4();
     const now = new Date().toISOString();
     await db.query(
-      "INSERT INTO conversations (id, user_id, other_user_id, created_at) VALUES ($1, $2, $3, $4), ($5, $3, $2, $4)",
-      [conversationId, userId, otherUserId, now, uuidv4()],
+      "INSERT INTO conversations (id, participant_a, participant_b, created_at) VALUES ($1, $2, $3, $4)",
+      [conversationId, userId, otherUserId, now],
     );
 
     res.status(201).json({ success: true, data: { id: conversationId } });
@@ -68,7 +68,7 @@ export async function getMessages(req: Request, res: Response): Promise<void> {
 
     // WHAT: Verify user is part of this conversation
     const conv = await db.query<any>(
-      "SELECT id FROM conversations WHERE id = $1 AND user_id = $2 LIMIT 1",
+      "SELECT id FROM conversations WHERE id = $1 AND $2 IN (participant_a, participant_b) LIMIT 1",
       [conversationId, userId],
     );
     if (conv.rows.length === 0) { res.status(403).json({ success: false, message: "Access denied" }); return; }
@@ -93,7 +93,7 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
     const userId = req.user!.id;
     const conversationId = req.params.id;
 
-    const conv = await db.query<any>("SELECT id FROM conversations WHERE id = $1 AND user_id = $2 LIMIT 1", [conversationId, userId]);
+    const conv = await db.query<any>("SELECT id FROM conversations WHERE id = $1 AND $2 IN (participant_a, participant_b) LIMIT 1", [conversationId, userId]);
     if (conv.rows.length === 0) { res.status(403).json({ success: false, message: "Access denied" }); return; }
 
     const messageId = uuidv4();
@@ -103,10 +103,10 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
       [messageId, conversationId, userId, req.body.content, now],
     );
 
-    // WHAT: Update last_message on conversation
+    // WHAT: Update last_message_at on conversation (no last_message column on conversations)
     await db.query(
-      "UPDATE conversations SET last_message = $1, last_message_at = $2 WHERE id = $3",
-      [req.body.content, now, conversationId],
+      "UPDATE conversations SET last_message_at = $1 WHERE id = $2",
+      [now, conversationId],
     );
 
     res.status(201).json({ success: true, data: { id: messageId, senderId: userId, content: req.body.content, createdAt: now } });

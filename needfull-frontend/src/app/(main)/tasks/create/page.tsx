@@ -324,7 +324,7 @@ export default function CreateTaskPage() {
                 Category
               </label>
               {catLoading ? (
-                <div className="flex items-center gap-2 text-sm text-gray-400">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Loading categories...
                 </div>
@@ -451,7 +451,7 @@ export default function CreateTaskPage() {
                   type="text"
                   value={locationLabel}
                   onChange={(e) => setLocationLabel(e.target.value)}
-                  placeholder="e.g. New Lecture Hall, FUOYE"
+                  placeholder="e.g. New Lecture Hall, Main Campus"
                   className={`flex-1 rounded-xl border-2 px-4 py-3 text-sm outline-none transition-colors placeholder:text-gray-400 ${
                     errors.locationLabel
                       ? 'border-red-300 focus:border-red-500'
@@ -491,7 +491,7 @@ export default function CreateTaskPage() {
             {/* Deadline */}
             <div>
               <label className="mb-1 block text-sm font-bold text-gray-800">
-                Deadline <span className="font-normal text-gray-400">(optional)</span>
+                Deadline <span className="font-normal text-gray-500">(optional)</span>
               </label>
               <div className="relative">
                 <Clock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -642,7 +642,7 @@ export default function CreateTaskPage() {
                 <span className="flex items-center gap-1 text-xs font-medium text-gray-700">
                   <MapPin className="h-3 w-3" />
                   {locationLabel}
-                  {lat !== null && <span className="text-gray-400">(GPS)</span>}
+                  {lat !== null && <span className="text-gray-500">(GPS)</span>}
                 </span>
               </div>
 

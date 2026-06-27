@@ -20,7 +20,7 @@ type TabKey = 'overview' | 'reviews' | 'activity' | 'settings';
 
 interface UserProfile {
   id: string; fullName: string; email: string; phone: string | null;
-  bio: string | null; department: string | null; level: string | null;
+  school: string | null; bio: string | null; department: string | null; level: string | null;
   hostel: string | null; skills: string[] | null;
   locationLabel: string | null; profilePictureUrl: string | null;
   trustScore: number; tasksCompleted: number;
@@ -193,7 +193,7 @@ export default function ProfilePage() {
   return (
     <div className="pb-8">
       {/* Header */}
-      <div className="bg-gradient-to-br from-brand to-brand-dark px-4 pb-8 pt-6 text-white">
+      <div className="glass-dark px-4 pb-8 pt-6 text-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -216,7 +216,7 @@ export default function ProfilePage() {
                 <h2 className="font-display text-lg font-bold truncate">{profile.fullName}</h2>
                 {profile.isVerifiedStudent && <BadgeCheck className="h-5 w-5 shrink-0 text-gold" />}
               </div>
-              <p className="text-sm text-white/80">Federal University Oye-Ekiti (FUOYE)</p>
+              <p className="text-sm text-white/80">{profile.school || 'Your campus'}</p>
               {profile.department && <p className="text-xs text-white/60">{profile.department}</p>}
             </div>
           </div>
@@ -317,7 +317,7 @@ export default function ProfilePage() {
                       <StarRating rating={r.rating} />
                     </div>
                     {r.comment && <p className="mt-1.5 text-sm text-gray-600">{r.comment}</p>}
-                    <p className="mt-1 text-[10px] text-gray-400">{new Date(r.createdAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                    <p className="mt-1 text-[10px] text-gray-500">{new Date(r.createdAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                   </div>
                 ))}
               </div>
@@ -400,8 +400,10 @@ export default function ProfilePage() {
 
       {/* Edit Profile Modal */}
       {editOpen && (
-        <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center">
-          <div className="w-full rounded-t-2xl bg-white p-5 sm:max-w-md sm:rounded-2xl sm:mx-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="glass-overlay fixed inset-0 z-50 flex items-end sm:items-center" onClick={() => setEditOpen(false)}>
+          <div className="glass-white w-full rounded-t-3xl px-4 pb-safe pb-8 pt-1 sm:max-w-md sm:mx-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-gray-300" />
+            <div className="px-4">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-display text-base font-bold text-gray-900">Edit Profile</h3>
               <button type="button" onClick={() => setEditOpen(false)} className="tap-target"><X className="h-5 w-5 text-gray-400" /></button>
@@ -422,6 +424,7 @@ export default function ProfilePage() {
               <button type="button" onClick={() => setEditOpen(false)} className="tap-target flex-1 rounded-xl border border-gray-200 py-3 text-sm font-bold text-gray-600">Cancel</button>
               <button type="button" onClick={handleEditSave} className="tap-target flex-1 rounded-xl bg-brand py-3 text-sm font-bold text-white">Save</button>
             </div>
+            </div>
           </div>
         </div>
       )}
@@ -438,8 +441,8 @@ function ToggleRow({ label, enabled, onToggle, disabled, disabledHint }: {
   return (
     <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
       <div>
-        <span className={`text-sm font-semibold ${disabled ? 'text-gray-400' : 'text-gray-700'}`}>{label}</span>
-        {disabled && disabledHint && <p className="text-[10px] text-gray-400">{disabledHint}</p>}
+        <span className={`text-sm font-semibold ${disabled ? 'text-gray-500' : 'text-gray-700'}`}>{label}</span>
+        {disabled && disabledHint && <p className="text-[10px] text-gray-500">{disabledHint}</p>}
       </div>
       <button type="button" onClick={onToggle} disabled={disabled} className="tap-target text-brand disabled:text-gray-300">
         {enabled ? <ToggleRight className="h-7 w-7" /> : <ToggleLeft className="h-7 w-7" />}
@@ -471,7 +474,7 @@ function VerificationRow({ icon, label, verified, detail, onVerify, uploading }:
           {uploading ? 'Uploading...' : 'Verify'}
         </button>
       ) : (
-        <span className="text-xs text-gray-400">—</span>
+        <span className="text-xs text-gray-500">—</span>
       )}
     </div>
   );

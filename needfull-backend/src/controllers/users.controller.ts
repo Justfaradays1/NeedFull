@@ -17,7 +17,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
         u.hostel, u.skills, u.location_label, u.profile_picture_url,
         u.trust_score, u.tasks_completed, u.is_available, u.is_runner,
         u.email_verified, u.is_verified_student, u.created_at,
-        jsonb_build_object('id', w.id, 'balanceKobo', w.balance_kobo, 'escrowKobo', w.escrow_kobo) as wallet,
+        jsonb_build_object('id', w.id, 'balanceKobo', w.balance, 'escrowKobo', w.escrow) as wallet,
         jsonb_build_object('accountNumber', va.account_number, 'bankName', va.bank_name, 'accountName', va.account_name) as virtual_account
       FROM users u
       JOIN wallets w ON w.user_id = u.id

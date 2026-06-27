@@ -3,7 +3,7 @@ const FEATURES = [
   { title: 'Get paid fast', desc: 'Once the task poster confirms completion, escrow releases your payment instantly to your wallet.' },
   { title: 'Build your reputation', desc: 'Every completed task grows your trust score. Higher trust = access to better-paying tasks.' },
   { title: 'No interview needed', desc: 'No CVs, no cover letters. Your trust score and task history speak for themselves.' },
-  { title: 'Campus only', desc: 'All tasks are within FUOYE. No commuting, no travel costs \u2014 just walk across campus.' },
+  { title: 'Campus only', desc: 'All tasks are on your campus. No commuting, no travel costs \u2014 just walk across campus.' },
   { title: 'Wide variety of tasks', desc: "Research assistance, delivery, tutoring, graphic design, event help \u2014 find what you're good at." },
 ];
 

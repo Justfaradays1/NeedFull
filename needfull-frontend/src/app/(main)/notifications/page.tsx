@@ -136,11 +136,14 @@ export default function NotificationsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top bar */}
-      <div className="sticky top-0 z-10 flex items-center justify-between bg-white px-4 py-3 shadow-sm">
-        <h1 className="font-display text-lg font-bold text-gray-900">Notifications</h1>
+      <div className="glass-dark sticky top-0 z-30 flex items-center justify-between px-4 py-3">
+        <div>
+          <h1 className="font-display text-xl font-bold text-white">Notifications</h1>
+          <p className="text-xs text-white/70">Stay updated on your tasks and activity</p>
+        </div>
         {unreadCount > 0 && (
           <button type="button" onClick={handleMarkAllRead}
-            className="tap-target flex items-center gap-1.5 rounded-lg bg-brand-light px-3 py-1.5 text-xs font-bold text-brand"
+            className="tap-target flex items-center gap-1.5 rounded-lg bg-white/15 px-3 py-1.5 text-xs font-bold text-white/90 hover:bg-white/25"
           >
             <CheckCheck className="h-3.5 w-3.5" />
             Mark all read
@@ -153,12 +156,19 @@ export default function NotificationsPage() {
         {loading ? (
           <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-brand" /></div>
         ) : list.length === 0 ? (
-          <div className="flex flex-col items-center py-16 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <CheckCheck className="h-8 w-8 text-green-600" />
+          <div className="flex flex-col items-center pt-16 text-center">
+            <div className="relative mb-6">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-50">
+                <CheckCheck className="h-10 w-10 text-green-400" />
+              </div>
+              <div className="absolute -bottom-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md">
+                <Bell className="h-5 w-5 text-brand" />
+              </div>
             </div>
-            <p className="mt-4 font-display text-lg font-bold text-gray-900">You&apos;re all caught up</p>
-            <p className="mt-1 text-sm text-gray-500">No new notifications</p>
+            <p className="font-display text-xl font-bold text-gray-900">You&apos;re all caught up</p>
+            <p className="mt-1.5 max-w-xs text-sm leading-relaxed text-gray-500">
+              Notifications about task applications, messages, and platform updates will show up here.
+            </p>
           </div>
         ) : (
           Array.from(groups.entries()).map(([label, items]) => (
@@ -192,7 +202,7 @@ export default function NotificationsPage() {
                               <p className={`text-sm ${showUnread ? 'font-bold text-gray-900' : 'font-medium text-gray-600'}`}>
                                 {n.title}
                               </p>
-                              <span className="shrink-0 text-[10px] text-gray-400">{timeAgo(n.createdAt)}</span>
+                              <span className="shrink-0 text-[10px] text-gray-500">{timeAgo(n.createdAt)}</span>
                             </div>
                             {n.body && <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">{n.body}</p>}
                           </div>

@@ -202,7 +202,7 @@ export default function VirtualFundPage() {
           <p className="mt-4 text-sm font-medium text-gray-600">
             Setting up your personal account...
           </p>
-          <p className="mt-1 text-xs text-gray-400">
+          <p className="mt-1 text-xs text-gray-500">
             This should take just a moment
           </p>
         </div>
@@ -362,7 +362,7 @@ export default function VirtualFundPage() {
                   <p className="mt-2 text-sm text-gray-500">
                     No virtual deposits yet
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-500">
                     Transfer to your account above and it will appear here
                   </p>
                 </div>
@@ -378,7 +378,7 @@ export default function VirtualFundPage() {
                           {formatDate(tx.createdAt)}
                         </p>
                         {tx.note && (
-                          <p className="mt-0.5 text-xs text-gray-400 truncate max-w-[200px]">
+                          <p className="mt-0.5 text-xs text-gray-500 truncate max-w-[200px]">
                             {tx.note}
                           </p>
                         )}
@@ -388,7 +388,7 @@ export default function VirtualFundPage() {
                           +₦{formatNaira(tx.amount.kobo)}
                         </p>
                         {tx.balanceAfter && (
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-gray-500">
                             Bal: ₦{formatNaira(tx.balanceAfter.kobo)}
                           </p>
                         )}

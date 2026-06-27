@@ -120,6 +120,11 @@ app.use("/api/reports", reportsRoutes);
 import uploadRoutes from "./routes/upload.routes";
 app.use("/api/upload", uploadRoutes);
 
+// WHAT: Mount user preferences routes
+// WHY: Per-user preferences (theme, notifications, defaults)
+import preferencesRoutes from "./routes/preferences.routes";
+app.use("/api/user", preferencesRoutes);
+
 // WHAT: Health check endpoint
 // WHY: Uptime monitoring and deployment verification
 app.get("/api/health", (_req, res) => {

@@ -350,7 +350,7 @@ export default function WalletPage() {
               Transaction History
             </h2>
             {pagination && (
-              <span className="text-xs text-gray-400">{pagination.total} total</span>
+              <span className="text-xs text-gray-500">{pagination.total} total</span>
             )}
           </div>
 
@@ -358,7 +358,7 @@ export default function WalletPage() {
             <div className="py-12 text-center">
               <Banknote className="mx-auto h-10 w-10 text-gray-300" />
               <p className="mt-3 text-sm font-medium text-gray-500">No transactions yet</p>
-              <p className="mt-1 text-xs text-gray-400">
+              <p className="mt-1 text-xs text-gray-500">
                 Fund your wallet or complete a task to get started
               </p>
             </div>

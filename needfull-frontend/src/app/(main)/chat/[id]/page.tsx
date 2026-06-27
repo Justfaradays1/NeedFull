@@ -42,7 +42,7 @@ function Bubble({ msg, isMine }: { msg: Message; isMine: boolean }) {
       }`}>
         <p className="whitespace-pre-wrap break-words">{msg.content}</p>
         <div className={`mt-0.5 flex items-center justify-end gap-1 ${
-          isMine ? 'text-white/70' : 'text-gray-400'
+          isMine ? 'text-white/70' : 'text-gray-500'
         }`}>
           <span className="text-[10px]">{time}</span>
           {isMine && (
@@ -268,7 +268,7 @@ export default function ChatThreadPage() {
       <div className="flex-1 overflow-y-auto py-3 space-y-2">
         {messages.length === 0 && !loading && (
           <div className="flex h-full items-center justify-center">
-            <p className="text-sm text-gray-400">No messages yet. Say hello!</p>
+            <p className="text-sm text-gray-500">No messages yet. Say hello!</p>
           </div>
         )}
         {messages.map((msg) => (

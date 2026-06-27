@@ -42,7 +42,7 @@ export async function apply(
 ): Promise<any> {
   // WHAT: Validate task exists and is open
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, title, budget_kobo, status, runner_id FROM tasks WHERE id = $1`,
+    `SELECT id, poster_id, title, budget_kobo, status, assigned_to as runner_id FROM tasks WHERE id = $1`,
     [params.taskId],
   );
 
@@ -110,7 +110,7 @@ export async function acceptApplication(
     `SELECT
       a.id as app_id, a.task_id, a.runner_id, a.proposed_amount_kobo, a.counter_amount_kobo,
       a.agreed_amount_kobo, a.status as app_status,
-      t.poster_id, t.title, t.budget_kobo, t.status as task_status, t.runner_id as task_runner_id
+      t.poster_id, t.title, t.budget_kobo, t.status as task_status, t.assigned_to as task_runner_id
      FROM task_applications a
      JOIN tasks t ON a.task_id = t.id
      WHERE a.id = $1`,
@@ -151,7 +151,7 @@ export async function acceptApplication(
     // WHAT: Update task to in_progress with runner and agreed amount
     await client.query(
       `UPDATE tasks
-       SET status = 'in_progress', runner_id = $1, agreed_amount_kobo = $2, updated_at = NOW()
+       SET status = 'in_progress', assigned_to = $1, agreed_amount_kobo = $2, updated_at = NOW()
        WHERE id = $3`,
       [runnerId, agreedAmountKobo, taskId],
     );
@@ -348,7 +348,7 @@ export async function acceptCounterOffer(
 
     await client.query(
       `UPDATE tasks
-       SET status = 'in_progress', runner_id = $1, agreed_amount_kobo = $2, updated_at = NOW()
+       SET status = 'in_progress', assigned_to = $1, agreed_amount_kobo = $2, updated_at = NOW()
        WHERE id = $3`,
       [runnerId, agreedAmountKobo, taskId],
     );

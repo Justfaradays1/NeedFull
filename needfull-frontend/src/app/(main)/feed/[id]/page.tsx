@@ -118,12 +118,12 @@ export default function TaskDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="sticky top-0 z-10 bg-white px-4 py-3 shadow-sm">
+      <div className="glass-dark sticky top-0 z-30 px-4 py-3">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-gray-100">
-            <ArrowLeft className="h-5 w-5 text-gray-700" />
+          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-white/20">
+            <ArrowLeft className="h-5 w-5 text-white" />
           </button>
-          <h1 className="text-lg font-bold text-gray-900 truncate">{task.title}</h1>
+          <h1 className="text-lg font-bold text-white truncate">{task.title}</h1>
         </div>
       </div>
 
@@ -222,7 +222,7 @@ export default function TaskDetailPage() {
                   min={50}
                 />
               </div>
-              <p className="mt-1 text-[10px] text-gray-400">Leave empty to accept the listed budget</p>
+              <p className="mt-1 text-[10px] text-gray-500">Leave empty to accept the listed budget</p>
             </div>
             <button
               onClick={handleApply}

@@ -1,6 +1,8 @@
 // WHAT: Server-safe navbar that blends into the hero gradient
 // WHY: WASM SWC can't compile client components imported from server components.
-// All interactivity (theme toggle + mobile menu) uses vanilla JS inline.
+// All interactivity (theme toggle + mobile menu) handled by NavbarScript client component.
+
+import NavbarScript from './NavbarScript';
 
 const NAV_LINKS = [
   { href: '#how-it-works', label: 'How it works' },
@@ -135,51 +137,7 @@ export function Navbar() {
         </div>
       </nav>
 
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-(function(){
-  function q(id){return document.getElementById(id)}
-  var toggle=q('theme-toggle'), toggleM=q('theme-toggle-mobile');
-  var menuBtn=q('mobile-menu-btn'), mobileMenu=q('mobile-menu');
-  var icons=[q('theme-icon-sun'),q('theme-icon-moon'),q('m-icon-sun'),q('m-icon-moon')];
-  var menuIcons=[q('menu-icon-open'),q('menu-icon-close')];
-
-  function setUI(theme){
-    icons.forEach(function(el){if(!el)return;el.classList.toggle('hidden',(el.id.indexOf('sun')>=0)!==(theme==='light'))});
-  }
-
-  function toggleTheme(){
-    var html=document.documentElement;
-    var cur=html.getAttribute('data-theme')||'light';
-    var next=cur==='dark'?'light':'dark';
-    html.setAttribute('data-theme',next);
-    try{localStorage.setItem('nf-theme',next)}catch(e){}
-    setUI(next);
-    var meta=document.querySelector('meta[name="theme-color"]');
-    if(meta)meta.setAttribute('content',next==='dark'?'#0a0a0b':'#1A6B4A');
-  }
-
-  if(toggle)toggle.addEventListener('click',toggleTheme);
-  if(toggleM)toggleM.addEventListener('click',toggleTheme);
-
-  if(menuBtn&&mobileMenu){
-    menuBtn.addEventListener('click',function(){
-      var closed=mobileMenu.classList.contains('hidden');
-      mobileMenu.classList.toggle('hidden',!closed);
-      menuBtn.setAttribute('aria-expanded',String(closed));
-      if(menuIcons[0]&&menuIcons[1]){
-        menuIcons[0].classList.toggle('hidden',!closed);
-        menuIcons[1].classList.toggle('hidden',closed);
-      }
-    });
-  }
-
-  setUI(document.documentElement.getAttribute('data-theme')||'light');
-})();
-          `,
-        }}
-      />
+      <NavbarScript />
     </>
   );
 }

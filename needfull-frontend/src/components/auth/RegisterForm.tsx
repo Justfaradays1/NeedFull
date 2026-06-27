@@ -9,10 +9,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff, ChevronLeft } from 'lucide-react';
+import { Eye, EyeOff, ChevronLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/store';
 import { post } from '@/lib/apiClient';
 import { OTPInput } from './OTPInput';
+import { PasswordStrength } from '@/components/ui/password-strength';
+import { sanitizeName } from '@/lib/sanitize';
 import {
   registerDetailsSchema,
   registerVerifySchema,
@@ -43,12 +45,17 @@ export function RegisterForm() {
     profile: null,
   });
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // WHAT: Step 1 - Details form
   const detailsForm = useForm<RegisterDetailsData>({
     resolver: zodResolver(registerDetailsSchema),
-    mode: 'onBlur',
+    mode: 'onChange',
   });
+
+  const passwordValue = detailsForm.watch('password');
+  const detailsErrors = detailsForm.formState.errors;
 
   // WHAT: Step 2 - OTP form
   const verifyForm = useForm<RegisterVerifyData>({
@@ -176,12 +183,23 @@ export function RegisterForm() {
               type="text"
               placeholder="John Doe"
               disabled={isLoading}
-              className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50"
-              {...detailsForm.register('fullName')}
+              autoComplete="off"
+              className={`tap-target w-full rounded-lg border bg-white px-4 py-3 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
+                detailsErrors.fullName ? 'border-danger focus:border-danger' : 'border-gray-300 focus:border-brand'
+              }`}
+              {...detailsForm.register('fullName', {
+                onChange: (e) => {
+                  const sanitized = e.target.value.replace(/[<>]/g, '');
+                  if (sanitized !== e.target.value) {
+                    detailsForm.setValue('fullName', sanitized);
+                  }
+                },
+              })}
             />
-            {detailsForm.formState.errors.fullName && (
-              <p className="text-sm text-danger">
-                {detailsForm.formState.errors.fullName.message}
+            {detailsErrors.fullName && (
+              <p className="flex items-center gap-1 text-sm text-danger" role="alert">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {detailsErrors.fullName.message}
               </p>
             )}
           </div>
@@ -196,12 +214,22 @@ export function RegisterForm() {
               type="email"
               placeholder="you@example.com"
               disabled={isLoading}
-              className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50"
+              autoComplete="off"
+              className={`tap-target w-full rounded-lg border bg-white px-4 py-3 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
+                detailsErrors.email ? 'border-danger focus:border-danger' : 'border-gray-300 focus:border-brand'
+              }`}
               {...detailsForm.register('email')}
             />
-            {detailsForm.formState.errors.email && (
-              <p className="text-sm text-danger">
-                {detailsForm.formState.errors.email.message}
+            {detailsErrors.email && (
+              <p className="flex items-center gap-1 text-sm text-danger" role="alert">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {detailsErrors.email.message}
+              </p>
+            )}
+            {detailsForm.getValues('email') && !detailsErrors.email && (
+              <p className="flex items-center gap-1 text-sm text-green-600">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                Email looks good
               </p>
             )}
           </div>
@@ -214,14 +242,18 @@ export function RegisterForm() {
             <input
               id="phone"
               type="tel"
-              placeholder="+234 (0) 123 4567"
+              placeholder="+234 801 234 5678"
               disabled={isLoading}
-              className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50"
+              autoComplete="off"
+              className={`tap-target w-full rounded-lg border bg-white px-4 py-3 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
+                detailsErrors.phone ? 'border-danger focus:border-danger' : 'border-gray-300 focus:border-brand'
+              }`}
               {...detailsForm.register('phone')}
             />
-            {detailsForm.formState.errors.phone && (
-              <p className="text-sm text-danger">
-                {detailsForm.formState.errors.phone.message}
+            {detailsErrors.phone && (
+              <p className="flex items-center gap-1 text-sm text-danger" role="alert">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {detailsErrors.phone.message}
               </p>
             )}
           </div>
@@ -231,18 +263,47 @@ export function RegisterForm() {
             <label htmlFor="password" className="block text-sm font-medium">
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Enter a strong password"
-              disabled={isLoading}
-              className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50"
-              {...detailsForm.register('password')}
-            />
-            {detailsForm.formState.errors.password && (
-              <p className="text-sm text-danger">
-                {detailsForm.formState.errors.password.message}
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Create a password"
+                disabled={isLoading}
+                autoComplete="new-password"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                className={`tap-target w-full rounded-lg border bg-white px-4 py-3 pr-12 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
+                  detailsErrors.password ? 'border-danger focus:border-danger' : 'border-gray-300 focus:border-brand'
+                }`}
+                {...detailsForm.register('password', {
+                  onChange: (e) => {
+                    const sanitized = e.target.value.replace(/[<>\s]/g, '');
+                    if (sanitized !== e.target.value) {
+                      detailsForm.setValue('password', sanitized);
+                    }
+                  },
+                })}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                disabled={isLoading}
+                className="tap-target absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:text-gray-300"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
+            </div>
+            {detailsErrors.password && (
+              <p className="flex items-center gap-1 text-sm text-danger" role="alert">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {detailsErrors.password.message}
               </p>
+            )}
+            <PasswordStrength password={passwordValue || ''} />
+            {passwordValue && (
+              <p className="text-[11px] text-gray-500">At least 8 characters</p>
             )}
           </div>
 
@@ -251,17 +312,41 @@ export function RegisterForm() {
             <label htmlFor="confirmPassword" className="block text-sm font-medium">
               Confirm password
             </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm your password"
-              disabled={isLoading}
-              className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50"
-              {...detailsForm.register('confirmPassword')}
-            />
-            {detailsForm.formState.errors.confirmPassword && (
-              <p className="text-sm text-danger">
-                {detailsForm.formState.errors.confirmPassword.message}
+            <div className="relative">
+              <input
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Repeat your password"
+                disabled={isLoading}
+                autoComplete="new-password"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                className={`tap-target w-full rounded-lg border bg-white px-4 py-3 pr-12 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
+                  detailsErrors.confirmPassword ? 'border-danger focus:border-danger' : 'border-gray-300 focus:border-brand'
+                }`}
+                {...detailsForm.register('confirmPassword')}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                disabled={isLoading}
+                className="tap-target absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:text-gray-300"
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
+            </div>
+            {detailsErrors.confirmPassword && (
+              <p className="flex items-center gap-1 text-sm text-danger" role="alert">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {detailsErrors.confirmPassword.message}
+              </p>
+            )}
+            {passwordValue && !detailsErrors.password && !detailsErrors.confirmPassword && (
+              <p className="flex items-center gap-1 text-sm text-green-600">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                Passwords match
               </p>
             )}
           </div>

@@ -269,8 +269,10 @@ export default function AdminUsersPage() {
 
       {/* Ban Confirmation Modal */}
       {banConfirmId && (
-        <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center">
-          <div className="w-full rounded-t-2xl bg-white p-5 sm:max-w-md sm:rounded-2xl sm:mx-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="glass-overlay fixed inset-0 z-50 flex items-end sm:items-center" onClick={() => setBanConfirmId(null)}>
+          <div className="glass-white w-full rounded-t-3xl px-4 pb-safe pb-8 pt-1 sm:max-w-md sm:mx-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-gray-300" />
+            <div className="px-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100"><Ban className="h-5 w-5 text-red-600" /></div>
               <div>
@@ -286,14 +288,17 @@ export default function AdminUsersPage() {
                 {submitting ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : 'Ban User'}
               </button>
             </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* Add Credit Modal */}
       {creditId && (
-        <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center">
-          <div className="w-full rounded-t-2xl bg-white p-5 sm:max-w-md sm:rounded-2xl sm:mx-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="glass-overlay fixed inset-0 z-50 flex items-end sm:items-center" onClick={() => setCreditId(null)}>
+          <div className="glass-white w-full rounded-t-3xl px-4 pb-safe pb-8 pt-1 sm:max-w-md sm:mx-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-gray-300" />
+            <div className="px-4">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-display text-base font-bold text-gray-900">Add Admin Credit</h3>
               <button type="button" onClick={() => setCreditId(null)} className="tap-target"><X className="h-5 w-5 text-gray-400" /></button>
@@ -312,6 +317,7 @@ export default function AdminUsersPage() {
               >
                 Add Credit
               </button>
+            </div>
             </div>
           </div>
         </div>

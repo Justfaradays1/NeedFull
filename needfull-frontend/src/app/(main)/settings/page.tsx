@@ -108,7 +108,7 @@ export default function SettingsPage() {
         </div>
 
         {user && (
-          <p className="text-center text-xs text-gray-400">
+          <p className="text-center text-xs text-gray-500">
             Logged in as {user.email} &middot; v1.0.0
           </p>
         )}

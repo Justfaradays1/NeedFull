@@ -18,13 +18,13 @@ export async function getDashboardStats(_req: Request, res: Response): Promise<v
         (SELECT COUNT(*) FROM tasks) as total_tasks,
         (SELECT COUNT(*) FROM tasks WHERE status = 'open') as open_tasks,
         (SELECT COUNT(*) FROM tasks WHERE status = 'completed') as completed_tasks,
-        (SELECT COALESCE(SUM(amount_kobo), 0) FROM wallet_transactions WHERE type IN ('earnings', 'card_deposit', 'manual_deposit_confirmed')) as total_volume_kobo,
-        (SELECT COALESCE(SUM(amount_kobo), 0) FROM wallet_transactions WHERE type IN ('earnings', 'card_deposit', 'manual_deposit_confirmed') AND created_at >= CURRENT_DATE) as today_volume_kobo,
+        (SELECT COALESCE(SUM(amount), 0) FROM wallet_transactions WHERE type IN ('earnings', 'card_deposit', 'manual_deposit_confirmed')) as total_volume_kobo,
+        (SELECT COALESCE(SUM(amount), 0) FROM wallet_transactions WHERE type IN ('earnings', 'card_deposit', 'manual_deposit_confirmed') AND created_at >= CURRENT_DATE) as today_volume_kobo,
         (SELECT COUNT(*) FROM manual_transfers WHERE status = 'pending') as pending_manual_transfers,
         (SELECT COUNT(*) FROM withdrawal_requests WHERE status = 'pending') as pending_withdrawals,
         (SELECT COUNT(*) FROM student_id_verifications WHERE status = 'pending') as pending_verifications,
         (SELECT COUNT(*) FROM reports WHERE status = 'open') as open_reports,
-        (SELECT COALESCE(SUM(amount_kobo), 0) FROM wallet_transactions WHERE type = 'platform_fee') as platform_earnings_kobo
+        (SELECT COALESCE(SUM(amount), 0) FROM wallet_transactions WHERE type = 'platform_fee') as platform_earnings_kobo
     `);
     const r = result.rows[0];
     res.json({
@@ -73,7 +73,7 @@ export async function listUsers(req: Request, res: Response): Promise<void> {
       db.query<any>(
         `SELECT u.id, u.full_name, u.email, u.role, u.trust_score, u.tasks_completed, u.is_verified_student,
                 u.is_runner, u.is_available, u.is_banned, u.created_at,
-          jsonb_build_object('balanceKobo', w.balance_kobo, 'escrowKobo', w.escrow_kobo) as wallet
+          jsonb_build_object('balanceKobo', w.balance, 'escrowKobo', w.escrow) as wallet
          FROM users u JOIN wallets w ON w.user_id = u.id ${whereSQL} ORDER BY u.created_at DESC LIMIT $${idx} OFFSET $${idx + 1}`,
         [...params, perPage, offset],
       ),
@@ -388,7 +388,7 @@ export async function listPlatformTransactions(req: Request, res: Response): Pro
     const whereSQL = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
     const [rows, countRes] = await Promise.all([
       db.query<any>(
-        `SELECT wt.id, wt.user_id, wt.type, wt.amount_kobo, wt.balance_before, wt.balance_after, wt.description, wt.reference, wt.created_at,
+        `SELECT wt.id, wt.user_id, wt.type, wt.amount AS amount_kobo, wt.balance_before, wt.balance_after, wt.description, wt.reference, wt.created_at,
           jsonb_build_object('id', u.id, 'fullName', u.full_name, 'email', u.email) as "user"
          FROM wallet_transactions wt JOIN users u ON wt.user_id = u.id
          ${whereSQL} ORDER BY wt.created_at DESC LIMIT $${idx} OFFSET $${idx + 1}`,
