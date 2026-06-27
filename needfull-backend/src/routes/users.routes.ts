@@ -34,7 +34,7 @@ router.patch("/me/location",
 
 router.patch("/me/available", users.toggleAvailable);
 
-router.patch("/me/runner-mode",
+router.patch("/me/runner",
   body("isRunner").isBoolean(),
   validate,
   users.toggleRunnerMode,
