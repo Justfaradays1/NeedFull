@@ -15,6 +15,7 @@ export interface AuthUser {
   role: "student" | "admin";
   emailVerified: boolean;
   trustScore: number;
+  profilePictureUrl?: string | null;
   wallet?: {
     id: string;
     balanceKobo: number;

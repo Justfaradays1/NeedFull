@@ -9,6 +9,7 @@ import {
   Shield, SendHorizontal,
 } from 'lucide-react';
 import { get } from '@/lib/apiClient';
+import { Avatar } from '@/components/ui/avatar';
 
 interface OtherUser {
   id: string; fullName: string; profilePictureUrl: string | null;
@@ -192,7 +193,7 @@ export default function ChatPage() {
                 </Link>
                 <Link
                   href="/explore"
-                  className="tap-target inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-bold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.97]"
+                  className="tap-target inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-surface px-5 py-3 text-sm font-bold text-gray-600 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.97]"
                 >
                   <SendHorizontal className="h-4 w-4" />
                   Browse Services
@@ -228,7 +229,7 @@ export default function ChatPage() {
                     <Link
                       key={task.id}
                       href={`/tasks/${task.id}`}
-                      className="tap-target block w-[180px] shrink-0 rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md active:scale-[0.98]"
+                      className="tap-target block w-[180px] shrink-0 rounded-xl border border-card-border bg-surface p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md active:scale-[0.98]"
                     >
                       <div className="mb-1.5 flex items-center gap-1.5">
                         {task.isUrgent && (
@@ -300,24 +301,18 @@ export default function ChatPage() {
                 key={c.id}
                 type="button"
                 onClick={() => router.push(`/chat/${c.id}`)}
-                className="tap-target flex w-full items-center gap-3 rounded-xl border border-transparent bg-white px-3 py-3 text-left shadow-sm transition-all hover:border-gray-200 hover:shadow-md active:scale-[0.98]"
+                className="tap-target flex w-full items-center gap-3 rounded-xl border border-transparent bg-surface px-3 py-3 text-left shadow-sm transition-all hover:border-card-border hover:shadow-md active:scale-[0.98]"
               >
                 {/* Avatar + online status */}
                 <div className="relative shrink-0">
-                  {c.otherUser.profilePictureUrl ? (
-                    <img src={c.otherUser.profilePictureUrl} alt="" className="h-12 w-12 rounded-full border border-gray-200 object-cover" />
-                  ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-light text-sm font-bold text-brand">
-                      {c.otherUser.fullName?.charAt(0)?.toUpperCase() || '?'}
-                    </div>
-                  )}
+                  <Avatar src={c.otherUser.profilePictureUrl} name={c.otherUser.fullName} size="lg" />
                   <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500" />
                 </div>
 
                 {/* Content */}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
-                    <span className={`truncate text-sm ${c.unreadCount > 0 ? 'font-bold text-gray-900' : 'font-semibold text-gray-700'}`}>
+                      <span className={`truncate text-sm ${c.unreadCount > 0 ? 'font-bold text-gray-900' : 'font-semibold text-gray-600'}`}>
                       {c.otherUser.fullName}
                     </span>
                     <span className="shrink-0 text-[10px] text-gray-400">{timeAgo(c.lastMessageAt)}</span>

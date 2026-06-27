@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useIsAuthenticated, useAuthInit, useAuthUser } from '@/store';
 import { get } from '@/lib/apiClient';
+import { Avatar } from '@/components/ui/avatar';
 
 // WHAT: Task row from API
 interface TaskRow {
@@ -57,7 +58,7 @@ function StatusBadge({ status }: { status: string }) {
 
 function PostedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
   return (
-    <button type="button" onClick={onTap} className="tap-target w-full rounded-2xl border border-gray-100 bg-white p-4 text-left shadow-card transition-shadow duration-200 active:scale-[0.99] hover:border-brand/30">
+    <button type="button" onClick={onTap} className="tap-target w-full rounded-2xl border border-card-border bg-surface p-4 text-left shadow-card transition-shadow duration-200 active:scale-[0.99] hover:border-brand/30">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <h3 className="text-sm font-semibold text-gray-900 line-clamp-1">{task.title}</h3>
@@ -86,16 +87,14 @@ function PostedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
 function AcceptedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
   const isInProgress = task.status === 'in_progress';
   return (
-    <button type="button" onClick={onTap} className={`tap-target w-full rounded-2xl border bg-white p-4 text-left shadow-card transition-shadow duration-200 active:scale-[0.99] hover:border-brand/30 ${isInProgress ? 'border-brand/20 ring-1 ring-brand/10' : 'border-gray-100'}`}>
+    <button type="button" onClick={onTap} className={`tap-target w-full rounded-2xl border bg-surface p-4 text-left shadow-card transition-shadow duration-200 active:scale-[0.99] hover:border-brand/30 ${isInProgress ? 'border-brand/20 ring-1 ring-brand/10' : 'border-card-border'}`}>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-semibold text-gray-900 line-clamp-1">{task.title}</h3>
           </div>
           <div className="mt-1 flex items-center gap-2 text-[11px] text-gray-500">
-            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-light text-[9px] font-bold text-brand">
-              {task.poster?.fullName?.charAt(0)?.toUpperCase() || '?'}
-            </div>
+            <Avatar name={task.poster?.fullName} size="xs" />
             <span>{task.poster?.fullName || 'Unknown'}</span>
           </div>
         </div>
@@ -118,7 +117,7 @@ function AcceptedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
 
 function SkeletonRow() {
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
+    <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 space-y-2">
           <div className="h-4 w-3/4 skeleton rounded" />
@@ -198,7 +197,7 @@ export default function MyTasksPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white shadow-sm">
+      <div className="sticky top-0 z-10 bg-surface shadow-sm">
         <div className="flex items-center justify-between px-4 py-3">
           <h1 className="font-display text-lg font-bold text-gray-900">My Tasks</h1>
           <Link

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -12,6 +12,8 @@ import {
 import { useAuthUser, useAuthStore } from '@/store';
 import { get } from '@/lib/apiClient';
 import { Callout } from '@/components/ui/callout';
+import { Avatar } from '@/components/ui/avatar';
+import { Dropdown } from '@/components/ui/dropdown';
 
 /* ─── Types ─── */
 
@@ -67,58 +69,32 @@ function TaskSkeleton() {
 
 /* ─── Profile Dropdown ─── */
 
-function ProfileDropdown({ onClose }: { onClose: () => void }) {
+function ProfileDropdown({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const user = useAuthUser();
   const logout = useAuthStore((s) => s.logout);
-  const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [onClose]);
-
-  const initials = user?.fullName?.charAt(0)?.toUpperCase() || '?';
-
-  return (
-    <>
-      <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div
-        ref={ref}
-        className="absolute right-0 top-full z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-lg"
-      >
-        <div className="flex items-center gap-3 border-b border-gray-100 px-4 py-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">
-            {initials}
-          </div>
+  const items = [
+    {
+      key: 'header',
+      render: () => (
+        <div className="flex items-center gap-3 border-b border-card-border px-4 py-3">
+          <Avatar src={user?.profilePictureUrl} name={user?.fullName} email={user?.email} size="lg" />
           <div className="min-w-0">
             <p className="truncate text-sm font-bold text-gray-900">{user?.fullName}</p>
-            <p className="truncate text-[11px] text-gray-600">{user?.email}</p>
+            <p className="truncate text-[11px] text-gray-500">{user?.email}</p>
           </div>
         </div>
-        <button type="button" onClick={() => { onClose(); router.push('/profile'); }}
-          className="tap-target flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
-          <User className="h-4 w-4 text-gray-400" /> Profile
-        </button>
-        <button type="button" onClick={() => { onClose(); router.push('/wallet'); }}
-          className="tap-target flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
-          <WalletIcon className="h-4 w-4 text-gray-400" /> Wallet
-        </button>
-        <button type="button" onClick={() => { onClose(); router.push('/settings'); }}
-          className="tap-target flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
-          <Settings className="h-4 w-4 text-gray-400" /> Settings
-        </button>
-        <div className="border-t border-gray-100" />
-        <button type="button" onClick={() => { onClose(); logout(); router.push('/login'); }}
-          className="tap-target flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50">
-          <LogOut className="h-4 w-4" /> Log Out
-        </button>
-      </div>
-    </>
-  );
+      ),
+    },
+    { key: 'profile', label: 'Profile', icon: <User size={16} />, onClick: () => router.push('/profile') },
+    { key: 'wallet', label: 'Wallet', icon: <WalletIcon size={16} />, onClick: () => router.push('/wallet') },
+    { key: 'settings', label: 'Settings', icon: <Settings size={16} />, onClick: () => router.push('/settings') },
+    { key: 'divider', render: () => <div className="border-t border-card-border" /> },
+    { key: 'logout', label: 'Log Out', icon: <LogOut size={16} />, variant: 'danger' as const, onClick: () => { logout(); router.push('/login'); } },
+  ];
+
+  return <Dropdown items={items}>{children}</Dropdown>;
 }
 
 /* ─── Task Card (solid — no glass on dense content) ─── */
@@ -127,7 +103,7 @@ function TaskCard({ task }: { task: TaskItem }) {
   return (
     <Link
       href={`/feed/${task.id}`}
-      className="tap-target block w-[200px] shrink-0 rounded-xl border border-gray-100 glass-card p-3 transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
+      className="tap-target block w-[200px] shrink-0 rounded-xl border border-card-border glass-card p-3 transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
     >
       <div className="mb-1.5 flex items-center gap-1.5">
         {task.isUrgent && (
@@ -165,13 +141,13 @@ function PopularCategoryCard({ cat }: { cat: typeof POPULAR_CATEGORIES[number] }
   return (
     <button
       type="button"
-      className="tap-target flex shrink-0 flex-col items-center gap-1.5 rounded-xl border border-gray-100 glass-card px-4 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md active:scale-[0.97]"
+      className="tap-target flex flex-col items-center gap-1.5 rounded-xl border border-card-border bg-surface px-3 py-3 shadow-card transition-all hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-lifted active:scale-[0.97]"
     >
       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-light">
         <Icon className="h-4 w-4 text-brand" />
       </div>
       <span className="text-[11px] font-bold text-gray-900 text-center leading-tight">{cat.name}</span>
-              <span className="text-[9px] text-gray-700 text-center leading-tight">{cat.desc}</span>
+      <span className="text-[9px] text-gray-600 text-center leading-tight">{cat.desc}</span>
     </button>
   );
 }
@@ -181,14 +157,12 @@ function PopularCategoryCard({ cat }: { cat: typeof POPULAR_CATEGORIES[number] }
 export default function FeedPage() {
   const router = useRouter();
   const user = useAuthUser();
-  const [profileOpen, setProfileOpen] = useState(false);
 
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [tasksLoading, setTasksLoading] = useState(true);
   const [postedCount, setPostedCount] = useState<number | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  const initials = user?.fullName?.charAt(0)?.toUpperCase() || '?';
   const balanceKobo = user?.wallet?.balanceKobo ?? 0;
   const balanceNaira = (balanceKobo / 100).toLocaleString();
 
@@ -237,19 +211,15 @@ export default function FeedPage() {
             </div>
             <span className="font-display text-lg font-bold text-white">NeedFull</span>
           </div>
-          <div className="relative">
+          <ProfileDropdown>
             <button
               type="button"
-              onClick={() => setProfileOpen((p) => !p)}
               className="tap-target flex items-center gap-2 rounded-full bg-white/10 px-2 py-1.5 pr-3 transition-colors hover:bg-white/20"
             >
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-xs font-bold text-white">
-                {initials}
-              </div>
+              <Avatar name={user?.fullName} email={user?.email} size="sm" />
               <ChevronRight className="h-3 w-3 text-white/60" />
             </button>
-            {profileOpen && <ProfileDropdown onClose={() => setProfileOpen(false)} />}
-          </div>
+          </ProfileDropdown>
         </div>
       </div>
 
@@ -355,7 +325,7 @@ export default function FeedPage() {
             <Star className="h-4 w-4 text-gold" />
             Popular Categories
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {POPULAR_CATEGORIES.map((cat) => <PopularCategoryCard key={cat.id} cat={cat} />)}
           </div>
         </section>

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { get, patch } from '@/lib/apiClient';
 import { useAuthUser, useAuthStore } from '@/store';
+import { Avatar } from '@/components/ui/avatar';
 
 interface Runner {
   id: string; fullName: string; bio: string | null;
@@ -30,16 +31,10 @@ function RunnerCard({ runner, onTap }: RunnerCardProps) {
   const topSkill = runner.skills?.[0] || null;
   return (
     <button type="button" onClick={onTap}
-      className="tap-target flex w-[140px] shrink-0 flex-col items-center rounded-2xl border border-gray-100 bg-white p-4 text-center shadow-card transition-shadow duration-200 active:scale-[0.99] hover:border-brand/20"
+      className="tap-target flex w-[140px] shrink-0 flex-col items-center rounded-2xl border border-card-border bg-surface p-4 text-center shadow-card transition-shadow duration-200 active:scale-[0.99] hover:border-brand/20"
     >
       <div className="relative">
-        {runner.profilePictureUrl ? (
-          <img src={runner.profilePictureUrl} alt="" className="h-12 w-12 rounded-full border-2 border-white object-cover shadow-sm" />
-        ) : (
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-light text-sm font-bold text-brand">
-            {runner.fullName.charAt(0)?.toUpperCase() || '?'}
-          </div>
-        )}
+        <Avatar src={runner.profilePictureUrl} name={runner.fullName} size="lg" />
         <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500" />
       </div>
       <p className="mt-2 w-full truncate text-sm font-bold text-gray-900">{runner.fullName}</p>
@@ -68,7 +63,7 @@ function TrustScoreSection({ score }: { score: number }) {
     'Verify your student ID for a trust bonus',
   ];
   return (
-    <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+    <div className="rounded-xl border border-card-border bg-surface p-4 shadow-sm">
       <div className="flex items-center gap-3">
         <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
           <svg className="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
@@ -102,7 +97,7 @@ function CreditsSection({ balanceKobo }: { balanceKobo: number }) {
   const credits = Math.floor(balanceKobo / 100); // proxy: ₦1 = 1 credit
   const progress = Math.min((credits / 500) * 100, 100);
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
+    <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50">
           <Award className="h-5 w-5 text-gold-dark" />

@@ -255,7 +255,7 @@ export default function CreateTaskPage() {
           <button
             type="button"
             onClick={() => router.push('/feed')}
-            className="tap-target w-full rounded-xl border border-gray-300 bg-white py-3.5 text-base font-semibold text-gray-700 hover:bg-gray-50"
+            className="tap-target w-full rounded-xl border border-gray-300 bg-surface py-3.5 text-base font-semibold text-gray-600 hover:bg-gray-50"
           >
             Back to Feed
           </button>
@@ -268,7 +268,7 @@ export default function CreateTaskPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* WHAT: Top bar with back button */}
-      <div className="sticky top-0 z-10 bg-white px-4 py-3 shadow-sm">
+      <div className="sticky top-0 z-10 bg-surface px-4 py-3 shadow-sm">
         <div className="mx-auto flex max-w-lg items-center gap-3">
           <button
             type="button"
@@ -287,7 +287,7 @@ export default function CreateTaskPage() {
                         ? 'bg-brand text-white'
                         : step === s.num
                           ? 'border-2 border-brand bg-brand text-white'
-                          : 'border-2 border-gray-300 bg-white text-gray-400'
+                          : 'border-2 border-gray-300 bg-surface text-gray-400'
                     }`}
                   >
                     {step > s.num ? <Check className="h-3 w-3" /> : s.num}
@@ -338,11 +338,11 @@ export default function CreateTaskPage() {
                       className={`tap-target flex flex-col items-center gap-1 rounded-xl border-2 p-3 text-center transition-all ${
                         categoryId === cat.id
                           ? 'border-gold bg-gold-light/30 shadow-sm'
-                          : 'border-gray-200 bg-white hover:border-gray-300'
+                          : 'border-card-border bg-surface hover:border-gray-300'
                       }`}
                     >
                       <span className="text-lg">{cat.icon}</span>
-                      <span className="text-[10px] font-medium leading-tight text-gray-700">
+                      <span className="text-[10px] font-medium leading-tight text-gray-600">
                         {cat.name}
                       </span>
                     </button>
@@ -462,7 +462,7 @@ export default function CreateTaskPage() {
                   type="button"
                   onClick={detectLocation}
                   disabled={locating}
-                  className="tap-target flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-xl border-2 border-gray-200 bg-white text-gray-500 hover:border-brand hover:text-brand disabled:opacity-50"
+                  className="tap-target flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-xl border-2 border-card-border bg-surface text-gray-500 hover:border-brand hover:text-brand disabled:opacity-50"
                 >
                   {locating ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -505,7 +505,7 @@ export default function CreateTaskPage() {
             </div>
 
             {/* Urgent toggle */}
-            <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-gray-200 bg-white px-4 py-3.5 transition-colors hover:border-gold/50">
+            <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-card-border bg-surface px-4 py-3.5 transition-colors hover:border-gold/50">
               <div className="flex items-center gap-3">
                 <div className={`flex h-9 w-9 items-center justify-center rounded-full ${
                   isUrgent ? 'bg-gold/20' : 'bg-gray-100'
@@ -538,7 +538,7 @@ export default function CreateTaskPage() {
 
             {/* Emergency toggle — only for verified students */}
             {user.emailVerified && (
-              <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-gray-200 bg-white px-4 py-3.5 transition-colors hover:border-red-300">
+              <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-card-border bg-surface px-4 py-3.5 transition-colors hover:border-red-300">
                 <div className="flex items-center gap-3">
                   <div className={`flex h-9 w-9 items-center justify-center rounded-full ${
                     isEmergency ? 'bg-red-100' : 'bg-gray-100'
@@ -591,7 +591,7 @@ export default function CreateTaskPage() {
             </h2>
 
             {/* Summary card */}
-            <div className="space-y-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
+            <div className="space-y-4 rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
               {/* Category */}
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Category</span>
@@ -717,7 +717,7 @@ export default function CreateTaskPage() {
             <button
               type="button"
               onClick={prevStep}
-              className="tap-target flex w-14 items-center justify-center rounded-xl border-2 border-gray-200 bg-white py-3.5 hover:bg-gray-50"
+              className="tap-target flex w-14 items-center justify-center rounded-xl border-2 border-card-border bg-surface py-3.5 hover:bg-gray-50"
             >
               <ChevronLeft className="h-5 w-5 text-gray-600" />
             </button>

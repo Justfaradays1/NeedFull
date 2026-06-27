@@ -15,6 +15,7 @@ import { useAuthUser, useAuthStore } from '@/store';
 import { get, patch, post } from '@/lib/apiClient';
 import apiClient from '@/lib/apiClient';
 import toast from 'react-hot-toast';
+import { Avatar } from '@/components/ui/avatar';
 
 type TabKey = 'overview' | 'reviews' | 'activity' | 'settings';
 
@@ -273,7 +274,7 @@ export default function ProfilePage() {
       <div className="sticky top-0 z-10 mx-4 mt-4 flex gap-1 rounded-xl bg-gray-100 p-1">
         {(['overview', 'reviews', 'activity', 'settings'] as TabKey[]).map((t) => (
           <button key={t} type="button" onClick={() => setActiveTab(t)}
-            className={`tap-target flex-1 rounded-lg py-2 text-xs font-bold uppercase tracking-wider transition-colors ${activeTab === t ? 'bg-white text-brand shadow-sm' : 'text-gray-500'}`}
+            className={`tap-target flex-1 rounded-lg py-2 text-xs font-bold uppercase tracking-wider transition-colors ${activeTab === t ? 'bg-surface text-brand shadow-sm' : 'text-gray-500'}`}
           >
             {t}
           </button>
@@ -331,9 +332,7 @@ export default function ProfilePage() {
                   <div key={r.id} className="rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-light text-[10px] font-bold text-brand">
-                          {r.reviewer.fullName?.charAt(0)?.toUpperCase() || '?'}
-                        </div>
+                        <Avatar name={r.reviewer.fullName} size="sm" />
                         <span className="text-sm font-semibold text-gray-900">{r.reviewer.fullName}</span>
                       </div>
                       <StarRating rating={r.rating} />

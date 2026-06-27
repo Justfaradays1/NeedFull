@@ -49,10 +49,10 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="sticky top-0 z-10 bg-white px-4 py-3">
+      <div className="sticky top-0 z-10 bg-surface px-4 py-3">
         <div className="flex items-center gap-3">
           <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-gray-100" aria-label="Back">
-            <ArrowLeft className="h-5 w-5 text-gray-700" />
+            <ArrowLeft className="h-5 w-5 text-gray-500" />
           </button>
           <h1 className="text-lg font-bold text-gray-900">Settings</h1>
         </div>
@@ -62,7 +62,7 @@ export default function SettingsPage() {
         {sections.map((section) => (
           <div key={section.title} className="mb-6">
             <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">{section.title}</h2>
-            <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+            <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
               {section.items.map((item) => (
                 <div key={item.label}>
                   {'href' in item ? (

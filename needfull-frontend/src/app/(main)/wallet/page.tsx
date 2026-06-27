@@ -317,7 +317,7 @@ export default function WalletPage() {
       {/* WHAT: Quick stats */}
       <div className="mx-4 mt-4 sm:mx-6">
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
+          <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-light">
                 <TrendingUp className="h-4 w-4 text-brand" />
@@ -328,7 +328,7 @@ export default function WalletPage() {
               ₦{formatNaira(earnedThisMonth)}
             </p>
           </div>
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
+          <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-light">
                 <CheckCircle className="h-4 w-4 text-gold-dark" />
@@ -344,8 +344,8 @@ export default function WalletPage() {
 
       {/* WHAT: Transaction history */}
       <div className="mx-4 mt-4 pb-8 sm:mx-6">
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
-          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+        <div className="rounded-2xl border border-card-border bg-surface shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
+          <div className="flex items-center justify-between border-b border-card-border px-5 py-4">
             <h2 className="font-display text-sm font-bold text-gray-900">
               Transaction History
             </h2>
@@ -363,7 +363,7 @@ export default function WalletPage() {
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-card-border">
               {transactions.map((tx) => {
                 const positive = isPositive(tx.type);
                 const cat = getTxCategory(tx.type);
@@ -415,31 +415,31 @@ export default function WalletPage() {
                           {tx.reference && (
                             <>
                               <p className="text-xs font-medium text-gray-500">Reference</p>
-                              <p className="text-xs font-mono text-gray-700 text-right break-all">{tx.reference}</p>
+                              <p className="text-xs font-mono text-gray-600 text-right break-all">{tx.reference}</p>
                             </>
                           )}
                           {tx.taskTitle && (
                             <>
                               <p className="text-xs font-medium text-gray-500">Task</p>
-                              <p className="text-xs text-gray-700 text-right">{tx.taskTitle}</p>
+                              <p className="text-xs text-gray-600 text-right">{tx.taskTitle}</p>
                             </>
                           )}
                           {tx.note && (
                             <>
                               <p className="text-xs font-medium text-gray-500">Note</p>
-                              <p className="text-xs text-gray-700 text-right">{tx.note}</p>
+                              <p className="text-xs text-gray-600 text-right">{tx.note}</p>
                             </>
                           )}
                           {tx.balanceBefore && (
                             <>
                               <p className="text-xs font-medium text-gray-500">Balance Before</p>
-                              <p className="text-xs text-gray-700 text-right">₦{formatNaira(tx.balanceBefore.kobo)}</p>
+                              <p className="text-xs text-gray-600 text-right">₦{formatNaira(tx.balanceBefore.kobo)}</p>
                             </>
                           )}
                           {tx.balanceAfter && (
                             <>
                               <p className="text-xs font-medium text-gray-500">Balance After</p>
-                              <p className="text-xs text-gray-700 text-right">₦{formatNaira(tx.balanceAfter.kobo)}</p>
+                              <p className="text-xs text-gray-600 text-right">₦{formatNaira(tx.balanceAfter.kobo)}</p>
                             </>
                           )}
                         </div>
@@ -453,12 +453,12 @@ export default function WalletPage() {
 
           {/* Load more */}
           {hasMore && (
-            <div className="border-t border-gray-100 px-5 py-4">
+            <div className="border-t border-card-border px-5 py-4">
               <button
                 type="button"
                 onClick={loadMore}
                 disabled={isLoadingTx}
-                className="tap-target flex w-full items-center justify-center gap-2 rounded-lg border-2 border-gray-200 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-brand hover:text-brand disabled:opacity-50"
+                className="tap-target flex w-full items-center justify-center gap-2 rounded-lg border-2 border-card-border py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:border-brand hover:text-brand disabled:opacity-50"
               >
                 {isLoadingTx ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
