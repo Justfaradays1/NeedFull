@@ -1,11 +1,16 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Callout } from "@/components/ui/callout";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useAuth } from "@/store";
+import axios from "axios";
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const { register: registerUser } = useAuth();
   const [step, setStep] = useState<"register" | "verify">("register");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -13,6 +18,8 @@ export default function RegisterPage() {
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
   async function handleRegister(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -35,32 +42,22 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.dismiss(loadingToast);
-        setError(data.message || data.error || "Registration failed");
-        setLoading(false);
-        return;
-      }
+      const { fullName, email, password, phone } = body as any;
+      await registerUser(fullName, email, password, phone);
 
       toast.dismiss(loadingToast);
       toast.success("Account created! Check your email for the verification code.");
       setEmail(body.email as string);
       setStep("verify");
-    } catch {
+    } catch (err: any) {
       toast.dismiss(loadingToast);
-      setError("Network error. Please try again.");
+      setError(err?.response?.data?.message || err?.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   }
+
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
   async function handleVerify(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -70,27 +67,15 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/verify-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.dismiss(loadingToast);
-        setError(data.message || data.error || "Verification failed");
-        setLoading(false);
-        return;
-      }
+      const res = await axios.post(`${API_BASE}/auth/verify-email`, { email, otp });
+      const data = res.data;
 
       toast.dismiss(loadingToast);
       toast.success("Email verified! You can now sign in.");
-      setTimeout(() => { window.location.href = "/login?verified=1"; }, 1200);
-    } catch {
+      setTimeout(() => { router.push("/login?verified=1"); }, 1200);
+    } catch (err: any) {
       toast.dismiss(loadingToast);
-      setError("Network error. Please try again.");
+      setError(err?.response?.data?.message || err?.message || "Verification failed");
     } finally {
       setLoading(false);
     }
@@ -205,7 +190,7 @@ export default function RegisterPage() {
               </p>
             </>
           ) : (
-            <form action="/api/auth/verify-email" method="POST" onSubmit={handleVerify} className="space-y-4">
+            <form onSubmit={handleVerify} className="space-y-4">
               <h2 className="text-xl font-bold text-gray-900">Check your email</h2>
               <p className="text-sm text-gray-500">
                 We sent a 6-digit verification code to <strong className="text-gray-700">{email}</strong>

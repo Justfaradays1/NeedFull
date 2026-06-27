@@ -72,7 +72,7 @@ export async function register(req: Request, res: Response): Promise<void> {
           email,
           hashedPassword,
           fullName.trim(),
-          phone || null,
+          phone || "",
           "user",
         ],
       );
@@ -90,12 +90,16 @@ export async function register(req: Request, res: Response): Promise<void> {
       [uuidv4(), newUser.id, otp, "email_verification", expiresAt.toISOString()],
     );
 
-    // WHAT: Send OTP email
-    await sendEmail({
-      to: email,
-      subject: "Verify your NeedFull email",
-      html: verificationEmailTemplate(otp, fullName),
-    });
+    // WHAT: Send OTP email (non-blocking — user can still log in and verify later)
+    try {
+      await sendEmail({
+        to: email,
+        subject: "Verify your NeedFull email",
+        html: verificationEmailTemplate(otp, fullName),
+      });
+    } catch (emailError) {
+      console.warn("Failed to send verification email:", emailError);
+    }
 
     // WHAT: Generate JWT tokens for immediate access (optional email verification)
     const accessToken = generateToken(
