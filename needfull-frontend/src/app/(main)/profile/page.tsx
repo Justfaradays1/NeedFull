@@ -95,8 +95,8 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     try {
       const [meRes, pubRes, postedRes] = await Promise.all([
-        get<{ success: boolean; data: UserProfile }>('/user/me'),
-        get<{ success: boolean; data: { recentReviews?: ReviewItem[] } }>(`/user/${storeUser?.id}/public`).catch(() => ({ success: false, data: {} })),
+        get<{ success: boolean; data: UserProfile }>('/users/me'),
+        get<{ success: boolean; data: { recentReviews?: ReviewItem[] } }>(`/users/${storeUser?.id}`).catch(() => ({ success: false, data: {} })),
         get<{ success: boolean; data: TaskRow[] }>('/tasks/me/posted').catch(() => ({ success: false, data: [] })),
       ]);
       if (meRes.success) {
@@ -129,7 +129,7 @@ export default function ProfilePage() {
   const balanceNaira = profile?.wallet ? (profile.wallet.balanceKobo / 100).toLocaleString() : '0';
 
   const handleToggle = async (field: 'isAvailable' | 'isRunner') => {
-    const endpoint = field === 'isAvailable' ? '/user/me/available' : '/user/me/runner';
+    const endpoint = field === 'isAvailable' ? '/users/me/available' : '/users/me/runner';
     const body = field === 'isRunner' ? { isRunner: !profile?.isRunner } : undefined;
     try {
       const res = await (field === 'isAvailable'
@@ -143,7 +143,7 @@ export default function ProfilePage() {
 
   const handleEditSave = async () => {
     try {
-      const res = await patch<{ success: boolean; data: any }>('/user/me', editForm);
+      const res = await patch<{ success: boolean; data: any }>('/users/me', editForm);
       if (res.success) {
         setProfile((p) => p ? { ...p, ...res.data } : null);
         setUser(storeUser ? { ...storeUser, fullName: editForm.fullName } : null);
@@ -159,7 +159,7 @@ export default function ProfilePage() {
     const fd = new FormData();
     fd.append('avatar', file);
     try {
-      const res = await apiClient.post<{ success: boolean; data: { profilePictureUrl: string } }>('/user/me/avatar', fd);
+      const res = await apiClient.post<{ success: boolean; data: { profilePictureUrl: string } }>('/users/me/avatar', fd);
       if (res.data.success) {
         setProfile((p) => p ? { ...p, profilePictureUrl: res.data.data.profilePictureUrl } : null);
         toast.success('Avatar updated');
@@ -174,7 +174,7 @@ export default function ProfilePage() {
     const fd = new FormData();
     fd.append('idCard', file);
     try {
-      await apiClient.post('/user/me/verify-student', fd);
+      await apiClient.post('/users/me/verify-student', fd);
       toast.success('ID card submitted for verification');
     } catch { toast.error('Upload failed'); }
     finally { setUploading(false); }
