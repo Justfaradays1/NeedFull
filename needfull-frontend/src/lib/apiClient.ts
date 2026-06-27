@@ -9,6 +9,7 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
+import { useAuthStore } from '@/store/authStore';
 
 // WHAT: Track if refresh is in progress to prevent multiple simultaneous refresh attempts
 // WHY: Prevents race condition when multiple 401s happen at same time
@@ -122,9 +123,9 @@ apiClient.interceptors.response.use(
         // WHAT: Retry original request with new token
         return apiClient(originalRequest);
       } catch (refreshError) {
-        // WHAT: Clear stored tokens and redirect to login
-        localStorage.removeItem('nf_access_token');
-        localStorage.removeItem('nf_refresh_token');
+        // WHAT: Clear auth state (updates persisted localStorage too) and redirect to login
+        // WHY: Prevents infinite reload loop — Zustand persist would restore isAuthenticated:true on next page load
+        useAuthStore.getState().logout();
 
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
