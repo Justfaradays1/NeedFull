@@ -5,7 +5,7 @@ export function CtaSection() {
         <h2 className="font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>
           Ready to turn campus time into real income?
         </h2>
-        <p className="mt-3 text-[15px]" style={{ color: 'var(--color-muted)' }}>
+        <p className="text-section-desc mt-3" style={{ color: 'var(--color-muted)' }}>
           Join students already earning on NeedFull.
           Set up your profile in 2 minutes. Start today.
         </p>

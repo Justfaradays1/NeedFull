@@ -138,8 +138,8 @@ export default function NotificationsPage() {
       {/* Top bar */}
       <div className="glass-dark sticky top-0 z-30 flex items-center justify-between px-4 py-3">
         <div>
-          <h1 className="font-display text-xl font-bold text-white">Notifications</h1>
-          <p className="text-xs text-white/70">Stay updated on your tasks and activity</p>
+          <h1 className="font-display text-xl font-bold text-white sm:text-2xl">Notifications</h1>
+          <p className="text-xs text-white/70 sm:text-sm">Stay updated on your tasks and activity</p>
         </div>
         {unreadCount > 0 && (
           <button type="button" onClick={handleMarkAllRead}

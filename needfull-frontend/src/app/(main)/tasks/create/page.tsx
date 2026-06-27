@@ -586,7 +586,7 @@ export default function CreateTaskPage() {
         {/* ── Step 3: Review & Post ── */}
         {step === 3 && (
           <div className="space-y-5">
-            <h2 className="font-display text-lg font-bold text-gray-900">
+            <h2 className="font-display text-lg font-bold text-gray-900 sm:text-xl">
               Review your task
             </h2>
 

@@ -12,11 +12,11 @@ export function EarnSection() {
     <section id="features" className="px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-section-alt)' }}>
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="inline-flex items-center rounded-full bg-gold-light px-3.5 py-1 text-[13px] font-semibold" style={{ color: '#B45309' }}>For students who earn</span>
+          <span className="text-section-label inline-flex items-center rounded-full bg-gold-light px-3.5 py-1" style={{ color: '#B45309' }}>For students who earn</span>
           <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>
             Turn free hours into <span className="text-brand">flexible income</span>
           </h2>
-          <p className="mt-3 text-[15px]" style={{ color: 'var(--color-muted)' }}>
+          <p className="text-section-desc mt-3" style={{ color: 'var(--color-muted)' }}>
             No CV required. No fixed schedule. Just real tasks from real students, paid fast.
           </p>
         </div>
@@ -27,8 +27,8 @@ export function EarnSection() {
               <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10">
                 <svg className="h-4 w-4 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
               </div>
-              <h3 className="font-display text-base font-bold" style={{ color: 'var(--color-foreground)' }}>{f.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed" style={{ color: 'var(--color-muted)' }}>{f.desc}</p>
+              <h3 className="font-display text-base font-bold sm:text-lg" style={{ color: 'var(--color-foreground)' }}>{f.title}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed sm:text-base" style={{ color: 'var(--color-muted)' }}>{f.desc}</p>
             </div>
           ))}
         </div>

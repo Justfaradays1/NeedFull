@@ -130,11 +130,13 @@ function CreditsSection({ balanceKobo }: { balanceKobo: number }) {
 export default function ExplorePage() {
   const router = useRouter();
   const user = useAuthUser();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [runners, setRunners] = useState<Runner[]>([]);
   const [loadingRunners, setLoadingRunners] = useState(true);
   const [geoError, setGeoError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!isAuthenticated) { setLoadingRunners(false); return; }
     if (!navigator.geolocation) {
       setGeoError('Geolocation not available');
       setLoadingRunners(false);
@@ -156,7 +158,7 @@ export default function ExplorePage() {
       },
       { enableHighAccuracy: false, timeout: 8000 },
     );
-  }, []);
+  }, [isAuthenticated]);
 
   const balanceKobo = user?.wallet?.balanceKobo ?? 0;
 
@@ -164,8 +166,8 @@ export default function ExplorePage() {
     <div className="min-h-screen bg-gray-50 pb-8">
       {/* Header */}
       <div className="glass-dark px-4 pb-4 pt-3">
-        <h1 className="font-display text-xl font-bold text-white">Explore</h1>
-        <p className="mt-0.5 text-xs text-white/70">Discover tasks, runners, and more</p>
+        <h1 className="font-display text-xl font-bold text-white sm:text-2xl">Explore</h1>
+        <p className="mt-0.5 text-xs text-white/70 sm:text-sm">Discover tasks, runners, and more</p>
       </div>
 
       <div className="px-4 space-y-5 mt-4">

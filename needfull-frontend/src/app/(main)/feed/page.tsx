@@ -157,6 +157,7 @@ function PopularCategoryCard({ cat }: { cat: typeof POPULAR_CATEGORIES[number] }
 export default function FeedPage() {
   const router = useRouter();
   const user = useAuthUser();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [tasksLoading, setTasksLoading] = useState(true);
@@ -167,6 +168,8 @@ export default function FeedPage() {
   const balanceNaira = (balanceKobo / 100).toLocaleString();
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const fetchAll = async () => {
       try {
         const [tasksRes, postedRes, convRes] = await Promise.all([
@@ -183,7 +186,7 @@ export default function FeedPage() {
       finally { setTasksLoading(false); }
     };
     fetchAll();
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <div className="min-h-screen bg-gray-50 safe-all">
@@ -230,7 +233,7 @@ export default function FeedPage() {
         <div className="glass-card rounded-xl px-4 py-3">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-display text-lg font-bold text-gray-900">
+              <h2 className="font-display text-lg font-bold text-gray-900 sm:text-xl">
                 {greeting()}, {user?.fullName?.split(' ')[0] || 'there'}
               </h2>
               <p className="text-sm text-gray-700">Ready to earn or get things done today?</p>

@@ -26,11 +26,11 @@ export function PosterSection() {
     <section id="safety" className="px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-background)' }}>
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="inline-flex items-center rounded-full bg-brand-light px-3.5 py-1 text-[13px] font-semibold text-brand">For task posters</span>
+          <span className="text-section-label inline-flex items-center rounded-full bg-brand-light px-3.5 py-1 text-brand">For task posters</span>
           <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>
             Get campus tasks done <span className="text-brand">faster</span>
           </h2>
-          <p className="mt-3 text-[15px]" style={{ color: 'var(--color-muted)' }}>
+          <p className="text-section-desc mt-3" style={{ color: 'var(--color-muted)' }}>
             Post what you need, get matched with verified students, and only pay when it&apos;s done right.
           </p>
         </div>
@@ -42,8 +42,8 @@ export function PosterSection() {
                 {f.icon}
               </div>
               <div>
-                <h3 className="font-display text-base font-bold" style={{ color: 'var(--color-foreground)' }}>{f.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--color-muted)' }}>{f.desc}</p>
+                <h3 className="font-display text-base font-bold sm:text-lg" style={{ color: 'var(--color-foreground)' }}>{f.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed sm:text-base" style={{ color: 'var(--color-muted)' }}>{f.desc}</p>
               </div>
             </div>
           ))}

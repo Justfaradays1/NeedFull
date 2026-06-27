@@ -54,7 +54,7 @@ export default function SettingsPage() {
           <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-gray-100" aria-label="Back">
             <ArrowLeft className="h-5 w-5 text-gray-500" />
           </button>
-          <h1 className="text-lg font-bold text-gray-900">Settings</h1>
+          <h1 className="text-lg font-bold text-gray-900 sm:text-xl">Settings</h1>
         </div>
       </div>
 

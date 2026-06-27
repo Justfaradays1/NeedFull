@@ -179,7 +179,7 @@ export default function ChatPage() {
             {/* Empty message */}
             <div className="flex flex-col items-center pt-4 text-center">
               <EmptyIllustration />
-              <h2 className="mt-4 font-display text-xl font-bold text-gray-900">No conversations yet</h2>
+              <h2 className="mt-4 font-display text-xl font-bold text-gray-900 sm:text-2xl">No conversations yet</h2>
               <p className="mt-1.5 max-w-xs text-sm leading-relaxed text-gray-500">
                 When you apply for tasks or receive applications, your conversations will appear here.
               </p>

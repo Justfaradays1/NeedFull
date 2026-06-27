@@ -125,7 +125,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-md">
           {step === "register" ? (
             <>
-              <h2 className="mb-3 text-xl font-bold text-gray-900">Create your NeedFull account</h2>
+              <h2 className="mb-3 text-xl font-bold text-gray-900 sm:text-2xl">Create your NeedFull account</h2>
               <Callout variant="tip" className="mb-4">
                 Complete your profile after signing up to increase trust and get more opportunities.
               </Callout>

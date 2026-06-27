@@ -199,7 +199,7 @@ export default function MyTasksPage() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-surface shadow-sm">
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="font-display text-lg font-bold text-gray-900">My Tasks</h1>
+          <h1 className="font-display text-lg font-bold text-gray-900 sm:text-xl">My Tasks</h1>
           <Link
             href="/tasks/create"
             className="tap-target flex h-9 w-9 items-center justify-center rounded-full bg-brand text-white shadow-sm"

@@ -69,13 +69,13 @@ export function TestimonialsSection() {
     <section id="testimonials" className="overflow-hidden bg-brand-dark py-20 text-white">
       <div className="px-4 text-center sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
-          <span className="inline-flex items-center rounded-full bg-white/10 px-3.5 py-1 text-[13px] font-semibold tracking-wide text-white/80 backdrop-blur-sm">
+          <span className="inline-flex items-center rounded-full bg-white/10 px-3.5 py-1 text-[13px] font-semibold tracking-wide text-white/80 backdrop-blur-sm sm:text-sm">
             What students say
           </span>
           <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight">
             Trusted by campus students
           </h2>
-          <p className="mt-3 text-[15px] text-white/60">
+          <p className="text-section-desc mt-3 text-white/60">
             Real experiences from real users on campus.
           </p>
         </div>

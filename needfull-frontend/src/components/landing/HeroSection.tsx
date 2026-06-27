@@ -7,14 +7,14 @@ export function HeroSection() {
       <div className="relative mx-auto max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
-            <span className="mb-4 inline-flex items-center rounded-full bg-white/10 px-3.5 py-1 text-[13px] font-semibold tracking-wide text-white/90 backdrop-blur-sm">
+            <span className="mb-4 inline-flex items-center rounded-full bg-white/10 px-3.5 py-1 text-[13px] font-semibold tracking-wide text-white/90 backdrop-blur-sm sm:text-sm">
               Now live at FUOYE &middot; More campuses coming
             </span>
             <h1 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-[1.08] tracking-tight">
               Your campus. Your hustle.{' '}
               <span className="text-gold">Real money.</span>
             </h1>
-            <p className="mt-5 max-w-lg text-[17px] leading-relaxed text-white/75">
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-white/75 sm:text-lg">
               Post a task in 60 seconds. Get matched with a trusted nearby student.
               Pay only when the job is done. Always protected.
             </p>
@@ -33,7 +33,7 @@ export function HeroSection() {
                 I need help with a task
               </a>
             </div>
-            <p className="text-white/40 text-sm mt-6">Free to join &middot; No hidden charges &middot; Open to all students</p>
+            <p className="text-white/40 text-sm mt-6 sm:text-base">Free to join &middot; No hidden charges &middot; Open to all students</p>
 
             <div className="mt-12 grid grid-cols-2 gap-3 sm:gap-4">
               {[

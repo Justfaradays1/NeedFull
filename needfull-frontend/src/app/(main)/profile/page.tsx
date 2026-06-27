@@ -236,7 +236,7 @@ export default function ProfilePage() {
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h2 className="font-display text-lg font-bold truncate">{profile.fullName}</h2>
+                <h2 className="font-display text-lg font-bold truncate sm:text-xl">{profile.fullName}</h2>
                 {profile.isVerifiedStudent && <BadgeCheck className="h-5 w-5 shrink-0 text-gold" />}
               </div>
               <p className="text-sm text-white/80">{profile.school || 'Your campus'}</p>

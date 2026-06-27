@@ -244,7 +244,7 @@ export default function WalletPage() {
       {/* WHAT: Gradient brand header */}
       <div className="bg-gradient-to-b from-brand-dark to-brand px-4 pb-8 pt-4 sm:px-6">
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="font-display text-lg font-bold text-white">
+          <h1 className="font-display text-lg font-bold text-white sm:text-xl">
             Wallet
           </h1>
           <button

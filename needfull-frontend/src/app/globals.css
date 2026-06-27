@@ -532,6 +532,27 @@ select {
   z-index: 1;
 }
 
+/* WHAT: Responsive typography scale */
+/* WHY: Consistent text sizing across breakpoints, prevents mobile-only sizing on desktop */
+
+.text-section-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+@media (min-width: 768px) {
+  .text-section-label { font-size: 0.875rem; }
+}
+
+.text-section-desc {
+  font-size: 0.9375rem;
+}
+@media (min-width: 768px) {
+  .text-section-desc { font-size: 1rem; }
+}
+@media (min-width: 1024px) {
+  .text-section-desc { font-size: 1.0625rem; }
+}
+
 /* WHAT: Floating animation for decorative elements */
 /* WHY: Subtle vertical motion for illustrations and icons */
 @keyframes float {

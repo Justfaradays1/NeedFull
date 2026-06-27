@@ -60,6 +60,9 @@ function UnreadBadge() {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
+    const authed = useAuthStore.getState().isAuthenticated;
+    if (!authed) return;
+
     import('@/lib/apiClient').then((mod) => {
       mod.default.get('/notifications/unread-count')
         .then((res) => setCount(res.data?.data?.count ?? 0))

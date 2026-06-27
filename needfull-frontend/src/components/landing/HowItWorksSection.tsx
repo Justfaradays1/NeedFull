@@ -3,11 +3,11 @@ export function HowItWorksSection() {
     <section id="how-it-works" className="px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-background)' }}>
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="inline-flex items-center rounded-full bg-brand-light px-3.5 py-1 text-[13px] font-semibold text-brand">How it works</span>
+          <span className="text-section-label inline-flex items-center rounded-full bg-brand-light px-3.5 py-1 text-brand">How it works</span>
           <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>
             Three steps to your first gig
           </h2>
-          <p className="mt-3 text-[15px]" style={{ color: 'var(--color-muted)' }}>
+          <p className="text-section-desc mt-3" style={{ color: 'var(--color-muted)' }}>
             Whether you&apos;re earning or hiring, getting started
             takes less than 5 minutes.
           </p>
@@ -35,9 +35,9 @@ export function HowItWorksSection() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-light text-brand transition-colors group-hover:bg-brand group-hover:text-white">
                 {item.icon}
               </div>
-              <span className="text-[13px] font-bold tracking-widest text-brand/60">{item.step}</span>
-              <h3 className="mt-1.5 font-display text-lg font-bold" style={{ color: 'var(--color-foreground)' }}>{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--color-muted)' }}>{item.desc}</p>
+              <span className="text-[13px] font-bold tracking-widest text-brand/60 sm:text-sm">{item.step}</span>
+              <h3 className="mt-1.5 font-display text-lg font-bold sm:text-xl" style={{ color: 'var(--color-foreground)' }}>{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed sm:text-base" style={{ color: 'var(--color-muted)' }}>{item.desc}</p>
             </div>
           ))}
         </div>

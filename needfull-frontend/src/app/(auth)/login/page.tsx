@@ -86,7 +86,7 @@ export default function LoginPage() {
               Email verified successfully. You can now sign in.
             </Callout>
           )}
-          <h2 className="mb-6 text-xl font-bold text-gray-900">Welcome back</h2>
+          <h2 className="mb-6 text-xl font-bold text-gray-900 sm:text-2xl">Welcome back</h2>
           <form onSubmit={handleLogin} autoComplete="off" className="space-y-4">
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
