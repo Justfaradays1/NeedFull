@@ -83,6 +83,7 @@ export default function ProfilePage() {
   const [activity, setActivity] = useState<TaskRow[]>([]);
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   // Edit profile modal state
   const [editOpen, setEditOpen] = useState(false);
@@ -93,6 +94,7 @@ export default function ProfilePage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const fetchProfile = async () => {
+    setFetchError(null);
     try {
       const [meRes, pubRes, postedRes] = await Promise.all([
         get<{ success: boolean; data: UserProfile }>('/users/me'),
@@ -109,6 +111,8 @@ export default function ProfilePage() {
           hostel: meRes.data.hostel || '',
           phone: meRes.data.phone || '',
         });
+      } else {
+        setFetchError('Failed to load profile data');
       }
       if ((pubRes as any).success && (pubRes as any).data?.recentReviews) {
         setReviews((pubRes as any).data.recentReviews);
@@ -116,7 +120,10 @@ export default function ProfilePage() {
       if (postedRes.success) {
         setActivity(postedRes.data.filter((t) => t.status === 'completed').slice(0, 10));
       }
-    } catch { /* handled */ }
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Failed to load profile';
+      setFetchError(msg);
+    }
     finally { setLoading(false); }
   };
 
@@ -182,10 +189,25 @@ export default function ProfilePage() {
 
   const handleLogout = () => { logout(); router.push('/login'); };
 
-  if (loading || !profile) {
+  if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (fetchError || !profile) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+          <svg className="h-6 w-6 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        </div>
+        <p className="text-sm font-semibold text-gray-900">Could not load profile</p>
+        <p className="text-xs text-gray-500 text-center max-w-xs">{fetchError || 'An unexpected error occurred'}</p>
+        <button type="button" onClick={fetchProfile} className="mt-2 rounded-xl bg-brand px-5 py-2.5 text-xs font-bold text-white">
+          Try again
+        </button>
       </div>
     );
   }

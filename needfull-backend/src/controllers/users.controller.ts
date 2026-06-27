@@ -17,17 +17,15 @@ export async function getMe(req: Request, res: Response): Promise<void> {
         u.hostel, u.skills, u.location_label, u.profile_picture_url,
         u.trust_score, u.tasks_completed, u.is_available, u.is_runner,
         u.email_verified, u.is_verified_student, u.created_at,
-        jsonb_build_object('id', w.id, 'balanceKobo', w.balance, 'escrowKobo', w.escrow) as wallet,
-        jsonb_build_object('accountNumber', va.account_number, 'bankName', va.bank_name, 'accountName', va.account_name) as virtual_account
+        jsonb_build_object('id', w.id, 'balanceKobo', w.balance, 'escrowKobo', w.escrow) as wallet
       FROM users u
       JOIN wallets w ON w.user_id = u.id
-      LEFT JOIN virtual_accounts va ON va.user_id = u.id AND va.is_active = true
       WHERE u.id = $1`,
       [userId],
     );
     if (result.rows.length === 0) { res.status(404).json({ success: false, message: "User not found" }); return; }
     const r = result.rows[0];
-    res.json({ success: true, data: { id: r.id, fullName: r.full_name, email: r.email, phone: r.phone, bio: r.bio, department: r.department, level: r.level, hostel: r.hostel, skills: r.skills, locationLabel: r.location_label, profilePictureUrl: r.profile_picture_url, trustScore: r.trust_score, tasksCompleted: r.tasks_completed, isAvailable: r.is_available, isRunner: r.is_runner, emailVerified: r.email_verified, isVerifiedStudent: r.is_verified_student, createdAt: r.created_at, wallet: r.wallet, virtualAccount: r.virtual_account } });
+    res.json({ success: true, data: { id: r.id, fullName: r.full_name, email: r.email, phone: r.phone, bio: r.bio, department: r.department, level: r.level, hostel: r.hostel, skills: r.skills, locationLabel: r.location_label, profilePictureUrl: r.profile_picture_url, trustScore: r.trust_score, tasksCompleted: r.tasks_completed, isAvailable: r.is_available, isRunner: r.is_runner, emailVerified: r.email_verified, isVerifiedStudent: r.is_verified_student, createdAt: r.created_at, wallet: r.wallet } });
   } catch (error) {
     console.error("[Users] getMe error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch profile" });
