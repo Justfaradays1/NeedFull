@@ -129,7 +129,7 @@ export default function RegisterPage() {
               <Callout variant="tip" className="mb-4">
                 Complete your profile after signing up to increase trust and get more opportunities.
               </Callout>
-              <form action="/api/auth/register" method="POST" onSubmit={handleRegister} className="space-y-4">
+              <form onSubmit={handleRegister} autoComplete="off" className="space-y-4">
                 <div className="space-y-1.5">
                   <label htmlFor="fullName" className="text-sm font-medium text-gray-700">Full name</label>
                   <input id="fullName" name="fullName" type="text" required autoComplete="off" className="block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" placeholder="John Doe" />
