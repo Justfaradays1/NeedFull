@@ -492,7 +492,15 @@ select {
 }
 
 @supports (backdrop-filter: blur(12px)) {
-  [data-theme="dark"] .glass-card {
+/* --- Card and lifted shadows (missing Tailwind utilities) --- */
+.shadow-card {
+  box-shadow: var(--shadow-card);
+}
+.shadow-lifted {
+  box-shadow: var(--shadow-lifted);
+}
+
+[data-theme="dark"] .glass-card {
     background: rgba(255, 255, 255, 0.05);
   }
 }

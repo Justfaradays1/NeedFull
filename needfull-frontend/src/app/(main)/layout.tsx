@@ -79,7 +79,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const showNav = !pathname.startsWith('/auth');
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
+    <div className="min-h-screen bg-gray-50" style={{ paddingBottom: 'calc(4.5rem + env(safe-area-inset-bottom))' }}>
       <AuthGuard>
         {children}
       </AuthGuard>
