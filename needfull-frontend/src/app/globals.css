@@ -22,6 +22,8 @@
   --color-gray-600: var(--clr-gray-600);
   --color-gray-700: var(--clr-gray-700);
   --color-gray-900: var(--clr-gray-900);
+  --color-surface: var(--clr-surface);
+  --color-card-border: var(--clr-card-border);
 
   --shadow-card: 0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
   --shadow-lifted: 0 8px 24px -4px rgb(0 0 0 / 0.12), 0 2px 6px -2px rgb(0 0 0 / 0.06);
@@ -34,7 +36,6 @@
   --color-foreground: #171717;
   --color-border: #e5e7eb;
   --color-muted: #6b7280;
-  --color-surface: #ffffff;
   --color-surface-2: #f0f2f0;
   --clr-gray-50: #f9fafb;
   --clr-gray-100: #f3f4f6;
@@ -44,9 +45,10 @@
   --clr-gray-600: #4b5563;
   --clr-gray-700: #374151;
   --clr-gray-900: #111827;
+  --clr-surface: #ffffff;
+  --clr-card-border: #f3f4f6;
   --color-info: #2563eb;
   --color-info-light: #eff6ff;
-  --color-surface: #ffffff;
   --color-surface-muted: #f9fafb;
   --color-nav-bg: rgba(255, 255, 255, 0.95);
   --color-hero-bg-start: #0D4F35;
@@ -54,7 +56,6 @@
   --color-hero-text: #ffffff;
   --color-hero-text-muted: rgba(255, 255, 255, 0.7);
   --color-card-bg: #ffffff;
-  --color-card-border: #f3f4f6;
   --color-footer-bg: #f9fafb;
   --color-footer-border: #e5e7eb;
   --color-section-alt: #f9fafb;
@@ -80,7 +81,8 @@
   --color-foreground: #f5f5f4;
   --color-border: #27272a;
   --color-muted: #a1a1aa;
-  --color-surface: #18181b;
+  --clr-surface: #18181b;
+  --clr-card-border: #27272a;
   --color-surface-2: #243828;
   --clr-gray-50: #09090b;
   --clr-gray-100: #18181b;
@@ -92,7 +94,6 @@
   --clr-gray-900: #f5f5f4;
   --color-info: #60a5fa;
   --color-info-light: #172554;
-  --color-surface: #18181b;
   --color-surface-muted: #09090b;
   --color-nav-bg: rgba(24, 24, 27, 0.95);
   --color-hero-bg-start: #0a0a0b;
@@ -100,7 +101,6 @@
   --color-hero-text: #f5f5f4;
   --color-hero-text-muted: rgba(245, 245, 244, 0.65);
   --color-card-bg: #18181b;
-  --color-card-border: #27272a;
   --color-footer-bg: #09090b;
   --color-footer-border: #27272a;
   --color-section-alt: #09090b;
@@ -492,17 +492,17 @@ select {
 }
 
 @supports (backdrop-filter: blur(12px)) {
-/* --- Card and lifted shadows (missing Tailwind utilities) --- */
+  [data-theme="dark"] .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* --- Card and lifted shadows --- */
 .shadow-card {
   box-shadow: var(--shadow-card);
 }
 .shadow-lifted {
   box-shadow: var(--shadow-lifted);
-}
-
-[data-theme="dark"] .glass-card {
-    background: rgba(255, 255, 255, 0.05);
-  }
 }
 
 /* --- Shared inner highlight (top edge light refraction effect) --- */
