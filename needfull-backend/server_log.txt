@@ -845,3 +845,205 @@ GET /api/tasks?sortBy=newest&status=open&perPage=6 304 - - 370.592 ms
 GET /api/auth/me 304 - - 1669.174 ms
 ✓ Database pool connection created
 PATCH /api/users/me/available 200 45 - 3947.110 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.711 ms
+JWT verification error: jwt expired
+GET /api/users/me 401 61 - 1.125 ms
+JWT verification error: jwt expired
+GET /api/users/2dc84329-9ab0-4c9e-a21e-2daeccbd6066 401 61 - 1.119 ms
+JWT verification error: jwt expired
+GET /api/tasks/me/posted 401 61 - 2.447 ms
+JWT verification error: jwt expired
+GET /api/users/me 401 61 - 1.075 ms
+JWT verification error: jwt expired
+GET /api/users/2dc84329-9ab0-4c9e-a21e-2daeccbd6066 401 61 - 1.084 ms
+JWT verification error: jwt expired
+GET /api/tasks/me/posted 401 61 - 1.039 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.226 ms
+JWT verification error: jwt expired
+JWT verification error: jwt expired
+GET /api/tasks/me/posted 401 61 - 1.070 ms
+JWT verification error: jwt expired
+GET /api/chat/conversations 401 61 - 1.023 ms
+[Tasks] listTasksHandler error: Error: getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async listTasks (C:\Users\user\Desktop\NeedFull\needfull-backend\src\services\task.service.ts:215:23)
+    at async listTasksHandler (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\tasks.controller.ts:10:20) {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'aws-1-eu-central-1.pooler.supabase.com'
+}
+GET /api/tasks?sortBy=newest&status=open&perPage=6 500 51 - 11.498 ms
+JWT verification error: jwt expired
+GET /api/tasks/me/posted 401 61 - 1.046 ms
+JWT verification error: jwt expired
+GET /api/wallet/transactions?perPage=5 401 61 - 1.027 ms
+JWT verification error: jwt expired
+[Tasks] listTasksHandler error: Error: getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async listTasks (C:\Users\user\Desktop\NeedFull\needfull-backend\src\services\task.service.ts:215:23)
+    at async listTasksHandler (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\tasks.controller.ts:10:20) {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'aws-1-eu-central-1.pooler.supabase.com'
+}
+GET /api/tasks?sortBy=newest&status=open&perPage=6 500 51 - 3.615 ms
+JWT verification error: jwt expired
+GET /api/user/preferences 401 61 - 1.219 ms
+JWT verification error: jwt expired
+GET /api/chat/conversations 401 61 - 1.038 ms
+JWT verification error: jwt expired
+GET /api/wallet/transactions?perPage=5 401 61 - 1.030 ms
+JWT verification error: jwt expired
+GET /api/notifications/unread-count 401 61 - 2.067 ms
+Failed to load user roles: Error: getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async loadRoles (C:\Users\user\Desktop\NeedFull\needfull-backend\src\middleware\auth.ts:53:18) {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'aws-1-eu-central-1.pooler.supabase.com'
+}
+[Admin] safeCount table "users" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "users" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "tasks" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "tasks" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "tasks" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeSum table "wallet_transactions" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeSum table "wallet_transactions" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "manual_transfers" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "withdrawal_requests" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "student_id_verifications" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "reports" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeSum table "wallet_transactions" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+GET /api/admin/stats 200 330 - 35.058 ms
+Failed to load user roles: Error: getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async loadRoles (C:\Users\user\Desktop\NeedFull\needfull-backend\src\middleware\auth.ts:53:18) {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'aws-1-eu-central-1.pooler.supabase.com'
+}
+Failed to load user roles: Error: getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async loadRoles (C:\Users\user\Desktop\NeedFull\needfull-backend\src\middleware\auth.ts:53:18) {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'aws-1-eu-central-1.pooler.supabase.com'
+}
+Database queryOne error: {
+  sql: 'SELECT theme, preferred_role, sidebar_collapsed, preferred_language, notifications_enabled, notification_sound, email_notifications, task_radius_km, default_sort, available_on_login FROM user_preferences WHERE user_id = $1',
+  error: Error: getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+      at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async queryOne (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:51:20)
+      at async <anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\src\routes\preferences.routes.ts:26:20) {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'aws-1-eu-central-1.pooler.supabase.com'
+  }
+}
+[Preferences] GET error: Error: getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async queryOne (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:51:20)
+    at async <anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\src\routes\preferences.routes.ts:26:20) {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'aws-1-eu-central-1.pooler.supabase.com'
+}
+GET /api/user/preferences 500 57 - 51.909 ms
+[Admin] safeCount table "users" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "users" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "tasks" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "tasks" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "tasks" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeSum table "wallet_transactions" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeSum table "wallet_transactions" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "manual_transfers" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "withdrawal_requests" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "student_id_verifications" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeCount table "reports" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+[Admin] safeSum table "wallet_transactions" failed (table may not exist yet): getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+GET /api/admin/stats 304 - - 52.684 ms
+✓ Database pool connection created
+POST /api/auth/login 200 676 - 4083.570 ms
+GET /api/user/preferences 304 - - 389.093 ms
+GET /api/auth/me 304 - - 193.192 ms
+GET /api/auth/me 304 - - 359.343 ms
+✓ Database pool connection created
+✓ Database pool connection created
+✓ Database pool connection created
+✓ Database pool connection created
+✓ Database pool connection created
+GET /api/tasks/me/posted 304 - - 1900.126 ms
+GET /api/chat/conversations 304 - - 1899.717 ms
+GET /api/notifications/unread-count 304 - - 2413.311 ms
+GET /api/chat/conversations 304 - - 510.903 ms
+GET /api/tasks/me/posted 304 - - 514.371 ms
+GET /api/wallet/transactions?perPage=5 304 - - 2418.264 ms
+GET /api/tasks?sortBy=newest&status=open&perPage=6 200 61 - 2432.937 ms
+GET /api/notifications/unread-count 304 - - 417.747 ms
+GET /api/wallet/transactions?perPage=5 304 - - 883.833 ms
+GET /api/tasks?sortBy=newest&status=open&perPage=6 304 - - 873.536 ms
+PATCH /api/user/preferences 200 270 - 1278.621 ms
+PATCH /api/user/preferences 200 271 - 2696.345 ms
+✓ Database pool connection created
+PATCH /api/user/preferences - - - - ms
+Failed to load user roles: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async loadRoles (C:\Users\user\Desktop\NeedFull\needfull-backend\src\middleware\auth.ts:53:18) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:508:28)
+      at TCP.<anonymous> (node:net:346:12)
+}
+[Users] switchActiveRole error: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async switchActiveRole (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\users.controller.ts:152:15) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:508:28)
+      at TCP.<anonymous> (node:net:346:12)
+}
+POST /api/users/me/switch-role 500 51 - 20033.192 ms
+JWT verification error: jwt expired
+PATCH /api/users/me/available 401 61 - 8.913 ms
+✓ Database pool connection created
+POST /api/auth/refresh 200 492 - 2806.737 ms
+PATCH /api/users/me/available 200 44 - 1872.381 ms
+✓ Database pool connection created
+POST /api/users/me/switch-role 200 47 - 5719.059 ms
+[Cron] Running expired tasks cleanup...
+[Cron] Error processing expired tasks: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async Task._execution (C:\Users\user\Desktop\NeedFull\needfull-backend\src\jobs\cron.ts:14:22) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:508:28)
+      at TCP.<anonymous> (node:net:346:12)
+}
