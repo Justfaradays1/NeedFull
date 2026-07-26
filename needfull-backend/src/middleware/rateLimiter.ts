@@ -41,3 +41,14 @@ export const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+// WHAT: Rate limiter for Google OAuth endpoints
+// WHY: Prevents abuse of OAuth callback endpoint
+// Allows 10 requests per 15 minutes per IP
+export const googleLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: "Too many Google sign-in attempts, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});

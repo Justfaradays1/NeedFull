@@ -1,10 +1,7 @@
-// WHAT: Users routes — profile management
-// WHY: RESTful endpoints for user profile CRUD and preferences
-
 import { Router } from "express";
 import { body, query } from "express-validator";
 import multer from "multer";
-import { authenticate } from "../middleware/auth";
+import { authenticate, requireRole } from "../middleware/auth";
 import { validate } from "../middleware/validate";
 import * as users from "../controllers/users.controller";
 
@@ -23,7 +20,7 @@ router.patch("/me",
   users.updateMe,
 );
 
-router.patch("/me/avatar", upload.single("avatar"), users.updateAvatar);
+router.post("/me/avatar", upload.single("avatar"), users.updateAvatar);
 
 router.patch("/me/location",
   body("lat").isFloat({ min: -90, max: 90 }),
@@ -40,6 +37,21 @@ router.patch("/me/runner",
   users.toggleRunnerMode,
 );
 
+// Role management
+router.post("/me/switch-role",
+  body("role").isString().isIn(["poster", "runner", "business"]),
+  validate,
+  users.switchActiveRole,
+);
+
+router.post("/me/apply-runner", users.applyForRunner);
+
+// Protected routes
+router.get("/me/verification-status", users.getVerificationStatus);
+router.get("/me/trust-breakdown", users.getTrustBreakdown);
+
+router.post("/me/verify-student", upload.single("idCard"), requireRole("poster", "runner"), users.submitStudentVerification);
+
 router.get("/nearby-runners",
   query("lat").isFloat({ min: -90, max: 90 }),
   query("lng").isFloat({ min: -180, max: 180 }),
@@ -49,7 +61,5 @@ router.get("/nearby-runners",
 );
 
 router.get("/:userId", users.getPublicProfile);
-
-router.post("/me/verify-student", upload.single("idCard"), users.submitStudentVerification);
 
 export default router;

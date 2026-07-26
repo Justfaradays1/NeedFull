@@ -1,7 +1,11 @@
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-background)' }}>
-      <div className="mx-auto max-w-6xl">
+    <section id="how-it-works" className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-background)' }}>
+      {/* Faint grid */}
+      <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.15) 1px, transparent 1px)`, backgroundSize: "48px 48px" }} />
+      {/* Subtle glow */}
+      <div className="pointer-events-none absolute -right-32 -top-32 h-72 w-72 rounded-full bg-gold/5 blur-3xl" />
+      <div className="mx-auto max-w-6xl relative z-10">
         <div className="mx-auto max-w-2xl text-center">
           <span className="text-section-label inline-flex items-center rounded-full bg-brand-light px-3.5 py-1 text-brand">How it works</span>
           <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>

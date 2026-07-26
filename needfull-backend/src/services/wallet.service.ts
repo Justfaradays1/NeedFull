@@ -441,8 +441,10 @@ export async function getWallet(userId: string): Promise<{
   id: string;
   balance_kobo: number;
   escrow_kobo: number;
+  pending_kobo: number;
   balance_naira: number;
   escrow_naira: number;
+  pending_naira: number;
 }> {
   try {
     // WHAT: Query wallet without locks (read-only)
@@ -451,7 +453,8 @@ export async function getWallet(userId: string): Promise<{
       id: string;
       balance_kobo: number;
       escrow_kobo: number;
-    }>(`SELECT id, balance AS balance_kobo, escrow AS escrow_kobo FROM wallets WHERE user_id = $1`, [
+      pending_kobo: number;
+    }    >(`SELECT id, balance AS balance_kobo, escrow AS escrow_kobo FROM wallets WHERE user_id = $1`, [
       userId,
     ]);
 
@@ -459,8 +462,10 @@ export async function getWallet(userId: string): Promise<{
       id: result.id,
       balance_kobo: result.balance_kobo,
       escrow_kobo: result.escrow_kobo,
+      pending_kobo: 0,
       balance_naira: result.balance_kobo / 100,
       escrow_naira: result.escrow_kobo / 100,
+      pending_naira: 0,
     };
   } catch (error) {
     throw new Error(

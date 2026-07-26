@@ -1,16 +1,28 @@
-// WHAT: Settings page — notification preferences, app settings, account management
-// WHY: Central place for user to manage their account settings
-// FUTURE: Add theme toggle, language selection, notification channel preferences
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Bell, Shield, ChevronRight, LogOut, User, Lock, HelpCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Bell,
+  Shield,
+  ChevronRight,
+  LogOut,
+  User,
+  Lock,
+  HelpCircle,
+  Wallet,
+  Eye,
+  Briefcase,
+  Volume2,
+  Globe,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthInit, useAuthStore } from "@/store";
+import { get, post, del } from "@/lib/apiClient";
 import apiClient from "@/lib/apiClient";
+import { ToggleRow } from "@/components/ui/toggle";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -19,83 +31,251 @@ export default function SettingsPage() {
   const logout = useAuthStore((s) => s.logout);
   const [loggingOut, setLoggingOut] = useState(false);
 
+  const [notifyTasks, setNotifyTasks] = useState(true);
+  const [notifyChat, setNotifyChat] = useState(true);
+  const [notifyPayments, setNotifyPayments] = useState(true);
+  const [notifyPromo, setNotifyPromo] = useState(false);
+
+  const [urgentAlert, setUrgentAlert] = useState(true);
+
+  const [showRealName, setShowRealName] = useState(true);
+  const [shareLocation, setShareLocation] = useState(true);
+
+  const [googleLinked, setGoogleLinked] = useState<boolean | null>(null);
+  const [linkingGoogle, setLinkingGoogle] = useState(false);
+
+  useEffect(() => {
+    apiClient.get("/auth/me").then((res) => {
+      setGoogleLinked(!!res.data.user?.googleId);
+    }).catch(() => {});
+  }, []);
+
+  const handleLinkGoogle = async () => {
+    setLinkingGoogle(true);
+    try {
+      const googleWindow = window.open(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/auth/google?action=link`,
+        "google-oauth",
+        "width=500,height=600"
+      );
+      if (!googleWindow) {
+        toast.error("Popup blocked. Please allow popups for this site.");
+        return;
+      }
+      const timer = setInterval(() => {
+        if (googleWindow.closed) {
+          clearInterval(timer);
+          apiClient.get("/auth/me").then((res) => {
+            if (!!res.data.user?.googleId) {
+              setGoogleLinked(true);
+              toast.success("Google account linked!");
+            }
+          }).catch(() => {});
+        }
+      }, 500);
+    } catch {
+      toast.error("Failed to link Google account");
+    } finally {
+      setLinkingGoogle(false);
+    }
+  };
+
+  const handleUnlinkGoogle = async () => {
+    try {
+      await apiClient.post("/auth/unlink-google");
+      setGoogleLinked(false);
+      toast.success("Google account unlinked");
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to unlink Google account");
+    }
+  };
+
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
       await apiClient.post("/auth/logout");
-    } catch { /* best-effort */ }
+    } catch {
+      /* best-effort */
+    }
     logout();
     toast.success("Logged out");
     router.push("/login");
   };
 
-  const sections = [
-    {
-      title: "Account",
-      items: [
-        { icon: User, label: "Profile", href: "/profile" },
-        { icon: Shield, label: "Verification", href: "/settings/verification" },
-        { icon: Lock, label: "Change Password", href: "/reset-password" },
-      ],
-    },
-    {
-      title: "Preferences",
-      items: [
-        { icon: Bell, label: "Notifications", description: "Push, email, and in-app preferences" },
-        { icon: HelpCircle, label: "Help & Support" },
-      ],
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="sticky top-0 z-10 bg-surface px-4 py-3">
+    <div className="min-h-screen page-shell">
+      <div className="sticky top-0 z-10 bg-surface px-4 py-3 border-b border-card-border">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-gray-100" aria-label="Back">
+          <button
+            onClick={() => router.back()}
+            className="tap-target rounded-lg p-2 hover:bg-gray-100"
+            aria-label="Back"
+          >
             <ArrowLeft className="h-5 w-5 text-gray-500" />
           </button>
-          <h1 className="text-lg font-bold text-gray-900 sm:text-xl">Settings</h1>
+          <h1 className="text-lg font-bold text-gray-900 sm:text-xl">
+            Settings
+          </h1>
         </div>
       </div>
 
-      <div className="px-4 py-4">
-        {sections.map((section) => (
-          <div key={section.title} className="mb-6">
-            <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">{section.title}</h2>
-            <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
-              {section.items.map((item) => (
-                <div key={item.label}>
-                  {'href' in item ? (
-                    <Link href={(item as { href: string }).href} className="flex items-center justify-between px-4 py-3.5 transition-colors hover:bg-gray-50">
-                      <div className="flex items-center gap-3">
-                        <item.icon className="h-5 w-5 text-gray-400" />
-                        <div>
-                          <span className="text-sm font-medium text-gray-900">{item.label}</span>
-                          {'description' in item && <p className="mt-0.5 text-xs text-gray-500">{(item as { description: string }).description}</p>}
-                        </div>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-gray-400" />
-                    </Link>
-                  ) : (
-                    <div className="flex items-center justify-between px-4 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <item.icon className="h-5 w-5 text-gray-400" />
-                        <div>
-                          <span className="text-sm font-medium text-gray-900">{item.label}</span>
-                          {'description' in item && <p className="mt-0.5 text-xs text-gray-500">{(item as { description: string }).description}</p>}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+      <div className="px-4 py-4 space-y-6">
+        {/* Account */}
+        <section>
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Account
+          </h2>
+          <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
+            <SettingsLink href="/profile" icon={User} label="Profile" />
+            <Divider />
+            <SettingsLink
+              href="/settings/verification"
+              icon={Shield}
+              label="Verification"
+            />
+            <Divider />
+            <SettingsLink
+              href="/reset-password"
+              icon={Lock}
+              label="Change Password"
+            />
+          </div>
+        </section>
+
+        {/* Linked Accounts */}
+        <section>
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Linked Accounts
+          </h2>
+          <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
+            <div className="flex items-center justify-between px-4 py-3.5">
+              <div className="flex items-center gap-3">
+                <Globe className="h-5 w-5 text-gray-400" />
+                <span className="text-sm font-medium text-gray-900">Google</span>
+              </div>
+              {googleLinked === null ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+              ) : googleLinked ? (
+                <button
+                  onClick={handleUnlinkGoogle}
+                  className="rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                >
+                  Unlink
+                </button>
+              ) : (
+                <button
+                  onClick={handleLinkGoogle}
+                  disabled={linkingGoogle}
+                  className="rounded-lg bg-brand px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-brand-mid disabled:opacity-50"
+                >
+                  {linkingGoogle ? "Linking..." : "Link"}
+                </button>
+              )}
             </div>
           </div>
-        ))}
+        </section>
 
-        <div className="mb-6">
-          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">Account</h2>
-          <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+        {/* Notification Preferences */}
+        <section>
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Notifications
+          </h2>
+          <div className="space-y-2">
+            <ToggleRow
+              label="Task alerts"
+              enabled={notifyTasks}
+              onToggle={() => setNotifyTasks((p) => !p)}
+            />
+            <ToggleRow
+              label="New chat messages"
+              enabled={notifyChat}
+              onToggle={() => setNotifyChat((p) => !p)}
+            />
+            <ToggleRow
+              label="Payment & escrow updates"
+              enabled={notifyPayments}
+              onToggle={() => setNotifyPayments((p) => !p)}
+            />
+            <ToggleRow
+              label="Promotional notifications"
+              enabled={notifyPromo}
+              onToggle={() => setNotifyPromo((p) => !p)}
+            />
+          </div>
+        </section>
+
+        {/* Agent / Runner Settings */}
+        <section>
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Agent / Runner
+          </h2>
+          <div className="space-y-2">
+            <ToggleRow
+              label="Urgent task alert priority"
+              enabled={urgentAlert}
+              onToggle={() => setUrgentAlert((p) => !p)}
+            />
+            <SettingsLink
+              href="/settings/services"
+              icon={Briefcase}
+              label="Manage service categories"
+            />
+          </div>
+        </section>
+
+        {/* Privacy & Visibility */}
+        <section>
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Privacy & Visibility
+          </h2>
+          <div className="space-y-2">
+            <ToggleRow
+              label="Show real name publicly"
+              enabled={showRealName}
+              onToggle={() => setShowRealName((p) => !p)}
+            />
+            <ToggleRow
+              label="Share location for task matching"
+              enabled={shareLocation}
+              onToggle={() => setShareLocation((p) => !p)}
+            />
+          </div>
+        </section>
+
+        {/* Wallet & Payments */}
+        <section>
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Wallet & Payments
+          </h2>
+          <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
+            <SettingsLink
+              href="/wallet"
+              icon={Wallet}
+              label="Fund wallet, withdraw, manage banks"
+            />
+          </div>
+        </section>
+
+        {/* Help & Support */}
+        <section>
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Support
+          </h2>
+          <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
+            <SettingsLink
+              href="/support"
+              icon={HelpCircle}
+              label="Help & Support"
+            />
+          </div>
+        </section>
+
+        {/* Sign Out */}
+        <section>
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Account
+          </h2>
+          <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
             <button
               onClick={handleLogout}
               disabled={loggingOut}
@@ -105,7 +285,7 @@ export default function SettingsPage() {
               {loggingOut ? "Logging out..." : "Log out"}
             </button>
           </div>
-        </div>
+        </section>
 
         {user && (
           <p className="text-center text-xs text-gray-500">
@@ -115,4 +295,31 @@ export default function SettingsPage() {
       </div>
     </div>
   );
+}
+
+function SettingsLink({
+  href,
+  icon: Icon,
+  label,
+}: {
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center justify-between px-4 py-3.5 transition-colors hover:bg-gray-100"
+    >
+      <div className="flex items-center gap-3">
+        <Icon className="h-5 w-5 text-gray-400" />
+        <span className="text-sm font-medium text-gray-900">{label}</span>
+      </div>
+      <ChevronRight className="h-4 w-4 text-gray-400" />
+    </Link>
+  );
+}
+
+function Divider() {
+  return <div className="mx-4 border-t border-card-border" />;
 }

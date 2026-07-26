@@ -76,6 +76,27 @@ export function useIsAdmin() {
   return role === "admin";
 }
 
+// WHAT: Hook to get user's assigned roles
+// WHY: Check what roles the user has
+export function useUserRoles() {
+  const user = useAuthStore((state) => state.user);
+  return user?.roles || ["poster"];
+}
+
+// WHAT: Hook to get active role
+// WHY: Drive role-aware UI
+export function useActiveRole() {
+  const user = useAuthStore((state) => state.user);
+  return user?.activeRole || "poster";
+}
+
+// WHAT: Hook to check if user has a specific role
+// WHY: Conditionally render role-specific components
+export function useHasRole(role: string) {
+  const roles = useUserRoles();
+  return roles.includes(role);
+}
+
 // WHAT: Hook to access wallet data
 // WHY: Display balance, escrow, etc.
 export function useWallet() {

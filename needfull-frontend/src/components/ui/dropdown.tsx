@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 interface DropdownItem {
   key: string;
@@ -8,51 +8,74 @@ interface DropdownItem {
   icon?: React.ReactNode;
   href?: string;
   onClick?: () => void;
-  variant?: 'default' | 'danger';
+  variant?: "default" | "danger";
   disabled?: boolean;
   render?: () => React.ReactNode;
 }
 
 interface DropdownProps {
   items: DropdownItem[];
-  align?: 'left' | 'right';
+  align?: "left" | "right";
   children?: React.ReactNode;
   className?: string;
   onItemClick?: (item: DropdownItem) => void;
 }
 
-export function Dropdown({ items, align = 'right', children, className = '', onItemClick }: DropdownProps) {
+export function Dropdown({
+  items,
+  align = "right",
+  children,
+  className = "",
+  onItemClick,
+}: DropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     }
     function handleEscape(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === "Escape") setOpen(false);
     }
     if (open) {
-      document.addEventListener('mousedown', handleClick);
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("mousedown", handleClick);
+      document.addEventListener("keydown", handleEscape);
     }
     return () => {
-      document.removeEventListener('mousedown', handleClick);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [open]);
 
   return (
     <div ref={ref} className={`relative ${className}`}>
-      <div onClick={() => setOpen((p) => !p)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setOpen((p) => !p); }} aria-haspopup="true" aria-expanded={open}>
+      <div
+        onClick={() => setOpen((p) => !p)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") setOpen((p) => !p);
+        }}
+        aria-haspopup="true"
+        aria-expanded={open}
+      >
         {children}
       </div>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div
-            className={`absolute z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl border border-card-border bg-surface py-1 shadow-lifted ${align === 'right' ? 'right-0' : 'left-0'}`}
+            className={`absolute z-50 mt-2 min-w-50 overflow-hidden rounded-xl py-1 profile-dropdown ${align === "right" ? "right-0" : "left-0"}`}
             role="menu"
+            style={{
+              zIndex: 9999,
+              background: "#ffffff",
+              border: "1px solid rgba(0,0,0,0.08)",
+              boxShadow:
+                "0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.10)",
+            }}
           >
             {items.map((item) => {
               if (item.render) return <div key={item.key}>{item.render()}</div>;
@@ -69,14 +92,21 @@ export function Dropdown({ items, align = 'right', children, className = '', onI
                     onItemClick?.(item);
                   }}
                   className={`tap-target flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors
-                    ${item.variant === 'danger'
-                      ? 'text-error hover:bg-error-light'
-                      : item.disabled
-                        ? 'cursor-not-allowed text-gray-400'
-                        : 'text-gray-700 hover:bg-gray-50'
+                    ${
+                      item.variant === "danger"
+                        ? "text-error hover:bg-error-light"
+                        : item.disabled
+                          ? "cursor-not-allowed text-gray-400"
+                          : "text-gray-700 hover:bg-gray-50"
                     }`}
                 >
-                  {item.icon && <span className={`${item.variant === 'danger' ? 'text-error' : 'text-gray-400'}`}>{item.icon}</span>}
+                  {item.icon && (
+                    <span
+                      className={`${item.variant === "danger" ? "text-error" : "text-gray-400"}`}
+                    >
+                      {item.icon}
+                    </span>
+                  )}
                   {item.label}
                 </button>
               );

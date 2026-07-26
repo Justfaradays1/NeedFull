@@ -4,7 +4,7 @@
 import { Request, Response } from "express";
 import db, { withTransaction } from "../config/db";
 import { v4 as uuidv4 } from "uuid";
-import { WITHDRAWAL_FEE_KOBO } from "../config/constants";
+import { WITHDRAWAL_FEE_KOBO, MIN_WITHDRAWAL_KOBO } from "../config/constants";
 
 // WHAT: Request withdrawal — debit wallet, create Paystack recipient & transfer, log request
 export async function requestWithdrawal(req: Request, res: Response): Promise<void> {
@@ -13,6 +13,15 @@ export async function requestWithdrawal(req: Request, res: Response): Promise<vo
     const { amountNaira, accountNumber, bankCode, bankName } = req.body;
     const amountKobo = Math.floor(amountNaira * 100);
     const totalDebit = amountKobo + WITHDRAWAL_FEE_KOBO;
+
+    if (amountKobo < MIN_WITHDRAWAL_KOBO) {
+      res.status(400).json({ success: false, message: `Minimum withdrawal is ₦${(MIN_WITHDRAWAL_KOBO / 100).toFixed(0)}` });
+      return;
+    }
+
+    const userResult = await db.query<any>("SELECT email_verified_at FROM users WHERE id = $1", [userId]);
+    if (userResult.rows.length === 0) { res.status(404).json({ success: false, message: "User not found" }); return; }
+    if (!userResult.rows[0].email_verified_at) { res.status(403).json({ success: false, message: "Verify your email before withdrawing" }); return; }
 
     const walletResult = await db.query<any>("SELECT id, balance AS balance_kobo FROM wallets WHERE user_id = $1", [userId]);
     if (walletResult.rows.length === 0) { res.status(404).json({ success: false, message: "Wallet not found" }); return; }

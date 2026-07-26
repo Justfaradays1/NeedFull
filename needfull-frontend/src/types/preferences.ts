@@ -13,7 +13,7 @@ export interface UserPreferences {
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'system',
-  preferredRole: 'both',
+  preferredRole: 'poster',
   sidebarCollapsed: false,
   preferredLanguage: 'en',
   notificationsEnabled: true,
@@ -29,7 +29,7 @@ export const PREFS_STORAGE_KEY = 'nf_prefs';
 export function dbToPreferences(row: Record<string, unknown>): UserPreferences {
   return {
     theme: (row.theme as UserPreferences['theme']) ?? 'system',
-    preferredRole: (row.preferred_role as UserPreferences['preferredRole']) ?? 'both',
+    preferredRole: (row.preferred_role as UserPreferences['preferredRole']) ?? 'poster',
     sidebarCollapsed: Boolean(row.sidebar_collapsed),
     preferredLanguage: (row.preferred_language as string) ?? 'en',
     notificationsEnabled: Boolean(row.notifications_enabled ?? true),

@@ -8,21 +8,21 @@ type Variant =
   | 'premium';
 
 const variantStyles: Record<string, string> = {
-  success:   'bg-green-100 text-green-700',
-  completed: 'bg-green-100 text-green-700',
-  verified:  'bg-green-100 text-green-700',
-  pending:   'bg-amber-100 text-amber-700',
-  processing:'bg-blue-100 text-blue-700',
-  'in-review':'bg-amber-100 text-amber-700',
-  warning:   'bg-amber-100 text-amber-700',
-  attention: 'bg-orange-100 text-orange-700',
-  error:     'bg-red-100 text-red-700',
-  failed:    'bg-red-100 text-red-700',
-  danger:    'bg-red-100 text-red-700',
-  info:      'bg-blue-100 text-blue-700',
+  success:   'bg-success-light text-success',
+  completed: 'bg-success-light text-success',
+  verified:  'bg-success-light text-success',
+  pending:   'bg-warning-light text-warning',
+  processing:'bg-processing-light text-processing',
+  'in-review':'bg-warning-light text-warning',
+  warning:   'bg-warning-light text-warning',
+  attention: 'bg-attention-light text-attention',
+  error:     'bg-error-light text-error',
+  failed:    'bg-error-light text-error',
+  danger:    'bg-error-light text-error',
+  info:      'bg-processing-light text-processing',
   disabled:  'bg-gray-100 text-gray-500',
   inactive:  'bg-gray-100 text-gray-500',
-  premium:   'bg-purple-100 text-purple-700',
+  premium:   'bg-gold-light text-gold-dark',
 };
 
 interface StatusBadgeProps {

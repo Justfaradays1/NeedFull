@@ -9,8 +9,12 @@ const FEATURES = [
 
 export function EarnSection() {
   return (
-    <section id="features" className="px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-section-alt)' }}>
-      <div className="mx-auto max-w-6xl">
+    <section id="features" className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-section-alt)' }}>
+      {/* Faint grid */}
+      <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.15) 1px, transparent 1px)`, backgroundSize: "48px 48px" }} />
+      {/* Glow accents */}
+      <div className="pointer-events-none absolute -left-32 top-1/3 h-64 w-64 rounded-full bg-brand/5 blur-3xl" />
+      <div className="mx-auto max-w-6xl relative z-10">
         <div className="mx-auto max-w-2xl text-center">
           <span className="text-section-label inline-flex items-center rounded-full bg-gold-light px-3.5 py-1" style={{ color: '#B45309' }}>For students who earn</span>
           <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>

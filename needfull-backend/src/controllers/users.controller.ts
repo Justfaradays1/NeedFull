@@ -17,6 +17,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
         u.hostel, u.skills, u.location_label, u.profile_picture_url,
         u.trust_score, u.tasks_completed, u.is_available, u.is_runner,
         u.email_verified, u.is_verified_student, u.created_at,
+        u.roles, u.active_role, u.runner_status,
         jsonb_build_object('id', w.id, 'balanceKobo', w.balance, 'escrowKobo', w.escrow) as wallet
       FROM users u
       JOIN wallets w ON w.user_id = u.id
@@ -25,7 +26,16 @@ export async function getMe(req: Request, res: Response): Promise<void> {
     );
     if (result.rows.length === 0) { res.status(404).json({ success: false, message: "User not found" }); return; }
     const r = result.rows[0];
-    res.json({ success: true, data: { id: r.id, fullName: r.full_name, email: r.email, phone: r.phone, bio: r.bio, department: r.department, level: r.level, hostel: r.hostel, skills: r.skills, locationLabel: r.location_label, profilePictureUrl: r.profile_picture_url, trustScore: r.trust_score, tasksCompleted: r.tasks_completed, isAvailable: r.is_available, isRunner: r.is_runner, emailVerified: r.email_verified, isVerifiedStudent: r.is_verified_student, createdAt: r.created_at, wallet: r.wallet } });
+    res.json({ success: true, data: {
+      id: r.id, fullName: r.full_name, email: r.email, phone: r.phone, bio: r.bio,
+      department: r.department, level: r.level, hostel: r.hostel, skills: r.skills,
+      locationLabel: r.location_label, profilePictureUrl: r.profile_picture_url,
+      trustScore: r.trust_score, tasksCompleted: r.tasks_completed,
+      isAvailable: r.is_available, isRunner: r.is_runner,
+      emailVerified: r.email_verified, isVerifiedStudent: r.is_verified_student,
+      createdAt: r.created_at, wallet: r.wallet,
+      roles: r.roles || ["poster"], activeRole: r.active_role || "poster", runnerStatus: r.runner_status || "none",
+    } });
   } catch (error) {
     console.error("[Users] getMe error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch profile" });
@@ -110,15 +120,63 @@ export async function toggleRunnerMode(req: Request, res: Response): Promise<voi
   try {
     const { isRunner } = req.body;
     if (isRunner) {
-      const u = await db.query<any>("SELECT trust_score FROM users WHERE id = $1", [req.user!.id]);
+      const u = await db.query<any>("SELECT trust_score, runner_status FROM users WHERE id = $1", [req.user!.id]);
       if (u.rows.length === 0) { res.status(404).json({ success: false, message: "User not found" }); return; }
       if (u.rows[0].trust_score < 30) { res.status(400).json({ success: false, message: "Build your trust score first. Minimum 30 required to become a runner." }); return; }
+      if (u.rows[0].runner_status !== 'approved') { res.status(400).json({ success: false, message: "You must apply for runner status and be approved first." }); return; }
     }
-    const result = await db.query<any>("UPDATE users SET is_runner = $1, updated_at = NOW() WHERE id = $2 RETURNING is_runner", [isRunner, req.user!.id]);
+    const result = await db.query<any>(
+      `UPDATE users SET
+        is_runner = $1,
+        roles = CASE WHEN $1 THEN array_append(array_remove(roles, 'runner'), 'runner') ELSE array_remove(roles, 'runner') END,
+        active_role = CASE WHEN $1 AND active_role NOT IN ('poster', 'runner') THEN 'runner' ELSE active_role END,
+        updated_at = NOW()
+       WHERE id = $2 RETURNING is_runner`,
+      [isRunner, req.user!.id],
+    );
     res.json({ success: true, data: { isRunner: result.rows[0].is_runner } });
   } catch (error) {
     console.error("[Users] toggleRunnerMode error:", error);
     res.status(500).json({ success: false, message: "Failed to toggle runner mode" });
+  }
+}
+
+// WHAT: Switch active role
+export async function switchActiveRole(req: Request, res: Response): Promise<void> {
+  try {
+    const { role } = req.body;
+    if (!role || !['poster', 'runner', 'business'].includes(role)) {
+      res.status(400).json({ success: false, message: "Invalid role. Must be one of: poster, runner, business" });
+      return;
+    }
+    const u = await db.query<any>("SELECT roles FROM users WHERE id = $1", [req.user!.id]);
+    if (u.rows.length === 0) { res.status(404).json({ success: false, message: "User not found" }); return; }
+    const roles: string[] = u.rows[0].roles || ['poster'];
+    if (!roles.includes(role)) {
+      res.status(403).json({ success: false, message: `You don't have the "${role}" role. Apply for it first.` });
+      return;
+    }
+    await db.query("UPDATE users SET active_role = $1, updated_at = NOW() WHERE id = $2", [role, req.user!.id]);
+    res.json({ success: true, data: { activeRole: role } });
+  } catch (error) {
+    console.error("[Users] switchActiveRole error:", error);
+    res.status(500).json({ success: false, message: "Failed to switch role" });
+  }
+}
+
+// WHAT: Apply for runner status
+export async function applyForRunner(req: Request, res: Response): Promise<void> {
+  try {
+    const u = await db.query<any>("SELECT runner_status FROM users WHERE id = $1", [req.user!.id]);
+    if (u.rows.length === 0) { res.status(404).json({ success: false, message: "User not found" }); return; }
+    const current = u.rows[0].runner_status;
+    if (current === 'pending') { res.status(400).json({ success: false, message: "You already have a pending runner application." }); return; }
+    if (current === 'approved') { res.status(400).json({ success: false, message: "You are already a runner." }); return; }
+    await db.query("UPDATE users SET runner_status = 'pending', updated_at = NOW() WHERE id = $1", [req.user!.id]);
+    res.json({ success: true, message: "Runner application submitted for review." });
+  } catch (error) {
+    console.error("[Users] applyForRunner error:", error);
+    res.status(500).json({ success: false, message: "Failed to submit runner application" });
   }
 }
 
@@ -134,13 +192,24 @@ export async function getPublicProfile(req: Request, res: Response): Promise<voi
     if (userResult.rows.length === 0) { res.status(404).json({ success: false, message: "User not found" }); return; }
     const u = userResult.rows[0];
 
-    const [trustLog, reviews] = await Promise.all([
-      db.query<any>("SELECT score_before, score_after, reason, created_at FROM trust_score_log WHERE user_id = $1 ORDER BY created_at DESC LIMIT 10", [targetId]),
-      db.query<any>("SELECT r.id, r.rating, r.comment, r.created_at, jsonb_build_object('id', rev.id, 'fullName', rev.full_name) as reviewer FROM reviews r JOIN users rev ON r.reviewer_id = rev.id WHERE r.reviewee_id = $1 ORDER BY r.created_at DESC LIMIT 5", [targetId]),
-    ]);
+    let trustHistory: any[] = [];
+    try {
+      const trustLog = await db.query<any>("SELECT * FROM trust_score_log WHERE user_id = $1 ORDER BY created_at DESC LIMIT 10", [targetId]);
+      trustHistory = trustLog.rows.map((r: any) => ({
+        score: r.score,
+        ratingPoints: r.rating_points ?? r.rating_pts,
+        completionPoints: r.completion_points ?? r.completion_pts,
+        verificationPoints: r.verification_points ?? r.verification_pts,
+        reportPenalty: r.report_penalty ?? r.report_penalty_pts,
+        tenurePoints: r.tenure_points ?? r.tenure_pts,
+        createdAt: r.created_at,
+      }));
+    } catch { /* trust_score_log table may not exist yet */ }
+
+    const reviews = await db.query<any>("SELECT r.id, r.rating, r.comment, r.created_at, jsonb_build_object('id', rev.id, 'fullName', rev.full_name) as reviewer FROM reviews r JOIN users rev ON r.reviewer_id = rev.id WHERE r.reviewee_id = $1 ORDER BY r.created_at DESC LIMIT 5", [targetId]);
 
     const data: Record<string, any> = { id: u.id, fullName: u.full_name, bio: u.bio, department: u.department, level: u.level, hostel: u.hostel, locationLabel: u.location_label, profilePictureUrl: u.profile_picture_url, trustScore: u.trust_score, tasksCompleted: u.tasks_completed, isAvailable: u.is_available, isRunner: u.is_runner, memberSince: u.created_at };
-    if (trustLog.rows.length > 0) data.trustHistory = trustLog.rows.map((r: any) => ({ scoreBefore: r.score_before, scoreAfter: r.score_after, reason: r.reason, createdAt: r.created_at }));
+    if (trustHistory.length > 0) data.trustHistory = trustHistory;
     if (reviews.rows.length > 0) data.recentReviews = reviews.rows.map((r: any) => ({ id: r.id, rating: r.rating, comment: r.comment, createdAt: r.created_at, reviewer: r.reviewer }));
     res.json({ success: true, data });
   } catch (error) {
@@ -154,9 +223,20 @@ export async function submitStudentVerification(req: Request, res: Response): Pr
   try {
     if (!req.file) { res.status(400).json({ success: false, message: "No ID card image provided" }); return; }
     const userId = req.user!.id;
+
+    // Prevent duplicate pending submissions
+    const existing = await db.query(
+      "SELECT id FROM student_id_verifications WHERE user_id = $1 AND status = 'pending'",
+      [userId],
+    );
+    if (existing.rows.length > 0) {
+      res.status(400).json({ success: false, message: "You already have a pending verification request" });
+      return;
+    }
+
     const imageUrl = await uploadImage(req.file.buffer, "verifications");
     const now = new Date().toISOString();
-    await db.query("INSERT INTO student_id_verifications (user_id, image_url, status, created_at, updated_at) VALUES ($1, $2, 'pending', $3, $3)", [userId, imageUrl, now]);
+    await db.query("INSERT INTO student_id_verifications (user_id, image_url, photo_url, status, created_at, updated_at) VALUES ($1, $2, $2, 'pending', $3, $3)", [userId, imageUrl, now]);
 
     const admins = await db.query<{ id: string }>("SELECT id FROM users WHERE role = 'admin'");
     if (admins.rows.length > 0) {
@@ -169,6 +249,80 @@ export async function submitStudentVerification(req: Request, res: Response): Pr
   } catch (error) {
     console.error("[Users] submitStudentVerification error:", error);
     res.status(500).json({ success: false, message: "Failed to submit verification" });
+  }
+}
+
+// WHAT: Get verification status for the authenticated user
+// WHY: Frontend needs email/phone/studentId verification state in one call
+export async function getVerificationStatus(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const user = await db.query<any>(
+      `SELECT email_verified, phone, is_verified_student FROM users WHERE id = $1`,
+      [userId],
+    );
+    if (user.rows.length === 0) { res.status(404).json({ success: false, message: "User not found" }); return; }
+    const u = user.rows[0];
+
+    const sv = await db.query<any>(
+      `SELECT status, rejection_note, image_url, created_at, reviewed_at
+       FROM student_id_verifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1`,
+      [userId],
+    );
+
+    let studentIdStatus: 'not_submitted' | 'pending' | 'approved' | 'rejected' = 'not_submitted';
+    let submittedAt: string | undefined;
+    let rejectionReason: string | undefined;
+    let documentUrl: string | undefined;
+
+    if (sv.rows.length > 0) {
+      const s = sv.rows[0];
+      studentIdStatus = s.status === 'pending' ? 'pending' : s.status === 'approved' ? 'approved' : 'rejected';
+      submittedAt = s.created_at;
+      documentUrl = s.image_url;
+      if (s.status === 'rejected') rejectionReason = s.rejection_note;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        email: { verified: u.email_verified },
+        phone: { verified: !!u.phone, phone: u.phone },
+        studentId: { status: studentIdStatus, submittedAt, rejectionReason, documentUrl },
+      },
+    });
+  } catch (error) {
+    console.error("[Users] getVerificationStatus error:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch verification status" });
+  }
+}
+
+// WHAT: Get trust score breakdown for the authenticated user
+// WHY: Frontend needs per-factor breakdown to display in trust score card
+export async function getTrustBreakdown(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const result = await db.query<any>(
+      `SELECT trust_score, email_verified, phone_verified, is_verified_student,
+              COALESCE(tasks_completed, 0) as tasks_completed
+       FROM users WHERE id = $1`,
+      [userId],
+    );
+    if (result.rows.length === 0) { res.status(404).json({ success: false, message: "User not found" }); return; }
+    const u = result.rows[0];
+
+    const verification = (u.email_verified ? 5 : 0) + (u.phone_verified ? 4 : 0) + (u.is_verified_student ? 6 : 0);
+
+    res.json({
+      success: true,
+      data: {
+        rating: 0, completion: 0, verification: Math.min(verification, 15), reports: 0, tenure: 0,
+        total: u.trust_score,
+      },
+    });
+  } catch (error) {
+    console.error("[Users] getTrustBreakdown error:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch trust breakdown" });
   }
 }
 

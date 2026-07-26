@@ -1,0 +1,660 @@
+✓ Environment validated. Running in development mode on port 5000
+Initializing cron jobs...
+
+╔════════════════════════════════════════╗
+║     NeedFull Backend - Running         ║
+║     Environment: DEVELOPMENT             ║
+║     Port: 5000                             ║
+║     Frontend: http://localhost:3000       ║
+╚════════════════════════════════════════╝
+  
+GET /api/health 200 74 - 5.652 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 16.862 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 2.700 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.369 ms
+Database query error: {
+  sql: 'SELECT id, email, password_hash, role, roles, active_role FROM users WHERE email = $1',
+  error: Error: Connection terminated due to connection timeout
+      at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async query (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:36:12)
+      at async login (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\authController.ts:155:24) {
+    [cause]: Error: Connection terminated unexpectedly
+        at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+        at Object.onceWrapper (node:events:622:28)
+        at Connection.emit (node:events:508:28)
+        at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+        at Socket.emit (node:events:520:35)
+        at TCP.<anonymous> (node:net:346:12)
+  }
+}
+Login error: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async query (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:36:12)
+    at async login (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\authController.ts:155:24) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:520:35)
+      at TCP.<anonymous> (node:net:346:12)
+}
+POST /api/auth/login 500 58 - 10151.155 ms
+✓ Database pool connection created
+POST /api/auth/login 200 676 - 2702.308 ms
+GET /api/user/preferences 304 - - 330.944 ms
+GET /api/auth/me 304 - - 232.437 ms
+GET /api/auth/me 304 - - 150.072 ms
+GET /api/auth/me 304 - - 150.242 ms
+GET /api/auth/me 304 - - 162.382 ms
+✓ Database pool connection created
+GET /api/notifications/unread-count 304 - - 1076.684 ms
+GET /api/notifications/unread-count 304 - - 204.399 ms
+GET /api/auth/me 304 - - 313.229 ms
+GET /api/auth/me 304 - - 162.931 ms
+GET /api/auth/me 304 - - 149.087 ms
+✓ Database pool connection created
+PATCH /api/user/preferences 200 270 - 2460.116 ms
+✓ Database pool connection created
+PATCH /api/user/preferences 200 271 - 3332.059 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 2.017 ms
+Database query error: {
+  sql: 'SELECT id, email, password_hash, role, roles, active_role FROM users WHERE email = $1',
+  error: Error: Connection terminated due to connection timeout
+      at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async query (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:36:12)
+      at async login (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\authController.ts:155:24) {
+    [cause]: Error: Connection terminated unexpectedly
+        at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+        at Object.onceWrapper (node:events:622:28)
+        at Connection.emit (node:events:508:28)
+        at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+        at Socket.emit (node:events:520:35)
+        at TCP.<anonymous> (node:net:346:12)
+  }
+}
+Login error: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async query (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:36:12)
+    at async login (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\authController.ts:155:24) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:520:35)
+      at TCP.<anonymous> (node:net:346:12)
+}
+POST /api/auth/login 500 58 - 10026.268 ms
+✓ Database pool connection created
+POST /api/auth/login 200 676 - 5731.549 ms
+GET /api/user/preferences 200 271 - 520.015 ms
+GET /api/auth/me 304 - - 211.200 ms
+GET /api/auth/me 304 - - 216.132 ms
+GET /api/auth/me 304 - - 432.160 ms
+✓ Database pool connection created
+GET /api/notifications/unread-count 304 - - 1687.362 ms
+GET /api/auth/me 304 - - 202.186 ms
+GET /api/notifications/unread-count 304 - - 223.873 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 2509.181 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 3744.992 ms
+[Cron] Running expired tasks cleanup...
+✓ Database pool connection created
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 3.606 ms
+JWT verification error: jwt expired
+JWT verification error: jwt expired
+GET /api/tasks/me/posted 401 61 - 14.821 ms
+JWT verification error: jwt expired
+GET /api/chat/conversations 401 61 - 1.386 ms
+JWT verification error: jwt expired
+GET /api/wallet/transactions?perPage=5 401 61 - 1.150 ms
+JWT verification error: jwt expired
+GET /api/user/preferences 401 61 - 2.219 ms
+JWT verification error: jwt expired
+GET /api/notifications/unread-count 401 61 - 46.803 ms
+JWT verification error: jwt expired
+GET /api/tasks/me/posted 401 61 - 1.353 ms
+JWT verification error: jwt expired
+GET /api/chat/conversations 401 61 - 4.459 ms
+JWT verification error: jwt expired
+GET /api/wallet/transactions?perPage=5 401 61 - 1.999 ms
+[Tasks] listTasksHandler error: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async listTasks (C:\Users\user\Desktop\NeedFull\needfull-backend\src\services\task.service.ts:215:23)
+    at async listTasksHandler (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\tasks.controller.ts:10:20) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:508:28)
+      at TCP.<anonymous> (node:net:346:12)
+}
+GET /api/tasks?sortBy=newest&status=open&perPage=6 500 51 - 10190.499 ms
+JWT verification error: jwt expired
+[Tasks] listTasksHandler error: Error: getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async listTasks (C:\Users\user\Desktop\NeedFull\needfull-backend\src\services\task.service.ts:215:23)
+    at async listTasksHandler (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\tasks.controller.ts:10:20) {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'aws-1-eu-central-1.pooler.supabase.com'
+}
+GET /api/tasks?sortBy=newest&status=open&perPage=6 500 51 - 1434.846 ms
+✓ Database pool connection created
+POST /api/auth/login 200 663 - 3845.914 ms
+GET /api/user/preferences 304 - - 1103.384 ms
+GET /api/auth/me 304 - - 156.817 ms
+GET /api/auth/me 304 - - 165.819 ms
+✓ Database pool connection created
+✓ Database pool connection created
+✓ Database pool connection created
+✓ Database pool connection created
+✓ Database pool connection created
+GET /api/notifications/unread-count 304 - - 2742.927 ms
+GET /api/tasks/me/posted 304 - - 2774.842 ms
+GET /api/chat/conversations 304 - - 2764.887 ms
+GET /api/wallet/transactions?perPage=5 304 - - 2939.285 ms
+GET /api/notifications/unread-count 304 - - 313.106 ms
+GET /api/chat/conversations 304 - - 309.837 ms
+GET /api/tasks/me/posted 304 - - 314.455 ms
+GET /api/tasks?sortBy=newest&status=open&perPage=6 200 61 - 3195.596 ms
+GET /api/wallet/transactions?perPage=5 304 - - 300.287 ms
+GET /api/tasks?sortBy=newest&status=open&perPage=6 304 - - 541.272 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.549 ms
+JWT verification error: jwt expired
+JWT verification error: jwt expired
+GET /api/tasks/me/posted 401 61 - 1.105 ms
+JWT verification error: jwt expired
+GET /api/wallet/transactions?perPage=5 401 61 - 1.313 ms
+JWT verification error: jwt expired
+GET /api/chat/conversations 401 61 - 1.180 ms
+JWT verification error: jwt expired
+GET /api/user/preferences 401 61 - 1.135 ms
+JWT verification error: jwt expired
+GET /api/notifications/unread-count 401 61 - 1.183 ms
+JWT verification error: jwt expired
+GET /api/tasks/me/posted 401 61 - 1.454 ms
+JWT verification error: jwt expired
+GET /api/wallet/transactions?perPage=5 401 61 - 1.154 ms
+JWT verification error: jwt expired
+GET /api/chat/conversations 401 61 - 1.599 ms
+GET /api/tasks?sortBy=newest&status=open&perPage=6 304 - - 366.080 ms
+JWT verification error: jwt expired
+GET /api/tasks?sortBy=newest&status=open&perPage=6 304 - - 651.456 ms
+POST /api/auth/login 200 676 - 2240.199 ms
+GET /api/user/preferences 304 - - 539.693 ms
+GET /api/user/preferences 304 - - 402.536 ms
+✓ Database pool connection created
+GET /api/chat/conversations 304 - - 308.141 ms
+GET /api/notifications/unread-count 304 - - 156.269 ms
+GET /api/chat/conversations 304 - - 163.072 ms
+GET /api/notifications/unread-count 304 - - 154.595 ms
+✓ Database pool connection created
+✓ Database pool connection created
+✓ Database pool connection created
+✓ Database pool connection created
+✓ Database pool connection created
+POST /api/auth/login 200 676 - 7257.697 ms
+GET /api/auth/me 304 - - 1318.600 ms
+GET /api/tasks/me/posted 304 - - 1329.232 ms
+GET /api/wallet/transactions?perPage=5 304 - - 1581.646 ms
+GET /api/tasks?sortBy=newest&status=open&perPage=6 304 - - 1700.918 ms
+GET /api/auth/me 304 - - 158.996 ms
+GET /api/tasks/me/posted 304 - - 166.380 ms
+GET /api/wallet/transactions?perPage=5 304 - - 741.667 ms
+GET /api/tasks?sortBy=newest&status=open&perPage=6 304 - - 740.622 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 4138.209 ms
+GET /api/auth/me 304 - - 435.451 ms
+GET /api/auth/me 304 - - 165.835 ms
+PATCH /api/user/preferences 200 270 - 1017.455 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 7155.736 ms
+GET /api/auth/me 304 - - 137.225 ms
+GET /api/auth/me 304 - - 147.695 ms
+GET /api/auth/me 304 - - 350.831 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 3057.982 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 1632.116 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 4956.974 ms
+JWT verification error: jwt expired
+GET /api/user/preferences 401 61 - 1.605 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.194 ms
+JWT verification error: jwt expired
+GET /api/notifications/unread-count 401 61 - 1.171 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.266 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.158 ms
+✓ Database pool connection created
+POST /api/auth/refresh 200 492 - 1985.846 ms
+GET /api/user/preferences 200 270 - 326.958 ms
+✓ Database pool connection created
+GET /api/notifications/unread-count 304 - - 1278.199 ms
+POST /api/auth/login 200 676 - 2344.769 ms
+GET /api/user/preferences 304 - - 315.850 ms
+GET /api/auth/me 304 - - 149.892 ms
+GET /api/notifications/unread-count 304 - - 148.867 ms
+GET /api/notifications/unread-count 304 - - 146.767 ms
+GET /api/auth/me 304 - - 160.251 ms
+GET /api/auth/me 304 - - 162.378 ms
+GET /api/auth/me 304 - - 172.138 ms
+PATCH /api/user/preferences 200 271 - 972.891 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.254 ms
+JWT verification error: jwt expired
+JWT verification error: jwt expired
+GET /api/tasks/me/posted 401 61 - 1.069 ms
+JWT verification error: jwt expired
+GET /api/chat/conversations 401 61 - 1.111 ms
+JWT verification error: jwt expired
+GET /api/wallet/transactions?perPage=5 401 61 - 1.150 ms
+JWT verification error: jwt expired
+GET /api/user/preferences 401 61 - 1.169 ms
+JWT verification error: jwt expired
+GET /api/tasks/me/posted 401 61 - 1.249 ms
+JWT verification error: jwt expired
+GET /api/chat/conversations 401 61 - 1.296 ms
+JWT verification error: jwt expired
+GET /api/wallet/transactions?perPage=5 401 61 - 1.219 ms
+JWT verification error: jwt expired
+GET /api/notifications/unread-count 401 61 - 1.162 ms
+GET /api/tasks?sortBy=newest&status=open&perPage=6 304 - - 652.689 ms
+JWT verification error: jwt expired
+GET /api/tasks?sortBy=newest&status=open&perPage=6 304 - - 686.627 ms
+PATCH /api/user/preferences 200 270 - 1138.046 ms
+✓ Database pool connection created
+PATCH /api/user/preferences 200 271 - 3400.203 ms
+✓ Database pool connection created
+PATCH /api/user/preferences 200 270 - 1508.102 ms
+[Cron] Running expired tasks cleanup...
+✓ Database pool connection created
+✓ Database pool connection created
+PATCH /api/user/preferences 200 271 - 3328.342 ms
+JWT verification error: jwt expired
+PATCH /api/user/preferences 401 61 - 2.594 ms
+✓ Database pool connection created
+POST /api/auth/refresh 200 492 - 2190.656 ms
+PATCH /api/user/preferences 200 270 - 1107.443 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 2932.679 ms
+GET /api/auth/me 304 - - 570.235 ms
+GET /api/auth/me 304 - - 411.793 ms
+GET /api/auth/me 304 - - 448.463 ms
+GET /api/auth/me 304 - - 400.138 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 1877.796 ms
+GET /api/auth/me 304 - - 450.312 ms
+PATCH /api/user/preferences 200 271 - 1156.907 ms
+GET /api/auth/me 304 - - 750.612 ms
+GET /api/auth/me 304 - - 515.400 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 1324.630 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 2687.215 ms
+JWT verification error: jwt expired
+GET /api/user/preferences 401 61 - 1.805 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.241 ms
+JWT verification error: jwt expired
+GET /api/notifications/unread-count 401 61 - 1.026 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.116 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.214 ms
+Database queryOne error: {
+  sql: 'SELECT id, email, role FROM users WHERE id = $1',
+  error: Error: Connection terminated due to connection timeout
+      at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async queryOne (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:51:20)
+      at async refresh (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\authController.ts:248:18) {
+    [cause]: Error: Connection terminated unexpectedly
+        at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+        at Object.onceWrapper (node:events:622:28)
+        at Connection.emit (node:events:508:28)
+        at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+        at Socket.emit (node:events:520:35)
+        at TCP.<anonymous> (node:net:346:12)
+  }
+}
+Refresh token error: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async queryOne (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:51:20)
+    at async refresh (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\authController.ts:248:18) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:520:35)
+      at TCP.<anonymous> (node:net:346:12)
+}
+POST /api/auth/refresh 500 66 - 10012.878 ms
+✓ Database pool connection created
+POST /api/auth/login 200 676 - 4263.086 ms
+GET /api/user/preferences 200 271 - 2051.502 ms
+✓ Database pool connection created
+✓ Database pool connection created
+GET /api/notifications/unread-count 304 - - 1710.818 ms
+GET /api/auth/me 304 - - 1723.404 ms
+GET /api/notifications/unread-count 304 - - 170.785 ms
+GET /api/auth/me 304 - - 168.206 ms
+GET /api/auth/me 304 - - 161.040 ms
+GET /api/auth/me 304 - - 172.533 ms
+✓ Database pool connection created
+PATCH /api/user/preferences 200 270 - 5322.585 ms
+PATCH /api/user/preferences 200 271 - 3347.829 ms
+✓ Database pool connection created
+PATCH /api/user/preferences 200 270 - 3912.681 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 1987.093 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 2378.109 ms
+GET /api/auth/me 304 - - 527.940 ms
+GET /api/auth/me 304 - - 686.487 ms
+GET /api/auth/me 304 - - 1137.737 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 1881.301 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 1810.670 ms
+GET /api/auth/me 304 - - 1821.008 ms
+JWT verification error: jwt expired
+PATCH /api/user/preferences 401 61 - 2.582 ms
+✓ Database pool connection created
+POST /api/auth/refresh 200 492 - 2531.578 ms
+PATCH /api/user/preferences 200 271 - 1015.075 ms
+✓ Database pool connection created
+PATCH /api/user/preferences 200 270 - 2829.281 ms
+Failed to load user roles: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async loadRoles (C:\Users\user\Desktop\NeedFull\needfull-backend\src\middleware\auth.ts:53:18) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:520:35)
+      at TCP.<anonymous> (node:net:346:12)
+}
+Failed to load user roles: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async loadRoles (C:\Users\user\Desktop\NeedFull\needfull-backend\src\middleware\auth.ts:53:18) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:520:35)
+      at TCP.<anonymous> (node:net:346:12)
+}
+[Preferences] PATCH error: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async withTransaction (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:76:18)
+    at async <anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\src\routes\preferences.routes.ts:73:22) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:508:28)
+      at TCP.<anonymous> (node:net:346:12)
+}
+PATCH /api/user/preferences 500 58 - 20038.942 ms
+[Preferences] PATCH error: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async withTransaction (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:76:18)
+    at async <anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\src\routes\preferences.routes.ts:73:22) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:508:28)
+      at TCP.<anonymous> (node:net:346:12)
+}
+PATCH /api/user/preferences 500 58 - 20061.200 ms
+Failed to load user roles: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async loadRoles (C:\Users\user\Desktop\NeedFull\needfull-backend\src\middleware\auth.ts:53:18) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:520:35)
+      at TCP.<anonymous> (node:net:346:12)
+}
+Database queryOne error: {
+  sql: 'SELECT \n' +
+    '        u.id, u.email, u.full_name, u.role, u.roles, u.active_role, u.email_verified_at, u.google_id,\n' +
+    '        w.id as wallet_id, w.balance, w.escrow,\n' +
+    '        COALESCE(u.trust_score, 50) as trust_score\n' +
+    '       FROM users u\n' +
+    '       LEFT JOIN wallets w ON w.user_id = u.id\n' +
+    '       WHERE u.id = $1',
+  error: Error: Connection terminated due to connection timeout
+      at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async queryOne (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:51:20)
+      at async getMe (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\authController.ts:504:22) {
+    [cause]: Error: Connection terminated unexpectedly
+        at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+        at Object.onceWrapper (node:events:622:28)
+        at Connection.emit (node:events:508:28)
+        at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+        at Socket.emit (node:events:520:35)
+        at TCP.<anonymous> (node:net:346:12)
+  }
+}
+Get me error: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async queryOne (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:51:20)
+    at async getMe (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\authController.ts:504:22) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:520:35)
+      at TCP.<anonymous> (node:net:346:12)
+}
+GET /api/auth/me 500 74 - 20038.786 ms
+✓ Database pool connection created
+GET /api/auth/me 200 335 - 10970.361 ms
+GET /api/auth/me 304 - - 287.014 ms
+GET /api/auth/me 304 - - 8025.700 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 2.048 ms
+✓ Database pool connection created
+POST /api/auth/login 200 676 - 4871.533 ms
+GET /api/user/preferences 200 270 - 436.019 ms
+GET /api/auth/me 304 - - 776.836 ms
+GET /api/auth/me 304 - - 566.997 ms
+GET /api/auth/me 304 - - 356.054 ms
+GET /api/auth/me 304 - - 229.724 ms
+✓ Database pool connection created
+GET /api/notifications/unread-count 304 - - 2972.243 ms
+GET /api/notifications/unread-count 304 - - 504.747 ms
+✓ Database pool connection created
+PATCH /api/user/preferences 200 271 - 2427.192 ms
+Failed to load user roles: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async loadRoles (C:\Users\user\Desktop\NeedFull\needfull-backend\src\middleware\auth.ts:53:18) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:508:28)
+      at TCP.<anonymous> (node:net:346:12)
+}
+✓ Database pool connection created
+PATCH /api/user/preferences 200 270 - 13844.523 ms
+PATCH /api/user/preferences 200 271 - 1618.325 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 2186.929 ms
+JWT verification error: jwt expired
+PATCH /api/user/preferences 401 61 - 7.874 ms
+✓ Database pool connection created
+POST /api/auth/refresh 200 492 - 8744.382 ms
+PATCH /api/user/preferences 200 270 - 2364.946 ms
+PATCH /api/user/preferences 200 271 - 1162.103 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 1778.882 ms
+GET /api/auth/me 304 - - 763.228 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 1536.880 ms
+GET /api/auth/me 304 - - 395.417 ms
+✓ Database pool connection created
+PATCH /api/user/preferences 200 270 - 7066.885 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 1747.920 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 1533.401 ms
+PATCH /api/user/preferences 200 271 - 1123.555 ms
+PATCH /api/user/preferences 200 270 - 588.176 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.726 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.203 ms
+JWT verification error: jwt expired
+GET /api/user/preferences 401 61 - 1.134 ms
+JWT verification error: jwt expired
+GET /api/auth/me 401 61 - 1.529 ms
+JWT verification error: jwt expired
+GET /api/notifications/unread-count 401 61 - 1.275 ms
+[Cron] Running expired tasks cleanup...
+[Cron] Error processing expired tasks: Error: getaddrinfo ENOTFOUND aws-1-eu-central-1.pooler.supabase.com
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async Task._execution (C:\Users\user\Desktop\NeedFull\needfull-backend\src\jobs\cron.ts:14:22) {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'aws-1-eu-central-1.pooler.supabase.com'
+}
+✓ Database pool connection created
+POST /api/auth/login 200 676 - 4919.632 ms
+GET /api/user/preferences 200 270 - 291.389 ms
+GET /api/auth/me 304 - - 192.549 ms
+GET /api/auth/me 304 - - 169.870 ms
+GET /api/auth/me 304 - - 235.621 ms
+GET /api/auth/me 304 - - 206.868 ms
+✓ Database pool connection created
+GET /api/notifications/unread-count 304 - - 1655.830 ms
+GET /api/notifications/unread-count 304 - - 155.224 ms
+✓ Database pool connection created
+PATCH /api/user/preferences 200 271 - 2719.523 ms
+Failed to load user roles: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async loadRoles (C:\Users\user\Desktop\NeedFull\needfull-backend\src\middleware\auth.ts:53:18) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:520:35)
+      at TCP.<anonymous> (node:net:346:12)
+}
+Failed to load user roles: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async loadRoles (C:\Users\user\Desktop\NeedFull\needfull-backend\src\middleware\auth.ts:53:18) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:520:35)
+      at TCP.<anonymous> (node:net:346:12)
+}
+✓ Database pool connection created
+✓ Database pool connection created
+PATCH /api/user/preferences 200 270 - 26583.831 ms
+PATCH /api/user/preferences 200 270 - 15498.711 ms
+PATCH /api/user/preferences 200 271 - 17942.733 ms
+Failed to load user roles: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async loadRoles (C:\Users\user\Desktop\NeedFull\needfull-backend\src\middleware\auth.ts:53:18) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:520:35)
+      at TCP.<anonymous> (node:net:346:12)
+}
+Database queryOne error: {
+  sql: 'SELECT \n' +
+    '        u.id, u.email, u.full_name, u.role, u.roles, u.active_role, u.email_verified_at, u.google_id,\n' +
+    '        w.id as wallet_id, w.balance, w.escrow,\n' +
+    '        COALESCE(u.trust_score, 50) as trust_score\n' +
+    '       FROM users u\n' +
+    '       LEFT JOIN wallets w ON w.user_id = u.id\n' +
+    '       WHERE u.id = $1',
+  error: Error: Connection terminated due to connection timeout
+      at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async queryOne (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:51:20)
+      at async getMe (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\authController.ts:504:22) {
+    [cause]: Error: Connection terminated unexpectedly
+        at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+        at Object.onceWrapper (node:events:622:28)
+        at Connection.emit (node:events:508:28)
+        at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+        at Socket.emit (node:events:520:35)
+        at TCP.<anonymous> (node:net:346:12)
+  }
+}
+Get me error: Error: Connection terminated due to connection timeout
+    at C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async queryOne (C:\Users\user\Desktop\NeedFull\needfull-backend\src\config\db.ts:51:20)
+    at async getMe (C:\Users\user\Desktop\NeedFull\needfull-backend\src\controllers\authController.ts:504:22) {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\client.js:193:73)
+      at Object.onceWrapper (node:events:622:28)
+      at Connection.emit (node:events:508:28)
+      at Socket.<anonymous> (C:\Users\user\Desktop\NeedFull\needfull-backend\node_modules\pg\lib\connection.js:61:12)
+      at Socket.emit (node:events:520:35)
+      at TCP.<anonymous> (node:net:346:12)
+}
+GET /api/auth/me 500 74 - 20021.026 ms
+✓ Database pool connection created
+GET /api/auth/me 200 335 - 1724.137 ms
+✓ Database pool connection created
+GET /api/auth/me 304 - - 2404.816 ms
+GET /api/auth/me 304 - - 927.320 ms
+GET /api/auth/me 304 - - 601.567 ms
+✓ Database pool connection created
+PATCH /api/user/preferences 200 271 - 4087.456 ms

@@ -1,16 +1,16 @@
 export default function ProfileLoading() {
   return (
-    <div className="min-h-screen bg-gray-50 safe-all">
+    <div className="min-h-screen page-shell safe-all">
       {/* Header skeleton */}
-      <div className="bg-gradient-to-b from-brand-dark to-brand px-4 pb-12 pt-4 sm:px-6">
+      <div className="bg-linear-to-b from-brand-dark to-brand px-4 pb-12 pt-4 sm:px-6">
         <div className="h-5 w-20 skeleton rounded" />
       </div>
 
       {/* Profile card skeleton */}
       <div className="mx-4 -mt-8 sm:mx-6">
-        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card">
+        <div className="rounded-2xl border border-card-border bg-surface p-5 shadow-card">
           <div className="flex items-center gap-4">
-            <div className="h-[72px] w-[72px] skeleton rounded-full shrink-0" />
+            <div className="h-18 w-18 skeleton rounded-full shrink-0" />
             <div className="flex-1 space-y-2">
               <div className="h-5 w-40 skeleton rounded" />
               <div className="h-3.5 w-28 skeleton rounded" />

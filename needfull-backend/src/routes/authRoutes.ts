@@ -14,10 +14,10 @@ import {
   resetPassword,
   getMe,
 } from "../controllers/authController.js";
-import { googleAuth, googleCallback } from "../controllers/googleAuthController.js";
+import { googleAuth, googleCallback, completeRegistration, completeProfile, linkGoogle, unlinkGoogle } from "../controllers/googleAuthController.js";
 import { authenticate } from "../middleware/auth.js";
 import { validate } from "../middleware/validate.js";
-import { authLimiter, registerLimiter } from "../middleware/rateLimiter.js";
+import { authLimiter, registerLimiter, googleLimiter } from "../middleware/rateLimiter.js";
 
 const authRouter = Router();
 
@@ -53,11 +53,56 @@ authRouter.post(
 
 // WHAT: Initiate Google OAuth login (GET /auth/google)
 // WHY: Redirects user to Google consent screen
-authRouter.get("/google", googleAuth);
+// RATE LIMIT: 5 per 15 minutes per IP
+authRouter.get("/google", googleLimiter, googleAuth);
 
-// WHAT: Google OAuth callback (GET /auth/google/callback)
-// WHY: Google redirects here after user grants permission
+// WHAT: Google OAuth callback (GET /auth/google/callback) — NO rate limit
+// WHY: Google redirects here; IP-based rate limiting would block legitimate users behind NAT
 authRouter.get("/google/callback", googleCallback);
+
+// WHAT: Complete Google registration (POST /auth/complete-registration)
+// WHY: Finalizes account creation for Google users with password, phone, etc.
+// VALIDATES: registrationCode, password (min 8), optional fields
+authRouter.post(
+  "/complete-registration",
+  body("registrationCode").trim().notEmpty().withMessage("Registration code is required"),
+  body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters"),
+  body("phone").optional().trim(),
+  body("department").optional().trim(),
+  body("level").optional().trim(),
+  validate,
+  completeRegistration,
+);
+
+// WHAT: Complete profile for Google-created users (PATCH /auth/complete-profile)
+// WHY: Legacy — Google users with pre-created accounts can set password, phone, etc.
+// REQUIRES: authenticate
+authRouter.patch(
+  "/complete-profile",
+  authenticate,
+  body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters"),
+  body("phone").optional().trim(),
+  body("department").optional().trim(),
+  body("level").optional().trim(),
+  validate,
+  completeProfile,
+);
+
+// WHAT: Link Google account to existing user (POST /auth/link-google)
+// WHY: Users who registered via email/password can link Google later
+// REQUIRES: authenticate
+authRouter.post(
+  "/link-google",
+  authenticate,
+  body("googleIdToken").trim().notEmpty().withMessage("Google ID token is required"),
+  validate,
+  linkGoogle,
+);
+
+// WHAT: Unlink Google account (POST /auth/unlink-google)
+// WHY: Users can remove Google association from their account
+// REQUIRES: authenticate
+authRouter.post("/unlink-google", authenticate, unlinkGoogle);
 
 // WHAT: Login with email and password (POST /auth/login)
 // WHY: Authenticate existing user

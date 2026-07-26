@@ -10,6 +10,8 @@ import { useVerification } from "@/hooks/useVerification";
 import { EmailVerificationCard } from "@/components/verification/EmailVerificationCard";
 import { PhoneVerificationCard } from "@/components/verification/PhoneVerificationCard";
 import { StudentIDVerificationCard } from "@/components/verification/StudentIDVerificationCard";
+import { CelebrationModal } from "@/components/ui/celebration-modal";
+import { useCelebration } from "@/hooks/useCelebration";
 
 export default function VerificationPage() {
   const {
@@ -27,6 +29,7 @@ export default function VerificationPage() {
   const [isSendingPhoneOtp, setIsSendingPhoneOtp] = useState(false);
   const [isVerifyingPhoneOtp, setIsVerifyingPhoneOtp] = useState(false);
   const [isSubmittingStudentId, setIsSubmittingStudentId] = useState(false);
+  const celebration = useCelebration();
 
   // Handle email resend with loading state
   const handleResendEmail = async () => {
@@ -62,7 +65,14 @@ export default function VerificationPage() {
   const handleSubmitStudentId = async (file: File, matricNumber: string) => {
     setIsSubmittingStudentId(true);
     try {
-      await submitStudentId(file, matricNumber);
+      const ok = await submitStudentId(file, matricNumber);
+      if (ok)
+        celebration.showForAction("poster", "student_verified", {
+          title: "Student ID Submitted",
+          description:
+            "Your student ID has been submitted for review. You'll be notified once it's approved. Your trust score will increase when verified.",
+          confetti: false,
+        });
     } finally {
       setIsSubmittingStudentId(false);
     }
@@ -70,7 +80,7 @@ export default function VerificationPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6">
+      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-4 sm:p-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center h-96">
             <div className="animate-pulse text-center">
@@ -85,9 +95,9 @@ export default function VerificationPage() {
 
   if (!status) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6">
+      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-4 sm:p-6">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg border border-red-200 p-6 text-center">
+          <div className="bg-surface rounded-lg border border-red-200 p-6 text-center">
             <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-gray-900 mb-2">
               Unable to load verification status
@@ -100,7 +110,7 @@ export default function VerificationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-4 sm:p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -124,7 +134,7 @@ export default function VerificationPage() {
 
         {/* Trust Score Summary */}
         {trustBreakdown && (
-          <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200 p-6 mb-8">
+          <div className="bg-linear-to-r from-green-50 to-blue-50 rounded-lg border border-green-200 p-6 mb-8">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-2">
@@ -212,7 +222,7 @@ export default function VerificationPage() {
         </div>
 
         {/* Benefits Section */}
-        <div className="mt-8 bg-white rounded-lg border border-gray-200 p-6">
+        <div className="mt-8 bg-surface rounded-lg border border-card-border p-6">
           <h3 className="font-semibold text-gray-900 mb-4">Why Verify?</h3>
           <ul className="grid sm:grid-cols-2 gap-4 text-sm text-gray-600">
             <li className="flex gap-3">
@@ -234,6 +244,11 @@ export default function VerificationPage() {
           </ul>
         </div>
       </div>
+      <CelebrationModal
+        open={celebration.open}
+        onClose={celebration.close}
+        config={celebration.config}
+      />
     </div>
   );
 }

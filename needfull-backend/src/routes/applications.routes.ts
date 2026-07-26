@@ -3,7 +3,7 @@
 
 import { Router } from "express";
 import { body, param } from "express-validator";
-import { authenticate } from "../middleware/auth";
+import { authenticate, requireRole } from "../middleware/auth";
 import { validate } from "../middleware/validate";
 import * as applications from "../controllers/applications.controller";
 
@@ -15,6 +15,7 @@ router.post("/",
   body("message").optional().trim().isLength({ min: 10, max: 500 }),
   body("proposedAmountNaira").optional().isFloat({ min: 50 }),
   validate,
+  requireRole("runner"),
   applications.applyHandler,
 );
 

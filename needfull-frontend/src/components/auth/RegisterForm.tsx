@@ -10,6 +10,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Eye, EyeOff, ChevronLeft, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CelebrationModal } from '@/components/ui/celebration-modal';
+import { useCelebration } from '@/hooks/useCelebration';
 import { useAuth } from '@/store';
 import { post } from '@/lib/apiClient';
 import { OTPInput } from './OTPInput';
@@ -45,6 +47,7 @@ export function RegisterForm() {
     profile: null,
   });
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const celebration = useCelebration();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -126,8 +129,10 @@ export function RegisterForm() {
       });
 
       // WHAT: Registration complete
-      toast.success('Welcome to NeedFull! Account created successfully.');
-      router.push('/feed');
+      celebration.showForAction('poster', 'register', {
+        primaryAction: () => router.push('/feed'),
+        primaryLabel: 'Start Exploring',
+      });
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
@@ -517,6 +522,7 @@ export function RegisterForm() {
           </div>
         </form>
       )}
+      <CelebrationModal open={celebration.open} onClose={celebration.close} config={celebration.config} />
     </div>
   );
 }

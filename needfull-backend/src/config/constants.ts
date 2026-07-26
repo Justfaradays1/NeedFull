@@ -17,6 +17,7 @@ export const WITHDRAWAL_FEE_KOBO = parseInt(
 
 export const MIN_TASK_BUDGET_KOBO = 5000; // ₦50 minimum
 export const MIN_DEPOSIT_KOBO = 10000; // ₦100 minimum
+export const MIN_WITHDRAWAL_KOBO = 10000; // ₦100 minimum
 
 // WHAT: Trust score range and defaults
 // WHY: Gamification mechanism to encourage quality work and platform participation

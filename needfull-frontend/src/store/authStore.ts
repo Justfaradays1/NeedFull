@@ -5,6 +5,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import axios, { AxiosError } from "axios";
+import { handleSessionExpired } from "@/lib/session";
 
 // WHAT: Type definitions for authenticated user
 // WHY: TypeScript support for user data throughout the app
@@ -12,10 +13,13 @@ export interface AuthUser {
   id: string;
   email: string;
   fullName: string;
-  role: "student" | "admin";
+  role: "user" | "admin";
+  roles: string[];
+  activeRole: string;
   emailVerified: boolean;
   trustScore: number;
   profilePictureUrl?: string | null;
+  runnerStatus?: string;
   wallet?: {
     id: string;
     balanceKobo: number;
@@ -24,8 +28,24 @@ export interface AuthUser {
 }
 
 // WHAT: API response types
+interface AuthUserResponse {
+  id: string;
+  email: string;
+  fullName?: string;
+  full_name?: string;
+  role: "user" | "admin";
+  roles?: string[];
+  activeRole?: string;
+  active_role?: string;
+  emailVerified?: boolean;
+  trustScore?: number;
+  trust_score?: number;
+  runnerStatus?: string;
+  profilePictureUrl?: string | null;
+}
+
 interface LoginResponse {
-  user: AuthUser;
+  user: AuthUserResponse;
   tokens: {
     accessToken: string;
     refreshToken: string;
@@ -33,7 +53,7 @@ interface LoginResponse {
 }
 
 interface RegisterResponse {
-  user: AuthUser;
+  user: AuthUserResponse;
   tokens: {
     accessToken: string;
     refreshToken: string;
@@ -41,11 +61,26 @@ interface RegisterResponse {
 }
 
 interface MeResponse {
-  user: AuthUser;
+  user: AuthUserResponse;
   wallet: {
     id: string;
     balanceKobo: number;
     escrowKobo: number;
+  };
+}
+
+function toAuthUser(raw: AuthUserResponse): AuthUser {
+  return {
+    id: raw.id,
+    email: raw.email,
+    fullName: raw.fullName ?? raw.full_name ?? '',
+    role: raw.role,
+    roles: raw.roles ?? ['poster'],
+    activeRole: raw.activeRole ?? raw.active_role ?? 'poster',
+    emailVerified: raw.emailVerified ?? false,
+    trustScore: raw.trustScore ?? raw.trust_score ?? 0,
+    runnerStatus: raw.runnerStatus ?? "none",
+    profilePictureUrl: raw.profilePictureUrl ?? null,
   };
 }
 
@@ -118,7 +153,8 @@ export const useAuthStore = create<AuthStore>()(
             password,
           });
 
-          const { user, tokens } = response.data;
+          const { user: raw, tokens } = response.data;
+          const user = toAuthUser(raw);
 
           // WHAT: Store tokens in localStorage for persistence and cookies for middleware
           localStorage.setItem("nf_access_token", tokens.accessToken);
@@ -132,14 +168,20 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false,
           });
         } catch (err) {
-          const axiosError = err as AxiosError<{ message?: string }>;
+          const axiosError = err as AxiosError<{ message?: string; details?: { message: string }[] }>;
+          const detailMsg =
+            axiosError.response?.data?.details
+              ?.map((d) => d.message)
+              .join(". ") || "";
           const errorMessage =
             axiosError.response?.data?.message ||
+            detailMsg ||
             "Login failed. Please try again.";
           set({
+            user: null,
+            isAuthenticated: false,
             isLoading: false,
             error: errorMessage,
-            isAuthenticated: false,
           });
           throw err;
         }
@@ -165,7 +207,8 @@ export const useAuthStore = create<AuthStore>()(
             },
           );
 
-          const { user, tokens } = response.data;
+          const { user: raw, tokens } = response.data;
+          const user = toAuthUser(raw);
 
           // WHAT: Store tokens in localStorage and cookies
           localStorage.setItem("nf_access_token", tokens.accessToken);
@@ -179,14 +222,20 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false,
           });
         } catch (err) {
-          const axiosError = err as AxiosError<{ message?: string }>;
+          const axiosError = err as AxiosError<{ message?: string; details?: { message: string }[] }>;
+          const detailMsg =
+            axiosError.response?.data?.details
+              ?.map((d) => d.message)
+              .join(". ") || "";
           const errorMessage =
             axiosError.response?.data?.message ||
+            detailMsg ||
             "Registration failed. Please try again.";
           set({
+            user: null,
+            isAuthenticated: false,
             isLoading: false,
             error: errorMessage,
-            isAuthenticated: false,
           });
           throw err;
         }
@@ -220,7 +269,8 @@ export const useAuthStore = create<AuthStore>()(
 
         try {
           const response = await apiClient.get<MeResponse>("/auth/me");
-          const { user, wallet } = response.data;
+          const { user: raw, wallet } = response.data;
+          const user = toAuthUser(raw);
 
           // WHAT: Update user with wallet data
           set({
@@ -236,11 +286,9 @@ export const useAuthStore = create<AuthStore>()(
         } catch (err) {
           const axiosError = err as AxiosError;
 
-          // WHAT: On 401, user session expired — clear auth state
-          // WHY: Prevents stale sessions, forces re-login
+          // WHAT: On 401, session expired — show message and redirect
           if (axiosError.response?.status === 401) {
-            console.warn("Auth token expired, clearing session");
-            get().logout();
+            handleSessionExpired();
           } else {
             // WHAT: Log other errors but don't fail silently
             console.error("Failed to refresh user:", err);

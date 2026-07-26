@@ -7,6 +7,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import compression from "compression";
+import cookieParser from "cookie-parser";
 import { Server as SocketIOServer } from "socket.io";
 import { createServer } from "http";
 import env from "./config/env";
@@ -29,6 +30,10 @@ export const io = new SocketIOServer(server, {
     credentials: true,
   },
 });
+
+// WHAT: Trust proxy — required for express-rate-limit behind a reverse proxy (Next.js rewrites)
+// WHY: Prevents ERR_ERL_UNEXPECTED_X_FORWARDED_FOR warning
+app.set("trust proxy", 1);
 
 // WHAT: Global middleware - Security headers
 app.use(helmet());
@@ -57,6 +62,10 @@ app.use(express.json({ limit: "100kb" }));
 // WHAT: URL-encoded body parser
 // WHY: Parse form submissions
 app.use(express.urlencoded({ limit: "100kb", extended: true }));
+
+// WHAT: Cookie parser middleware
+// WHY: Read cookies for OAuth state parameter and token management
+app.use(cookieParser());
 
 // WHAT: Mount webhook routes BEFORE json() middleware
 // WHY: Webhooks need raw body for signature verification
@@ -104,6 +113,11 @@ app.use("/api/applications", applicationsRoutes);
 // WHY: Task category listing and management
 import categoriesRoutes from "./routes/categories.routes";
 app.use("/api/categories", categoriesRoutes);
+
+// WHAT: Mount purchase routes
+// WHY: Secure escrow-based purchase and delivery system
+import purchaseRoutes from "./routes/purchase.routes";
+app.use("/api/purchase", purchaseRoutes);
 
 // WHAT: Mount review routes
 // WHY: Review creation and listing

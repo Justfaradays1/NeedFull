@@ -9,13 +9,16 @@ import { useRouter } from 'next/navigation';
 import {
   User, Settings, LogOut, ChevronRight, Pencil, Star, Shield,
   MapPin, Award, Clock, CheckCircle2, X, Upload, BadgeCheck,
-  Phone, Mail, GraduationCap, Volume2, Wifi, ToggleLeft, ToggleRight,
+  Phone, Mail, GraduationCap, Volume2, Wifi, UserCheck,
 } from 'lucide-react';
 import { useAuthUser, useAuthStore } from '@/store';
-import { get, patch, post } from '@/lib/apiClient';
-import apiClient from '@/lib/apiClient';
+import apiClient, { get, patch } from '@/lib/apiClient';
 import toast from 'react-hot-toast';
 import { Avatar } from '@/components/ui/avatar';
+import { ToggleRow } from '@/components/ui/toggle';
+import { CelebrationModal } from '@/components/ui/celebration-modal';
+import { useCelebration } from '@/hooks/useCelebration';
+import { ProfileSkeleton } from '@/components/ui/skeletons/ProfileSkeleton';
 
 type TabKey = 'overview' | 'reviews' | 'activity' | 'settings';
 
@@ -26,6 +29,7 @@ interface UserProfile {
   locationLabel: string | null; profilePictureUrl: string | null;
   trustScore: number; tasksCompleted: number;
   isAvailable: boolean; isRunner: boolean;
+  roles: string[]; activeRole: string; runnerStatus: string;
   emailVerified: boolean; isVerifiedStudent: boolean;
   createdAt: string;
   wallet?: { id: string; balanceKobo: number; escrowKobo: number };
@@ -85,6 +89,7 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const celebration = useCelebration();
 
   // Edit profile modal state
   const [editOpen, setEditOpen] = useState(false);
@@ -119,7 +124,7 @@ export default function ProfilePage() {
         setReviews((pubRes as any).data.recentReviews);
       }
       if (postedRes.success) {
-        setActivity(postedRes.data.filter((t) => t.status === 'completed').slice(0, 10));
+        setActivity(postedRes.data.filter((t: TaskRow) => t.status === 'completed').slice(0, 10));
       }
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || 'Failed to load profile';
@@ -144,7 +149,11 @@ export default function ProfilePage() {
         ? patch<{ success: boolean; data: { isAvailable: boolean } }>(endpoint)
         : patch<{ success: boolean; data: { isRunner: boolean } }>(endpoint, body));
       if (res.success) {
-        setProfile((p) => p ? { ...p, [field]: field === 'isAvailable' ? (res as any).data.isAvailable : (res as any).data.isRunner } : null);
+        const newVal = (res as any).data[field === 'isAvailable' ? 'isAvailable' : 'isRunner'];
+        setProfile((p) => p ? { ...p, [field]: newVal } : null);
+        if (field === 'isRunner' && newVal) {
+          celebration.showForAction('runner', 'runner_approved');
+        }
       }
     } catch { toast.error('Failed to update'); }
   };
@@ -183,19 +192,16 @@ export default function ProfilePage() {
     fd.append('idCard', file);
     try {
       await apiClient.post('/users/me/verify-student', fd);
-      toast.success('ID card submitted for verification');
+      fetchProfile();
     } catch { toast.error('Upload failed'); }
     finally { setUploading(false); }
+    if (fileRef.current) fileRef.current.value = '';
   };
 
   const handleLogout = () => { logout(); router.push('/login'); };
 
   if (loading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-      </div>
-    );
+    return <ProfileSkeleton />;
   }
 
   if (fetchError || !profile) {
@@ -304,10 +310,39 @@ export default function ProfilePage() {
             )}
             <div className="space-y-3">
               <ToggleRow label="Available for tasks" enabled={profile.isAvailable} onToggle={() => handleToggle('isAvailable')} />
-              <ToggleRow label="Runner mode" enabled={profile.isRunner} onToggle={() => handleToggle('isRunner')}
-                disabled={profile.trustScore < 30 && !profile.isRunner}
-                disabledHint={profile.trustScore < 30 ? 'Need trust score ≥ 30' : undefined}
-              />
+              {profile.runnerStatus === 'approved' ? (
+                <ToggleRow label="Runner mode" enabled={profile.isRunner} onToggle={() => handleToggle('isRunner')}
+                  disabled={profile.trustScore < 30 && !profile.isRunner}
+                  disabledHint={profile.trustScore < 30 ? 'Need trust score ≥ 30' : undefined}
+                />
+              ) : profile.runnerStatus === 'pending' ? (
+                <div className="flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100">
+                      <Clock className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-amber-800">Runner Application Pending</p>
+                      <p className="text-xs text-amber-600">Your request is being reviewed</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Link href="/become-runner"
+                  className="tap-target flex w-full items-center justify-between rounded-xl border-2 border-dashed border-brand/40 bg-brand-light/20 px-4 py-3.5 transition-colors hover:border-brand hover:bg-brand-light/40"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-light">
+                      <UserCheck className="h-5 w-5 text-brand" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-bold text-brand">Become a Runner</p>
+                      <p className="text-xs text-gray-600">Earn money by completing tasks</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-brand" />
+                </Link>
+              )}
             </div>
             {profile.locationLabel && (
               <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -452,22 +487,7 @@ export default function ProfilePage() {
 
       {/* Hidden file input for student ID verification */}
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleVerificationUpload} />
-    </div>
-  );
-}
-
-function ToggleRow({ label, enabled, onToggle, disabled, disabledHint }: {
-  label: string; enabled: boolean; onToggle: () => void; disabled?: boolean; disabledHint?: string;
-}) {
-  return (
-    <div className="flex items-center justify-between rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
-      <div>
-        <span className={`text-sm font-semibold ${disabled ? 'text-gray-500' : 'text-gray-700'}`}>{label}</span>
-        {disabled && disabledHint && <p className="text-[10px] text-gray-500">{disabledHint}</p>}
-      </div>
-      <button type="button" onClick={onToggle} disabled={disabled} className="tap-target text-brand disabled:text-gray-300">
-        {enabled ? <ToggleRight className="h-7 w-7" /> : <ToggleLeft className="h-7 w-7" />}
-      </button>
+      <CelebrationModal open={celebration.open} onClose={celebration.close} config={celebration.config} />
     </div>
   );
 }
@@ -478,7 +498,7 @@ function VerificationRow({ icon, label, verified, detail, onVerify, uploading }:
   return (
     <div className="flex items-center justify-between rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
       <div className="flex items-center gap-3">
-        <div className={`flex h-8 w-8 items-center justify-center rounded-full ${verified ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
+        <div className={`flex h-8 w-8 items-center justify-center rounded-full ${verified ? 'bg-success-light text-success' : 'bg-gray-100 text-gray-400'}`}>
           {icon}
         </div>
         <div>

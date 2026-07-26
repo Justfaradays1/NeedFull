@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useAuthStore } from '@/store';
-import { Button } from '@/components/ui/button';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuthStore } from "@/store";
+import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   const router = useRouter();
@@ -21,16 +21,16 @@ export default function NotFound() {
     if (window.history.length > 1) {
       router.back();
     } else {
-      router.push(isAuthed ? '/feed' : '/');
+      router.push(isAuthed ? "/feed" : "/");
     }
   }
 
   function handlePrimary() {
-    router.push(isAuthed ? '/feed' : '/');
+    router.push(isAuthed ? "/feed" : "/");
   }
 
   return (
-    <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-white px-4">
+    <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-surface px-4">
       {/* Decorative blurs */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-brand-light/40 blur-3xl" />
@@ -39,7 +39,7 @@ export default function NotFound() {
 
       <div
         className={`flex w-full max-w-md flex-col items-center text-center transition-all duration-700 ease-out ${
-          mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+          mounted ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         }`}
       >
         {/* 404 illustration */}
@@ -102,15 +102,15 @@ export default function NotFound() {
 
         {/* Description */}
         <p className="mb-8 max-w-sm text-[15px] leading-relaxed text-gray-500">
-          The page you&apos;re looking for doesn&apos;t exist, may have been moved,
-          or the link is incorrect.
+          The page you&apos;re looking for doesn&apos;t exist, may have been
+          moved, or the link is incorrect.
         </p>
 
         {/* Buttons */}
         <div className="flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
           <Button
             size="lg"
-            className="w-full sm:w-auto sm:min-w-[180px]"
+            className="w-full sm:w-auto sm:min-w-45"
             onClick={handlePrimary}
           >
             Go to Dashboard
@@ -118,7 +118,7 @@ export default function NotFound() {
           <Button
             variant="outline"
             size="lg"
-            className="w-full sm:w-auto sm:min-w-[140px]"
+            className="w-full sm:w-auto sm:min-w-35"
             onClick={handleGoBack}
           >
             Go Back
@@ -127,7 +127,7 @@ export default function NotFound() {
 
         {/* Helpful navigation */}
         <p className="mt-10 text-sm text-gray-400">
-          Looking for something?{' '}
+          Looking for something?{" "}
           <Link
             href="/tasks"
             className="font-semibold text-brand hover:text-brand-mid transition-colors"

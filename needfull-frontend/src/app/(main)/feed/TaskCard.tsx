@@ -4,6 +4,7 @@
 
 'use client';
 
+import { formatCurrency } from '@/lib/format';
 import {
   Flame,
   ShieldCheck,
@@ -40,14 +41,6 @@ interface TaskCardProps {
   onPress?: (task: FeedTask) => void;
 }
 
-// WHAT: Format naira for display
-function fmt(amount: number): string {
-  return amount.toLocaleString('en-NG', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-}
-
 // WHAT: Format deadline to readable string
 function formatDeadline(iso: string | null): string | null {
   if (!iso) return null;
@@ -73,7 +66,7 @@ function formatDistance(meters: number | null): string | null {
 export default function TaskCard({ task, onPress }: TaskCardProps) {
   const distance = formatDistance(task.distance);
   const deadline = formatDeadline(task.deadline);
-  const budget = task.budget.naira;
+  const budget = task.budget.kobo;
 
   // WHAT: Determine left border accent
   let borderAccent = '';
@@ -105,7 +98,7 @@ export default function TaskCard({ task, onPress }: TaskCardProps) {
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       className={`
-        cursor-pointer select-none rounded-2xl border border-gray-100 bg-white
+        cursor-pointer select-none rounded-2xl border border-card-border bg-surface
         border-l-[3px] px-4 pb-3 pt-3.5 shadow-card transition-shadow duration-200
         active:scale-[0.99]
         hover:border-brand/30 hover:shadow-lifted
@@ -137,7 +130,7 @@ export default function TaskCard({ task, onPress }: TaskCardProps) {
 
         {/* Budget */}
         <span className="shrink-0 font-display text-lg font-bold leading-none text-brand">
-          ₦{fmt(budget)}
+          {formatCurrency(budget)}
         </span>
       </div>
 

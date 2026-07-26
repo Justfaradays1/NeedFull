@@ -4,7 +4,7 @@
 import { Router } from "express";
 import { body, query, param } from "express-validator";
 import multer from "multer";
-import { authenticate, optionalAuth } from "../middleware/auth";
+import { authenticate, optionalAuth, requireRole } from "../middleware/auth";
 import { validate } from "../middleware/validate";
 import * as tasks from "../controllers/tasks.controller";
 
@@ -27,7 +27,7 @@ router.get("/", optionalAuth,
   tasks.listTasksHandler,
 );
 
-router.post("/", authenticate, upload.single("image"),
+router.post("/", authenticate, requireRole("poster"), upload.single("image"),
   body("categoryId").isUUID(),
   body("title").trim().isLength({ min: 5, max: 200 }),
   body("description").trim().isLength({ min: 10, max: 2000 }),
@@ -42,7 +42,7 @@ router.post("/", authenticate, upload.single("image"),
 );
 
 router.get("/me/posted", authenticate, tasks.getMyPostedTasks);
-router.get("/me/assigned", authenticate, tasks.getMyAssignedTasks);
+router.get("/me/assigned", authenticate, requireRole("runner"), tasks.getMyAssignedTasks);
 
 router.get("/:taskId", optionalAuth, param("taskId").isUUID(), validate, tasks.getTaskHandler);
 

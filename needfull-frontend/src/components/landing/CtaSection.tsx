@@ -1,7 +1,9 @@
 export function CtaSection() {
   return (
-    <section id="cta" className="px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-background)' }}>
-      <div className="mx-auto max-w-2xl text-center">
+    <section id="cta" className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-background)' }}>
+      {/* Faint grid */}
+      <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.15) 1px, transparent 1px)`, backgroundSize: "48px 48px" }} />
+      <div className="relative z-10 mx-auto max-w-2xl text-center">
         <h2 className="font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>
           Ready to turn campus time into real income?
         </h2>

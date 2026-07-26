@@ -1,8 +1,8 @@
 export default function WalletLoading() {
   return (
-    <div className="min-h-screen bg-gray-50 safe-all">
+    <div className="min-h-screen page-shell safe-all">
       {/* Gradient brand header skeleton */}
-      <div className="bg-gradient-to-b from-brand-dark to-brand px-4 pb-8 pt-4 sm:px-6">
+      <div className="bg-linear-to-b from-brand-dark to-brand px-4 pb-8 pt-4 sm:px-6">
         <div className="mb-4 flex items-center justify-between">
           <div className="h-5 w-16 skeleton rounded" />
           <div className="h-9 w-9 skeleton rounded-full" />
@@ -32,10 +32,13 @@ export default function WalletLoading() {
 
       {/* Transaction list skeleton */}
       <div className="mx-4 mt-4 pb-8 sm:mx-6">
-        <div className="rounded-2xl border border-gray-100 bg-white p-5">
+        <div className="rounded-2xl border border-card-border bg-surface p-5">
           <div className="h-4 w-40 skeleton rounded mb-4" />
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 py-4 border-t border-gray-100 first:border-t-0">
+            <div
+              key={i}
+              className="flex items-center gap-3 py-4 border-t border-gray-100 first:border-t-0"
+            >
               <div className="h-9 w-9 skeleton rounded-full shrink-0" />
               <div className="flex-1 space-y-1.5">
                 <div className="h-3.5 w-32 skeleton rounded" />

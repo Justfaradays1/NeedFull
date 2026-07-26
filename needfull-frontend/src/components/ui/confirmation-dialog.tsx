@@ -45,7 +45,7 @@ export function ConfirmationDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
       <div className="fixed inset-0 glass-overlay" onClick={onCancel} />
-      <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-lifted animate-in fade-in zoom-in-95">
+      <div className="relative w-full max-w-sm rounded-2xl bg-surface p-6 shadow-lifted border border-card-border animate-in fade-in zoom-in-95">
         <button
           type="button" onClick={onCancel}
           className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"

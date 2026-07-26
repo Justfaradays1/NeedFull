@@ -86,7 +86,7 @@ export async function recalculateTrustScore(userId: string): Promise<number> {
         -- VERIFICATION: Email, phone, student ID verified
         COALESCE(u.email_verified, false) as email_verified,
         COALESCE(u.phone_verified, false) as phone_verified,
-        COALESCE((u.metadata->>'studentIdVerified')::boolean, false) as student_id_verified,
+        COALESCE(u.is_verified_student, false) as student_id_verified,
         
         -- REPORTS: Open reports against this user
         COALESCE(SUM(CASE WHEN rep.status = 'open' THEN 1 ELSE 0 END), 0) as open_report_count,

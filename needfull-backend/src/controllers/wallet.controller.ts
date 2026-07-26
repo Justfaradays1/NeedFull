@@ -35,7 +35,7 @@ export async function getTransactions(req: Request, res: Response): Promise<void
 
     const [txns, countRes] = await Promise.all([
       db.query<any>(
-        `SELECT wt.id, wt.type, wt.amount AS amount_kobo, wt.balance_before AS balance_before_kobo, wt.balance_after AS balance_after_kobo, wt.reference, wt.task_id, wt.note, wt.created_at, t.title as task_title
+        `SELECT wt.id, wt.type, wt.amount AS amount_kobo, wt.balance_before AS balance_before_kobo, wt.balance_after AS balance_after_kobo, wt.task_id, wt.note, wt.created_at, t.title as task_title
          FROM wallet_transactions wt LEFT JOIN tasks t ON wt.task_id = t.id
          WHERE wt.wallet_id = $1 ORDER BY wt.created_at DESC LIMIT $2 OFFSET $3`,
         [wallet.rows[0].id, perPage, offset],
@@ -46,7 +46,7 @@ export async function getTransactions(req: Request, res: Response): Promise<void
     const total = parseInt(countRes.rows[0]?.count || "0", 10);
     res.json({
       success: true,
-      data: txns.rows.map((tx: any) => ({ id: tx.id, type: tx.type, amount: { kobo: tx.amount_kobo, naira: tx.amount_kobo / 100 }, balanceBefore: { kobo: tx.balance_before_kobo, naira: tx.balance_before_kobo / 100 }, balanceAfter: { kobo: tx.balance_after_kobo, naira: tx.balance_after_kobo / 100 }, reference: tx.reference, taskId: tx.task_id, taskTitle: tx.task_title, note: tx.note, createdAt: tx.created_at })),
+      data: txns.rows.map((tx: any) => ({ id: tx.id, type: tx.type, amount: { kobo: tx.amount_kobo, naira: tx.amount_kobo / 100 }, balanceBefore: { kobo: tx.balance_before_kobo, naira: tx.balance_before_kobo / 100 }, balanceAfter: { kobo: tx.balance_after_kobo, naira: tx.balance_after_kobo / 100 }, taskId: tx.task_id, taskTitle: tx.task_title, note: tx.note, createdAt: tx.created_at })),
       pagination: { page, perPage, total, totalPages: Math.ceil(total / perPage) },
     });
   } catch (error) {

@@ -176,7 +176,7 @@ export function NotificationItem({
 
       {/* Context Menu */}
       {showMenu && (
-        <div className="absolute right-0 top-12 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+        <div className="absolute right-0 top-12 bg-surface rounded-lg shadow-lg border border-card-border z-10">
           {!notification.is_read && (
             <button
               onClick={handleMarkReadClick}

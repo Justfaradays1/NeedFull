@@ -17,7 +17,7 @@ export function FundingMethodCard({ method, title, description, selected, onClic
     <div 
       onClick={onClick}
       className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
-        selected ? "border-primary bg-primary/5" : "border-gray-200 bg-white hover:border-primary/50"
+        selected ? "border-primary bg-primary/5" : "border-card-border bg-surface hover:border-primary/50"
       }`}
     >
       {selected && (

@@ -91,6 +91,20 @@ router.get("/tasks",
 );
 router.post("/tasks/:id/cancel", param("id").isUUID(), validate, admin.cancelTaskAdmin);
 
+// Runner applications
+router.get("/runner-applications",
+  query("page").optional().isInt({ min: 1 }).toInt(),
+  query("perPage").optional().isInt({ min: 1, max: 100 }).toInt(),
+  validate,
+  admin.listRunnerApplications,
+);
+router.post("/runner-applications/:id/review",
+  param("id").isUUID(),
+  body("action").isIn(["approve", "reject"]),
+  validate,
+  admin.reviewRunnerApplication,
+);
+
 // Transactions
 router.get("/transactions",
   query("type").optional().isString(),

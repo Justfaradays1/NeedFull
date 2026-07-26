@@ -24,10 +24,49 @@ interface TaskRow {
   status: string;
   location_label: string | null;
   location: any;
+  lat: number | null;
+  lng: number | null;
   image_url: string | null;
   assigned_to: string | null;
+  runner_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// WHAT: Per-task capabilities — computed server-side, authoritative for UI
+// WHY: Never trust client-side role flags; these tell the frontend exactly
+//      what buttons to show/enable for the current user on this task
+export interface TaskCapabilities {
+  canEdit: boolean;
+  canCancel: boolean;
+  canViewApplications: boolean;
+  canApply: boolean;
+  canConfirmCompletion: boolean;
+  canChat: boolean;
+  canRate: boolean;
+}
+
+// WHAT: Compute what the current user is allowed to do on a given task
+// WHY: Single source of truth for permission checks — used by both server-side
+//      services and returned to the frontend for UI rendering
+export function getTaskCapabilities(
+  userId: string,
+  task: { posterId: string; assignedRunnerId: string | null; status: string },
+): TaskCapabilities {
+  const isPoster = task.posterId === userId;
+  const isRunner = task.assignedRunnerId === userId;
+  const s = task.status;
+  const hasRunner = !!task.assignedRunnerId;
+
+  return {
+    canEdit: isPoster && s === "open",
+    canCancel: isPoster && (s === "open" || s === "in_progress"),
+    canViewApplications: isPoster && s === "open",
+    canApply: !isPoster && s === "open" && !hasRunner,
+    canConfirmCompletion: isPoster && s === "in_progress" && hasRunner,
+    canChat: (isPoster || isRunner) && hasRunner,
+    canRate: (isPoster || isRunner) && s === "completed",
+  };
 }
 
 // WHAT: Filters accepted by listTasks
@@ -206,25 +245,36 @@ export async function listTasks(
 
   const result = await db.query<any>(dataSQL, params);
 
-  const data = result.rows.map((row: any) => ({
-    id: row.id,
-    title: row.title,
-    description: row.description,
-    budget: { kobo: row.budget_kobo, naira: row.budget_kobo / 100 },
-    deadline: row.deadline,
-    isUrgent: row.is_urgent,
-    status: row.status,
-    locationLabel: row.location_label,
-    lat: row.lat,
-    lng: row.lng,
-    imageUrl: row.image_url,
-    runnerId: row.runner_id,
-    distance: row.distance,
-    poster: row.poster,
-    category: row.category,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  }));
+  const data = result.rows.map((row: any) => {
+    const capabilities = currentUserId
+      ? getTaskCapabilities(currentUserId, {
+          posterId: row.poster.id,
+          assignedRunnerId: row.runner_id,
+          status: row.status,
+        })
+      : undefined;
+
+    return {
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      budget: { kobo: row.budget_kobo, naira: row.budget_kobo / 100 },
+      deadline: row.deadline,
+      isUrgent: row.is_urgent,
+      status: row.status,
+      locationLabel: row.location_label,
+      lat: row.lat,
+      lng: row.lng,
+      imageUrl: row.image_url,
+      runnerId: row.runner_id,
+      distance: row.distance,
+      poster: row.poster,
+      category: row.category,
+      capabilities,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+  });
 
   return {
     data,
@@ -235,11 +285,12 @@ export async function listTasks(
 }
 
 // WHAT: Get a single task by ID with full details
-// WHY: Detail view needs poster profile, category, and distance
+// WHY: Detail view needs poster profile, category, distance, and capabilities
 export async function getTask(
   taskId: string,
   currentLat?: number,
   currentLng?: number,
+  currentUserId?: string,
 ): Promise<any> {
   let distanceSelect = "NULL::float as distance";
   const params: any[] = [taskId];
@@ -286,6 +337,14 @@ export async function getTask(
 
   const row = await queryOne<any>(sql, params);
 
+  const capabilities = currentUserId
+    ? getTaskCapabilities(currentUserId, {
+        posterId: row.poster_id,
+        assignedRunnerId: row.runner_id,
+        status: row.status,
+      })
+    : undefined;
+
   return {
     id: row.id,
     posterId: row.poster_id,
@@ -303,6 +362,7 @@ export async function getTask(
     distance: row.distance,
     poster: row.poster,
     category: row.category,
+    capabilities,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -386,6 +446,11 @@ export async function createTask(
     title: task.title,
     budget: { kobo: task.budget_kobo, naira: task.budget_kobo / 100 },
     status: task.status,
+    capabilities: getTaskCapabilities(userId, {
+      posterId: userId,
+      assignedRunnerId: null,
+      status: task.status,
+    }),
     createdAt: task.created_at,
   };
 }
@@ -485,6 +550,11 @@ export async function updateTask(
     title: result.title,
     budget: { kobo: result.budget_kobo, naira: result.budget_kobo / 100 },
     status: result.status,
+    capabilities: getTaskCapabilities(userId, {
+      posterId: userId,
+      assignedRunnerId: result.assigned_to,
+      status: result.status,
+    }),
     updatedAt: result.updated_at,
   };
 }

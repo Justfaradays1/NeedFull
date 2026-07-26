@@ -64,8 +64,8 @@ export async function register(req: Request, res: Response): Promise<void> {
     await withTransaction(async (client) => {
       // WHAT: Create user (wallet auto-created via DB trigger)
       const userResult = await client.query(
-        `INSERT INTO users (id, email, password_hash, full_name, phone, role, email_verified_at)
-         VALUES ($1, $2, $3, $4, $5, $6, NULL)
+        `INSERT INTO users (id, email, password_hash, full_name, phone, role, roles, active_role, email_verified_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NULL)
          RETURNING id, email, role`,
         [
           uuidv4(),
@@ -74,6 +74,8 @@ export async function register(req: Request, res: Response): Promise<void> {
           fullName.trim(),
           phone || "",
           "user",
+          "{poster}",
+          "poster",
         ],
       );
 
@@ -117,6 +119,8 @@ export async function register(req: Request, res: Response): Promise<void> {
         id: newUser.id,
         email: newUser.email,
         role: newUser.role,
+        roles: ["poster"],
+        activeRole: "poster",
       },
       tokens: {
         accessToken,
@@ -149,7 +153,7 @@ export async function login(req: Request, res: Response): Promise<void> {
 
     // WHAT: Find user by email
     const userResult = await query(
-      "SELECT id, email, password_hash, role FROM users WHERE email = $1",
+      "SELECT id, email, password_hash, role, roles, active_role FROM users WHERE email = $1",
       [email],
     );
 
@@ -196,6 +200,8 @@ export async function login(req: Request, res: Response): Promise<void> {
         id: user.id,
         email: user.email,
         role: user.role,
+        roles: user.roles || ["poster"],
+        activeRole: user.active_role || "poster",
       },
       tokens: {
         accessToken,
@@ -495,20 +501,22 @@ export async function getMe(req: Request, res: Response): Promise<void> {
     }
 
     // WHAT: Fetch user and wallet in single query
-    const result = await queryOne<{
+      const result = await queryOne<{
       id: string;
       email: string;
-      first_name: string;
-      last_name: string;
+      full_name: string;
       role: "user" | "admin";
+      roles: string[];
+      active_role: string;
       email_verified_at: string | null;
+      google_id: string | null;
       wallet_id: string;
-      balance_kobo: number;
-      escrow_kobo: number;
+      balance: number;
+      escrow: number;
       trust_score: number;
     }>(
       `SELECT 
-        u.id, u.email, u.full_name, u.role, u.email_verified_at,
+        u.id, u.email, u.full_name, u.role, u.roles, u.active_role, u.email_verified_at, u.google_id,
         w.id as wallet_id, w.balance, w.escrow,
         COALESCE(u.trust_score, 50) as trust_score
        FROM users u
@@ -523,8 +531,11 @@ export async function getMe(req: Request, res: Response): Promise<void> {
         email: result.email,
         fullName: result.full_name,
         role: result.role,
+        roles: result.roles || ["poster"],
+        activeRole: result.active_role || "poster",
         email_verified_at: result.email_verified_at,
-        trust_score: result.trust_score,
+        trustScore: result.trust_score,
+        googleId: result.google_id,
       },
       wallet: {
         id: result.wallet_id,

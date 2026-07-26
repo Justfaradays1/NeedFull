@@ -6,6 +6,7 @@ import { body } from "express-validator";
 import { authenticate } from "../middleware/auth";
 import { validate } from "../middleware/validate";
 import { queryOne } from "../config/db";
+import { withTransaction } from "../config/db";
 
 const router = Router();
 router.use(authenticate);
@@ -54,30 +55,53 @@ router.patch("/preferences",
     try {
       const userId = req.user!.id;
 
-      const setClauses: string[] = [];
-      const params: any[] = [];
-      let idx = 1;
+      const prefCols: string[] = [];
+      const prefVals: any[] = [];
 
       for (const field of PREFERENCE_FIELDS) {
         if (req.body[field] !== undefined) {
-          setClauses.push(`${field} = $${idx++}`);
-          params.push(req.body[field]);
+          prefCols.push(field);
+          prefVals.push(req.body[field]);
         }
       }
 
-      if (setClauses.length === 0) {
+      if (prefCols.length === 0) {
         res.status(400).json({ success: false, message: "No valid fields to update" });
         return;
       }
 
-      setClauses.push("updated_at = NOW()");
-      params.push(userId);
+      const result = await withTransaction(async (client) => {
+        const paramPlaceholders = prefCols.map((_, i) => `$${i + 1}`).join(", ");
+        const colAssignments = prefCols.map((col) => `${col} = EXCLUDED.${col}`).join(", ");
+        const allParams = [...prefVals, userId];
 
-      const result = await queryOne<any>(
-        `UPDATE user_preferences SET ${setClauses.join(", ")} WHERE user_id = $${idx}
-         RETURNING ${SELECT_COLS}`,
-        params,
-      );
+        const prefResult = await client.query(
+          `INSERT INTO user_preferences (user_id, ${prefCols.join(", ")})
+           VALUES ($${prefCols.length + 1}, ${paramPlaceholders})
+           ON CONFLICT (user_id) DO UPDATE SET ${colAssignments}, updated_at = NOW()
+           RETURNING ${SELECT_COLS}`,
+          allParams,
+        );
+
+        // WHAT: Sync preferred_role to user's actual roles array
+        // WHY: When user picks a role at registration we need to grant/revoke runner
+        if (req.body.preferred_role !== undefined) {
+          const role = req.body.preferred_role;
+          if (role === "both") {
+            await client.query(
+              "UPDATE users SET roles = $1, active_role = 'poster' WHERE id = $2",
+              [["poster", "runner"], userId],
+            );
+          } else {
+            await client.query(
+              "UPDATE users SET roles = $1, active_role = $2 WHERE id = $3",
+              [["poster"], "poster", userId],
+            );
+          }
+        }
+
+        return prefResult.rows[0];
+      });
 
       res.json({ success: true, data: result });
     } catch (error) {

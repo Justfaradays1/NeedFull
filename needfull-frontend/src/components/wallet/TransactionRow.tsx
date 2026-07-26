@@ -1,3 +1,4 @@
+import { formatCurrency } from "@/lib/format";
 import { ArrowDownLeft, ArrowUpRight, Lock, Unlock, Clock, RefreshCw } from "lucide-react";
 
 interface TransactionRowProps {
@@ -47,7 +48,7 @@ export function TransactionRow({ type, amountKobo, note, createdAt }: Transactio
     }
   };
 
-  const formattedAmount = `₦${(amountKobo / 100).toLocaleString()}`;
+  const formattedAmount = formatCurrency(amountKobo);
   const prefix = ["deposit", "transfer_in", "refund", "escrow_refund", "escrow_release"].includes(type) ? "+" : "-";
   
   return (

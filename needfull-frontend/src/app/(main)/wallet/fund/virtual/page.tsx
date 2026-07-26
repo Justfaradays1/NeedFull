@@ -2,15 +2,24 @@
 // WHY: Users get a dedicated NUBAN account number to transfer funds — deposits credit automatically via Monnify webhooks
 // FUTURE: Add multiple bank options, add QR code, add saved beneficiary shortcut
 
-'use client';
+"use client";
 
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { ArrowLeft, Copy, Check, Wallet, Banknote, RefreshCw, Loader2 } from 'lucide-react';
-import toast from 'react-hot-toast';
-import { useIsAuthenticated, useAuthUser, useAuthInit } from '@/store';
-import { get } from '@/lib/apiClient';
+import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  Copy,
+  Check,
+  Wallet,
+  Banknote,
+  RefreshCw,
+  Loader2,
+} from "lucide-react";
+import toast from "react-hot-toast";
+import { useIsAuthenticated, useAuthUser, useAuthInit } from "@/store";
+import { get } from "@/lib/apiClient";
+import { formatCurrency } from "@/lib/format";
 
 // WHAT: Virtual account data from API
 interface VirtualAccount {
@@ -34,23 +43,15 @@ interface Transaction {
   createdAt: string;
 }
 
-// WHAT: Convert kobo to naira string for display
-function formatNaira(kobo: number): string {
-  return (kobo / 100).toLocaleString('en-NG', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
-
 // WHAT: Format a date string to a readable format
 function formatDate(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleDateString('en-NG', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return d.toLocaleDateString("en-NG", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -61,7 +62,9 @@ export default function VirtualFundPage() {
   useAuthInit();
 
   // WHAT: Virtual account state
-  const [virtualAccount, setVirtualAccount] = useState<VirtualAccount | null>(null);
+  const [virtualAccount, setVirtualAccount] = useState<VirtualAccount | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -75,7 +78,7 @@ export default function VirtualFundPage() {
   // WHAT: Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push("/login");
     }
   }, [isAuthenticated, router]);
 
@@ -94,7 +97,7 @@ export default function VirtualFundPage() {
         data: {
           virtualAccount: VirtualAccount;
         };
-      }>('/wallet/fund/virtual');
+      }>("/wallet/fund/virtual");
 
       setVirtualAccount(res.data.virtualAccount);
 
@@ -105,16 +108,16 @@ export default function VirtualFundPage() {
         const txRes = await get<{
           success: boolean;
           data: Transaction[];
-        }>('/wallet/transactions?perPage=50');
+        }>("/wallet/transactions?perPage=50");
 
         // WHAT: Filter to only virtual/monnify deposits
         const virtualTx = (txRes.data || []).filter(
-          (tx) => tx.type === 'monnify_deposit',
+          (tx) => tx.type === "monnify_deposit",
         );
         setTransactions(virtualTx);
       } catch {
         // Transactions are non-critical — silently fail
-        console.warn('Failed to load transaction history');
+        console.warn("Failed to load transaction history");
       } finally {
         setTransactionsLoading(false);
       }
@@ -122,7 +125,7 @@ export default function VirtualFundPage() {
       const message =
         err instanceof Error
           ? err.message
-          : 'Failed to load virtual account. Please try again.';
+          : "Failed to load virtual account. Please try again.";
       setError(message);
       toast.error(message);
     } finally {
@@ -136,7 +139,7 @@ export default function VirtualFundPage() {
 
   // WHAT: Refresh data (pull-to-refresh style)
   async function handleRefresh() {
-    toast.success('Refreshing...');
+    toast.success("Refreshing...");
     await fetchData();
   }
 
@@ -150,17 +153,17 @@ export default function VirtualFundPage() {
     try {
       await navigator.clipboard.writeText(virtualAccount.accountNumber);
       setCopied(true);
-      toast.success('Account number copied!');
+      toast.success("Account number copied!");
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error('Failed to copy. Please select and copy manually.');
+      toast.error("Failed to copy. Please select and copy manually.");
     }
   }
 
   const balanceKobo = user?.wallet?.balanceKobo ?? 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 safe-all">
+    <div className="min-h-screen page-shell safe-all">
       {/* WHAT: Brand green header with balance */}
       <div className="bg-brand px-4 pb-6 pt-4 sm:px-6">
         <div className="mb-4 flex items-center gap-3">
@@ -180,7 +183,9 @@ export default function VirtualFundPage() {
             disabled={isLoading}
             className="tap-target ml-auto flex h-9 w-9 items-center justify-center rounded-full text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
           >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+            />
           </button>
         </div>
 
@@ -189,7 +194,7 @@ export default function VirtualFundPage() {
           <div className="mt-1 flex items-baseline gap-1.5">
             <Wallet className="h-5 w-5 text-gold" />
             <span className="font-display text-3xl font-bold text-white">
-              ₦{formatNaira(balanceKobo)}
+              {formatCurrency(balanceKobo)}
             </span>
           </div>
         </div>
@@ -229,7 +234,7 @@ export default function VirtualFundPage() {
         <>
           {/* Virtual account card */}
           <div className="mx-4 -mt-4 sm:mx-6">
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
+            <div className="rounded-2xl border border-card-border bg-surface p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
               <div className="mb-1 flex items-center justify-between">
                 <h2 className="font-display text-sm font-bold text-gray-900">
                   Your dedicated account
@@ -244,14 +249,18 @@ export default function VirtualFundPage() {
                 <Banknote className="h-5 w-5 shrink-0 text-brand" />
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-brand-dark">Bank</p>
-                  <p className="text-sm font-bold text-brand">{virtualAccount.bankName}</p>
+                  <p className="text-sm font-bold text-brand">
+                    {virtualAccount.bankName}
+                  </p>
                 </div>
               </div>
 
               {/* Account number with copy */}
               <div className="mt-2 flex items-center gap-3 rounded-lg bg-gray-50 px-4 py-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium text-gray-500">Account Number</p>
+                  <p className="text-xs font-medium text-gray-500">
+                    Account Number
+                  </p>
                   <p className="font-display text-2xl font-bold tracking-widest text-gray-900">
                     {virtualAccount.accountNumber}
                   </p>
@@ -259,7 +268,7 @@ export default function VirtualFundPage() {
                 <button
                   type="button"
                   onClick={copyAccountNumber}
-                  className="tap-target flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm transition-colors hover:bg-gray-100"
+                  className="tap-target flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface shadow-sm transition-colors hover:bg-gray-100"
                 >
                   {copied ? (
                     <Check className="h-5 w-5 text-green-600" />
@@ -271,8 +280,12 @@ export default function VirtualFundPage() {
 
               {/* Account name */}
               <div className="mt-2 rounded-lg bg-gray-50 px-4 py-3">
-                <p className="text-xs font-medium text-gray-500">Account Name</p>
-                <p className="text-sm font-semibold text-gray-900">{virtualAccount.accountName}</p>
+                <p className="text-xs font-medium text-gray-500">
+                  Account Name
+                </p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {virtualAccount.accountName}
+                </p>
               </div>
 
               {/* Transfer info */}
@@ -297,7 +310,7 @@ export default function VirtualFundPage() {
 
           {/* Instructions */}
           <div className="mt-4 px-4 sm:px-6">
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
+            <div className="rounded-2xl border border-card-border bg-surface p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
               <h2 className="font-display text-sm font-bold text-gray-900">
                 How to fund your wallet
               </h2>
@@ -337,7 +350,8 @@ export default function VirtualFundPage() {
                       Your NeedFull wallet credits automatically
                     </p>
                     <p className="text-xs text-gray-500">
-                      Funds appear in your wallet within 5 minutes — no manual confirmation needed
+                      Funds appear in your wallet within 5 minutes — no manual
+                      confirmation needed
                     </p>
                   </div>
                 </li>
@@ -347,7 +361,7 @@ export default function VirtualFundPage() {
 
           {/* Transaction history */}
           <div className="mt-4 px-4 pb-8 sm:px-6">
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
+            <div className="rounded-2xl border border-card-border bg-surface p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
               <h2 className="font-display text-sm font-bold text-gray-900">
                 Deposit History
               </h2>
@@ -369,7 +383,10 @@ export default function VirtualFundPage() {
               ) : (
                 <div className="mt-3 divide-y divide-gray-100">
                   {transactions.map((tx) => (
-                    <div key={tx.id} className="flex items-center justify-between py-3">
+                    <div
+                      key={tx.id}
+                      className="flex items-center justify-between py-3"
+                    >
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-gray-900">
                           Transfer received
@@ -378,18 +395,18 @@ export default function VirtualFundPage() {
                           {formatDate(tx.createdAt)}
                         </p>
                         {tx.note && (
-                          <p className="mt-0.5 text-xs text-gray-500 truncate max-w-[200px]">
+                          <p className="mt-0.5 text-xs text-gray-500 truncate max-w-50">
                             {tx.note}
                           </p>
                         )}
                       </div>
                       <div className="text-right shrink-0 ml-3">
                         <p className="text-sm font-bold text-green-600">
-                          +₦{formatNaira(tx.amount.kobo)}
+                          +{formatCurrency(tx.amount.kobo)}
                         </p>
                         {tx.balanceAfter && (
                           <p className="text-xs text-gray-500">
-                            Bal: ₦{formatNaira(tx.balanceAfter.kobo)}
+                            Bal: {formatCurrency(tx.balanceAfter.kobo)}
                           </p>
                         )}
                       </div>

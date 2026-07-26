@@ -41,6 +41,9 @@ const envSchema = z.object({
   MONNIFY_CONTRACT_CODE: z.string().min(1),
   MONNIFY_BASE_URL: z.string().url("Invalid MONNIFY_BASE_URL"),
 
+  // Backend URL (used for OAuth callback redirect URI)
+  BACKEND_URL: z.string().url("Invalid BACKEND_URL").default("http://localhost:5000"),
+
   // Google OAuth
   GOOGLE_CLIENT_ID: z.string().default(""),
   GOOGLE_CLIENT_SECRET: z.string().default(""),

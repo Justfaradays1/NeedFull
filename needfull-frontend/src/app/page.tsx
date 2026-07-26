@@ -12,13 +12,21 @@ export default function LandingPage() {
   return (
     <>
       <Navbar />
-      <HeroSection />
-      <HowItWorksSection />
-      <EarnSection />
-      <TestimonialsSection />
-      <PosterSection />
-      <FaqSection />
-      <CtaSection />
+      <main className="relative">
+        {/* Abstract glowing blurs */}
+        <div className="pointer-events-none fixed -right-48 -top-48 h-[600px] w-[600px] rounded-full bg-gold/5 blur-3xl" />
+        <div className="pointer-events-none fixed -bottom-48 -left-48 h-[500px] w-[500px] rounded-full bg-brand/5 blur-3xl" />
+        {/* Subtle top-left accent */}
+        <div className="pointer-events-none fixed left-1/4 top-1/3 h-64 w-64 rounded-full bg-brand-light/30 blur-3xl" />
+
+        <HeroSection />
+        <HowItWorksSection />
+        <EarnSection />
+        <TestimonialsSection />
+        <PosterSection />
+        <FaqSection />
+        <CtaSection />
+      </main>
       <FooterSection />
     </>
   );

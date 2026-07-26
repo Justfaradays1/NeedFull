@@ -2,22 +2,21 @@
 // WHY: Users choose how to add money to their wallet — manual bank transfer (free), virtual account (~₦30), or card (1.5% + ₦100)
 // FUTURE: Add saved payment methods, add quick-amount presets, add promo code entry
 
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { ChevronRight, Landmark, CreditCard, Smartphone, Wallet, ArrowLeft } from 'lucide-react';
-import { useIsAuthenticated, useAuthUser, useAuthInit } from '@/store';
-
-// WHAT: Convert kobo to naira string for display
-// WHY: All amounts stored as kobo integers, display requires naira formatting
-function formatNaira(kobo: number): string {
-  return (kobo / 100).toLocaleString('en-NG', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+  ChevronRight,
+  Landmark,
+  CreditCard,
+  Smartphone,
+  Wallet,
+  ArrowLeft,
+} from "lucide-react";
+import { useIsAuthenticated, useAuthUser, useAuthInit } from "@/store";
+import { formatCurrency } from "@/lib/format";
 
 // WHAT: Funding method card props
 interface FundingCardProps {
@@ -33,11 +32,20 @@ interface FundingCardProps {
 
 // WHAT: Single funding method card with icon, badge, description, and fee
 // WHY: Consistent, tappable selection card for each funding method
-function FundingCard({ href, icon, title, description, badge, fee, feeWarning, highlight }: FundingCardProps) {
+function FundingCard({
+  href,
+  icon,
+  title,
+  description,
+  badge,
+  fee,
+  feeWarning,
+  highlight,
+}: FundingCardProps) {
   return (
     <Link
       href={href}
-      className="tap-target group flex w-full items-start gap-4 rounded-2xl border border-gray-100 bg-white p-5 text-left shadow-card transition-shadow duration-200 hover:border-brand/30 hover:shadow-lifted active:scale-[0.99]"
+      className="tap-target group flex w-full items-start gap-4 rounded-2xl border border-card-border bg-surface p-5 text-left shadow-card transition-shadow duration-200 hover:border-brand/30 hover:shadow-lifted active:scale-[0.99]"
     >
       {/* Icon container */}
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-light text-brand">
@@ -51,9 +59,7 @@ function FundingCard({ href, icon, title, description, badge, fee, feeWarning, h
           {badge && (
             <span
               className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${
-                badge.gold
-                  ? 'bg-gold text-white'
-                  : 'bg-brand-light text-brand'
+                badge.gold ? "bg-gold text-white" : "bg-brand-light text-brand"
               }`}
             >
               {badge.text}
@@ -72,13 +78,13 @@ function FundingCard({ href, icon, title, description, badge, fee, feeWarning, h
         </h3>
 
         {/* Description */}
-        <p className="text-sm leading-relaxed text-gray-600">
-          {description}
-        </p>
+        <p className="text-sm leading-relaxed text-gray-600">{description}</p>
 
         {/* Fee disclaimer */}
         {fee && (
-          <p className={`text-xs font-medium ${feeWarning ? 'text-amber-600' : 'text-gray-500'}`}>
+          <p
+            className={`text-xs font-medium ${feeWarning ? "text-amber-600" : "text-gray-500"}`}
+          >
             {fee}
           </p>
         )}
@@ -102,7 +108,7 @@ export default function WalletFundPage() {
   // WHY: Protect wallet page from unauthenticated access
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push("/login");
     }
   }, [isAuthenticated, router]);
 
@@ -113,9 +119,9 @@ export default function WalletFundPage() {
   const balanceKobo = user?.wallet?.balanceKobo ?? 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 safe-all">
-      {/* WHAT: Brand green header */}
-      <div className="bg-brand px-4 pb-6 pt-4 sm:px-6">
+    <div className="min-h-screen page-shell safe-all">
+      {/* WHAT: Header */}
+      <div className="glass-dark px-4 pb-6 pt-4 sm:px-6">
         {/* Back button + title */}
         <div className="mb-4 flex items-center gap-3">
           <Link
@@ -135,7 +141,7 @@ export default function WalletFundPage() {
           <div className="mt-1 flex items-baseline gap-1.5">
             <Wallet className="h-5 w-5 text-gold" />
             <span className="font-display text-3xl font-bold text-white">
-              ₦{formatNaira(balanceKobo)}
+              {formatCurrency(balanceKobo)}
             </span>
           </div>
         </div>
@@ -157,7 +163,7 @@ export default function WalletFundPage() {
         <FundingCard
           href="/wallet/fund/manual"
           icon={<Landmark className="h-6 w-6" />}
-          badge={{ text: 'RECOMMENDED', gold: true }}
+          badge={{ text: "RECOMMENDED", gold: true }}
           highlight="FREE"
           title="Bank Transfer"
           description="Transfer directly to our account. Free, no charges."
@@ -167,7 +173,7 @@ export default function WalletFundPage() {
         <FundingCard
           href="/wallet/fund/virtual"
           icon={<CreditCard className="h-6 w-6" />}
-          badge={{ text: 'AUTO-CONFIRM' }}
+          badge={{ text: "AUTO-CONFIRM" }}
           title="Your Personal Account"
           description="Transfer to your dedicated account number. ~₦30 flat fee."
           fee="~₦30 flat fee applies"

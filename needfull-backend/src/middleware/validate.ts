@@ -14,8 +14,10 @@ export function validate(
 ): void {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    const messages = errors.array().map((err) => err.msg);
     res.status(400).json({
       error: "Validation failed",
+      message: messages.join(". "),
       details: errors.array().map((err) => ({
         field: err.type === "field" ? (err as any).path : undefined,
         message: err.msg,

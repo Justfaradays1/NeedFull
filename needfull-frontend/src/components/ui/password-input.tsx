@@ -64,7 +64,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             autoCorrect={autoCorrect}
             autoCapitalize={autoCapitalize}
             spellCheck={spellCheck}
-            className={`block w-full rounded-[10px] border border-gray-300 px-4 py-2.5 pr-12 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 disabled:opacity-50 ${className}`}
+            className={`block w-full rounded-xl border border-gray-300 px-4 py-2.5 pr-12 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 disabled:opacity-50 ${className}`}
           />
           <button
             type="button"

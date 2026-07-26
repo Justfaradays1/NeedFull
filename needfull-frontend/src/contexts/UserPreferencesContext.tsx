@@ -48,10 +48,11 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
       const stored = localStorage.getItem(PREFS_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as Partial<UserPreferences>;
+        if (typeof parsed !== 'object' || parsed === null) return DEFAULT_PREFERENCES;
         return { ...DEFAULT_PREFERENCES, ...parsed };
       }
     } catch {
-      // ignore
+      try { localStorage.removeItem(PREFS_STORAGE_KEY); } catch { /* ignore */ }
     }
     return DEFAULT_PREFERENCES;
   };
@@ -63,29 +64,67 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
   );
 
   const resolvedTheme: 'light' | 'dark' = (() => {
-    if (preferences.theme !== 'system') return preferences.theme;
-    if (typeof window === 'undefined') return 'light';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    try {
+      if (preferences.theme !== 'system') return preferences.theme;
+      if (typeof window === 'undefined') return 'light';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    } catch {
+      return 'light';
+    }
   })();
 
   useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(resolvedTheme);
-    root.setAttribute('data-theme', resolvedTheme);
-  }, [resolvedTheme]);
+    try {
+      const root = document.documentElement;
+      if (!root) return;
+      // Sync React state with localStorage — handles NavbarScript DOM toggles
+      const stored = localStorage.getItem(PREFS_STORAGE_KEY);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored) as Partial<UserPreferences>;
+          if (parsed && typeof parsed.theme === 'string' && parsed.theme !== preferences.theme) {
+            dispatch({ type: 'SET_PREFERENCE', key: 'theme', value: parsed.theme });
+            return;
+          }
+        } catch { /* ignore parse errors */ }
+      }
+      root.classList.remove('light', 'dark');
+      root.classList.add(resolvedTheme);
+      root.setAttribute('data-theme', resolvedTheme);
+    } catch { /* defensive */ }
+  }, [resolvedTheme, preferences.theme]);
 
   useEffect(() => {
-    if (preferences.theme !== 'system') return;
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = () => {
-      const newTheme = media.matches ? 'dark' : 'light';
-      document.documentElement.classList.remove('light', 'dark');
-      document.documentElement.classList.add(newTheme);
-      document.documentElement.setAttribute('data-theme', newTheme);
+    try {
+      if (preferences.theme !== 'system') return;
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      const handler = () => {
+        try {
+          const newTheme = media.matches ? 'dark' : 'light';
+          const root = document.documentElement;
+          if (!root) return;
+          root.classList.remove('light', 'dark');
+          root.classList.add(newTheme);
+          root.setAttribute('data-theme', newTheme);
+        } catch { /* defensive */ }
+      };
+      media.addEventListener('change', handler);
+      return () => {
+        try { media.removeEventListener('change', handler); } catch { /* ignore */ }
+      };
+    } catch { /* defensive */ }
+  }, [preferences.theme]);
+
+  // Listen for DOM theme toggles from NavbarScript (landing page)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const theme = (e as CustomEvent).detail;
+      if (typeof theme === 'string' && theme !== preferences.theme) {
+        dispatch({ type: 'SET_PREFERENCE', key: 'theme', value: theme });
+      }
     };
-    media.addEventListener('change', handler);
-    return () => media.removeEventListener('change', handler);
+    window.addEventListener('needfull:theme-changed', handler);
+    return () => window.removeEventListener('needfull:theme-changed', handler);
   }, [preferences.theme]);
 
   // Fetch preferences from API on mount if authenticated
@@ -94,9 +133,11 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
     get<{ success: boolean; data: Record<string, unknown> }>('/user/preferences')
       .then((res) => {
         if (res.success && res.data) {
-          const serverPrefs = dbToPreferences(res.data);
-          dispatch({ type: 'SET_ALL', preferences: serverPrefs });
-          localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(serverPrefs));
+          try {
+            const serverPrefs = dbToPreferences(res.data);
+            dispatch({ type: 'SET_ALL', preferences: serverPrefs });
+            localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(serverPrefs));
+          } catch { /* defensive */ }
         }
       })
       .catch(() => {
@@ -117,29 +158,33 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
     key: K,
     value: UserPreferences[K],
   ) => {
-    dispatch({ type: 'SET_PREFERENCE', key, value });
+    try {
+      dispatch({ type: 'SET_PREFERENCE', key, value });
 
-    const currentStored = (() => {
-      try {
-        const s = localStorage.getItem(PREFS_STORAGE_KEY);
-        return s ? (JSON.parse(s) as Partial<UserPreferences>) : {};
-      } catch {
-        return {};
-      }
-    })();
-    const updated = { ...DEFAULT_PREFERENCES, ...currentStored, [key]: value };
-    localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(updated));
+      const currentStored = (() => {
+        try {
+          const s = localStorage.getItem(PREFS_STORAGE_KEY);
+          return s ? (JSON.parse(s) as Partial<UserPreferences>) : {};
+        } catch {
+          return {};
+        }
+      })();
+      const updated = { ...DEFAULT_PREFERENCES, ...currentStored, [key]: value };
+      localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(updated));
 
-    if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
-    syncTimerRef.current = setTimeout(() => {
-      syncToApi(updated as UserPreferences);
-    }, 500);
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+      syncTimerRef.current = setTimeout(() => {
+        syncToApi(updated as UserPreferences);
+      }, 500);
+    } catch { /* defensive */ }
   }, [syncToApi]);
 
   const resetPreferences = useCallback(() => {
-    dispatch({ type: 'RESET' });
-    localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(DEFAULT_PREFERENCES));
-    syncToApi(DEFAULT_PREFERENCES);
+    try {
+      dispatch({ type: 'RESET' });
+      localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(DEFAULT_PREFERENCES));
+      syncToApi(DEFAULT_PREFERENCES);
+    } catch { /* defensive */ }
   }, [syncToApi]);
 
   return (

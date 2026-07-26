@@ -1,6 +1,23 @@
 'use client';
 
 import { useInsertionEffect } from 'react';
+import { PREFS_STORAGE_KEY } from '@/types/preferences';
+
+function readStoredPrefs(): Record<string, unknown> {
+  try {
+    const raw = localStorage.getItem(PREFS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeStoredPrefs(update: Record<string, unknown>) {
+  try {
+    const current = readStoredPrefs();
+    localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify({ ...current, ...update }));
+  } catch { /* noop */ }
+}
 
 export default function NavbarScript() {
   useInsertionEffect(() => {
@@ -28,10 +45,11 @@ export default function NavbarScript() {
       const cur = html.getAttribute('data-theme') || 'light';
       const next = cur === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', next);
-      try { localStorage.setItem('nf-theme', next); } catch { /* noop */ }
+      writeStoredPrefs({ theme: next });
       setUI(next);
       const meta = document.querySelector('meta[name="theme-color"]');
       if (meta) meta.setAttribute('content', next === 'dark' ? '#0a0a0b' : '#1A6B4A');
+      window.dispatchEvent(new CustomEvent('needfull:theme-changed', { detail: next }));
     }
 
     if (toggle) toggle.addEventListener('click', toggleTheme);

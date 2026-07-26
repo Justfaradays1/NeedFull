@@ -43,7 +43,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         onClick={handleClick}
         aria-busy={loading}
         className={cn(
-          'inline-flex items-center justify-center rounded-[10px] font-semibold',
+          'inline-flex items-center justify-center rounded-xl font-bold',
           'transition-all duration-150 ease-out',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40',
           'disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100',

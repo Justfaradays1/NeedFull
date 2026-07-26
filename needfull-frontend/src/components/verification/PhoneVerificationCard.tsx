@@ -62,7 +62,7 @@ export function PhoneVerificationCard({
   };
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
+    <div className="rounded-2xl border border-card-border bg-surface p-5 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">

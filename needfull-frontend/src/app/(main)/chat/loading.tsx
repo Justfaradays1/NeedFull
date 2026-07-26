@@ -1,6 +1,6 @@
 export default function ChatLoading() {
   return (
-    <div className="min-h-screen bg-gray-50 safe-all px-4 pt-4 pb-24">
+    <div className="min-h-screen page-shell safe-all px-4 pt-4 pb-24">
       {/* Header skeleton */}
       <div className="space-y-1 mb-6">
         <div className="h-7 w-32 skeleton rounded" />
@@ -15,7 +15,7 @@ export default function ChatLoading() {
         <div className="h-5 w-44 skeleton rounded" />
         <div className="flex gap-3 overflow-hidden">
           {Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className="w-[200px] shrink-0 h-28 skeleton rounded-xl" />
+            <div key={i} className="w-50 shrink-0 h-28 skeleton rounded-xl" />
           ))}
         </div>
       </div>
@@ -34,7 +34,10 @@ export default function ChatLoading() {
       <div className="space-y-2">
         <div className="h-5 w-32 skeleton rounded mb-3" />
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100">
+          <div
+            key={i}
+            className="flex items-center gap-3 p-4 bg-surface rounded-2xl border border-card-border"
+          >
             <div className="h-12 w-12 skeleton rounded-full shrink-0" />
             <div className="flex-1 space-y-2">
               <div className="flex items-center justify-between">

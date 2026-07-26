@@ -28,11 +28,11 @@ export function TrustBadge({ variant = 'secure', label, description, size = 'sm'
   return (
     <div className={`flex items-start gap-2 ${isSmall ? 'text-[12px]' : 'text-sm'} ${className}`}>
       <div className={`flex shrink-0 items-center justify-center rounded-full ${
-        variant === 'verified' ? 'bg-blue-100 text-blue-600' :
-        variant === 'escrow' ? 'bg-green-100 text-green-600' :
+        variant === 'verified' ? 'bg-processing-light text-processing' :
+        variant === 'escrow' ? 'bg-success-light text-success' :
         variant === 'secure' ? 'bg-brand-light text-brand' :
-        variant === 'encrypted' ? 'bg-purple-100 text-purple-600' :
-        'bg-amber-100 text-amber-600'
+        variant === 'encrypted' ? 'bg-warning-light text-warning' :
+        'bg-warning-light text-warning'
       } ${iconContainerSize}`}>
         <Icon className={iconSize} aria-hidden="true" />
       </div>

@@ -9,5 +9,8 @@ export {
   useAuthError,
   useAuthLoading,
   useUserRole,
+  useUserRoles,
+  useActiveRole,
+  useHasRole,
 } from '@/hooks/useAuthHooks';
 export { useAuthInit } from '@/hooks/useAuthInit';

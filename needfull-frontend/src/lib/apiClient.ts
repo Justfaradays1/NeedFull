@@ -1,4 +1,4 @@
-// WHAT: Shared axios API client with automatic token refresh and retry logic
+// WHAT: Shared axios API client with automatic token refresh, retry logic, and loading bar
 // WHY: Centralised API configuration, automatic auth token injection, 401 handling with refresh, prevents manual error handling
 // FUTURE: Add request/response logging, add request deduplication, add timeout configuration per endpoint
 
@@ -10,6 +10,12 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios';
 import { useAuthStore } from '@/store/authStore';
+import { useLoadingStore } from '@/store/loadingStore';
+import { handleSessionExpired } from '@/lib/session';
+
+// WHAT: Auth endpoints that should NOT trigger session-expiry handling on 401
+// WHY: A failed login returns 401 — that's "wrong password", not "session expired"
+const SESSION_EXEMPT_PATHS = ['/auth/login', '/auth/register', '/auth/verify-email'];
 
 // WHAT: Track if refresh is in progress to prevent multiple simultaneous refresh attempts
 // WHY: Prevents race condition when multiple 401s happen at same time
@@ -67,7 +73,9 @@ apiClient.interceptors.request.use(
 // WHAT: Response interceptor with automatic token refresh on 401
 // WHY: Silently refresh token and retry original request, only logout on refresh failure
 apiClient.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response: AxiosResponse) => {
+    return response;
+  },
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
@@ -75,6 +83,12 @@ apiClient.interceptors.response.use(
 
     // WHAT: Handle 401 (Unauthorized — token expired or invalid)
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // WHAT: Skip session-expiry handling on auth endpoints (e.g. wrong password on login)
+      // WHY: Those return 401 naturally and should show their own error messages
+      if (originalRequest.url && SESSION_EXEMPT_PATHS.some((p) => originalRequest.url?.includes(p))) {
+        return Promise.reject(error);
+      }
+
       // WHAT: Prevent infinite retry loop
       originalRequest._retry = true;
 
@@ -123,12 +137,11 @@ apiClient.interceptors.response.use(
         // WHAT: Retry original request with new token
         return apiClient(originalRequest);
       } catch (refreshError) {
-        // WHAT: Clear auth state (updates persisted localStorage too) and redirect to login
-        // WHY: Prevents infinite reload loop — Zustand persist would restore isAuthenticated:true on next page load
-        useAuthStore.getState().logout();
-
+        // WHAT: Session expired — show message, clear state, redirect
         if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+          handleSessionExpired();
+        } else {
+          useAuthStore.getState().logout();
         }
 
         processQueue(refreshError as AxiosError, undefined);
@@ -145,7 +158,7 @@ apiClient.interceptors.response.use(
 // WHY: Type-safe API calls with full TypeScript support
 
 /**
- * WHAT: Typed GET request
+ * WHAT: Typed GET request with loading bar tracking
  * WHY: Simplifies read operations with type inference
  * USAGE: const user = await get<User>('/users/me')
  */
@@ -153,12 +166,17 @@ export async function get<T>(
   url: string,
   config?: AxiosRequestConfig
 ): Promise<T> {
-  const response = await apiClient.get<T>(url, config);
-  return response.data;
+  useLoadingStore.getState().startRequest();
+  try {
+    const response = await apiClient.get<T>(url, config);
+    return response.data;
+  } finally {
+    useLoadingStore.getState().endRequest();
+  }
 }
 
 /**
- * WHAT: Typed POST request
+ * WHAT: Typed POST request with loading bar tracking
  * WHY: Simplifies create/mutation operations
  * USAGE: const newUser = await post<User>('/auth/register', { email, password })
  */
@@ -167,12 +185,17 @@ export async function post<T>(
   data?: unknown,
   config?: AxiosRequestConfig
 ): Promise<T> {
-  const response = await apiClient.post<T>(url, data, config);
-  return response.data;
+  useLoadingStore.getState().startRequest();
+  try {
+    const response = await apiClient.post<T>(url, data, config);
+    return response.data;
+  } finally {
+    useLoadingStore.getState().endRequest();
+  }
 }
 
 /**
- * WHAT: Typed PATCH request
+ * WHAT: Typed PATCH request with loading bar tracking
  * WHY: Simplifies partial updates
  * USAGE: const updated = await patch<Task>('/tasks/123', { status: 'completed' })
  */
@@ -181,12 +204,17 @@ export async function patch<T>(
   data?: unknown,
   config?: AxiosRequestConfig
 ): Promise<T> {
-  const response = await apiClient.patch<T>(url, data, config);
-  return response.data;
+  useLoadingStore.getState().startRequest();
+  try {
+    const response = await apiClient.patch<T>(url, data, config);
+    return response.data;
+  } finally {
+    useLoadingStore.getState().endRequest();
+  }
 }
 
 /**
- * WHAT: Typed DELETE request
+ * WHAT: Typed DELETE request with loading bar tracking
  * WHY: Simplifies delete operations
  * USAGE: await del<void>('/tasks/123')
  */
@@ -194,8 +222,13 @@ export async function del<T = void>(
   url: string,
   config?: AxiosRequestConfig
 ): Promise<T> {
-  const response = await apiClient.delete<T>(url, config);
-  return response.data;
+  useLoadingStore.getState().startRequest();
+  try {
+    const response = await apiClient.delete<T>(url, config);
+    return response.data;
+  } finally {
+    useLoadingStore.getState().endRequest();
+  }
 }
 
 export default apiClient;

@@ -3,42 +3,73 @@
 // FUTURE: Add revenue analytics with time-series data, user growth charts, fraud detection
 
 import { Request, Response } from "express";
-import db from "../config/db";
+import db, { withTransaction } from "../config/db";
 import { notifyUser } from "../services/notification.service";
 import { onTrustEvent } from "../services/trust.service";
 import { confirmManualTransfer as svcConfirmTransfer, rejectManualTransfer as svcRejectTransfer } from "../services/manualTransfer.service";
 
-// WHAT: Single query returning all platform stats
+// WHAT: Helper to safely count rows in a table (handles missing tables)
+async function safeCount(table: string, where?: string): Promise<number> {
+  try {
+    const sql = where ? `SELECT COUNT(*) as c FROM ${table} WHERE ${where}` : `SELECT COUNT(*) as c FROM ${table}`;
+    const result = await db.query<{ c: string }>(sql);
+    return parseInt(result.rows[0]?.c || "0", 10);
+  } catch (err) {
+    console.warn(`[Admin] safeCount table "${table}" failed (table may not exist yet):`, (err as Error).message);
+    return 0;
+  }
+}
+
+// WHAT: Helper to safely sum a column (handles missing tables)
+async function safeSum(table: string, column: string, where?: string): Promise<number> {
+  try {
+    const sql = where
+      ? `SELECT COALESCE(SUM(${column}), 0) as s FROM ${table} WHERE ${where}`
+      : `SELECT COALESCE(SUM(${column}), 0) as s FROM ${table}`;
+    const result = await db.query<{ s: string }>(sql);
+    return parseInt(result.rows[0]?.s || "0", 10);
+  } catch (err) {
+    console.warn(`[Admin] safeSum table "${table}" failed (table may not exist yet):`, (err as Error).message);
+    return 0;
+  }
+}
+
+// WHAT: Dashboard stats with per-query error handling
+// WHY: Combined SQL query fails if any referenced table doesn't exist (MVP phase)
 export async function getDashboardStats(_req: Request, res: Response): Promise<void> {
   try {
-    const result = await db.query<any>(`
-      SELECT
-        (SELECT COUNT(*) FROM users) as total_users,
-        (SELECT COUNT(*) FROM users WHERE created_at >= CURRENT_DATE) as new_users_today,
-        (SELECT COUNT(*) FROM tasks) as total_tasks,
-        (SELECT COUNT(*) FROM tasks WHERE status = 'open') as open_tasks,
-        (SELECT COUNT(*) FROM tasks WHERE status = 'completed') as completed_tasks,
-        (SELECT COALESCE(SUM(amount), 0) FROM wallet_transactions WHERE type IN ('earnings', 'card_deposit', 'manual_deposit_confirmed')) as total_volume_kobo,
-        (SELECT COALESCE(SUM(amount), 0) FROM wallet_transactions WHERE type IN ('earnings', 'card_deposit', 'manual_deposit_confirmed') AND created_at >= CURRENT_DATE) as today_volume_kobo,
-        (SELECT COUNT(*) FROM manual_transfers WHERE status = 'pending') as pending_manual_transfers,
-        (SELECT COUNT(*) FROM withdrawal_requests WHERE status = 'pending') as pending_withdrawals,
-        (SELECT COUNT(*) FROM student_id_verifications WHERE status = 'pending') as pending_verifications,
-        (SELECT COUNT(*) FROM reports WHERE status = 'open') as open_reports,
-        (SELECT COALESCE(SUM(amount), 0) FROM wallet_transactions WHERE type = 'platform_fee') as platform_earnings_kobo
-    `);
-    const r = result.rows[0];
+    const [
+      totalUsers, newUsersToday,
+      totalTasks, openTasks, completedTasks,
+      totalVolumeKobo, todayVolumeKobo,
+      pendingManualTransfers,
+      pendingWithdrawals,
+      pendingVerifications,
+      openReports,
+      platformEarningsKobo,
+    ] = await Promise.all([
+      safeCount('users'),
+      safeCount('users', "created_at >= CURRENT_DATE"),
+      safeCount('tasks'),
+      safeCount('tasks', "status = 'open'"),
+      safeCount('tasks', "status = 'completed'"),
+      safeSum('wallet_transactions', 'amount', "type IN ('earnings', 'card_deposit', 'manual_deposit_confirmed')"),
+      safeSum('wallet_transactions', 'amount', "type IN ('earnings', 'card_deposit', 'manual_deposit_confirmed') AND created_at >= CURRENT_DATE"),
+      safeCount('manual_transfers', "status = 'pending'"),
+      safeCount('withdrawal_requests', "status = 'pending'"),
+      safeCount('student_id_verifications', "status = 'pending'"),
+      safeCount('reports', "status = 'open'"),
+      safeSum('wallet_transactions', 'amount', "type = 'platform_fee'"),
+    ]);
+
     res.json({
       success: true, data: {
-        totalUsers: parseInt(r.total_users, 10), newUsersToday: parseInt(r.new_users_today, 10),
-        totalTasks: parseInt(r.total_tasks, 10), openTasks: parseInt(r.open_tasks, 10),
-        completedTasks: parseInt(r.completed_tasks, 10),
-        totalVolumeKobo: parseInt(r.total_volume_kobo, 10), totalVolumeNaira: parseInt(r.total_volume_kobo, 10) / 100,
-        todayVolumeKobo: parseInt(r.today_volume_kobo, 10), todayVolumeNaira: parseInt(r.today_volume_kobo, 10) / 100,
-        pendingManualTransfers: parseInt(r.pending_manual_transfers, 10),
-        pendingWithdrawals: parseInt(r.pending_withdrawals, 10),
-        pendingVerifications: parseInt(r.pending_verifications, 10),
-        openReports: parseInt(r.open_reports, 10),
-        platformEarningsKobo: parseInt(r.platform_earnings_kobo, 10), platformEarningsNaira: parseInt(r.platform_earnings_kobo, 10) / 100,
+        totalUsers, newUsersToday,
+        totalTasks, openTasks, completedTasks,
+        totalVolumeKobo, totalVolumeNaira: totalVolumeKobo / 100,
+        todayVolumeKobo, todayVolumeNaira: todayVolumeKobo / 100,
+        pendingManualTransfers, pendingWithdrawals, pendingVerifications, openReports,
+        platformEarningsKobo, platformEarningsNaira: platformEarningsKobo / 100,
       },
     });
   } catch (error) {
@@ -119,14 +150,14 @@ export async function listVerifications(req: Request, res: Response): Promise<vo
 
     const [result, countRes] = await Promise.all([
       db.query<any>(
-        `SELECT sv.id, sv.user_id, sv.id_url, sv.status, sv.note, sv.created_at,
-                u.email, u.first_name, u.last_name
-         FROM student_verifications sv
+        `SELECT sv.id, sv.user_id, sv.image_url, sv.status, sv.rejection_note, sv.created_at,
+                u.email, u.full_name
+         FROM student_id_verifications sv
          JOIN users u ON sv.user_id = u.id
          ORDER BY sv.created_at DESC LIMIT $1 OFFSET $2`,
         [perPage, offset],
       ),
-      db.query<{ count: string }>("SELECT COUNT(*) as count FROM student_verifications"),
+      db.query<{ count: string }>("SELECT COUNT(*) as count FROM student_id_verifications"),
     ]);
 
     const total = parseInt(countRes.rows[0]?.count || "0", 10);
@@ -136,10 +167,10 @@ export async function listVerifications(req: Request, res: Response): Promise<vo
         id: r.id,
         userId: r.user_id,
         email: r.email,
-        fullName: [r.first_name, r.last_name].filter(Boolean).join(" "),
-        idUrl: r.id_url,
+        fullName: r.full_name,
+        idUrl: r.image_url,
         status: r.status,
-        note: r.note,
+        note: r.rejection_note,
         createdAt: r.created_at,
       })),
       pagination: { page, perPage, total, totalPages: Math.ceil(total / perPage) },
@@ -153,27 +184,57 @@ export async function listVerifications(req: Request, res: Response): Promise<vo
 export async function verifyStudentId(req: Request, res: Response): Promise<void> {
   try {
     const { action, note } = req.body;
+    const adminId = req.user!.id;
     if (!["approve", "reject"].includes(action)) { res.status(400).json({ success: false, message: "Action must be 'approve' or 'reject'" }); return; }
+
     const verification = await db.query<any>("SELECT id, user_id, status FROM student_id_verifications WHERE id = $1", [req.params.id]);
     if (verification.rows.length === 0) { res.status(404).json({ success: false, message: "Verification not found" }); return; }
     if (verification.rows[0].status !== "pending") { res.status(400).json({ success: false, message: "Verification already reviewed" }); return; }
     const targetUserId = verification.rows[0].user_id;
 
+    await withTransaction(async (client) => {
+      if (action === "approve") {
+        // Prevent double verification
+        const userCheck = await client.query("SELECT is_verified_student FROM users WHERE id = $1 FOR UPDATE", [targetUserId]);
+        if (userCheck.rows[0]?.is_verified_student) {
+          throw Object.assign(new Error("Student already verified"), { statusCode: 400 });
+        }
+
+        await client.query(
+          "UPDATE student_id_verifications SET status = 'approved', reviewed_by = $1, reviewed_at = NOW(), updated_at = NOW() WHERE id = $2",
+          [adminId, req.params.id],
+        );
+        await client.query(
+          "UPDATE users SET is_verified_student = true, updated_at = NOW() WHERE id = $1",
+          [targetUserId],
+        );
+      } else {
+        await client.query(
+          "UPDATE student_id_verifications SET status = 'rejected', reviewed_by = $1, reviewed_at = NOW(), rejection_note = $2, updated_at = NOW() WHERE id = $3",
+          [adminId, note || null, req.params.id],
+        );
+      }
+
+      // Audit log
+      await client.query(
+        `INSERT INTO admin_audit_log (admin_id, action, target_type, target_id, details, created_at)
+         VALUES ($1, $2, 'student_verification', $3, $4, NOW())`,
+        [adminId, action === "approve" ? "approve_verification" : "reject_verification", req.params.id, note || null],
+      );
+    });
+
     if (action === "approve") {
-      await db.query("UPDATE student_id_verifications SET status = 'approved', reviewed_by = $1, reviewed_at = NOW(), updated_at = NOW() WHERE id = $2", [req.user!.id, req.params.id]);
-      await db.query("UPDATE users SET is_verified_student = true, updated_at = NOW() WHERE id = $1", [targetUserId]);
       onTrustEvent(targetUserId, "student_verified").catch(() => {});
-    } else {
-      await db.query("UPDATE student_id_verifications SET status = 'rejected', reviewed_by = $1, reviewed_at = NOW(), rejection_note = $2, updated_at = NOW() WHERE id = $3", [req.user!.id, note || null, req.params.id]);
     }
 
     notifyUser(targetUserId, {
       type: "verification_result", title: action === "approve" ? "ID Verified" : "Verification Rejected",
       body: action === "approve" ? "Your student ID has been verified. You can now access all features." : `Your student ID verification was rejected.${note ? ` Reason: ${note}` : " Please resubmit with a clearer image."}`,
-      actorId: req.user!.id, taskId: undefined, conversationId: undefined,
+      actorId: adminId, taskId: undefined, conversationId: undefined,
     }).catch(() => {});
     res.json({ success: true, message: `Verification ${action === "approve" ? "approved" : "rejected"}` });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.statusCode === 400) { res.status(400).json({ success: false, message: error.message }); return; }
     console.error("[Admin] verifyStudentId error:", error);
     res.status(500).json({ success: false, message: "Failed to review verification" });
   }
@@ -388,7 +449,7 @@ export async function listPlatformTransactions(req: Request, res: Response): Pro
     const whereSQL = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
     const [rows, countRes] = await Promise.all([
       db.query<any>(
-        `SELECT wt.id, wt.user_id, wt.type, wt.amount AS amount_kobo, wt.balance_before, wt.balance_after, wt.description, wt.reference, wt.created_at,
+        `SELECT wt.id, wt.user_id, wt.type, wt.amount AS amount_kobo, wt.balance_before, wt.balance_after, wt.description, wt.created_at,
           jsonb_build_object('id', u.id, 'fullName', u.full_name, 'email', u.email) as "user"
          FROM wallet_transactions wt JOIN users u ON wt.user_id = u.id
          ${whereSQL} ORDER BY wt.created_at DESC LIMIT $${idx} OFFSET $${idx + 1}`,
@@ -400,5 +461,80 @@ export async function listPlatformTransactions(req: Request, res: Response): Pro
   } catch (error) {
     console.error("[Admin] listPlatformTransactions error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch transactions" });
+  }
+}
+
+// WHAT: List runner applications (status = pending)
+export async function listRunnerApplications(req: Request, res: Response): Promise<void> {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const perPage = parseInt(req.query.perPage as string) || 20;
+    const offset = (page - 1) * perPage;
+    const [rows, countRes] = await Promise.all([
+      db.query<any>(
+        "SELECT id, full_name AS \"fullName\", email, school, department, level, trust_score AS \"trustScore\", runner_status AS \"runnerStatus\", created_at, updated_at FROM users WHERE runner_status = 'pending' ORDER BY updated_at DESC LIMIT $1 OFFSET $2",
+        [perPage, offset],
+      ),
+      db.query<{ count: string }>("SELECT COUNT(*) as count FROM users WHERE runner_status = 'pending'"),
+    ]);
+    res.json({ success: true, data: rows.rows, pagination: { page, perPage, total: parseInt(countRes.rows[0]?.count || "0", 10) } });
+  } catch (error) {
+    console.error("[Admin] listRunnerApplications error:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch runner applications" });
+  }
+}
+
+// WHAT: Approve or reject a runner application
+export async function reviewRunnerApplication(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const { action } = req.body;
+    if (!["approve", "reject"].includes(action)) {
+      res.status(400).json({ success: false, message: "Action must be 'approve' or 'reject'" });
+      return;
+    }
+    const user = await db.query<any>("SELECT * FROM users WHERE id = $1", [id]);
+    if (user.rows.length === 0) { res.status(404).json({ success: false, message: "User not found" }); return; }
+    if (user.rows[0].runner_status !== "pending") {
+      res.status(400).json({ success: false, message: "User does not have a pending runner application" });
+      return;
+    }
+    if (action === "approve") {
+      await db.query(
+        "UPDATE users SET runner_status = 'approved', roles = CASE WHEN NOT ('runner' = ANY(roles)) THEN array_append(roles, 'runner') ELSE roles END, updated_at = NOW() WHERE id = $1",
+        [id],
+      );
+      const target = await db.query<any>("SELECT full_name FROM users WHERE id = $1", [id]);
+      const name = target.rows[0]?.full_name || 'You';
+      notifyUser(id, {
+        type: 'runner_approved',
+        title: '🎉 Welcome to the Runner Team!',
+        body: `${name}, your application to become a NeedRunner has been approved! Start browsing and earning now.`,
+        actorId: req.user!.id,
+        conversationId: undefined,
+        taskId: undefined,
+      }).catch(() => {});
+    } else {
+      await db.query(
+        "UPDATE users SET runner_status = 'none', updated_at = NOW() WHERE id = $1",
+        [id],
+      );
+      notifyUser(id, {
+        type: 'runner_rejected',
+        title: 'Application Update',
+        body: 'Your runner application was not approved at this time. You can reapply later.',
+        actorId: req.user!.id,
+        conversationId: undefined,
+        taskId: undefined,
+      }).catch(() => {});
+    }
+    await db.query(
+      "INSERT INTO admin_audit_log (admin_id, action, target_type, target_id, details, created_at) VALUES ($1, $2, 'runner_application', $3, $4, NOW())",
+      [req.user!.id, `${action}_runner`, id, JSON.stringify({ action })],
+    );
+    res.json({ success: true, message: `Runner application ${action}d` });
+  } catch (error) {
+    console.error("[Admin] reviewRunnerApplication error:", error);
+    res.status(500).json({ success: false, message: "Failed to review runner application" });
   }
 }

@@ -66,8 +66,11 @@ function TestimonialCard({ t }: { t: typeof TESTIMONIALS[number] }) {
 
 export function TestimonialsSection() {
   return (
-    <section id="testimonials" className="overflow-hidden bg-brand-dark py-20 text-white">
-      <div className="px-4 text-center sm:px-6 lg:px-8">
+    <section id="testimonials" className="relative overflow-hidden bg-brand-dark py-20 text-white">
+      {/* Faint grid */}
+      <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: `linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)`, backgroundSize: "48px 48px" }} />
+      <div className="pointer-events-none absolute -left-32 -top-32 h-80 w-80 rounded-full bg-gold/5 blur-3xl" />
+      <div className="relative z-10 px-4 text-center sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <span className="inline-flex items-center rounded-full bg-white/10 px-3.5 py-1 text-[13px] font-semibold tracking-wide text-white/80 backdrop-blur-sm sm:text-sm">
             What students say
