@@ -121,7 +121,7 @@ function getAuthHeader(): string | null {
 // WHAT: Configure axios instance with auth header
 // WHY: Automatically includes token in all API requests
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
+  baseURL: "https://needfull.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },

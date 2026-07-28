@@ -418,7 +418,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
         const token = localStorage.getItem("nf_access_token");
         if (!token) throw new Error("no token");
         const res = await fetch(
-          `/api/auth/me`,
+          `https://needfull.onrender.com/api/auth/me`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
         if (!res.ok) throw new Error("API rejected token");

@@ -192,7 +192,7 @@ export default function ManualFundPage() {
           formData.append("receipt", receiptFile);
 
           const uploadRes = await fetch(
-            `/api/upload/receipt`,
+            `https://needfull.onrender.com/api/upload/receipt`,
             {
               method: "POST",
               headers: {

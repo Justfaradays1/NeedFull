@@ -10,7 +10,7 @@ let globalSocket: Socket | null = null;
 
 function getSocket(): Socket {
   if (!globalSocket) {
-    const url = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
+    const url = 'https://needfull.onrender.com';
     globalSocket = io(url, {
       transports: ['websocket', 'polling'],
       autoConnect: false,

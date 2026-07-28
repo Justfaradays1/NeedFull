@@ -54,7 +54,7 @@ export default function SettingsPage() {
     setLinkingGoogle(true);
     try {
       const googleWindow = window.open(
-        `/api/auth/google?action=link`,
+        `https://needfull.onrender.com/api/auth/google?action=link`,
         "google-oauth",
         "width=500,height=600"
       );
