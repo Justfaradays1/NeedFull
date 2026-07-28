@@ -62,7 +62,7 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  allowedDevOrigins: ["192.168.157.43", "192.168.183.43"],
+  allowedDevOrigins: ["192.168.157.43", "192.168.183.43", "needfull-frontend.vercel.app"],
 
   async rewrites() {
     return [
