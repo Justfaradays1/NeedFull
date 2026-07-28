@@ -73,6 +73,7 @@ const nextConfig: NextConfig = {
     ];
   },
 
+
   compress: true,
   productionBrowserSourceMaps: false,
   reactStrictMode: true,
