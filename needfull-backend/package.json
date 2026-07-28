@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "NeedFull backend - Student task marketplace API. WHAT: Core Express.js TypeScript server with wallet, authentication, task management, and real-time features. WHY: Structured foundation for scalable student marketplace. FUTURE: Add database connection pooling, caching layer (Redis), job queue (Bull), API documentation (Swagger).",
   "main": "dist/index.js",
-  "type": "module",
+
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",

@@ -5,8 +5,8 @@
     // FUTURE: Add path aliases for cleaner imports, enable incremental compilation for faster rebuilds
 
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": "./src",
