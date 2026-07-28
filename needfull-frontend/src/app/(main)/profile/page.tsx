@@ -196,7 +196,7 @@ export default function ProfilePage() {
       fetchProfile();
     } catch { toast.error('Upload failed'); }
     finally { setUploading(false); }
-    if (fileRef.current) fileRef.current.value = '';
+    if (verificationFileRef.current) verificationFileRef.current.value = '';
   };
 
   const handleLogout = () => { logout(); router.push('/login'); };
@@ -227,7 +227,7 @@ export default function ProfilePage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <button type="button" onClick={() => fileRef.current?.click()} className="tap-target block">
+              <button type="button" onClick={() => avatarFileRef.current?.click()} className="tap-target block">
                 {profile.profilePictureUrl ? (
                   <img src={profile.profilePictureUrl} alt="" className="h-[72px] w-[72px] rounded-full border-2 border-white/30 object-cover" />
                 ) : (
@@ -239,7 +239,7 @@ export default function ProfilePage() {
                   <Pencil className="h-3 w-3" />
                 </span>
               </button>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+              <input ref={avatarFileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
@@ -422,7 +422,7 @@ export default function ProfilePage() {
                 <VerificationRow icon={<Phone className="h-4 w-4" />} label="Phone" verified={!!profile.phone} detail={profile.phone || undefined} />
                 <VerificationRow icon={<GraduationCap className="h-4 w-4" />} label="Student ID"
                   verified={profile.isVerifiedStudent}
-                  onVerify={() => fileRef.current?.click()}
+                  onVerify={() => verificationFileRef.current?.click()}
                   uploading={uploading}
                 />
               </div>
@@ -487,7 +487,7 @@ export default function ProfilePage() {
       )}
 
       {/* Hidden file input for student ID verification */}
-      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleVerificationUpload} />
+      <input ref={verificationFileRef} type="file" accept="image/*" className="hidden" onChange={handleVerificationUpload} />
       <CelebrationModal open={celebration.open} onClose={celebration.close} config={celebration.config} />
     </div>
   );
