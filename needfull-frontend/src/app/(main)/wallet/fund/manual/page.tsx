@@ -192,7 +192,7 @@ export default function ManualFundPage() {
           formData.append("receipt", receiptFile);
 
           const uploadRes = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/upload/receipt`,
+            `/api/upload/receipt`,
             {
               method: "POST",
               headers: {

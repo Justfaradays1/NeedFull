@@ -54,7 +54,7 @@ export default function SettingsPage() {
     setLinkingGoogle(true);
     try {
       const googleWindow = window.open(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/auth/google?action=link`,
+        `/api/auth/google?action=link`,
         "google-oauth",
         "width=500,height=600"
       );

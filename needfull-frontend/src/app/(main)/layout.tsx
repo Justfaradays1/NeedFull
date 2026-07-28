@@ -418,7 +418,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
         const token = localStorage.getItem("nf_access_token");
         if (!token) throw new Error("no token");
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/auth/me`,
+          `/api/auth/me`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
         if (!res.ok) throw new Error("API rejected token");

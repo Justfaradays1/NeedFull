@@ -46,7 +46,7 @@ const processQueue = (
 // WHAT: Create axios instance pointing to NeedFull API
 // WHY: Single point of configuration for all API requests
 const apiClient: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
+  baseURL: '/api',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ apiClient.interceptors.response.use(
         const response = await axios.post<{
           tokens: { accessToken: string; refreshToken: string };
         }>(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/refresh`,
+          '/api/auth/refresh',
           { refreshToken }
         );
 
