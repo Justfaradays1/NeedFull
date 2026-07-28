@@ -30,16 +30,19 @@ const envSchema = z.object({
   CLOUDINARY_API_KEY: z.string().min(1),
   CLOUDINARY_API_SECRET: z.string().min(1),
 
-  // Paystack
-  PAYSTACK_SECRET_KEY: z.string().min(1),
-  PAYSTACK_PUBLIC_KEY: z.string().min(1),
-  PAYSTACK_WEBHOOK_SECRET: z.string().min(1),
+  // Paystack (card payments — secondary, not required for MVP)
+  // Default to "" so the server boots without them; the service only fails
+  // if a card-payment endpoint is actually called while unconfigured.
+  PAYSTACK_SECRET_KEY: z.string().default(""),
+  PAYSTACK_PUBLIC_KEY: z.string().default(""),
+  PAYSTACK_WEBHOOK_SECRET: z.string().default(""),
 
-  // Monnify
-  MONNIFY_API_KEY: z.string().min(1),
-  MONNIFY_SECRET_KEY: z.string().min(1),
-  MONNIFY_CONTRACT_CODE: z.string().min(1),
-  MONNIFY_BASE_URL: z.string().url("Invalid MONNIFY_BASE_URL"),
+  // Monnify (virtual accounts — not in MVP)
+  // Default to "" / known base URL so the server boots without them.
+  MONNIFY_API_KEY: z.string().default(""),
+  MONNIFY_SECRET_KEY: z.string().default(""),
+  MONNIFY_CONTRACT_CODE: z.string().default(""),
+  MONNIFY_BASE_URL: z.string().url("Invalid MONNIFY_BASE_URL").default("https://api.monnify.com"),
 
   // Backend URL (used for OAuth callback redirect URI)
   BACKEND_URL: z.string().url("Invalid BACKEND_URL").default("http://localhost:5000"),
