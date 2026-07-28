@@ -6,26 +6,17 @@ import {
   MapPin,
   Star,
   Award,
-  TrendingUp,
   DollarSign,
   CheckCircle,
   ChevronRight,
   Zap,
   Clock,
-  Target,
-  Users,
   Flame,
   Wallet as WalletIcon,
   ArrowUp,
   Briefcase,
-  Sparkles,
-  ShieldCheck,
-  ArrowRight,
   Navigation,
-  Crown,
-  Circle,
   Activity,
-  Check,
 } from "lucide-react";
 import { useAuthUser, useAuthStore } from "@/store";
 import { patch } from "@/lib/apiClient";
@@ -115,36 +106,6 @@ function weeklyEarnings(transactions: WalletTransaction[]): number {
   weekAgo.setHours(0, 0, 0, 0);
   return filterEarnings(transactions, weekAgo);
 }
-
-/* ─── Mock Data ─── */
-
-const HOT_ZONES = [
-  { name: "Engineering", count: 4 },
-  { name: "School Gate", count: 3 },
-  { name: "Female Hostel", count: 3 },
-  { name: "Library", count: 2 },
-  { name: "New Bazaar", count: 2 },
-];
-
-const CHALLENGES = [
-  { id: "1", title: "Complete 3 tasks today", reward: "+100 Trust", icon: Star, progress: 1, total: 3 },
-  { id: "2", title: "Complete 5 deliveries", reward: "₦500 Bonus", icon: Award, progress: 2, total: 5 },
-  { id: "3", title: "Get 5-star rating", reward: "+50 Trust", icon: Sparkles, progress: 0, total: 1 },
-  { id: "4", title: "Work 7 days straight", reward: "Gold Badge", icon: Crown, progress: 4, total: 7 },
-];
-
-const LEADERBOARD = [
-  { name: "Chioma O.", earnings: 452000, avatar: null },
-  { name: "Emeka N.", earnings: 389000, avatar: null },
-  { name: "Aisha B.", earnings: 312000, avatar: null },
-];
-
-const ACTIVITIES_MOCK = [
-  { id: "a1", type: "accepted", text: "You accepted \"Research paper help\"", time: "2h ago" },
-  { id: "a2", type: "completed", text: "You completed \"Deliver notes to FEM\"", time: "4h ago" },
-  { id: "a3", type: "payment", text: "₦2,500 received for \"Photography\"", time: "6h ago" },
-  { id: "a4", type: "accepted", text: "You accepted \"Buy snacks from shop\"", time: "8h ago" },
-];
 
 /* ─── RunnerHero ─── */
 
@@ -353,10 +314,7 @@ function NearbyTasks({ tasks, loading }: { tasks: TaskItem[]; loading: boolean }
 
 /* ─── RunnerPerformance ─── */
 
-function RunnerPerformance({ trustScore }: { trustScore: number }) {
-  const mockRating = 4.9;
-  const mockStreak = 5;
-
+function RunnerPerformance({ trustScore, averageRating, dayStreak }: { trustScore: number; averageRating: number | null; dayStreak: number | null }) {
   return (
     <section>
       <h2 className="mb-3 font-display text-base font-bold text-gray-900 flex items-center gap-1.5">
@@ -366,8 +324,8 @@ function RunnerPerformance({ trustScore }: { trustScore: number }) {
       <div className="grid grid-cols-3 gap-2">
         <div className="rounded-xl border border-card-border bg-surface p-3 text-center shadow-sm">
           <div className="flex items-center justify-center gap-0.5 text-lg font-black text-gold">
-            {mockRating}
-            <Star className="h-4 w-4 fill-gold text-gold" />
+            {averageRating !== null ? averageRating.toFixed(1) : "—"}
+            {averageRating !== null && <Star className="h-4 w-4 fill-gold text-gold" />}
           </div>
           <p className="mt-0.5 text-[10px] font-medium text-gray-500">Rating</p>
         </div>
@@ -378,7 +336,7 @@ function RunnerPerformance({ trustScore }: { trustScore: number }) {
         <div className="rounded-xl border border-card-border bg-surface p-3 text-center shadow-sm">
           <div className="flex items-center justify-center gap-0.5 text-lg font-black text-amber-600">
             <Flame className="h-4 w-4" />
-            {mockStreak}
+            {dayStreak !== null ? dayStreak : "—"}
           </div>
           <p className="mt-0.5 text-[10px] font-medium text-gray-500">Day Streak</p>
         </div>
@@ -433,40 +391,11 @@ function EarningsCard({ todayEarned }: { todayEarned: number }) {
   );
 }
 
-/* ─── HotZones ─── */
-
-function HotZones() {
-  return (
-    <section>
-      <h2 className="mb-3 font-display text-base font-bold text-gray-900 flex items-center gap-1.5">
-        <Flame className="h-4 w-4 text-gold" />
-        Hot Zones
-      </h2>
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        {HOT_ZONES.map((zone) => (
-          <div
-            key={zone.name}
-            className="flex shrink-0 items-center gap-2 rounded-xl border border-card-border bg-surface px-3 py-2.5 shadow-sm"
-          >
-            <MapPin className="h-4 w-4 text-gold" />
-            <div>
-              <p className="text-xs font-bold text-gray-900">{zone.name}</p>
-              <p className="text-[10px] text-gray-500">{zone.count} active jobs</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 /* ─── ActivityFeed ─── */
 
 function ActivityFeed({ transactions }: { transactions: WalletTransaction[] }) {
-  const hasTransactions = transactions.length > 0;
-
   const recentActivities = useMemo(() => {
-    if (!hasTransactions) return ACTIVITIES_MOCK.slice(0, 3);
+    if (transactions.length === 0) return [];
     return transactions.slice(0, 3).map((tx) => ({
       id: tx.id,
       type: tx.type === "escrow_release" ? "payment" : "accepted",
@@ -478,7 +407,7 @@ function ActivityFeed({ transactions }: { transactions: WalletTransaction[] }) {
             : `Transaction: ${tx.type}`,
       time: timeAgo(tx.createdAt),
     }));
-  }, [transactions, hasTransactions]);
+  }, [transactions]);
 
   const iconMap: Record<string, React.ReactNode> = {
     accepted: <CheckCircle className="h-4 w-4 text-gold" />,
@@ -517,104 +446,6 @@ function ActivityFeed({ transactions }: { transactions: WalletTransaction[] }) {
   );
 }
 
-/* ─── Challenges ─── */
-
-function Challenges() {
-  return (
-    <section>
-      <h2 className="mb-3 font-display text-base font-bold text-gray-900 flex items-center gap-1.5">
-        <Target className="h-4 w-4 text-gold" />
-        Challenges
-      </h2>
-      <div className="space-y-2">
-        {CHALLENGES.map((c) => {
-          const Icon = c.icon;
-          const pct = Math.round((c.progress / c.total) * 100);
-          return (
-            <div
-              key={c.id}
-              className="flex items-center gap-3 rounded-xl border border-card-border bg-surface p-3 shadow-sm"
-            >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gold-light">
-                <Icon className="h-4 w-4 text-gold" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold text-gray-900">{c.title}</p>
-                <p className="text-[10px] font-medium text-gold">{c.reward}</p>
-                <div className="mt-1 h-1.5 rounded-full bg-gray-100">
-                  <div className="h-1.5 rounded-full bg-gold" style={{ width: `${pct}%` }} />
-                </div>
-              </div>
-              <span className="text-[10px] font-medium text-gray-500 shrink-0">
-                {c.progress}/{c.total}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-/* ─── Leaderboard ─── */
-
-function Leaderboard({ currentUserName }: { currentUserName: string }) {
-  const rankColors = [
-    { bg: "bg-amber-100 text-amber-700 ring-1 ring-amber-300", label: "gold" },
-    { bg: "bg-gray-200 text-gray-600 ring-1 ring-gray-300", label: "silver" },
-    { bg: "bg-orange-100 text-orange-700 ring-1 ring-orange-300", label: "bronze" },
-  ];
-
-  return (
-    <section>
-      <h2 className="mb-3 font-display text-base font-bold text-gray-900 flex items-center gap-1.5">
-        <Crown className="h-4 w-4 text-gold" />
-        Top NeedRunners
-      </h2>
-      <div className="rounded-xl border border-card-border bg-surface shadow-sm">
-        {LEADERBOARD.map((entry, idx) => {
-          const rank = idx + 1;
-          const isPodium = rank <= 3;
-          const rankStyle = isPodium ? rankColors[rank - 1] : null;
-
-          return (
-            <div
-              key={entry.name}
-              className="flex items-center gap-3 px-4 py-3"
-            >
-              {entry.avatar ? (
-                <Avatar src={entry.avatar} name={entry.name} size="sm" />
-              ) : (
-                <span
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black ${
-                    rankStyle ? rankStyle.bg : "bg-gray-100 text-gray-500"
-                  }`}
-                >
-                  {rank}
-                </span>
-              )}
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold text-gray-900">{entry.name}</p>
-                <p className="text-[10px] text-gray-500">{formatCurrency(entry.earnings)} earned</p>
-              </div>
-              {rank === 1 && <Crown className="h-4 w-4 text-gold shrink-0" />}
-            </div>
-          );
-        })}
-        <div className="flex items-center gap-3 border-t border-card-border px-4 py-3 bg-brand-light/30">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-black text-white">
-            YOU
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold text-brand">{currentUserName}</p>
-            <p className="text-[10px] text-gray-500">Keep going!</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ─── Main Export ─── */
 
 export default function RunnerDashboard({
@@ -627,7 +458,7 @@ export default function RunnerDashboard({
   const user = useAuthUser();
   const name = user?.fullName?.split(" ")[0] || "there";
 
-  const [isAvailable, setIsAvailable] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(user?.isAvailable ?? false);
 
   const earnedToday = useMemo(() => todayEarnings(transactions), [transactions]);
   const weeklyEarned = useMemo(
@@ -657,17 +488,11 @@ export default function RunnerDashboard({
 
         <NearbyTasks tasks={tasks} loading={tasksLoading} />
 
-        <RunnerPerformance trustScore={trustScore} />
+        <RunnerPerformance trustScore={trustScore} averageRating={null} dayStreak={null} />
 
         <EarningsCard todayEarned={earnedToday} />
 
-        <HotZones />
-
         <ActivityFeed transactions={transactions} />
-
-        <Challenges />
-
-        <Leaderboard currentUserName={name} />
       </div>
     </div>
   );

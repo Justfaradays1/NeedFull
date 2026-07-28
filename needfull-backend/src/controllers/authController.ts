@@ -510,13 +510,14 @@ export async function getMe(req: Request, res: Response): Promise<void> {
       active_role: string;
       email_verified_at: string | null;
       google_id: string | null;
+      is_available: boolean;
       wallet_id: string;
       balance: number;
       escrow: number;
       trust_score: number;
     }>(
       `SELECT 
-        u.id, u.email, u.full_name, u.role, u.roles, u.active_role, u.email_verified_at, u.google_id,
+        u.id, u.email, u.full_name, u.role, u.roles, u.active_role, u.email_verified_at, u.google_id, u.is_available,
         w.id as wallet_id, w.balance, w.escrow,
         COALESCE(u.trust_score, 50) as trust_score
        FROM users u
@@ -536,6 +537,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
         email_verified_at: result.email_verified_at,
         trustScore: result.trust_score,
         googleId: result.google_id,
+        isAvailable: result.is_available,
       },
       wallet: {
         id: result.wallet_id,

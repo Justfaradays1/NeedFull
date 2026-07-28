@@ -20,6 +20,7 @@ export interface AuthUser {
   trustScore: number;
   profilePictureUrl?: string | null;
   runnerStatus?: string;
+  isAvailable?: boolean;
   wallet?: {
     id: string;
     balanceKobo: number;
@@ -42,6 +43,8 @@ interface AuthUserResponse {
   trust_score?: number;
   runnerStatus?: string;
   profilePictureUrl?: string | null;
+  isAvailable?: boolean;
+  is_available?: boolean;
 }
 
 interface LoginResponse {
@@ -81,6 +84,7 @@ function toAuthUser(raw: AuthUserResponse): AuthUser {
     trustScore: raw.trustScore ?? raw.trust_score ?? 0,
     runnerStatus: raw.runnerStatus ?? "none",
     profilePictureUrl: raw.profilePictureUrl ?? null,
+    isAvailable: raw.isAvailable ?? raw.is_available ?? false,
   };
 }
 

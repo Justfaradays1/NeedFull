@@ -50,6 +50,8 @@ router.patch("/:taskId", authenticate, param("taskId").isUUID(), validate, tasks
 
 router.post("/:taskId/cancel", authenticate, param("taskId").isUUID(), validate, tasks.cancelTaskHandler);
 
+router.post("/:taskId/done", authenticate, param("taskId").isUUID(), validate, tasks.markAsDoneHandler);
+
 router.post("/:taskId/complete", authenticate, param("taskId").isUUID(), validate, tasks.confirmCompletionHandler);
 
 export default router;

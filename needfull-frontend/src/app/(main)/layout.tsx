@@ -12,25 +12,10 @@ import {
   Search,
   ChevronDown,
   Shield,
-  ShieldCheck,
   User,
   LogOut,
-  House,
-  Compass,
-  ListTodo,
-  MessageCircle,
-  CirclePlus,
-  BellRing,
-  Bookmark,
-  ClipboardCheck,
-  Wallet,
-  Settings,
-  HelpCircle,
   Zap,
-  Eye,
   ChevronRight,
-  Award,
-  DollarSign,
 } from "lucide-react";
 import {
   useAuthStore,
@@ -45,26 +30,13 @@ import { CommandPalette } from "@/components/ui/CommandPalette";
 import { NotificationDrawer } from "@/components/ui/NotificationDrawer";
 
 import { useNotifications } from "@/hooks/useNotifications";
+import { POSTER_NAV, RUNNER_NAV } from "@/lib/navConfig";
+import type { NavItem } from "@/lib/navConfig";
 
-const POSTER_TABS = [
-  { href: "/feed", label: "Home", icon: "House" },
-  { href: "/explore", label: "Explore", icon: "Compass" },
-  { href: "/post", label: "Post", icon: "CirclePlus", isFab: true },
-  { href: "/chat", label: "Chat", icon: "MessageCircle" },
-  { href: "/profile", label: "Profile", icon: "User" },
-] as const;
-
-const RUNNER_TABS = [
-  { href: "/feed", label: "Home", icon: "House" },
-  { href: "/tasks", label: "Tasks", icon: "ListTodo" },
-  { href: "/wallet", label: "Earnings", icon: "Wallet" },
-  { href: "/chat", label: "Chat", icon: "MessageCircle" },
-  { href: "/profile", label: "Profile", icon: "User" },
-] as const;
-
-// WHAT: Defer heavy icon imports to avoid WASM SWC compilation issues
-// WHY: WASM SWC can fail on lucide-react dynamic icon resolution
-function TabIcon({ icon, className }: { icon: string; className?: string }) {
+// WHAT: Lazy-load a lucide icon by name
+// WHY: WASM SWC can fail on lucide-react dynamic icon resolution; this avoids
+//      importing all icons upfront in the nav-heavy layout
+function NavIcon({ icon, className }: { icon: string; className?: string }) {
   const [Icon, setIcon] = useState<React.ComponentType<{
     className?: string;
   }> | null>(null);
@@ -74,17 +46,18 @@ function TabIcon({ icon, className }: { icon: string; className?: string }) {
     import("lucide-react")
       .then((mod) => {
         if (cancelled) return;
-        const Icons: Record<
-          string,
-          React.ComponentType<{ className?: string }>
-        > = {
-          House: mod.House,
-          Compass: mod.Compass,
+        const Icons: Record<string, React.ComponentType<{ className?: string }>> = {
+          BellRing: mod.BellRing,
+          Bookmark: mod.Bookmark,
           CirclePlus: mod.CirclePlus,
-          MessageCircle: mod.MessageCircle,
-          User: mod.User,
-          ChevronLeft: mod.ChevronLeft,
+          ClipboardCheck: mod.ClipboardCheck,
+          Compass: mod.Compass,
+          HelpCircle: mod.HelpCircle,
+          House: mod.House,
           ListTodo: mod.ListTodo,
+          MessageCircle: mod.MessageCircle,
+          Settings: mod.Settings,
+          User: mod.User,
           Wallet: mod.Wallet,
         };
         setIcon(() => Icons[icon]);
@@ -92,28 +65,13 @@ function TabIcon({ icon, className }: { icon: string; className?: string }) {
       .catch(() => {
         if (!cancelled)
           setIcon(() => () => (
-            <span
-              style={{
-                width: className?.includes("h-7") ? 28 : 20,
-                height: className?.includes("h-7") ? 28 : 20,
-              }}
-            />
+            <span style={{ width: 20, height: 20 }} />
           ));
       });
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [icon]);
 
-  if (!Icon)
-    return (
-      <span
-        style={{
-          width: className?.includes("h-7") ? 28 : 20,
-          height: className?.includes("h-7") ? 28 : 20,
-        }}
-      />
-    );
+  if (!Icon) return <span style={{ width: 20, height: 20 }} />;
   return <Icon className={className || "h-5 w-5"} />;
 }
 
@@ -230,20 +188,81 @@ function RunnerIllustration() {
 
 function NavSidebarContent({
   user,
-  roles,
+  activeRole,
   pathname,
 }: {
   user: any;
-  roles: string[];
+  activeRole: string;
   pathname: string;
 }) {
-  const isRunner = roles.includes("runner");
+  const isRunner = activeRole === "runner";
+  const navItems: NavItem[] = isRunner ? RUNNER_NAV : POSTER_NAV;
 
   useEffect(() => {
     useAuthStore.getState().refreshUser();
   }, [pathname]);
 
   const isPending = user?.runnerStatus === "pending";
+
+  function renderLink(item: NavItem) {
+    if (item.disabled) {
+      return (
+        <div
+          key={item.label}
+          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 cursor-not-allowed"
+        >
+          <NavIcon icon={item.icon} className="h-5 w-5 shrink-0 text-gray-300" />
+          <span>{item.label}</span>
+          <span className="ml-auto text-[9px] font-medium text-gray-300">Soon</span>
+        </div>
+      );
+    }
+
+    const isActive =
+      pathname === item.href || pathname.startsWith(item.href + "/");
+
+    if (item.isCta) {
+      return (
+        <Link
+          key={item.label}
+          href={item.href}
+          className="tap-target group mt-1 flex items-center gap-3 rounded-xl bg-brand px-3 py-3 text-sm font-bold text-white shadow-md shadow-brand/20 transition-all duration-150 hover:shadow-lg hover:shadow-brand/25 active:scale-[0.98]"
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 transition-colors group-hover:bg-white/25">
+            <NavIcon icon={item.icon} className="h-5 w-5" />
+          </div>
+          <span>{item.label}</span>
+          <ChevronRight className="ml-auto h-4 w-4 text-white/60" />
+        </Link>
+      );
+    }
+
+    return (
+      <Link
+        key={item.label}
+        href={item.href}
+        className={`tap-target flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
+          isActive
+            ? "bg-brand-light/80 text-brand font-bold shadow-sm ring-1 ring-brand/20"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        }`}
+      >
+        <NavIcon
+          icon={item.icon}
+          className={`h-5 w-5 shrink-0 transition-colors ${
+            isActive ? "text-brand" : "text-gray-400"
+          }`}
+        />
+        <span>{item.label}</span>
+      </Link>
+    );
+  }
+
+  const sections: { key: "main" | "community" | "account"; label: string; collapsible: boolean }[] = [
+    { key: "main", label: "Main", collapsible: false },
+    { key: "community", label: "Community", collapsible: true },
+    { key: "account", label: "Account", collapsible: true },
+  ];
 
   return (
     <div className="flex flex-col h-full px-3 py-4 sidebar-scroll">
@@ -306,128 +325,27 @@ function NavSidebarContent({
 
       {/* ─── Navigation ─── */}
       <nav className="flex-1 space-y-2">
-        {/* MAIN — always visible */}
-        <div>
-          <p className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">
-            Main
-          </p>
-          <div className="space-y-0.5">
-            {[
-              { href: "/feed", label: "Home", icon: House },
-              { href: "/explore", label: "Explore", icon: Compass },
-              { href: "/tasks", label: "Browse Tasks", icon: ListTodo },
-            ].map(({ href, label, icon: Icon }) => {
-              const isActive =
-                pathname === href || pathname.startsWith(href + "/");
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`tap-target flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
-                    isActive
-                      ? "bg-brand-light/80 text-brand font-bold shadow-sm ring-1 ring-brand/20"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                  }`}
-                >
-                  <Icon
-                    className={`h-5 w-5 shrink-0 transition-colors ${
-                      isActive ? "text-brand" : "text-gray-400"
-                    }`}
-                  />
-                  <span>{label}</span>
-                </Link>
-              );
-            })}
-            {/* Post Task — prominent CTA */}
-            <Link
-              href="/tasks/create"
-              className="tap-target group mt-1 flex items-center gap-3 rounded-xl bg-brand px-3 py-3 text-sm font-bold text-white shadow-md shadow-brand/20 transition-all duration-150 hover:shadow-lg hover:shadow-brand/25 active:scale-[0.98]"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 transition-colors group-hover:bg-white/25">
-                <CirclePlus className="h-5 w-5" />
-              </div>
-              <span>Post Task</span>
-              <ChevronRight className="ml-auto h-4 w-4 text-white/60" />
-            </Link>
-          </div>
-        </div>
+        {sections.map((section) => {
+          const items = navItems.filter((n) => n.section === section.key);
+          if (items.length === 0) return null;
 
-        {/* COMMUNITY — collapsible, closed by default */}
-        <SidebarSection label="Community">
-          {[
-            { href: "/chat", label: "Chat", icon: MessageCircle },
-            { href: "/notifications", label: "Notifications", icon: BellRing },
-            { href: "#", label: "Saved", icon: Bookmark, disabled: true },
-            { href: "#", label: "My Applications", icon: ClipboardCheck, disabled: true },
-          ].map(({ href, label, icon: Icon, disabled }) => {
-            const isActive =
-              !disabled &&
-              (pathname === href || pathname.startsWith(href + "/"));
-            if (disabled) {
-              return (
-                <div
-                  key={label}
-                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 cursor-not-allowed"
-                >
-                  <Icon className="h-5 w-5 shrink-0 text-gray-300" />
-                  <span>{label}</span>
-                  <span className="ml-auto text-[9px] font-medium text-gray-300">
-                    Soon
-                  </span>
-                </div>
-              );
-            }
+          if (section.collapsible) {
             return (
-              <Link
-                key={href}
-                href={href}
-                className={`tap-target flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? "bg-brand-light/80 text-brand font-bold shadow-sm ring-1 ring-brand/20"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                }`}
-              >
-                <Icon
-                  className={`h-5 w-5 shrink-0 transition-colors ${
-                    isActive ? "text-brand" : "text-gray-400"
-                  }`}
-                />
-                <span>{label}</span>
-              </Link>
+              <SidebarSection key={section.key} label={section.label}>
+                {items.map(renderLink)}
+              </SidebarSection>
             );
-          })}
-        </SidebarSection>
+          }
 
-        {/* ACCOUNT — collapsible, closed by default */}
-        <SidebarSection label="Account">
-          {[
-            { href: "/profile", label: "Profile", icon: User },
-            { href: "/wallet", label: "Wallet", icon: Wallet },
-            { href: "/settings", label: "Settings", icon: Settings },
-            { href: "/settings", label: "Help & Support", icon: HelpCircle },
-          ].map(({ href, label, icon: Icon }) => {
-            const isActive =
-              pathname === href || pathname.startsWith(href + "/");
-            return (
-              <Link
-                key={label}
-                href={href}
-                className={`tap-target flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? "bg-brand-light/80 text-brand font-bold shadow-sm ring-1 ring-brand/20"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                }`}
-              >
-                <Icon
-                  className={`h-5 w-5 shrink-0 transition-colors ${
-                    isActive ? "text-brand" : "text-gray-400"
-                  }`}
-                />
-                <span>{label}</span>
-              </Link>
-            );
-          })}
-        </SidebarSection>
+          return (
+            <div key={section.key}>
+              <p className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">
+                {section.label}
+              </p>
+              <div className="space-y-0.5">{items.map(renderLink)}</div>
+            </div>
+          );
+        })}
       </nav>
 
       {/* ─── Sign Out ─── */}
@@ -517,6 +435,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
             emailVerified: raw.emailVerified ?? !!raw.email_verified_at,
             trustScore: raw.trustScore ?? raw.trust_score ?? 0,
             profilePictureUrl: raw.profilePictureUrl ?? null,
+            isAvailable: raw.isAvailable ?? raw.is_available ?? false,
+            runnerStatus: raw.runnerStatus ?? "none",
             wallet: (json.wallet ?? raw.wallet)
               ? { id: (json.wallet ?? raw.wallet).id, balanceKobo: (json.wallet ?? raw.wallet).balanceKobo, escrowKobo: (json.wallet ?? raw.wallet).escrowKobo }
               : undefined,
@@ -560,7 +480,7 @@ function UnreadBadge() {
     import("@/lib/apiClient").then((mod) => {
       mod.default
         .get("/notifications/unread-count")
-        .then((res) => setCount(res.data?.data?.count ?? 0))
+        .then((res) => setCount(res.data?.count ?? 0))
         .catch(() => {});
     });
   }, [isAuthenticated]);
@@ -706,7 +626,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <aside className="hidden md:flex md:flex-col md:w-72 md:shrink-0 md:border-r md:border-gray-200 md:bg-surface/95 md:backdrop-blur-xl" style={{ height: "100dvh" }}>
         <NavSidebarContent
           user={user}
-          roles={roles}
+          activeRole={activeRole}
           pathname={pathname}
         />
       </aside>
@@ -891,9 +811,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         >
           <div className="flex items-center justify-between gap-2 px-1">
-            {(activeRole === "runner" ? RUNNER_TABS : POSTER_TABS).map((tab) => {
+            {(activeRole === "runner" ? RUNNER_NAV : POSTER_NAV)
+              .filter((n) => n.mobileTab)
+              .map((tab) => {
               const { href, label, icon } = tab;
-              const isFab = "isFab" in tab && tab.isFab;
+              const isCta = tab.isCta;
               const isActive =
                 pathname === href || pathname.startsWith(href + "/");
               const isRunner = activeRole === "runner";
@@ -902,7 +824,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               const activeText = isRunner ? "text-gold" : "text-brand";
               const activeIconColor = isRunner ? "text-gold scale-110" : "text-brand scale-110";
 
-              if (isFab) {
+              if (isCta) {
                 return (
                   <Link
                     key={href}
@@ -911,7 +833,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     style={{ flex: "none" }}
                     aria-label={label}
                   >
-                    <TabIcon icon={icon} className="h-6 w-6" />
+                    <NavIcon icon={icon} className="h-6 w-6" />
                   </Link>
                 );
               }
@@ -930,7 +852,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       isActive ? activeBg : "bg-transparent"
                     }`}
                   >
-                    <TabIcon
+                    <NavIcon
                       icon={icon}
                       className={`h-6 w-6 transition-all duration-200 ${isActive ? activeIconColor : "text-slate-500"}`}
                     />

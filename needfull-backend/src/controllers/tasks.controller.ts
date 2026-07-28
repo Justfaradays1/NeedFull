@@ -3,7 +3,7 @@
 // FUTURE: Add pagination metadata helper
 
 import { Request, Response } from "express";
-import { listTasks, getTask, createTask, updateTask, cancelTask, confirmCompletion, getTaskCapabilities } from "../services/task.service";
+import { listTasks, getTask, createTask, updateTask, cancelTask, confirmCompletion, markAsDone, getTaskCapabilities } from "../services/task.service";
 
 export async function listTasksHandler(req: Request, res: Response): Promise<void> {
   try {
@@ -73,6 +73,17 @@ export async function confirmCompletionHandler(req: Request, res: Response): Pro
   }
 }
 
+export async function markAsDoneHandler(req: Request, res: Response): Promise<void> {
+  try {
+    await markAsDone(req.params.taskId, req.user!.id);
+    res.json({ success: true, message: "Task marked as done. Awaiting poster confirmation." });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "Failed to mark task as done";
+    console.error("[Tasks] markAsDoneHandler error:", error);
+    res.status(400).json({ success: false, message: msg });
+  }
+}
+
 // WHAT: Get tasks posted by the current user
 export async function getMyPostedTasks(req: Request, res: Response): Promise<void> {
   try {
@@ -85,7 +96,7 @@ export async function getMyPostedTasks(req: Request, res: Response): Promise<voi
        WHERE t.poster_id = $1 ORDER BY t.created_at DESC`,
       [req.user!.id],
     );
-    res.json({ success: true, data: result.rows.map((r: any) => ({ id: r.id, title: r.title, budget: { kobo: r.budget_kobo, naira: r.budget_kobo / 100 }, status: r.status, isUrgent: r.is_urgent, createdAt: r.created_at, deadline: r.deadline, category: r.category, applicationCount: parseInt(r.application_count, 10), capabilities: getTaskCapabilities(req.user!.id, { posterId: req.user!.id, assignedRunnerId: null, status: r.status }) })) });
+    res.json({ success: true, data: result.rows.map((r: any) => ({ id: r.id, title: r.title, budget: { kobo: r.budget_kobo, naira: r.budget_kobo / 100 }, status: r.status, isUrgent: r.is_urgent, createdAt: r.created_at, deadline: r.deadline, category: r.category, applicationCount: parseInt(r.application_count, 10), capabilities: getTaskCapabilities(req.user!.id, { posterId: req.user!.id, assignedRunnerId: null, status: r.status, runnerDoneAt: null }) })) });
   } catch (error) {
     console.error("[Tasks] getMyPostedTasks error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch your tasks" });
@@ -104,7 +115,7 @@ export async function getMyAssignedTasks(req: Request, res: Response): Promise<v
        WHERE t.assigned_to = $1 ORDER BY t.created_at DESC`,
       [req.user!.id],
     );
-    res.json({ success: true, data: result.rows.map((r: any) => ({ id: r.id, title: r.title, budget: { kobo: r.budget_kobo, naira: r.budget_kobo / 100 }, status: r.status, isUrgent: r.is_urgent, createdAt: r.created_at, deadline: r.deadline, category: r.category, poster: r.poster, capabilities: getTaskCapabilities(req.user!.id, { posterId: r.poster.id, assignedRunnerId: req.user!.id, status: r.status }) })) });
+    res.json({ success: true, data: result.rows.map((r: any) => ({ id: r.id, title: r.title, budget: { kobo: r.budget_kobo, naira: r.budget_kobo / 100 }, status: r.status, isUrgent: r.is_urgent, createdAt: r.created_at, deadline: r.deadline, category: r.category, poster: r.poster, capabilities: getTaskCapabilities(req.user!.id, { posterId: r.poster.id, assignedRunnerId: req.user!.id, status: r.status, runnerDoneAt: null }) })) });
   } catch (error) {
     console.error("[Tasks] getMyAssignedTasks error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch assigned tasks" });

@@ -31,6 +31,7 @@ interface TaskCapabilities {
   canViewApplications: boolean;
   canApply: boolean;
   canConfirmCompletion: boolean;
+  canMarkAsDone: boolean;
   canChat: boolean;
   canRate: boolean;
 }
@@ -53,6 +54,7 @@ interface TaskDetail {
     fullName: string;
     profilePictureUrl: string | null;
   } | null;
+  runnerDoneAt?: string | null;
   applicationCount?: number;
   capabilities?: TaskCapabilities;
 }
@@ -118,6 +120,20 @@ export default function MyTaskDetailPage() {
     }
   };
 
+  const handleMarkAsDone = async () => {
+    setActionLoading("done");
+    try {
+      await apiClient.post(`/tasks/${taskId}/done`);
+      toast.success("Task marked as done! Awaiting poster confirmation.");
+      const res = await apiClient.get(`/tasks/${taskId}?lat=&lng=`);
+      setTask(res.data?.data ?? null);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to mark as done");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleComplete = async () => {
     setActionLoading("complete");
     try {
@@ -155,7 +171,9 @@ export default function MyTaskDetailPage() {
     );
   }
 
-  const badge = STATUS_BADGES[task.status] || STATUS_BADGES.open;
+  const badge = task.runnerDoneAt && task.status === "in_progress"
+    ? { bg: "bg-purple-100", text: "text-purple-800", label: "Awaiting Confirmation" }
+    : STATUS_BADGES[task.status] || STATUS_BADGES.open;
 
   return (
     <>
@@ -287,7 +305,22 @@ export default function MyTaskDetailPage() {
                     ) : (
                       <CheckCircle className="h-4 w-4" />
                     )}
-                    Confirm Complete & Release Payment
+                    {task.runnerDoneAt ? "Confirm Complete & Release Payment" : "Mark as Complete"}
+                  </button>
+                )}
+
+                {task.capabilities?.canMarkAsDone && (
+                  <button
+                    onClick={handleMarkAsDone}
+                    disabled={actionLoading === "done"}
+                    className="flex items-center justify-center gap-2 rounded-xl bg-green-600 py-3 text-sm font-bold text-white disabled:opacity-50"
+                  >
+                    {actionLoading === "done" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <CheckCircle className="h-4 w-4" />
+                    )}
+                    Mark as Done
                   </button>
                 )}
 

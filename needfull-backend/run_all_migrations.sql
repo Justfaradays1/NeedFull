@@ -102,3 +102,6 @@ ALTER TABLE wallet_transactions ADD COLUMN IF NOT EXISTS reference TEXT;
 
 -- 8. wallets.pending_balance (used by wallet service, removed from queries but kept for schema completeness)
 ALTER TABLE wallets ADD COLUMN IF NOT EXISTS pending_balance INTEGER NOT NULL DEFAULT 0;
+
+-- 9. Migration 012 — runner_done_at (Mark as Done flow)
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS runner_done_at TIMESTAMPTZ;

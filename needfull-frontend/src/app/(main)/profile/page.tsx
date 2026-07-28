@@ -97,7 +97,8 @@ export default function ProfilePage() {
 
   // Verification upload state
   const [uploading, setUploading] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const avatarFileRef = useRef<HTMLInputElement>(null);
+  const verificationFileRef = useRef<HTMLInputElement>(null);
 
   const fetchProfile = async () => {
     setFetchError(null);

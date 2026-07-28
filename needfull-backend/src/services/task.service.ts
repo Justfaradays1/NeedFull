@@ -29,6 +29,7 @@ interface TaskRow {
   image_url: string | null;
   assigned_to: string | null;
   runner_id: string | null;
+  runner_done_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -44,6 +45,7 @@ export interface TaskCapabilities {
   canConfirmCompletion: boolean;
   canChat: boolean;
   canRate: boolean;
+  canMarkAsDone: boolean;
 }
 
 // WHAT: Compute what the current user is allowed to do on a given task
@@ -51,12 +53,13 @@ export interface TaskCapabilities {
 //      services and returned to the frontend for UI rendering
 export function getTaskCapabilities(
   userId: string,
-  task: { posterId: string; assignedRunnerId: string | null; status: string },
+  task: { posterId: string; assignedRunnerId: string | null; status: string; runnerDoneAt: string | null },
 ): TaskCapabilities {
   const isPoster = task.posterId === userId;
   const isRunner = task.assignedRunnerId === userId;
   const s = task.status;
   const hasRunner = !!task.assignedRunnerId;
+  const runnerDone = !!task.runnerDoneAt;
 
   return {
     canEdit: isPoster && s === "open",
@@ -64,6 +67,7 @@ export function getTaskCapabilities(
     canViewApplications: isPoster && s === "open",
     canApply: !isPoster && s === "open" && !hasRunner,
     canConfirmCompletion: isPoster && s === "in_progress" && hasRunner,
+    canMarkAsDone: isRunner && s === "in_progress" && !runnerDone,
     canChat: (isPoster || isRunner) && hasRunner,
     canRate: (isPoster || isRunner) && s === "completed",
   };
@@ -219,7 +223,7 @@ export async function listTasks(
   const dataSQL = `
     SELECT
       t.id, t.title, t.description, t.budget_kobo, t.deadline,
-      t.is_urgent, t.status, t.location_label,
+      t.is_urgent, t.status, t.location_label, t.runner_done_at,
       ST_X(t.location::geometry) as lat, ST_Y(t.location::geometry) as lng,
       t.image_url, t.assigned_to as runner_id, t.created_at, t.updated_at,
       ${distanceSelect},
@@ -251,6 +255,7 @@ export async function listTasks(
           posterId: row.poster.id,
           assignedRunnerId: row.runner_id,
           status: row.status,
+          runnerDoneAt: row.runner_done_at,
         })
       : undefined;
 
@@ -267,6 +272,7 @@ export async function listTasks(
       lng: row.lng,
       imageUrl: row.image_url,
       runnerId: row.runner_id,
+      runnerDoneAt: row.runner_done_at,
       distance: row.distance,
       poster: row.poster,
       category: row.category,
@@ -308,7 +314,7 @@ export async function getTask(
   const sql = `
     SELECT
       t.id, t.poster_id, t.title, t.description, t.budget_kobo, t.deadline,
-      t.is_urgent, t.status, t.location_label,
+      t.is_urgent, t.status, t.location_label, t.runner_done_at,
       ST_X(t.location::geometry) as lat, ST_Y(t.location::geometry) as lng,
       t.image_url, t.assigned_to as runner_id, t.created_at, t.updated_at,
       ${distanceSelect},
@@ -342,6 +348,7 @@ export async function getTask(
         posterId: row.poster_id,
         assignedRunnerId: row.runner_id,
         status: row.status,
+        runnerDoneAt: row.runner_done_at,
       })
     : undefined;
 
@@ -359,6 +366,7 @@ export async function getTask(
     lng: row.lng,
     imageUrl: row.image_url,
     runnerId: row.runner_id,
+    runnerDoneAt: row.runner_done_at,
     distance: row.distance,
     poster: row.poster,
     category: row.category,
@@ -450,6 +458,7 @@ export async function createTask(
       posterId: userId,
       assignedRunnerId: null,
       status: task.status,
+      runnerDoneAt: null,
     }),
     createdAt: task.created_at,
   };
@@ -554,9 +563,41 @@ export async function updateTask(
       posterId: userId,
       assignedRunnerId: result.assigned_to,
       status: result.status,
+      runnerDoneAt: result.runner_done_at,
     }),
     updatedAt: result.updated_at,
   };
+}
+
+// WHAT: Runner marks task as done — sets runner_done_at, notifies poster to confirm
+// WHY: Gives runner agency to signal completion; poster still controls escrow release
+export async function markAsDone(
+  taskId: string,
+  userId: string,
+): Promise<void> {
+  const task = await queryOne<TaskRow>(
+    `SELECT id, poster_id, assigned_to, status, title
+     FROM tasks WHERE id = $1`,
+    [taskId],
+  );
+
+  if (!task) throw new Error("Task not found");
+  if (task.assigned_to !== userId) throw new Error("Only the assigned runner can mark this task as done");
+  if (task.status !== "in_progress") throw new Error(`Task status is "${task.status}". Only in_progress tasks can be marked as done.`);
+
+  await db.query(
+    `UPDATE tasks SET runner_done_at = NOW(), updated_at = NOW() WHERE id = $1`,
+    [taskId],
+  );
+
+  await notifyUser(task.poster_id, {
+    type: "task_marked_done",
+    title: "Task Marked Complete",
+    body: `"${task.title}" has been marked as done by the runner. Confirm completion or report an issue.`,
+    taskId,
+    conversationId: undefined,
+    actorId: userId,
+  });
 }
 
 // WHAT: Cancel a task — poster or admin can cancel
