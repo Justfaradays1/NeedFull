@@ -13,7 +13,7 @@ const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
-  PORT: z.coerce.number().int().min(1).max(65535).default(5000),
+  PORT: z.coerce.number().int().min(1).max(65535),
   FRONTEND_URL: z.string().url("Invalid FRONTEND_URL"),
 
   // Database
