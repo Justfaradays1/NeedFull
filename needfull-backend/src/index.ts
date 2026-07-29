@@ -22,11 +22,18 @@ import webhookRoutes from "./routes/webhookRoutes";
 const app = express();
 const server = createServer(app);
 
+// WHAT: Define allowed CORS origins (supports multiple for development)
+// WHY: Prevent CORS errors when frontend runs on different ports locally
+const allowedOrigins: string[] = [env.FRONTEND_URL];
+if (env.NODE_ENV === "development") {
+  allowedOrigins.push("http://localhost:3000");
+}
+
 // WHAT: Initialize Socket.io for real-time notifications
 // WHY: Push notifications to connected clients without polling
 export const io = new SocketIOServer(server, {
   cors: {
-    origin: env.FRONTEND_URL,
+    origin: allowedOrigins,
     credentials: true,
   },
 });
@@ -42,7 +49,7 @@ app.use(helmet());
 // WHY: Allow frontend to make requests to backend
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+    origin: allowedOrigins,
     credentials: true,
   }),
 );
