@@ -52,7 +52,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data: https://fonts.gstatic.com",
-              "connect-src 'self' http://localhost:5000 http://localhost:3000 https://res.cloudinary.com",
+              "connect-src 'self' http://localhost:5000 http://localhost:3000 https://res.cloudinary.com https://needfull.onrender.com wss://needfull.onrender.com",
               "manifest-src 'self'",
               "base-uri 'self'",
               "form-action 'self'",
