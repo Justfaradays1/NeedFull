@@ -18,11 +18,6 @@ import {
   Settings,
   Wallet as WalletIcon,
   Shield,
-  BookOpen,
-  PenTool,
-  Palette,
-  Code,
-  Truck,
   ArrowRight,
   ArrowUp,
   ArrowDownLeft,
@@ -302,36 +297,15 @@ function TaskCard({ task }: { task: TaskItem }) {
 /* ─── Popular Category Card ─── */
 
 const POPULAR_CATEGORIES = [
-  {
-    id: "assignment",
-    name: "Assignment Help",
-    icon: BookOpen,
-    desc: "Research, writing, editing",
-  },
-  {
-    id: "delivery",
-    name: "Delivery",
-    icon: Truck,
-    desc: "Food, packages, documents",
-  },
-  {
-    id: "design",
-    name: "Graphic Design",
-    icon: Palette,
-    desc: "Flyers, logos, banners",
-  },
-  {
-    id: "tutoring",
-    name: "Tutoring",
-    icon: PenTool,
-    desc: "One-on-one academic help",
-  },
-  {
-    id: "tech",
-    name: "Tech Support",
-    icon: Code,
-    desc: "IT, software, hardware",
-  },
+  { name: "Laundry & Washing", icon: "🧺", desc: "Wash, dry, iron, fold" },
+  { name: "Delivery & Errands", icon: "🛵", desc: "Deliver items, run errands" },
+  { name: "Cleaning", icon: "🧹", desc: "Clean rooms and spaces" },
+  { name: "Printing & Binding", icon: "🖨", desc: "Print, bind, photocopy" },
+  { name: "Shopping", icon: "🛒", desc: "Buy groceries, supplies" },
+  { name: "Food Runs", icon: "🍔", desc: "Food and snack delivery" },
+  { name: "Tech Support", icon: "💻", desc: "Fix computers, software" },
+  { name: "Graphic Design", icon: "🎨", desc: "Flyers, logos, banners" },
+  { name: "Academic Assistance", icon: "📚", desc: "Research, writing, tutoring" },
 ];
 
 function PopularCategoryCard({
@@ -339,21 +313,18 @@ function PopularCategoryCard({
 }: {
   cat: (typeof POPULAR_CATEGORIES)[number];
 }) {
-  const Icon = cat.icon;
   return (
     <button
       type="button"
       className="tap-target flex flex-col items-center gap-1.5 rounded-xl border border-card-border bg-surface px-3 py-3 shadow-card transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-lifted active:scale-[0.97]"
     >
-      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-light">
-        <Icon className="h-4 w-4 text-brand" />
+      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-light text-base">
+        {cat.icon}
       </div>
       <span className="text-[11px] font-bold text-gray-900 text-center leading-tight">
         {cat.name}
       </span>
-      <span className="text-[9px] text-gray-600 text-center leading-tight">
-        {cat.desc}
-      </span>
+      <span className="text-[9px] text-gray-500 text-center leading-tight">{cat.desc}</span>
     </button>
   );
 }
@@ -815,8 +786,8 @@ export default function FeedPage() {
             Popular categories
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {POPULAR_CATEGORIES.map((cat) => (
-              <PopularCategoryCard key={cat.id} cat={cat} />
+            {POPULAR_CATEGORIES.map((cat, i) => (
+              <PopularCategoryCard key={i} cat={cat} />
             ))}
           </div>
         </section>

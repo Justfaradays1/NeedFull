@@ -1,25 +1,14 @@
-// WHAT: 3-step task posting form — category, location/deadline, review & post
-// WHY: Guided creation flow ensures complete task data before wallet escrow
-// FUTURE: Add draft save, add AI budget suggestions, add image upload step
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
-  ChevronRight,
   MapPin,
-  Crosshair,
   Clock,
-  Zap,
   AlertTriangle,
-  ShieldCheck,
   Loader2,
-  CheckCircle2,
-  ArrowLeft,
   DollarSign,
-  Info,
   ShoppingBag,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
@@ -27,36 +16,26 @@ import { get, post } from "@/lib/apiClient";
 import { useAuthInit } from "@/hooks/useAuthInit";
 import { ProgressSteps } from "@/components/ui/progress-steps";
 import { EscrowSummaryCard } from "@/components/tasks/EscrowSummaryCard";
+import { BudgetStep, type BudgetStepData } from "@/components/tasks/budget/BudgetStep";
+import { CategorySelectionStep } from "@/components/tasks/create/CategorySelectionStep";
+import { TaskDetailsStep } from "@/components/tasks/create/TaskDetailsStep";
 import { CelebrationModal } from "@/components/ui/celebration-modal";
 import { useCelebration } from "@/hooks/useCelebration";
+import type { TaskMode } from "@/lib/categoryConfig";
 
-// WHAT: Category shape from API
 interface Category {
   id: string;
   name: string;
   icon: string;
 }
 
-// WHAT: Budget suggestions per category name
-const BUDGET_SUGGESTIONS: Record<string, { min: number; max: number }> = {
-  Delivery: { min: 500, max: 2000 },
-  Shopping: { min: 1000, max: 5000 },
-  Assignment: { min: 500, max: 3000 },
-  Tutoring: { min: 1000, max: 5000 },
-  Tech: { min: 1000, max: 10000 },
-  Handyman: { min: 2000, max: 10000 },
-  Event: { min: 2000, max: 15000 },
-  Other: { min: 500, max: 5000 },
-};
-
-// WHAT: Steps for the progress indicator
 const STEPS = [
-  { num: 1, label: "What" },
-  { num: 2, label: "Where & When" },
-  { num: 3, label: "Review" },
+  { num: 1, label: "Category" },
+  { num: 2, label: "Details" },
+  { num: 3, label: "Budget" },
+  { num: 4, label: "Review" },
 ];
 
-// WHAT: Platform fee configuration (mirrors backend)
 const PLATFORM_FEE_PERCENT = 10;
 
 export default function CreateTaskPage() {
@@ -64,46 +43,36 @@ export default function CreateTaskPage() {
   const user = useAuthStore((s) => s.user);
   useAuthInit();
 
-  // WHAT: Redirect to login if not authenticated
   useEffect(() => {
-    if (!user) {
-      router.push("/login");
-    }
+    if (!user) router.push("/login");
   }, [user, router]);
 
-  // WHAT: Step state
   const [step, setStep] = useState(1);
-
-  // WHAT: Categories
   const [categories, setCategories] = useState<Category[]>([]);
   const [catLoading, setCatLoading] = useState(true);
 
-  // WHAT: Form data
+  // Step 1: Category
   const [categoryId, setCategoryId] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [budgetNaira, setBudgetNaira] = useState("");
-  const [locationLabel, setLocationLabel] = useState("");
-  const [lat, setLat] = useState<number | null>(null);
-  const [lng, setLng] = useState<number | null>(null);
-  const [deadline, setDeadline] = useState("");
-  const [isUrgent, setIsUrgent] = useState(false);
-  const [isEmergency, setIsEmergency] = useState(false);
+  const [categoryName, setCategoryName] = useState("");
 
-  // WHAT: GPS state
-  const [locating, setLocating] = useState(false);
-  const [geoError, setGeoError] = useState<string | null>(null);
+  // Step 2: Task Details
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
+  const [taskMode, setTaskMode] = useState<TaskMode>("onsite");
+  const [taskLocation, setTaskLocation] = useState("");
+  const [completionLocation, setCompletionLocation] = useState("");
 
-  // WHAT: Submit state
+  // Step 3: Budget
+  const [budgetStepData, setBudgetStepData] = useState<BudgetStepData | null>(null);
+
+  // Submit
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [createdTaskId, setCreatedTaskId] = useState<string | null>(null);
   const celebration = useCelebration();
-
-  // WHAT: Field-level errors per step
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // WHAT: Load categories on mount
+  // Load categories
   useEffect(() => {
     if (!user) return;
     setCatLoading(true);
@@ -116,75 +85,23 @@ export default function CreateTaskPage() {
       .finally(() => setCatLoading(false));
   }, [user]);
 
-  // WHAT: Find selected category name for suggestions
   const selectedCategory = categories.find((c) => c.id === categoryId);
-  const suggestion = selectedCategory
-    ? (BUDGET_SUGGESTIONS[selectedCategory.name] ?? BUDGET_SUGGESTIONS.Other)
-    : null;
+  const budgetNum = budgetStepData?.budgetNaira ?? 0;
+  const deadline = budgetStepData?.deadline;
+  const budgetLocLabel = budgetStepData?.taskLocation.label ?? "";
+  const walletBalanceKobo = user?.wallet?.balanceKobo ?? 0;
+  const totalKobo = (budgetNum + Math.floor(budgetNum * PLATFORM_FEE_PERCENT / 100)) * 100;
+  const hasEnoughBalance = totalKobo === 0 || walletBalanceKobo >= totalKobo;
 
-  // WHAT: Budget naira as number
-  const budgetNum = parseFloat(budgetNaira) || 0;
-  const balanceKobo = user?.wallet?.balanceKobo ?? 0;
-  const hasEnough = budgetNum === 0 || balanceKobo >= budgetNum * 100;
-
-  // WHAT: GPS location detection
-  function detectLocation() {
-    if (!navigator.geolocation) {
-      setGeoError("GPS not supported on this device");
-      return;
-    }
-    setLocating(true);
-    setGeoError(null);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLat(pos.coords.latitude);
-        setLng(pos.coords.longitude);
-        setLocating(false);
-      },
-      (err) => {
-        setGeoError(
-          err.code === 1
-            ? "Location permission denied. Enable GPS and try again."
-            : "Could not detect location. Try again.",
-        );
-        setLocating(false);
-      },
-      { enableHighAccuracy: true, timeout: 10000 },
-    );
-  }
-
-  // WHAT: Validate current step, return true if valid
   function validateStep(s: number): boolean {
     const newErrors: Record<string, string> = {};
-
-    if (s === 1) {
-      if (!categoryId) newErrors.categoryId = "Select a category";
-      if (!title.trim() || title.trim().length < 5)
-        newErrors.title = "Title must be at least 5 characters";
-      if (title.trim().length > 200)
-        newErrors.title = "Title must be under 200 characters";
-      if (!description.trim() || description.trim().length < 10)
-        newErrors.description = "Description must be at least 10 characters";
-      if (description.trim().length > 2000)
-        newErrors.description = "Description must be under 2000 characters";
-      if (!budgetNaira || budgetNum < 50)
-        newErrors.budgetNaira = "Budget must be at least ₦50";
-    }
-
-    if (s === 2) {
-      if (!locationLabel.trim())
-        newErrors.locationLabel = "Enter a location or use GPS";
-    }
-
+    if (s === 1 && !categoryId) newErrors.categoryId = "Select a category";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
 
-  // WHAT: Go to next step
   function nextStep() {
-    if (validateStep(step)) {
-      setStep((s) => Math.min(s + 1, 3));
-    }
+    if (validateStep(step)) setStep((s) => Math.min(s + 1, 4));
   }
 
   function prevStep() {
@@ -192,29 +109,28 @@ export default function CreateTaskPage() {
     setErrors({});
   }
 
-  // WHAT: Submit the task
   async function handleSubmit() {
-    if (!validateStep(3)) return;
+    if (!budgetStepData) return;
     setSubmitting(true);
     setSubmitError(null);
 
     try {
-      const deadlineISO = deadline
-        ? new Date(deadline).toISOString()
-        : undefined;
+      const locationLabel = taskLocation || budgetLocLabel || undefined;
+      const lat = taskMode === "remote" ? undefined : (budgetStepData.taskLocation.lat ?? undefined);
+      const lng = taskMode === "remote" ? undefined : (budgetStepData.taskLocation.lng ?? undefined);
 
       const res = await post<{ success: boolean; data: { id: string } }>(
         "/tasks",
         {
           categoryId,
-          title: title.trim(),
-          description: description.trim(),
+          title: taskTitle,
+          description: taskDescription,
           budgetNaira: budgetNum,
-          deadline: deadlineISO,
-          isUrgent,
-          locationLabel: locationLabel.trim() || undefined,
-          lat: lat ?? undefined,
-          lng: lng ?? undefined,
+          deadline: budgetStepData.deadline,
+          isUrgent: false,
+          locationLabel,
+          lat,
+          lng,
         },
       );
 
@@ -230,10 +146,7 @@ export default function CreateTaskPage() {
         setSubmitError("Failed to create task. Please try again.");
       }
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error
-          ? err.message
-          : "Something went wrong. Please try again.";
+      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
       setSubmitError(msg);
     } finally {
       setSubmitting(false);
@@ -242,11 +155,10 @@ export default function CreateTaskPage() {
 
   if (!user) return null;
 
-  // ─── MAIN FORM ────────────────────────────
   return (
     <>
       <div className="min-h-screen page-shell">
-        {/* WHAT: Purchase task mode toggle */}
+        {/* Purchase mode toggle */}
         <div className="bg-gold-light/20 px-4 py-2 border-b border-gold/20">
           <div className="mx-auto flex max-w-lg items-center justify-between">
             <div className="flex items-center gap-2">
@@ -262,7 +174,7 @@ export default function CreateTaskPage() {
           </div>
         </div>
 
-        {/* WHAT: Top bar with back button */}
+        {/* Top bar */}
         <div className="sticky top-0 z-10 bg-surface px-4 py-3 shadow-sm">
           <div className="mx-auto flex max-w-lg items-center gap-3">
             <button
@@ -274,356 +186,108 @@ export default function CreateTaskPage() {
             </button>
             <div className="flex-1">
               <ProgressSteps
-                steps={STEPS.map((s) => ({
-                  id: String(s.num),
-                  label: s.label,
-                }))}
+                steps={STEPS.map((s) => ({ id: String(s.num), label: s.label }))}
                 currentStep={step - 1}
               />
             </div>
           </div>
         </div>
 
-        {/* WHAT: Form content */}
+        {/* Content */}
         <div className="mx-auto max-w-lg px-4 pb-8 pt-6">
-          {/* ── Step 1: What ── */}
+          {/* Step 1: Category Selection */}
           {step === 1 && (
             <div className="space-y-6">
-              {/* Category grid */}
-              <div>
-                <label className="mb-2 block text-sm font-bold text-gray-900">
-                  Category
-                </label>
-                {catLoading ? (
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading categories...
-                  </div>
-                ) : (
-                  <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-                    {categories.map((cat) => {
-                      const name = cat.name.charAt(0).toUpperCase() + cat.name.slice(1);
-                      return (
-                        <button
-                          key={cat.id}
-                          type="button"
-                          onClick={() => setCategoryId(cat.id)}
-                          className={`tap-target flex items-center gap-1.5 whitespace-nowrap rounded-full border-2 px-4 py-2 text-sm font-semibold transition-all shrink-0 ${
-                            categoryId === cat.id
-                              ? "border-gold bg-gold-light/30 text-gold-dark shadow-sm"
-                              : "border-card-border bg-surface text-gray-600 hover:border-gray-400"
-                          }`}
-                        >
-                          <span className="text-base">{cat.icon}</span>
-                          <span>{name}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-                {errors.categoryId && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.categoryId}
-                  </p>
-                )}
-              </div>
-
-              {/* Title */}
-              <div>
-                <label className="mb-1 block text-sm font-bold text-gray-900">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Pick up my laundry from hall A"
-                  maxLength={200}
-                  className={`w-full rounded-xl border-2 px-4 py-3 text-sm outline-none transition-colors placeholder:text-gray-400 ${
-                    errors.title
-                      ? "border-red-300 focus:border-red-500"
-                      : "border-gray-200 focus:border-brand"
-                  }`}
+              {catLoading ? (
+                <div className="flex items-center gap-2 py-8 text-sm text-gray-500">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading categories...
+                </div>
+              ) : (
+                <CategorySelectionStep
+                  allCategories={categories}
+                  selectedCategoryId={categoryId}
+                  onSelect={(id) => {
+                    setCategoryId(id);
+                    const cat = categories.find((c) => c.id === id);
+                    if (cat) setCategoryName(cat.name);
+                  }}
                 />
-                {errors.title && (
-                  <p className="mt-1 text-xs text-red-500">{errors.title}</p>
-                )}
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="mb-1 block text-sm font-bold text-gray-900">
-                  Description
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe what needs to be done in detail..."
-                  rows={4}
-                  maxLength={2000}
-                  className={`w-full resize-none rounded-xl border-2 px-4 py-3 text-sm outline-none transition-colors placeholder:text-gray-400 ${
-                    errors.description
-                      ? "border-red-300 focus:border-red-500"
-                      : "border-gray-200 focus:border-brand"
-                  }`}
-                />
-                {errors.description && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.description}
-                  </p>
-                )}
-              </div>
-
-              {/* Budget */}
-              <div>
-                <label className="mb-1 block text-sm font-bold text-gray-900">
-                  Budget
-                </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-gray-600">
-                    ₦
-                  </span>
-                  <input
-                    type="number"
-                    value={budgetNaira}
-                    onChange={(e) => setBudgetNaira(e.target.value)}
-                    placeholder="e.g. 2000"
-                    min={50}
-                    className={`w-full rounded-xl border-2 px-8 py-3 pl-10 text-sm outline-none transition-colors placeholder:text-gray-400 ${
-                      errors.budgetNaira
-                        ? "border-red-300 focus:border-red-500"
-                        : "border-gray-200 focus:border-brand"
-                    }`}
-                  />
-                </div>
-                {errors.budgetNaira && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.budgetNaira}
-                  </p>
-                )}
-
-                {/* Fair price suggestion */}
-                {suggestion && (
-                  <div className="mt-2 flex items-start gap-1.5 rounded-lg bg-brand-light/40 px-3 py-2">
-                    <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand" />
-                    <p className="text-[11px] leading-relaxed text-gray-900">
-                      Fair price suggestion for{" "}
-                      <strong>{selectedCategory?.name}</strong>:{" "}
-                      <strong>
-                        ₦{suggestion.min.toLocaleString()} – ₦
-                        {suggestion.max.toLocaleString()}
-                      </strong>
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* ── Step 2: Where & When ── */}
-          {step === 2 && (
-            <div className="space-y-6">
-              {/* Location */}
-              <div>
-                <label className="mb-1 block text-sm font-bold text-gray-900">
-                  Location
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={locationLabel}
-                    onChange={(e) => setLocationLabel(e.target.value)}
-                    placeholder="e.g. New Lecture Hall, Main Campus"
-                    className={`flex-1 rounded-xl border-2 px-4 py-3 text-sm outline-none transition-colors placeholder:text-gray-400 ${
-                      errors.locationLabel
-                        ? "border-red-300 focus:border-red-500"
-                        : "border-gray-200 focus:border-brand"
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={detectLocation}
-                    disabled={locating}
-                    className="tap-target flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-card-border bg-surface text-gray-500 hover:border-brand hover:text-brand disabled:opacity-50"
-                  >
-                    {locating ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <Crosshair className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
-                {errors.locationLabel && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.locationLabel}
-                  </p>
-                )}
-                {geoError && (
-                  <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
-                    <AlertTriangle className="h-3 w-3" />
-                    {geoError}
-                  </p>
-                )}
-                {lat !== null && lng !== null && (
-                  <p className="mt-1 flex items-center gap-1 text-xs text-brand">
-                    <MapPin className="h-3 w-3" />
-                    Coordinates detected
-                  </p>
-                )}
-              </div>
-
-              {/* Deadline */}
-              <div>
-                <label className="mb-1 block text-sm font-bold text-gray-900">
-                  Deadline{" "}
-                  <span className="font-normal text-gray-500">(optional)</span>
-                </label>
-                <div className="relative">
-                  <Clock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="datetime-local"
-                    value={deadline}
-                    onChange={(e) => setDeadline(e.target.value)}
-                    className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 pl-10 text-sm outline-none transition-colors focus:border-brand"
-                  />
-                </div>
-              </div>
-
-              {/* Urgent toggle */}
-              <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-card-border bg-surface px-4 py-3.5 transition-colors hover:border-gold/50">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`flex h-9 w-9 items-center justify-center rounded-full ${
-                      isUrgent ? "bg-gold/20" : "bg-gray-200"
-                    }`}
-                  >
-                    <Zap
-                      className={`h-5 w-5 ${isUrgent ? "text-gold" : "text-gray-400"}`}
-                    />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">
-                      Urgent
-                    </p>
-                    <p className="text-[11px] text-gray-500">
-                      Runner needed ASAP
-                    </p>
-                  </div>
-                </div>
-                <div
-                  className={`relative h-6 w-11 rounded-full transition-colors ${
-                    isUrgent ? "bg-gold" : "bg-gray-400"
-                  }`}
+              )}
+              {errors.categoryId && (
+                <p className="text-xs text-red-500">{errors.categoryId}</p>
+              )}
+              {/* Next button for Step 1 */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  disabled={!categoryId}
+                  className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:opacity-50"
                 >
-                  <div
-                    className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                      isUrgent ? "translate-x-5" : ""
-                    }`}
-                  />
-                </div>
-                <input
-                  type="checkbox"
-                  checked={isUrgent}
-                  onChange={(e) => setIsUrgent(e.target.checked)}
-                  className="sr-only"
-                />
-              </label>
-
-              {/* Emergency toggle — only for verified students */}
-              {user.emailVerified && (
-                <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-card-border bg-surface px-4 py-3.5 transition-colors hover:border-red-300">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`flex h-9 w-9 items-center justify-center rounded-full ${
-                        isEmergency ? "bg-red-100" : "bg-gray-200"
-                      }`}
-                    >
-                      <AlertTriangle
-                        className={`h-5 w-5 ${isEmergency ? "text-red-500" : "text-gray-400"}`}
-                      />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">
-                        Emergency
-                      </p>
-                      <p className="text-[11px] text-gray-500">
-                        Critical situation — immediate response
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    className={`relative h-6 w-11 rounded-full transition-colors ${
-                      isEmergency ? "bg-red-500" : "bg-gray-400"
-                    }`}
-                  >
-                    <div
-                      className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                        isEmergency ? "translate-x-5" : ""
-                      }`}
-                    />
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={isEmergency}
-                    onChange={(e) => setIsEmergency(e.target.checked)}
-                    className="sr-only"
-                  />
-                </label>
-              )}
-              {!user.emailVerified && (
-                <div className="flex items-start gap-2 rounded-xl bg-gray-200 px-4 py-3">
-                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
-                  <p className="text-xs text-gray-500">
-                    Emergency listing is available for verified students only.{" "}
-                    <button
-                      type="button"
-                      className="font-semibold text-brand underline"
-                    >
-                      Verify your account
-                    </button>
-                  </p>
-                </div>
-              )}
+                  Continue to Details
+                </button>
+              </div>
             </div>
           )}
 
-          {/* ── Step 3: Review & Post ── */}
-          {step === 3 && (
+          {/* Step 2: Task Details */}
+          {step === 2 && selectedCategory && (
+            <TaskDetailsStep
+              categoryName={selectedCategory.name}
+              initialTitle={taskTitle}
+              initialDescription={taskDescription}
+              onContinue={(data) => {
+                setTaskTitle(data.title);
+                setTaskDescription(data.description);
+                setTaskMode(data.taskMode);
+                setTaskLocation(data.taskLocation);
+                setCompletionLocation(data.completionLocation);
+                setStep(3);
+              }}
+            />
+          )}
+
+          {/* Step 3: Budget */}
+          {step === 3 && selectedCategory && (
+            <BudgetStep
+              categoryName={selectedCategory.name}
+              onContinue={(data) => {
+                setBudgetStepData(data);
+                setStep(4);
+              }}
+            />
+          )}
+
+          {/* Step 4: Review */}
+          {step === 4 && selectedCategory && (
             <div className="space-y-5">
               <h2 className="font-display text-lg font-bold text-gray-900 sm:text-xl">
                 Review your task
               </h2>
 
-              {/* Summary card */}
-              <div className="space-y-4 rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
-                {/* Category */}
+              {/* Task Summary Card */}
+              <div className="space-y-4 rounded-2xl border border-card-border bg-surface p-4 shadow-card">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">Category</span>
                   <span className="inline-flex items-center gap-1 rounded-md bg-brand-light px-2 py-0.5 text-xs font-semibold text-brand">
-                    {selectedCategory?.icon} {selectedCategory?.name}
+                    {selectedCategory.icon} {selectedCategory.name}
                   </span>
                 </div>
                 <hr className="border-gray-100" />
 
-                {/* Title */}
                 <div>
                   <span className="text-xs text-gray-500">Title</span>
-                  <p className="mt-0.5 text-sm font-medium text-gray-900">
-                    {title}
-                  </p>
+                  <p className="mt-0.5 text-sm font-medium text-gray-900">{taskTitle}</p>
                 </div>
                 <hr className="border-gray-100" />
 
-                {/* Description */}
                 <div>
                   <span className="text-xs text-gray-500">Description</span>
-                  <p className="mt-0.5 text-sm leading-relaxed text-gray-700 line-clamp-4">
-                    {description}
-                  </p>
+                  <p className="mt-0.5 text-sm leading-relaxed text-gray-700 line-clamp-4">{taskDescription}</p>
                 </div>
                 <hr className="border-gray-100" />
 
-                {/* Budget + fee */}
                 <EscrowSummaryCard
                   budgetNaira={budgetNum}
                   feePercent={PLATFORM_FEE_PERCENT}
@@ -631,19 +295,18 @@ export default function CreateTaskPage() {
                 />
                 <hr className="border-gray-100" />
 
-                {/* Location */}
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">Location</span>
-                  <span className="flex items-center gap-1 text-xs font-medium text-gray-700">
-                    <MapPin className="h-3 w-3" />
-                    {locationLabel}
-                    {lat !== null && (
-                      <span className="text-gray-500">(GPS)</span>
-                    )}
-                  </span>
-                </div>
+                {(taskLocation || budgetLocLabel) && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-500">Location</span>
+                      <span className="flex items-center gap-1 text-xs font-medium text-gray-700">
+                        <MapPin className="h-3 w-3" />
+                        {taskLocation || budgetLocLabel}
+                      </span>
+                    </div>
+                  </>
+                )}
 
-                {/* Deadline */}
                 {deadline && (
                   <>
                     <hr className="border-gray-100" />
@@ -652,53 +315,71 @@ export default function CreateTaskPage() {
                       <span className="flex items-center gap-1 text-xs font-medium text-gray-700">
                         <Clock className="h-3 w-3" />
                         {new Date(deadline).toLocaleDateString("en-NG", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
+                          day: "numeric", month: "short", year: "numeric",
+                          hour: "2-digit", minute: "2-digit",
                         })}
                       </span>
                     </div>
                   </>
                 )}
-
-                {/* Urgency */}
-                {(isUrgent || isEmergency) && (
-                  <>
-                    <hr className="border-gray-100" />
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">Priority</span>
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-bold ${
-                          isEmergency
-                            ? "bg-error-light text-error"
-                            : "bg-warning-light text-warning"
-                        }`}
-                      >
-                        {isEmergency ? (
-                          <AlertTriangle className="h-3 w-3" />
-                        ) : (
-                          <Zap className="h-3 w-3" />
-                        )}
-                        {isEmergency ? "EMERGENCY" : "URGENT"}
-                      </span>
-                    </div>
-                  </>
-                )}
               </div>
 
-              {/* Info note */}
+              {/* Payment Summary — separate from the button */}
+              <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                  Payment Summary
+                </h3>
+
+                <div className="mt-4 flex items-baseline justify-center gap-1">
+                  <span className="text-3xl font-extrabold text-gray-900 tabular-nums">
+                    ₦{budgetNum.toLocaleString()}
+                  </span>
+                </div>
+                <p className="mt-1 text-center text-xs text-gray-400">
+                  Held securely in NeedFull Escrow
+                </p>
+
+                <div className="mt-4 space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-500">Task Budget</span>
+                    <span className="font-semibold text-gray-700">₦{budgetNum.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-500">Platform Fee (10%)</span>
+                    <span className="font-semibold text-gray-700">—₦{Math.floor(budgetNum * 10 / 100).toLocaleString()}</span>
+                  </div>
+                  <hr className="border-gray-100" />
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium text-gray-600">Amount to Pay</span>
+                    <span className="font-bold text-brand">₦{(budgetNum + Math.floor(budgetNum * 10 / 100)).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Wallet check */}
+                <div className={`mt-4 rounded-xl px-4 py-3 text-sm ${
+                  hasEnoughBalance
+                    ? "bg-green-50 text-green-700"
+                    : "bg-red-50 text-red-600"
+                }`}>
+                  <div className="flex items-center gap-2">
+                    <div className={`h-2 w-2 rounded-full ${hasEnoughBalance ? "bg-green-500" : "bg-red-500"}`} />
+                    <span className="text-xs font-semibold">
+                      {hasEnoughBalance
+                        ? `Wallet Balance: ₦${(walletBalanceKobo / 100).toLocaleString()}`
+                        : `Insufficient — you need ₦${((budgetNum + Math.floor(budgetNum * 10 / 100)) - walletBalanceKobo / 100).toLocaleString()} more`}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Escrow info note */}
               <div className="flex items-start gap-2 rounded-xl bg-brand-light/30 px-4 py-3">
                 <DollarSign className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                 <p className="text-xs leading-relaxed text-gray-600">
-                  Your payment is only deducted when you accept a runner. Until
-                  then, the budget amount is held in escrow but not charged to
-                  your wallet.
+                  Your payment is only deducted when you accept a runner. Until then, the budget amount is held in escrow but not charged to your wallet.
                 </p>
               </div>
 
-              {/* Submit error */}
               {submitError && (
                 <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
                   <p className="flex items-center gap-1.5 text-sm font-medium text-red-600">
@@ -707,61 +388,42 @@ export default function CreateTaskPage() {
                   </p>
                 </div>
               )}
-            </div>
-          )}
 
-          {/* ── Navigation buttons ── */}
-          <div className="mt-8 flex gap-3">
-            {step > 1 && (
-              <button
-                type="button"
-                onClick={prevStep}
-                className="tap-target flex w-14 items-center justify-center rounded-xl border-2 border-card-border bg-surface py-3.5 hover:bg-gray-200"
-              >
-                <ChevronLeft className="h-5 w-5 text-gray-600" />
-              </button>
-            )}
-
-            {step < 3 ? (
-              <button
-                type="button"
-                onClick={nextStep}
-                className="tap-target flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-base font-bold text-white shadow-sm hover:bg-brand-dark"
-              >
-                Continue
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={submitting || !hasEnough}
-                  className="tap-target flex flex-1 items-center justify-center gap-2 rounded-xl bg-gold py-3.5 text-base font-bold text-white shadow-sm hover:bg-gold-dark disabled:opacity-60"
-                >
-                  {submitting ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      Posting...
-                    </>
-                  ) : (
-                    <>Post Task — ₦{budgetNum.toLocaleString()}</>
-                  )}
-                </button>
-                {!hasEnough && (
+              {/* Sticky action buttons — clean, no amounts inside */}
+              <div className="sticky bottom-0 -mx-4 bg-gradient-to-t from-white via-white to-transparent px-4 pb-4 pt-6">
+                {hasEnoughBalance ? (
                   <button
                     type="button"
-                    onClick={() => router.push("/wallet/fund")}
-                    className="tap-target mt-2 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-brand bg-surface py-3 text-sm font-bold text-brand hover:bg-brand-light/30"
+                    onClick={handleSubmit}
+                    disabled={submitting}
+                    className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-gold py-4 text-base font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:opacity-60"
                   >
-                    Fund Wallet
+                    {submitting ? (
+                      <><Loader2 className="h-5 w-5 animate-spin" />Posting...</>
+                    ) : (
+                      <>Post Task</>
+                    )}
                   </button>
+                ) : (
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => router.push("/wallet/fund")}
+                      className="tap-target flex w-full items-center justify-center gap-2 rounded-xl border-2 border-brand bg-white py-4 text-base font-bold text-brand shadow-sm transition-all hover:bg-brand/5 active:scale-[0.97]"
+                    >
+                      Fund Wallet
+                    </button>
+                    <p className="text-center text-xs text-gray-400">
+                      Insufficient balance to post this task
+                    </p>
+                  </div>
                 )}
-              </>
-            )}
-          </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
       <CelebrationModal
         open={celebration.open}
         onClose={celebration.close}
