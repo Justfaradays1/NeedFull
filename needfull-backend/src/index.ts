@@ -23,8 +23,15 @@ const app = express();
 const server = createServer(app);
 
 // WHAT: Define allowed CORS origins (supports multiple for development)
-// WHY: Prevent CORS errors when frontend runs on different ports locally
+// WHY: Prevent CORS errors when frontend runs on different domains locally or on Vercel
 const allowedOrigins: string[] = [env.FRONTEND_URL];
+if (env.CORS_ORIGINS) {
+  allowedOrigins.push(
+    ...env.CORS_ORIGINS.split(",")
+      .map((o) => o.trim())
+      .filter(Boolean),
+  );
+}
 if (env.NODE_ENV === "development") {
   allowedOrigins.push("http://localhost:3000");
 }

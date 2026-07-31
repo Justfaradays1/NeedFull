@@ -16,6 +16,9 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535),
   FRONTEND_URL: z.string().url("Invalid FRONTEND_URL"),
 
+  // Comma-separated list of additional CORS origins (e.g. preview domains)
+  CORS_ORIGINS: z.string().default(""),
+
   // Database
   DATABASE_URL: z.string().url("Invalid DATABASE_URL"),
   DATABASE_POOL_MAX: z.coerce.number().int().min(1).default(20),
