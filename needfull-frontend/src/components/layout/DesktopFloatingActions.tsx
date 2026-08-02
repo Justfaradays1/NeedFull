@@ -17,11 +17,11 @@ export function DesktopFloatingActions({
   if (pathname.startsWith("/tasks/create")) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 hidden flex-col items-end gap-3 md:flex">
+    <div className="fixed bottom-6 right-6 z-50 hidden flex-col items-center gap-3 md:flex">
       {/* ─── Messages (laptop+) ─── */}
       <Link
         href="/chat"
-        className="group relative hidden h-16 w-16 items-center justify-center rounded-full border border-slate-200/70 bg-surface text-brand-text shadow-lifted transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-95 lg:flex"
+        className="group relative hidden h-16 w-16 items-center justify-center rounded-full border-2 border-gold bg-surface text-brand-text shadow-lg shadow-gold/25 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-gold/30 active:scale-95 lg:flex"
         aria-label="Open messages"
       >
         <span className="relative">
