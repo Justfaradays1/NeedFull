@@ -197,7 +197,7 @@ export default function CreatePurchaseTaskPage() {
           {step === 1 && (
             <div className="space-y-6">
               <div className="flex items-center gap-2 mb-2">
-                <ShoppingBag className="h-5 w-5 text-brand" />
+                <ShoppingBag className="h-5 w-5 text-brand-text" />
                 <h2 className="font-display text-lg font-bold text-gray-900">Purchase Task</h2>
               </div>
 
@@ -351,7 +351,7 @@ export default function CreatePurchaseTaskPage() {
                     }`}
                   />
                   <button type="button" onClick={detectLocation} disabled={locating}
-                    className="tap-target flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-card-border bg-surface text-gray-500 hover:border-brand hover:text-brand disabled:opacity-50"
+                    className="tap-target flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-card-border bg-surface text-gray-500 hover:border-brand hover:text-brand-text disabled:opacity-50"
                   >
                     {locating ? <Loader2 className="h-5 w-5 animate-spin" /> : <Crosshair className="h-5 w-5" />}
                   </button>
@@ -359,7 +359,7 @@ export default function CreatePurchaseTaskPage() {
                 {errors.locationLabel && <p className="mt-1 text-xs text-red-500">{errors.locationLabel}</p>}
                 {geoError && <p className="mt-1 flex items-center gap-1 text-xs text-red-500"><AlertTriangle className="h-3 w-3" />{geoError}</p>}
                 {lat !== null && lng !== null && (
-                  <p className="mt-1 flex items-center gap-1 text-xs text-brand"><MapPin className="h-3 w-3" />Coordinates detected</p>
+                  <p className="mt-1 flex items-center gap-1 text-xs text-brand-text"><MapPin className="h-3 w-3" />Coordinates detected</p>
                 )}
               </div>
 
@@ -470,7 +470,7 @@ export default function CreatePurchaseTaskPage() {
 
               {/* Escrow info */}
               <div className="flex items-start gap-2 rounded-xl bg-brand-light/30 px-4 py-3">
-                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-brand-text" />
                 <p className="text-xs leading-relaxed text-gray-600">
                   <strong>Full amount locked in NeedFull Escrow.</strong>{" "}
                   Funds are only released to the runner after delivery is confirmed.
@@ -500,7 +500,7 @@ export default function CreatePurchaseTaskPage() {
 
             {step < 4 ? (
               <button type="button" onClick={nextStep}
-                className="tap-target flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-base font-bold text-white shadow-sm hover:bg-brand-dark"
+                className="tap-target flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-base font-bold text-on-brand shadow-sm hover:bg-brand-dark"
               >
                 Continue <ChevronRight className="h-5 w-5" />
               </button>
@@ -518,7 +518,7 @@ export default function CreatePurchaseTaskPage() {
                 </button>
                 {!hasEnough && (
                   <button type="button" onClick={() => router.push("/wallet/fund")}
-                    className="tap-target mt-2 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-brand bg-surface py-3 text-sm font-bold text-brand hover:bg-brand-light/30"
+                    className="tap-target mt-2 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-brand bg-surface py-3 text-sm font-bold text-brand-text hover:bg-brand-light/30"
                   >
                     Fund Wallet
                   </button>

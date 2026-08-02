@@ -232,7 +232,7 @@ function CompleteRegistrationForm() {
 
           <p className="mt-6 text-center text-xs text-gray-500">
             Already have an account?{" "}
-            <a href="/login" className="font-semibold text-brand hover:underline">Sign in</a>
+            <a href="/login" className="font-semibold text-brand-text hover:underline">Sign in</a>
           </p>
         </div>
       </div>

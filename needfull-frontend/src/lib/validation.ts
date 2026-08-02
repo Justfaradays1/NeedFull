@@ -65,7 +65,7 @@ export function getPasswordStrengthTextColor(strength: PasswordStrength): string
     case 'weak': return 'text-red-600';
     case 'fair': return 'text-amber-600';
     case 'strong': return 'text-green-600';
-    case 'very-strong': return 'text-brand';
+    case 'very-strong': return 'text-brand-text';
     default: return 'text-gray-400';
   }
 }

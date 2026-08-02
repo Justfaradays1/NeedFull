@@ -98,7 +98,7 @@ export default function TermsPage() {
         </div>
 
         <div className="mt-12 border-t border-gray-200 pt-6 text-center">
-          <Link href="/" className="text-sm font-semibold text-brand hover:underline">
+          <Link href="/" className="text-sm font-semibold text-brand-text hover:underline">
             Back to NeedFull
           </Link>
         </div>

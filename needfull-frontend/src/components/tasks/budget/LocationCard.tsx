@@ -32,7 +32,7 @@ export function LocationCard({
       <div className="mb-2 flex items-center gap-2">
         <MapPin
           className={`h-4 w-4 ${
-            value ? "text-brand" : "text-gray-400"
+            value ? "text-brand-text" : "text-gray-400"
           }`}
         />
         <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -59,7 +59,7 @@ export function LocationCard({
             type="button"
             onClick={onDetect}
             disabled={locating}
-            className="tap-target flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:border-brand hover:text-brand disabled:opacity-50"
+            className="tap-target flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:border-brand hover:text-brand-text disabled:opacity-50"
           >
             {locating ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -77,7 +77,7 @@ export function LocationCard({
       )}
 
       {lat !== null && lng !== null && (
-        <p className="mt-1 text-xs text-brand">Coordinates detected</p>
+        <p className="mt-1 text-xs text-brand-text">Coordinates detected</p>
       )}
 
       {geoError && (

@@ -269,7 +269,7 @@ export function AuthBranding() {
               {scenario.due}
             </div>
             <div className="mt-6 flex items-center gap-3 pt-4" style={{ borderTop: "1px solid var(--color-card-border, #e5e7eb)" }}>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-xs font-bold text-on-brand">
                 {scenario.runnerInitials}
               </div>
               <div className="flex-1">

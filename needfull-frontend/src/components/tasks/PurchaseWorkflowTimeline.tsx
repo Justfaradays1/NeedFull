@@ -77,7 +77,7 @@ export default function PurchaseWorkflowTimeline({
         <div key={step.key} className="flex gap-3">
           <div className="flex flex-col items-center">
             {step.status === "done" ? (
-              <CheckCircle2 className="h-5 w-5 text-brand" />
+              <CheckCircle2 className="h-5 w-5 text-brand-text" />
             ) : step.status === "current" ? (
               <div className="flex h-5 w-5 items-center justify-center">
                 <Loader2 className="h-4 w-4 animate-spin text-gold" />

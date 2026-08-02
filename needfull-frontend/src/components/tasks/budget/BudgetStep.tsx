@@ -234,7 +234,7 @@ export function BudgetStep({
               onClick={handleSameLocationToggle}
               className={`tap-target flex items-center gap-2 rounded-xl border-2 px-4 py-2.5 text-xs font-semibold transition-all ${
                 sameLocation
-                  ? "border-brand bg-brand/10 text-brand"
+                  ? "border-brand bg-brand/10 text-brand-text"
                   : "border-gray-200 text-gray-500 hover:border-gray-300"
               }`}
             >

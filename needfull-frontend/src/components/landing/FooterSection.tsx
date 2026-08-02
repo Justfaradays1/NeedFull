@@ -124,7 +124,7 @@ export function FooterSection() {
               <li>
                 <a
                   href="/register"
-                  className="transition-colors hover:text-brand"
+                  className="transition-colors hover:text-brand-text"
                 >
                   Browse tasks
                 </a>
@@ -132,7 +132,7 @@ export function FooterSection() {
               <li>
                 <a
                   href="/register"
-                  className="transition-colors hover:text-brand"
+                  className="transition-colors hover:text-brand-text"
                 >
                   Start earning
                 </a>
@@ -140,7 +140,7 @@ export function FooterSection() {
               <li>
                 <a
                   href="/register"
-                  className="transition-colors hover:text-brand"
+                  className="transition-colors hover:text-brand-text"
                 >
                   Trust scores
                 </a>
@@ -148,7 +148,7 @@ export function FooterSection() {
               <li>
                 <a
                   href="#how-it-works"
-                  className="transition-colors hover:text-brand"
+                  className="transition-colors hover:text-brand-text"
                 >
                   How it works
                 </a>
@@ -169,7 +169,7 @@ export function FooterSection() {
               <li>
                 <a
                   href="/register"
-                  className="transition-colors hover:text-brand"
+                  className="transition-colors hover:text-brand-text"
                 >
                   Post a task
                 </a>
@@ -177,7 +177,7 @@ export function FooterSection() {
               <li>
                 <a
                   href="#safety"
-                  className="transition-colors hover:text-brand"
+                  className="transition-colors hover:text-brand-text"
                 >
                   How escrow works
                 </a>
@@ -185,7 +185,7 @@ export function FooterSection() {
               <li>
                 <a
                   href="/register"
-                  className="transition-colors hover:text-brand"
+                  className="transition-colors hover:text-brand-text"
                 >
                   Pricing
                 </a>
@@ -193,7 +193,7 @@ export function FooterSection() {
               <li>
                 <a
                   href="#features"
-                  className="transition-colors hover:text-brand"
+                  className="transition-colors hover:text-brand-text"
                 >
                   Student benefits
                 </a>
@@ -212,14 +212,14 @@ export function FooterSection() {
               style={{ color: "var(--color-muted)" }}
             >
               <li>
-                <a href="/about" className="transition-colors hover:text-brand">
+                <a href="/about" className="transition-colors hover:text-brand-text">
                   About NeedFull
                 </a>
               </li>
               <li>
                 <a
                   href="mailto:support@needfull.ng"
-                  className="transition-colors hover:text-brand"
+                  className="transition-colors hover:text-brand-text"
                 >
                   Contact us
                 </a>
@@ -227,7 +227,7 @@ export function FooterSection() {
               <li>
                 <a
                   href="#how-it-works"
-                  className="transition-colors hover:text-brand"
+                  className="transition-colors hover:text-brand-text"
                 >
                   How it works
                 </a>
@@ -235,7 +235,7 @@ export function FooterSection() {
               <li>
                 <a
                   href="#safety"
-                  className="transition-colors hover:text-brand"
+                  className="transition-colors hover:text-brand-text"
                 >
                   Safety &amp; escrow
                 </a>

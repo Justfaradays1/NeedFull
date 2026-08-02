@@ -106,7 +106,7 @@ export function AdminSidebar() {
                 key={href}
                 href={href}
                 className={`tap-target relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 min-h-13 transition-all duration-200 ${
-                  isActive ? "text-brand" : "text-gray-500"
+                  isActive ? "text-brand-text" : "text-gray-500"
                 }`}
               >
                 <div

@@ -99,7 +99,7 @@ export default function AdminRunnerApplicationsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-brand" />
+          <Loader2 className="h-6 w-6 animate-spin text-brand-text" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 py-20">

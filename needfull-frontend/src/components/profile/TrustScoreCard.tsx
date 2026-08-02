@@ -140,7 +140,7 @@ export function TrustScoreCard({
       {breakdown && (
         <div className="px-6 py-4 border-t border-card-border bg-surface">
           <details className="group">
-            <summary className="flex items-center justify-between cursor-pointer py-2 hover:text-brand transition-colors">
+            <summary className="flex items-center justify-between cursor-pointer py-2 hover:text-brand-text transition-colors">
               <span className="font-semibold text-gray-900">
                 Score Breakdown
               </span>
@@ -188,7 +188,7 @@ export function TrustScoreCard({
         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-2 text-sm font-semibold text-gray-900 hover:text-brand transition-colors w-full"
+            className="flex items-center gap-2 text-sm font-semibold text-gray-900 hover:text-brand-text transition-colors w-full"
           >
             <HelpCircle className="w-4 h-4" />
             How is this calculated?

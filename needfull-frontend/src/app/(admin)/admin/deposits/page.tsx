@@ -133,7 +133,7 @@ export default function AdminDepositsPage() {
         {(['pending', 'confirmed', 'rejected'] as Tab[]).map((t) => (
           <button key={t} type="button" onClick={() => setTab(t)}
             className={`tap-target flex-1 rounded-lg py-2 text-xs font-bold uppercase tracking-wider transition-colors ${
-              tab === t ? 'bg-surface text-brand shadow-sm' : 'text-gray-500'
+              tab === t ? 'bg-surface text-brand-text shadow-sm' : 'text-gray-500'
             }`}
           >
             {t}
@@ -144,7 +144,7 @@ export default function AdminDepositsPage() {
       {/* Deposits list */}
       <div className="mx-4 mt-3 space-y-3">
         {loading ? (
-          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-brand" /></div>
+          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-brand-text" /></div>
         ) : deposits.length === 0 ? (
           <div className="py-12 text-center">
             <Banknote className="mx-auto h-8 w-8 text-gray-300" />
@@ -156,7 +156,7 @@ export default function AdminDepositsPage() {
               <div className="flex items-start justify-between gap-2">
                 {userRow(d)}
                 <div className="text-right shrink-0">
-                  <p className="font-display text-lg font-black text-brand">₦{d.amount_naira.toLocaleString()}</p>
+                  <p className="font-display text-lg font-black text-brand-text">₦{d.amount_naira.toLocaleString()}</p>
                   <p className="text-[10px] text-gray-400">{timeAgo(d.created_at)}</p>
                 </div>
               </div>

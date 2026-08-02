@@ -205,7 +205,7 @@ export function RunnerApplicationForm() {
                 ) : (
                   <>
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-light">
-                      <Upload className="h-7 w-7 text-brand" />
+                      <Upload className="h-7 w-7 text-brand-text" />
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-gray-900 dark:text-amber-100">Upload Student ID</p>

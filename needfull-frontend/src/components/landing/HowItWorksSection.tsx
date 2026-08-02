@@ -39,7 +39,7 @@ export function HowItWorksSection() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-light text-brand transition-colors group-hover:bg-brand group-hover:text-white">
                 {item.icon}
               </div>
-              <span className="text-[13px] font-bold tracking-widest text-brand/60 sm:text-sm">{item.step}</span>
+              <span className="text-[13px] font-bold tracking-widest text-brand-text/60 sm:text-sm">{item.step}</span>
               <h3 className="mt-1.5 font-display text-lg font-bold sm:text-xl" style={{ color: 'var(--color-foreground)' }}>{item.title}</h3>
               <p className="mt-2 text-sm leading-relaxed sm:text-base" style={{ color: 'var(--color-muted)' }}>{item.desc}</p>
             </div>

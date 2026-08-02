@@ -49,7 +49,7 @@ export function RecommendedRunners({ runners, loading }: RecommendedRunnersProps
         <h3 className="text-sm font-bold text-gray-900">Recommended NeedRunners</h3>
         <Link
           href="/runners"
-          className="flex items-center gap-0.5 text-[11px] font-bold text-brand"
+          className="flex items-center gap-0.5 text-[11px] font-bold text-brand-text"
         >
           View all <ChevronRight className="h-3 w-3" />
         </Link>
@@ -74,7 +74,7 @@ export function RecommendedRunners({ runners, loading }: RecommendedRunnersProps
                   {runner.fullName}
                 </p>
                 {runner.isVerified && (
-                  <Shield className="h-3.5 w-3.5 shrink-0 text-brand" />
+                  <Shield className="h-3.5 w-3.5 shrink-0 text-brand-text" />
                 )}
               </div>
               <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] text-gray-500">

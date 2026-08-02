@@ -127,7 +127,7 @@ export function CelebrationModal({ open, onClose, config }: CelebrationModalProp
             <button
               type="button"
               onClick={handlePrimary}
-              className="tap-target w-full rounded-xl bg-brand py-3.5 text-base font-bold text-white shadow-sm hover:bg-brand-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+              className="tap-target w-full rounded-xl bg-brand py-3.5 text-base font-bold text-on-brand shadow-sm hover:bg-brand-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
             >
               {config.primaryLabel}
             </button>

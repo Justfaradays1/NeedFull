@@ -24,7 +24,7 @@ export function SuggestedBudgets({
             onClick={() => onSelect(amount)}
             className={`tap-target rounded-xl border-2 px-4 py-2.5 text-sm font-bold transition-all duration-150 ${
               isActive
-                ? "border-brand bg-brand text-white shadow-sm"
+                ? "border-brand bg-brand text-on-brand shadow-sm"
                 : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
             }`}
           >

@@ -208,8 +208,8 @@ function RunnerStats({
   const stats = [
     { label: "Today's Earnings", value: formatCurrency(todayEarned), color: "text-gold", bg: "bg-gold-light" },
     { label: "Weekly Earnings", value: formatCurrency(weeklyEarned), color: "text-gold", bg: "bg-gold-light" },
-    { label: "Acceptance Rate", value: `${acceptanceRate}%`, color: "text-brand", bg: "bg-brand-light" },
-    { label: "Trust Score", value: `${trustScore}/100`, color: "text-brand", bg: "bg-brand-light" },
+    { label: "Acceptance Rate", value: `${acceptanceRate}%`, color: "text-brand-text", bg: "bg-brand-light" },
+    { label: "Trust Score", value: `${trustScore}/100`, color: "text-brand-text", bg: "bg-brand-light" },
   ];
 
   return (
@@ -330,7 +330,7 @@ function RunnerPerformance({ trustScore, averageRating, dayStreak }: { trustScor
           <p className="mt-0.5 text-[10px] font-medium text-gray-500">Rating</p>
         </div>
         <div className="rounded-xl border border-card-border bg-surface p-3 text-center shadow-sm">
-          <p className="text-lg font-black text-brand">{trustScore}<span className="text-xs font-medium text-gray-400">/100</span></p>
+          <p className="text-lg font-black text-brand-text">{trustScore}<span className="text-xs font-medium text-gray-400">/100</span></p>
           <p className="mt-0.5 text-[10px] font-medium text-gray-500">Trust Score</p>
         </div>
         <div className="rounded-xl border border-card-border bg-surface p-3 text-center shadow-sm">

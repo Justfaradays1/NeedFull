@@ -226,7 +226,7 @@ function NavSidebarContent({
         <Link
           key={item.label}
           href={item.href}
-          className="tap-target group mt-1 flex items-center gap-3 rounded-xl bg-brand px-3 py-3 text-sm font-bold text-white shadow-md shadow-brand/20 transition-all duration-150 hover:shadow-lg hover:shadow-brand/25 active:scale-[0.98]"
+          className="tap-target group mt-1 flex items-center gap-3 rounded-xl bg-brand px-3 py-3 text-sm font-bold text-on-brand shadow-md shadow-brand/20 transition-all duration-150 hover:shadow-lg hover:shadow-brand/25 active:scale-[0.98]"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 transition-colors group-hover:bg-white/25">
             <NavIcon icon={item.icon} className="h-5 w-5" />
@@ -250,7 +250,7 @@ function NavSidebarContent({
         <NavIcon
           icon={item.icon}
           className={`h-5 w-5 shrink-0 transition-colors ${
-            isActive ? "text-brand" : "text-gray-400"
+            isActive ? "text-brand-text" : "text-gray-400"
           }`}
         />
         <span>{item.label}</span>
@@ -819,10 +819,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               const isActive =
                 pathname === href || pathname.startsWith(href + "/");
               const isRunner = activeRole === "runner";
-              const activeColor = isRunner ? "text-gold" : "text-brand";
+              const activeColor = isRunner ? "text-gold" : "text-brand-text";
               const activeBg = isRunner ? "bg-gold-light/70 shadow-sm shadow-gold/10" : "bg-brand-light/70 shadow-sm shadow-brand/10";
-              const activeText = isRunner ? "text-gold" : "text-brand";
-              const activeIconColor = isRunner ? "text-gold scale-110" : "text-brand scale-110";
+              const activeText = isRunner ? "text-gold" : "text-brand-text";
+              const activeIconColor = isRunner ? "text-gold scale-110" : "text-brand-text scale-110";
 
               if (isCta) {
                 return (

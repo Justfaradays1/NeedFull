@@ -133,7 +133,7 @@ export default function AdminUsersPage() {
       {/* User cards */}
       <div className="mx-4 mt-3 space-y-2">
         {loading ? (
-          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-brand" /></div>
+          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-brand-text" /></div>
         ) : users.length === 0 ? (
           <div className="py-12 text-center">
             <Users className="mx-auto h-8 w-8 text-gray-300" />
@@ -170,7 +170,7 @@ export default function AdminUsersPage() {
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
                     <div className="text-right">
-                      <p className="text-xs font-bold text-brand">₦{(u.wallet.balanceKobo / 100).toLocaleString()}</p>
+                      <p className="text-xs font-bold text-brand-text">₦{(u.wallet.balanceKobo / 100).toLocaleString()}</p>
                       <span className={`rounded-full px-2 py-[1px] text-[9px] font-bold ${
                         u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
                         u.isBanned ? 'bg-red-100 text-red-600' :
@@ -204,7 +204,7 @@ export default function AdminUsersPage() {
                       <div><span className="text-gray-500">Runner</span><p className="font-semibold text-gray-900">{u.isRunner ? 'Yes' : 'No'}</p></div>
                       <div><span className="text-gray-500">Available</span><p className="font-semibold text-gray-900">{u.isAvailable ? 'Yes' : 'No'}</p></div>
                       <div><span className="text-gray-500">Verified</span><p className="font-semibold text-gray-900">{u.isVerifiedStudent ? 'Yes' : 'No'}</p></div>
-                      <div><span className="text-gray-500">Wallet</span><p className="font-semibold text-brand">₦{(u.wallet.balanceKobo / 100).toLocaleString()}</p></div>
+                      <div><span className="text-gray-500">Wallet</span><p className="font-semibold text-brand-text">₦{(u.wallet.balanceKobo / 100).toLocaleString()}</p></div>
                       <div className="col-span-2"><span className="text-gray-500">Joined</span><p className="font-semibold text-gray-900">{new Date(u.createdAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })}</p></div>
                     </div>
 

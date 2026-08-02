@@ -12,14 +12,14 @@ export function HeroSection() {
       <div className="relative mx-auto max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
-            <span className="mb-4 inline-flex items-center rounded-full bg-white/10 px-3.5 py-1 text-[13px] font-semibold tracking-wide text-white/90 backdrop-blur-sm sm:text-sm">
+            <span className="mb-4 inline-flex items-center rounded-full bg-on-brand/10 px-3.5 py-1 text-[13px] font-semibold tracking-wide text-on-brand/90 backdrop-blur-sm sm:text-sm">
               Now live at FUOYE &middot; More campuses coming
             </span>
-            <h1 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-[1.08] tracking-tight text-white">
+            <h1 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-[1.08] tracking-tight text-on-brand">
               Your campus. Your hustle.{" "}
               <span className="text-gold">Real money.</span>
             </h1>
-            <p className="mt-5 max-w-lg text-base leading-relaxed text-white/75 sm:text-lg">
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-on-brand/75 sm:text-lg">
               Post a task in 60 seconds. Get matched with a trusted nearby
               student. Pay only when the job is done. Always protected.
             </p>
@@ -45,12 +45,12 @@ export function HeroSection() {
               </a>
               <a
                 href="/register?type=seeker"
-                className="inline-flex items-center justify-center gap-2 rounded-[10px] border-2 border-white/50 bg-white/10 px-7 py-3.5 text-[15px] font-semibold text-white backdrop-blur-sm transition-all duration-150 hover:bg-white/20 active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="inline-flex items-center justify-center gap-2 rounded-[10px] border-2 border-on-brand/50 bg-on-brand/10 px-7 py-3.5 text-[15px] font-semibold text-on-brand backdrop-blur-sm transition-all duration-150 hover:bg-on-brand/20 active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-on-brand/50"
               >
                 I need help with a task
               </a>
             </div>
-            <p className="text-white/40 text-sm mt-6 sm:text-base">
+            <p className="text-on-brand/40 text-sm mt-6 sm:text-base">
               Free to join &middot; No hidden charges &middot; Open to all
               students
             </p>
@@ -136,15 +136,15 @@ export function HeroSection() {
               ].map((s) => (
                 <div
                   key={s.label}
-                  className="group relative rounded-2xl border border-white/10 bg-white/5 px-3 py-4 text-center backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:shadow-lifted sm:px-4 sm:py-5"
+                  className="group relative rounded-2xl border border-on-brand/10 bg-on-brand/5 px-3 py-4 text-center backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-on-brand/20 hover:shadow-lifted sm:px-4 sm:py-5"
                 >
                   <div className="mx-auto mb-2.5 flex h-9 w-9 items-center justify-center rounded-xl bg-gold/15 text-gold transition-all duration-200 group-hover:bg-gold/25 group-hover:scale-105 sm:h-10 sm:w-10">
                     {s.icon}
                   </div>
-                  <div className="font-display text-xl font-extrabold leading-none tracking-tight text-white md:text-2xl">
+                  <div className="font-display text-xl font-extrabold leading-none tracking-tight text-on-brand md:text-2xl">
                     {s.value}
                   </div>
-                  <div className="mt-1 text-[11px] font-medium text-white/60 sm:text-xs">
+                  <div className="mt-1 text-[11px] font-medium text-on-brand/60 sm:text-xs">
                     {s.label}
                   </div>
                   <div className="mx-auto mt-3 h-[3px] w-0 rounded-full bg-gold/30 transition-all duration-300 group-hover:w-6 sm:group-hover:w-8" />
@@ -171,7 +171,7 @@ export function HeroSection() {
                 📍 Female Hostel Block B · Due in 2 hours
               </p>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-brand flex items-center justify-center text-white text-xs font-bold">
+                <div className="w-10 h-10 rounded-full bg-brand flex items-center justify-center text-on-brand text-xs font-bold">
                   TF
                 </div>
                 <span className="text-sm" style={{ color: "#4b5563" }}>
@@ -193,7 +193,7 @@ export function HeroSection() {
                 </p>
               </div>
             </div>
-            <div className="absolute -bottom-5 -left-5 bg-brand text-white rounded-xl shadow-lg px-5 py-3">
+            <div className="absolute -bottom-5 -left-5 bg-brand text-on-brand rounded-xl shadow-lg px-5 py-3">
               <p className="text-xs font-medium">2 students applied</p>
             </div>
           </div>

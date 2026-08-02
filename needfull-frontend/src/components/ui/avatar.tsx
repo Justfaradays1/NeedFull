@@ -50,7 +50,7 @@ export function Avatar({ src, name, email, size = 'md', className = '', border =
   if (initial) {
     return (
       <div
-        className={`${dims.container} flex items-center justify-center rounded-full bg-brand ${dims.text} font-bold text-white ${border ? 'border-2 border-white/30' : ''} ${className}`}
+        className={`${dims.container} flex items-center justify-center rounded-full bg-brand ${dims.text} font-bold text-on-brand ${border ? 'border-2 border-white/30' : ''} ${className}`}
         aria-label={name || email || undefined}
       >
         {initial}

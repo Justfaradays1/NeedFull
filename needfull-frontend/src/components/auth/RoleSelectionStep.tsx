@@ -56,7 +56,7 @@ export function RoleSelectionStep({ onSelect, onSkip, loading }: RoleSelectionSt
               <div className="flex items-start gap-3">
                 <div
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                    isSelected ? 'bg-brand text-white' : 'bg-gray-100 text-gray-500'
+                    isSelected ? 'bg-brand text-on-brand' : 'bg-gray-100 text-gray-500'
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -65,7 +65,7 @@ export function RoleSelectionStep({ onSelect, onSkip, loading }: RoleSelectionSt
                   <div className="flex items-center gap-2">
                     <span
                       className={`font-semibold ${
-                        isSelected ? 'text-brand' : 'text-gray-900'
+                        isSelected ? 'text-brand-text' : 'text-gray-900'
                       }`}
                     >
                       {role.title}

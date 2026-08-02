@@ -45,7 +45,7 @@ const TESTIMONIALS = [
 
 function TestimonialCard({ t }: { t: typeof TESTIMONIALS[number] }) {
   return (
-    <div className="flex w-[320px] shrink-0 flex-col rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-colors hover:bg-white/10">
+    <div className="flex w-[320px] shrink-0 flex-col rounded-2xl border border-on-brand/10 bg-on-brand/5 p-6 backdrop-blur-sm transition-colors hover:bg-on-brand/10">
       <div className="mb-3 flex gap-1" aria-hidden="true">
         {[...Array(5)].map((_, i) => (
           <svg key={i} className="h-4 w-4 text-gold" fill="currentColor" viewBox="0 0 20 20">
@@ -53,12 +53,12 @@ function TestimonialCard({ t }: { t: typeof TESTIMONIALS[number] }) {
           </svg>
         ))}
       </div>
-      <p className="flex-1 text-sm leading-relaxed text-white/80">
+      <p className="flex-1 text-sm leading-relaxed text-on-brand/80">
         <span aria-hidden="true">&ldquo;</span>{t.quote}<span aria-hidden="true">&rdquo;</span>
       </p>
-      <div className="mt-4 border-t border-white/10 pt-4">
-        <div className="text-sm font-bold text-white">{t.name}</div>
-        <div className="text-[13px] text-white/50">{t.role}</div>
+      <div className="mt-4 border-t border-on-brand/10 pt-4">
+        <div className="text-sm font-bold text-on-brand">{t.name}</div>
+        <div className="text-[13px] text-on-brand/50">{t.role}</div>
       </div>
     </div>
   );
@@ -66,19 +66,19 @@ function TestimonialCard({ t }: { t: typeof TESTIMONIALS[number] }) {
 
 export function TestimonialsSection() {
   return (
-    <section id="testimonials" className="relative overflow-hidden bg-brand-dark py-20 text-white">
+    <section id="testimonials" className="relative overflow-hidden bg-brand-dark py-20 text-on-brand">
       {/* Faint grid */}
       <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: `linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)`, backgroundSize: "48px 48px" }} />
       <div className="pointer-events-none absolute -left-32 -top-32 h-80 w-80 rounded-full bg-gold/5 blur-3xl" />
       <div className="relative z-10 px-4 text-center sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
-          <span className="inline-flex items-center rounded-full bg-white/10 px-3.5 py-1 text-[13px] font-semibold tracking-wide text-white/80 backdrop-blur-sm sm:text-sm">
+          <span className="inline-flex items-center rounded-full bg-on-brand/10 px-3.5 py-1 text-[13px] font-semibold tracking-wide text-on-brand/80 backdrop-blur-sm sm:text-sm">
             What students say
           </span>
           <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight">
             Trusted by campus students
           </h2>
-          <p className="text-section-desc mt-3 text-white/60">
+          <p className="text-section-desc mt-3 text-on-brand/60">
             Real experiences from real users on campus.
           </p>
         </div>

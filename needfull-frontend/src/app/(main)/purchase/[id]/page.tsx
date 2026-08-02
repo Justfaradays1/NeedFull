@@ -248,7 +248,7 @@ export default function PurchaseTaskDetailPage() {
           <button
             onClick={handleConfirmDelivery}
             disabled={actionLoading === "confirm"}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-white disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-on-brand disabled:opacity-50"
           >
             {actionLoading === "confirm" ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -287,7 +287,7 @@ export default function PurchaseTaskDetailPage() {
                   <button
                     onClick={() => handleApproveBudget(approval.id)}
                     disabled={actionLoading === `approve-${approval.id}`}
-                    className="flex-1 rounded-lg bg-brand py-2 text-xs font-bold text-white disabled:opacity-50"
+                    className="flex-1 rounded-lg bg-brand py-2 text-xs font-bold text-on-brand disabled:opacity-50"
                   >
                     {actionLoading === `approve-${approval.id}` ? (
                       <Loader2 className="mx-auto h-4 w-4 animate-spin" />
@@ -350,7 +350,7 @@ export default function PurchaseTaskDetailPage() {
               <button
                 onClick={handleOpenDispute}
                 disabled={actionLoading === "dispute"}
-                className="flex-1 rounded-lg bg-red-600 py-2.5 text-xs font-bold text-white disabled:opacity-50"
+                className="flex-1 rounded-lg bg-red-600 py-2.5 text-xs font-bold text-on-brand disabled:opacity-50"
               >
                 {actionLoading === "dispute" ? (
                   <Loader2 className="mx-auto h-4 w-4 animate-spin" />
@@ -381,7 +381,7 @@ export default function PurchaseTaskDetailPage() {
           <button
             onClick={() => handleUpdateStatus("at_store")}
             disabled={actionLoading === "at_store"}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-white disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-on-brand disabled:opacity-50"
           >
             {actionLoading === "at_store" ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -396,7 +396,7 @@ export default function PurchaseTaskDetailPage() {
           <button
             onClick={() => handleUpdateStatus("shopping")}
             disabled={actionLoading === "shopping"}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-white disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-on-brand disabled:opacity-50"
           >
             {actionLoading === "shopping" ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -417,7 +417,7 @@ export default function PurchaseTaskDetailPage() {
               <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-400 p-4 hover:border-brand">
                 {receiptFile ? (
                   <>
-                    <FileImage className="h-5 w-5 text-brand" />
+                    <FileImage className="h-5 w-5 text-brand-text" />
                     <span className="text-xs text-gray-600">{receiptFile.name}</span>
                   </>
                 ) : (
@@ -461,7 +461,7 @@ export default function PurchaseTaskDetailPage() {
             <button
               onClick={handleUploadReceipt}
               disabled={actionLoading === "receipt" || !receiptFile || !receiptAmount}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gold py-2.5 text-sm font-bold text-white disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gold py-2.5 text-sm font-bold text-on-brand disabled:opacity-50"
             >
               {actionLoading === "receipt" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -478,7 +478,7 @@ export default function PurchaseTaskDetailPage() {
             <button
               onClick={handleGenerateOTP}
               disabled={actionLoading === "otp"}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-white disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-on-brand disabled:opacity-50"
             >
               {actionLoading === "otp" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -517,7 +517,7 @@ export default function PurchaseTaskDetailPage() {
             <button
               onClick={handleVerifyOTP}
               disabled={actionLoading === "verify" || showRunnerOTP.length !== 6}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-white disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-on-brand disabled:opacity-50"
             >
               {actionLoading === "verify" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -575,9 +575,9 @@ export default function PurchaseTaskDetailPage() {
     return (
       <div className="rounded-xl bg-brand-light/30 p-4 border border-brand/20">
         <div className="flex items-start gap-3">
-          <ShieldCheck className="mt-0.5 h-6 w-6 shrink-0 text-brand" />
+          <ShieldCheck className="mt-0.5 h-6 w-6 shrink-0 text-brand-text" />
           <div>
-            <p className="text-sm font-bold text-brand">Payment Secured by NeedFull</p>
+            <p className="text-sm font-bold text-brand-text">Payment Secured by NeedFull</p>
             <p className="text-xs text-gray-600 mt-1">
               ₦{(detail.purchase.total_escrow / 100).toLocaleString()} locked in escrow.
               Funds released only after successful delivery.
@@ -599,7 +599,7 @@ export default function PurchaseTaskDetailPage() {
       <div className="flex min-h-screen flex-col items-center justify-center page-shell px-4 text-center">
         <AlertTriangle className="mb-3 h-12 w-12 text-gray-400" />
         <h2 className="text-lg font-semibold text-gray-900">Purchase task not found</h2>
-        <button onClick={() => router.push("/tasks")} className="mt-4 rounded-xl bg-brand px-6 py-2.5 text-sm font-semibold text-white">
+        <button onClick={() => router.push("/tasks")} className="mt-4 rounded-xl bg-brand px-6 py-2.5 text-sm font-semibold text-on-brand">
           My Tasks
         </button>
       </div>
@@ -664,7 +664,7 @@ export default function PurchaseTaskDetailPage() {
                     href={detail.purchase.receipt_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-brand underline"
+                    className="inline-flex items-center gap-1 text-xs text-brand-text underline"
                   >
                     <FileImage className="h-3 w-3" />
                     View Receipt
@@ -687,7 +687,7 @@ export default function PurchaseTaskDetailPage() {
         {/* People */}
         <div className="rounded-2xl bg-surface p-4 shadow-sm border border-card-border">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand-text">
               {detail.task.poster.fullName.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -743,7 +743,7 @@ function BudgetRow({ label, amountKobo, accent, bold, highlight }: {
     <div className="flex items-center justify-between">
       <span className={`text-sm ${bold ? "font-bold text-gray-900" : "text-gray-600"}`}>{label}</span>
       <span className={`text-sm ${
-        highlight ? "font-bold text-gold" : accent ? "font-medium text-brand" : bold ? "font-bold text-gray-900" : "font-semibold text-gray-900"
+        highlight ? "font-bold text-gold" : accent ? "font-medium text-brand-text" : bold ? "font-bold text-gray-900" : "font-semibold text-gray-900"
       }`}>
         ₦{(amountKobo / 100).toLocaleString()}
       </span>

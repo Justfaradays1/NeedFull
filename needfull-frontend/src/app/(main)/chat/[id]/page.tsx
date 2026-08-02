@@ -65,7 +65,7 @@ function Bubble({ msg, isMine }: { msg: Message; isMine: boolean }) {
       <div
         className={`relative max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed ${
           isMine
-            ? "rounded-br-md bg-brand text-white"
+            ? "rounded-br-md bg-brand text-on-brand"
             : "rounded-bl-md bg-gray-100 text-gray-900"
         }`}
       >
@@ -374,7 +374,7 @@ export default function ChatThreadPage() {
             type="button"
             onClick={sendMessage}
             disabled={!input.trim() || sending}
-            className="tap-target flex h-10 w-10 items-center justify-center rounded-full bg-brand text-white shadow-sm transition-all disabled:opacity-40"
+            className="tap-target flex h-10 w-10 items-center justify-center rounded-full bg-brand text-on-brand shadow-sm transition-all disabled:opacity-40"
           >
             {sending ? (
               <Loader2 className="h-4 w-4 animate-spin" />

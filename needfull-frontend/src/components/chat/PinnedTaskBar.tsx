@@ -28,7 +28,7 @@ export function PinnedTaskBar({ task, onViewTask }: PinnedTaskBarProps) {
   return (
     <div className="border-b border-gray-200 bg-surface px-4 py-2.5">
       <div className="flex items-center gap-3">
-        <ShieldCheck className="h-4 w-4 shrink-0 text-brand" />
+        <ShieldCheck className="h-4 w-4 shrink-0 text-brand-text" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <p className="truncate text-sm font-medium text-gray-900">{task.title}</p>
@@ -54,7 +54,7 @@ export function PinnedTaskBar({ task, onViewTask }: PinnedTaskBarProps) {
         <button
           type="button"
           onClick={onViewTask}
-          className="flex shrink-0 items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-brand transition-colors hover:bg-brand-light/30"
+          className="flex shrink-0 items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-brand-text transition-colors hover:bg-brand-light/30"
         >
           <span className="hidden sm:inline">View</span>
           <ArrowRight className="h-3.5 w-3.5" />

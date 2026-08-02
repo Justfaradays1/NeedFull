@@ -35,7 +35,7 @@ export function DeadlineSelector({ value, onChange }: DeadlineSelectorProps) {
               onClick={() => onChange({ option: opt.key })}
               className={`tap-target flex flex-1 flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-center text-xs font-semibold transition-all duration-150 ${
                 isActive
-                  ? "border-brand bg-brand/10 text-brand"
+                  ? "border-brand bg-brand/10 text-brand-text"
                   : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
               }`}
             >

@@ -166,7 +166,7 @@ export default function AdminVerificationsPage() {
 
         {/* Loading */}
         {loading ? (
-          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-brand" /></div>
+          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-brand-text" /></div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-gray-400">
             <Shield className="mb-2 h-12 w-12" />

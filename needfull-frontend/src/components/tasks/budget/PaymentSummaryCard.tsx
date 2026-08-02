@@ -40,7 +40,7 @@ export function PaymentSummaryCard({
           value={formatNaira(fee)}
           muted
         />
-        <Row label="Escrow Amount" value={formatNaira(budgetNaira)} icon={<Lock className="h-3 w-3 text-brand" />} />
+        <Row label="Escrow Amount" value={formatNaira(budgetNaira)} icon={<Lock className="h-3 w-3 text-brand-text" />} />
         <div className="border-t border-gray-100 pt-2">
           <Row
             label="Total Payment"
@@ -101,7 +101,7 @@ export function PaymentSummaryCard({
           </p>
         </div>
         <div className="flex items-start gap-2">
-          <Lock className="mt-0.5 h-3 w-3 shrink-0 text-brand" />
+          <Lock className="mt-0.5 h-3 w-3 shrink-0 text-brand-text" />
           <p className="text-[11px] leading-relaxed text-gray-500">
             Your task budget will be held safely in NeedFull Escrow and released
             to the NeedRunner only after you confirm that the task has been

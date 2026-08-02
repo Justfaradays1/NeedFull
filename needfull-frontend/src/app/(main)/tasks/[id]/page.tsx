@@ -163,7 +163,7 @@ export default function MyTaskDetailPage() {
         <h2 className="text-lg font-semibold text-gray-900">Task not found</h2>
         <button
           onClick={() => router.push("/tasks")}
-          className="mt-4 rounded-xl bg-brand px-6 py-2.5 text-sm font-semibold text-white"
+          className="mt-4 rounded-xl bg-brand px-6 py-2.5 text-sm font-semibold text-on-brand"
         >
           My Tasks
         </button>
@@ -224,7 +224,7 @@ export default function MyTaskDetailPage() {
 
               <div className="mb-4 space-y-2 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-brand" />
+                  <DollarSign className="h-4 w-4 text-brand-text" />
                   <span className="font-semibold text-gray-900">
                     ₦{task.budget.naira.toLocaleString()}
                   </span>
@@ -246,7 +246,7 @@ export default function MyTaskDetailPage() {
               </div>
 
               <div className="mb-4 flex items-center gap-3 rounded-xl bg-gray-200 p-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand-text">
                   {(task.runner?.fullName ?? task.poster.fullName)
                     .charAt(0)
                     .toUpperCase()}
@@ -298,7 +298,7 @@ export default function MyTaskDetailPage() {
                   <button
                     onClick={() => setCompleteConfirmOpen(true)}
                     disabled={actionLoading === "complete"}
-                    className="flex items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-white disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-on-brand disabled:opacity-50"
                   >
                     {actionLoading === "complete" ? (
                       <Loader2 className="h-4 w-4 animate-spin" />

@@ -104,7 +104,7 @@ export function LoginForm() {
       <div className="flex justify-end">
         <Link
           href="/forgot-password"
-          className="text-sm text-brand hover:underline"
+          className="text-sm text-brand-text hover:underline"
         >
           Forgot password?
         </Link>
@@ -129,7 +129,7 @@ export function LoginForm() {
         Don&apos;t have an account?{' '}
         <Link
           href="/register"
-          className="font-semibold text-brand hover:text-brand-mid"
+          className="font-semibold text-brand-text hover:text-brand-mid"
         >
           Create one
         </Link>

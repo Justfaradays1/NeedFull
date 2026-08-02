@@ -223,7 +223,7 @@ export default function CreateTaskPage() {
                   type="button"
                   onClick={nextStep}
                   disabled={!categoryId}
-                  className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:opacity-50"
+                  className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-on-brand shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:opacity-50"
                 >
                   Continue to Details
                 </button>
@@ -351,7 +351,7 @@ export default function CreateTaskPage() {
                   <hr className="border-gray-100" />
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-gray-600">Amount to Pay</span>
-                    <span className="font-bold text-brand">₦{(budgetNum + Math.floor(budgetNum * 10 / 100)).toLocaleString()}</span>
+                    <span className="font-bold text-brand-text">₦{(budgetNum + Math.floor(budgetNum * 10 / 100)).toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -374,7 +374,7 @@ export default function CreateTaskPage() {
 
               {/* Escrow info note */}
               <div className="flex items-start gap-2 rounded-xl bg-brand-light/30 px-4 py-3">
-                <DollarSign className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+                <DollarSign className="mt-0.5 h-4 w-4 shrink-0 text-brand-text" />
                 <p className="text-xs leading-relaxed text-gray-600">
                   Your payment is only deducted when you accept a runner. Until then, the budget amount is held in escrow but not charged to your wallet.
                 </p>

@@ -59,7 +59,7 @@ function StarRating({ rating, size = 12 }: { rating: number; size?: number }) {
 
 function TrustScoreCard({ score }: { score: number }) {
   const seg = Math.round((score / 100) * 100);
-  const color = score >= 70 ? 'text-brand' : score >= 40 ? 'text-gold' : 'text-danger';
+  const color = score >= 70 ? 'text-brand-text' : score >= 40 ? 'text-gold' : 'text-danger';
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
       <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
@@ -213,7 +213,7 @@ export default function ProfilePage() {
         </div>
         <p className="text-sm font-semibold text-gray-900">Could not load profile</p>
         <p className="text-xs text-gray-500 text-center max-w-xs">{fetchError || 'An unexpected error occurred'}</p>
-        <button type="button" onClick={fetchProfile} className="mt-2 rounded-xl bg-brand px-5 py-2.5 text-xs font-bold text-white">
+        <button type="button" onClick={fetchProfile} className="mt-2 rounded-xl bg-brand px-5 py-2.5 text-xs font-bold text-on-brand">
           Try again
         </button>
       </div>
@@ -265,7 +265,7 @@ export default function ProfilePage() {
           { label: 'Credits', value: `₦${balanceNaira}`, Icon: Award },
         ].map(({ label, value, Icon: StatIcon }) => (
           <div key={label} className="flex flex-col items-center gap-1 rounded-xl bg-surface p-2.5 shadow-sm">
-            <StatIcon className="h-4 w-4 text-brand" />
+            <StatIcon className="h-4 w-4 text-brand-text" />
             <span className="text-xs font-black text-gray-900">{value}</span>
             <span className="text-[9px] text-gray-500">{label}</span>
           </div>
@@ -281,7 +281,7 @@ export default function ProfilePage() {
       <div className="sticky top-0 z-10 mx-4 mt-4 flex gap-1 rounded-xl bg-gray-100 p-1">
         {(['overview', 'reviews', 'activity', 'settings'] as TabKey[]).map((t) => (
           <button key={t} type="button" onClick={() => setActiveTab(t)}
-            className={`tap-target flex-1 rounded-lg py-2 text-xs font-bold uppercase tracking-wider transition-colors ${activeTab === t ? 'bg-surface text-brand shadow-sm' : 'text-gray-500'}`}
+            className={`tap-target flex-1 rounded-lg py-2 text-xs font-bold uppercase tracking-wider transition-colors ${activeTab === t ? 'bg-surface text-brand-text shadow-sm' : 'text-gray-500'}`}
           >
             {t}
           </button>
@@ -334,14 +334,14 @@ export default function ProfilePage() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-light">
-                      <UserCheck className="h-5 w-5 text-brand" />
+                      <UserCheck className="h-5 w-5 text-brand-text" />
                     </div>
                     <div className="text-left">
-                      <p className="text-sm font-bold text-brand">Become a Runner</p>
+                      <p className="text-sm font-bold text-brand-text">Become a Runner</p>
                       <p className="text-xs text-gray-600">Earn money by completing tasks</p>
                     </div>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-brand" />
+                  <ChevronRight className="h-5 w-5 text-brand-text" />
                 </Link>
               )}
             </div>
@@ -400,7 +400,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">Done</span>
-                      <span className="text-xs font-bold text-brand">₦{t.budget.naira.toLocaleString()}</span>
+                      <span className="text-xs font-bold text-brand-text">₦{t.budget.naira.toLocaleString()}</span>
                     </div>
                   </div>
                 ))}
@@ -479,7 +479,7 @@ export default function ProfilePage() {
             </div>
             <div className="mt-5 flex gap-2">
               <button type="button" onClick={() => setEditOpen(false)} className="tap-target flex-1 rounded-xl border border-gray-200 py-3 text-sm font-bold text-gray-600">Cancel</button>
-              <button type="button" onClick={handleEditSave} className="tap-target flex-1 rounded-xl bg-brand py-3 text-sm font-bold text-white">Save</button>
+              <button type="button" onClick={handleEditSave} className="tap-target flex-1 rounded-xl bg-brand py-3 text-sm font-bold text-on-brand">Save</button>
             </div>
             </div>
           </div>
@@ -512,7 +512,7 @@ function VerificationRow({ icon, label, verified, detail, onVerify, uploading }:
           <CheckCircle2 className="h-3.5 w-3.5" /> Verified
         </span>
       ) : onVerify ? (
-        <button type="button" onClick={onVerify} disabled={uploading} className="tap-target rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50">
+        <button type="button" onClick={onVerify} disabled={uploading} className="tap-target rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-on-brand disabled:opacity-50">
           {uploading ? 'Uploading...' : 'Verify'}
         </button>
       ) : (

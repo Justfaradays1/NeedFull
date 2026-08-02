@@ -29,7 +29,7 @@ export function ErrorState({
         <button
           type="button"
           onClick={retry}
-          className="tap-target mt-5 inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-brand-dark active:scale-[0.97]"
+          className="tap-target mt-5 inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-on-brand shadow-sm transition-all hover:bg-brand-dark active:scale-[0.97]"
         >
           <RefreshCw className="h-4 w-4" aria-hidden="true" />
           {retryLabel}

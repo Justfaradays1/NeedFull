@@ -203,7 +203,7 @@ export default function VirtualFundPage() {
       {/* WHAT: Loading state */}
       {isLoading && (
         <div className="flex flex-col items-center justify-center px-4 py-20">
-          <Loader2 className="h-10 w-10 animate-spin text-brand" />
+          <Loader2 className="h-10 w-10 animate-spin text-brand-text" />
           <p className="mt-4 text-sm font-medium text-gray-600">
             Setting up your personal account...
           </p>
@@ -221,7 +221,7 @@ export default function VirtualFundPage() {
             <button
               type="button"
               onClick={handleRefresh}
-              className="tap-target mt-4 rounded-lg bg-brand px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark"
+              className="tap-target mt-4 rounded-lg bg-brand px-6 py-2.5 text-sm font-semibold text-on-brand hover:bg-brand-dark"
             >
               Try again
             </button>
@@ -246,10 +246,10 @@ export default function VirtualFundPage() {
 
               {/* Bank name */}
               <div className="mt-3 flex items-center gap-3 rounded-lg bg-brand-light px-4 py-3">
-                <Banknote className="h-5 w-5 shrink-0 text-brand" />
+                <Banknote className="h-5 w-5 shrink-0 text-brand-text" />
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-brand-dark">Bank</p>
-                  <p className="text-sm font-bold text-brand">
+                  <p className="text-sm font-bold text-brand-text">
                     {virtualAccount.bankName}
                   </p>
                 </div>

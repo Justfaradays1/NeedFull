@@ -19,7 +19,7 @@ export function EscrowSummaryCard({ budgetNaira, feePercent, walletBalanceKobo }
   return (
     <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
       <div className="flex items-center gap-2">
-        <ShieldCheck className="h-4 w-4 text-brand" />
+        <ShieldCheck className="h-4 w-4 text-brand-text" />
         <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
           Escrow summary
         </span>
@@ -33,7 +33,7 @@ export function EscrowSummaryCard({ budgetNaira, feePercent, walletBalanceKobo }
 
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">Locked in escrow</span>
-          <span className="font-semibold text-brand">₦{budgetNaira.toLocaleString()}</span>
+          <span className="font-semibold text-brand-text">₦{budgetNaira.toLocaleString()}</span>
         </div>
 
         <hr className="border-gray-100" />
@@ -63,7 +63,7 @@ export function EscrowSummaryCard({ budgetNaira, feePercent, walletBalanceKobo }
               ₦{(walletBalanceKobo / 100).toLocaleString()}
             </span>
           </div>
-          <p className={`mt-1.5 text-xs ${walletBalanceKobo >= budgetNaira * 100 ? 'text-brand' : 'text-danger'}`}>
+          <p className={`mt-1.5 text-xs ${walletBalanceKobo >= budgetNaira * 100 ? 'text-brand-text' : 'text-danger'}`}>
             {walletBalanceKobo >= budgetNaira * 100
               ? 'Enough ✓'
               : `Insufficient — top up before posting`}

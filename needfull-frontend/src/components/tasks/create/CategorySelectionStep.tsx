@@ -111,7 +111,7 @@ export function CategorySelectionStep({
                 onClick={() => handleSelect(cat.id, cat.name)}
                 className={`tap-target flex items-center gap-1.5 rounded-full border-2 px-4 py-2 text-sm font-semibold transition-all ${
                   selectedCategoryId === cat.id
-                    ? "border-brand bg-brand/10 text-brand"
+                    ? "border-brand bg-brand/10 text-brand-text"
                     : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
                 }`}
               >

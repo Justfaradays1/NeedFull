@@ -173,7 +173,7 @@ function NavCard({
     >
       <div className="relative">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-light">
-          <Icon className="h-5 w-5 text-brand" />
+          <Icon className="h-5 w-5 text-brand-text" />
         </div>
         {count !== undefined && count > 0 && (
           <span
@@ -228,7 +228,7 @@ export default function AdminDashboardPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Loader2 className="mx-auto h-6 w-6 animate-spin text-brand" />
+          <Loader2 className="mx-auto h-6 w-6 animate-spin text-brand-text" />
           <p className="mt-2 text-sm text-gray-500">Loading dashboard...</p>
         </div>
       </div>

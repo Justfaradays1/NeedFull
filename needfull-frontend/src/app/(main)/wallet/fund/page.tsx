@@ -73,7 +73,7 @@ function FundingCard({
         </div>
 
         {/* Title */}
-        <h3 className="font-display text-base font-bold text-gray-900 group-hover:text-brand">
+        <h3 className="font-display text-base font-bold text-gray-900 group-hover:text-brand-text">
           {title}
         </h3>
 
@@ -91,7 +91,7 @@ function FundingCard({
       </div>
 
       {/* Arrow indicator */}
-      <div className="flex h-12 shrink-0 items-center text-gray-400 transition-colors group-hover:text-brand">
+      <div className="flex h-12 shrink-0 items-center text-gray-400 transition-colors group-hover:text-brand-text">
         <ChevronRight className="h-5 w-5" />
       </div>
     </Link>

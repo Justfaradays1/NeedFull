@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useIsAuthenticated, useAuthUser, useAuthInit } from "@/store";
-import { post } from "@/lib/apiClient";
+import { post, API_BASE_URL } from "@/lib/apiClient";
 import { formatCurrency } from "@/lib/format";
 import { CelebrationModal } from "@/components/ui/celebration-modal";
 import { useCelebration } from "@/hooks/useCelebration";
@@ -62,6 +62,25 @@ const ACCOUNT_NUMBER =
   process.env.NEXT_PUBLIC_NEEDFULL_ACCOUNT_NUMBER || "1234567890";
 const ACCOUNT_NAME =
   process.env.NEXT_PUBLIC_NEEDFULL_ACCOUNT_NAME || "NeedFull Platform Ltd";
+
+// WHAT: Extract a user-friendly message from a failed API call
+// WHY: Users should never see raw axios/HTTP errors ("Request failed with status code 400")
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (typeof error === "object" && error !== null) {
+    const err = error as {
+      response?: { data?: { message?: unknown; error?: unknown } };
+    };
+    const backendMessage = err.response?.data?.message;
+    if (typeof backendMessage === "string" && backendMessage.trim()) {
+      return backendMessage;
+    }
+    const backendError = err.response?.data?.error;
+    if (typeof backendError === "string" && backendError.trim()) {
+      return backendError;
+    }
+  }
+  return fallback;
+}
 
 // WHAT: Status of the manual transfer flow
 type PageState = "form" | "submitting" | "success";
@@ -192,7 +211,7 @@ export default function ManualFundPage() {
           formData.append("receipt", receiptFile);
 
           const uploadRes = await fetch(
-            `https://needfull.onrender.com/api/upload/receipt`,
+            `${API_BASE_URL}/upload/receipt`,
             {
               method: "POST",
               headers: {
@@ -250,11 +269,32 @@ export default function ManualFundPage() {
         primaryLabel: "Return to Wallet",
         primaryHref: "/wallet",
       });
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to submit transfer. Please try again.";
+    } catch (error) {
+      // WHAT: Dev-only detailed logging for debugging failed submissions
+      // WHY: Status code, endpoint, payload and response body make root-causing trivial
+      if (process.env.NODE_ENV !== "production") {
+        const err = error as { response?: { status?: number; data?: unknown } };
+        console.error("[ManualFund] manual transfer submission failed", {
+          endpoint: "/wallet/fund/manual",
+          status: err.response?.status,
+          responseBody: err.response?.data,
+          payload: {
+            amount: parseFloat(amount) || 0,
+            bankReference: bankReference.trim(),
+            senderBank,
+            senderName: senderName.trim(),
+            receiptAttached: !!receiptFile,
+          },
+          error,
+        });
+      }
+
+      // WHAT: Show the backend's own message when available, never raw HTTP errors
+      // WHY: Users get actionable messages ("A transfer with this reference is already pending")
+      const message = getErrorMessage(
+        error,
+        "We couldn't process your bank transfer request. Please check the information provided and try again.",
+      );
       toast.error(message);
       setPageState("form");
     }
@@ -385,7 +425,7 @@ export default function ManualFundPage() {
             {/* Return to wallet button */}
             <Link
               href="/wallet"
-              className="tap-target flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 font-semibold text-white transition-colors hover:bg-brand-dark"
+              className="tap-target flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 font-semibold text-on-brand transition-colors hover:bg-brand-dark"
             >
               <Wallet className="h-5 w-5" />
               Return to Wallet
@@ -453,10 +493,10 @@ export default function ManualFundPage() {
 
             {/* Bank name */}
             <div className="mt-3 flex items-center gap-3 rounded-lg bg-brand-light px-4 py-3">
-              <Banknote className="h-5 w-5 shrink-0 text-brand" />
+              <Banknote className="h-5 w-5 shrink-0 text-brand-text" />
               <div className="min-w-0">
                 <p className="text-xs font-medium text-brand-dark">Bank</p>
-                <p className="text-sm font-bold text-brand">{BANK_NAME}</p>
+                <p className="text-sm font-bold text-brand-text">{BANK_NAME}</p>
               </div>
             </div>
 
@@ -694,7 +734,7 @@ export default function ManualFundPage() {
           {/* Fee info */}
           <div className="rounded-xl bg-brand-light px-5 py-4">
             <div className="flex items-start gap-3">
-              <Banknote className="mt-0.5 h-5 w-5 shrink-0 text-brand" />
+              <Banknote className="mt-0.5 h-5 w-5 shrink-0 text-brand-text" />
               <div>
                 <p className="text-sm font-semibold text-brand-dark">
                   No fees &middot; No charges

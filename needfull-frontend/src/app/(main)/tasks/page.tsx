@@ -139,7 +139,7 @@ function PostedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
           <StatusBadge status={task.status} />
-          <span className="font-display text-base font-bold text-brand">
+          <span className="font-display text-base font-bold text-brand-text">
             {formatCurrency(task.budget.kobo)}
           </span>
         </div>
@@ -170,14 +170,14 @@ function AcceptedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
           <StatusBadge status={task.status} />
-          <span className="font-display text-sm font-bold text-brand">
+          <span className="font-display text-sm font-bold text-brand-text">
             {formatCurrency(task.budget.kobo)}
           </span>
         </div>
       </div>
       {canContinue && (
         <div className="mt-3 flex justify-end">
-          <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">
+          <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-on-brand">
             <MessageCircle className="h-3.5 w-3.5" />
             Continue
           </span>
@@ -282,7 +282,7 @@ export default function MyTasksPage() {
           </h1>
           <Link
             href="/tasks/create"
-            className="tap-target flex h-9 w-9 items-center justify-center rounded-full bg-brand text-white shadow-sm"
+            className="tap-target flex h-9 w-9 items-center justify-center rounded-full bg-brand text-on-brand shadow-sm"
           >
             <Plus className="h-5 w-5" />
           </Link>
@@ -296,7 +296,7 @@ export default function MyTasksPage() {
               type="button"
               onClick={() => setTab(t)}
               className={`tap-target relative px-5 pb-3 pt-1 text-sm font-bold transition-colors ${
-                tab === t ? "text-brand" : "text-gray-500"
+                tab === t ? "text-brand-text" : "text-gray-500"
               }`}
             >
               {t === "posted" ? "Posted" : "Accepted"}
@@ -317,7 +317,7 @@ export default function MyTasksPage() {
             <button
               type="button"
               onClick={fetchTasks}
-              className="tap-target mt-2 rounded-lg bg-brand px-4 py-2 text-xs font-bold text-white"
+              className="tap-target mt-2 rounded-lg bg-brand px-4 py-2 text-xs font-bold text-on-brand"
             >
               Retry
             </button>
@@ -345,7 +345,7 @@ export default function MyTasksPage() {
                   onClick={() => setPostedFilter(f.key)}
                   className={`tap-target shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
                     postedFilter === f.key
-                      ? "bg-brand text-white"
+                      ? "bg-brand text-on-brand"
                       : "bg-gray-200 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
@@ -404,7 +404,7 @@ export default function MyTasksPage() {
                 </p>
                 <Link
                   href="/feed"
-                  className="tap-target mt-4 inline-flex items-center gap-2 rounded-xl bg-brand px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-brand-dark"
+                  className="tap-target mt-4 inline-flex items-center gap-2 rounded-xl bg-brand px-6 py-3 text-sm font-bold text-on-brand shadow-sm hover:bg-brand-dark"
                 >
                   Browse Feed
                 </Link>

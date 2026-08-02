@@ -81,7 +81,7 @@ export function NotificationDrawer({
             <button
               type="button"
               onClick={markAllAsRead}
-              className="font-semibold text-brand transition hover:text-brand-dark"
+              className="font-semibold text-brand-text transition hover:text-brand-dark"
             >
               Mark all read
             </button>

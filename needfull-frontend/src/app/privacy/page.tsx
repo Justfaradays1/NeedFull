@@ -91,13 +91,13 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-bold text-gray-900">7. Contact</h2>
             <p>
               For questions about this policy, contact us at{" "}
-              <a href="mailto:support@needfull.app" className="font-semibold text-brand hover:underline">support@needfull.app</a>.
+              <a href="mailto:support@needfull.app" className="font-semibold text-brand-text hover:underline">support@needfull.app</a>.
             </p>
           </section>
         </div>
 
         <div className="mt-12 border-t border-gray-200 pt-6 text-center">
-          <Link href="/" className="text-sm font-semibold text-brand hover:underline">
+          <Link href="/" className="text-sm font-semibold text-brand-text hover:underline">
             Back to NeedFull
           </Link>
         </div>

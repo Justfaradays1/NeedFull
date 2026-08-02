@@ -132,7 +132,7 @@ export function TaskDetailsStep({
         {/* Guidance (shown when empty or on focus) */}
         {showGuidance && !description.trim() && (
           <div className="mt-2 rounded-xl bg-brand-light/20 px-4 py-3">
-            <p className="text-xs font-semibold text-brand">Include:</p>
+            <p className="text-xs font-semibold text-brand-text">Include:</p>
             <ul className="mt-1 space-y-0.5 text-xs text-gray-500">
               <li>• What should be done</li>
               <li>• Where</li>
@@ -193,7 +193,7 @@ export function TaskDetailsStep({
                   onClick={() => setTaskMode(opt.value)}
                   className={`tap-target flex flex-col items-center gap-1.5 rounded-2xl border-2 px-4 py-4 text-center transition-all ${
                     isActive
-                      ? "border-brand bg-brand/10 text-brand"
+                      ? "border-brand bg-brand/10 text-brand-text"
                       : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
                   }`}
                 >
@@ -294,7 +294,7 @@ export function TaskDetailsStep({
           type="button"
           onClick={handleContinue}
           disabled={!canContinue}
-          className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-white shadow-sm transition-all duration-150 hover:brightness-105 active:scale-[0.97] disabled:opacity-50"
+          className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-on-brand shadow-sm transition-all duration-150 hover:brightness-105 active:scale-[0.97] disabled:opacity-50"
         >
           Continue to Budget
         </button>

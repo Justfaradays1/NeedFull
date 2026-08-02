@@ -21,7 +21,7 @@ export function RouteSummary({
 
       <div className="space-y-1">
         <div className="flex items-start gap-3">
-          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-text" />
           <div>
             {taskLocation ? (
               <p className="text-sm font-medium text-gray-800">{taskLocation}</p>

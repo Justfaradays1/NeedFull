@@ -5,10 +5,12 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #1a6b4a;
-  --color-brand-mid: #2d9e6b;
-  --color-brand-light: #e6f5ee;
-  --color-brand-dark: #0d4f35;
+  --color-brand: var(--clr-brand);
+  --color-brand-mid: var(--clr-brand-mid);
+  --color-brand-light: var(--clr-brand-light);
+  --color-brand-dark: var(--clr-brand-dark);
+  --color-brand-text: var(--clr-brand-text);
+  --color-on-brand: var(--clr-on-brand);
   --color-gold: #eaa325;
   --color-gold-light: #fff4df;
   --color-gold-dark: #c47f1a;
@@ -50,6 +52,12 @@
   --color-border: #e5e7eb;
   --color-muted: #6b7280;
   --color-surface-2: #f0f2f0;
+  --clr-brand: #1a6b4a;
+  --clr-brand-mid: #2d9e6b;
+  --clr-brand-light: #e6f5ee;
+  --clr-brand-dark: #0d4f35;
+  --clr-brand-text: #1a6b4a;
+  --clr-on-brand: #ffffff;
   --clr-gray-50: #f9fafb;
   --clr-gray-100: #f3f4f6;
   --clr-gray-200: #e5e7eb;
@@ -98,6 +106,12 @@
   --clr-surface: #18181b;
   --clr-card-border: #27272a;
   --color-surface-2: #243828;
+  --clr-brand: #1a6b4a;
+  --clr-brand-mid: #2d9e6b;
+  --clr-brand-light: #e6f5ee;
+  --clr-brand-dark: #0d4f35;
+  --clr-brand-text: #34d399;
+  --clr-on-brand: #ffffff;
   --clr-gray-50: #09090b;
   --clr-gray-100: #18181b;
   --clr-gray-200: #27272a;
@@ -249,6 +263,12 @@ body {
   --color-gray-500: #4b5563;
   --color-gray-400: #6b7280;
   --color-gray-200: #e5e7eb;
+  --clr-brand: #1a6b4a;
+  --clr-brand-mid: #2d9e6b;
+  --clr-brand-light: #e6f5ee;
+  --clr-brand-dark: #0d4f35;
+  --clr-brand-text: #1a6b4a;
+  --clr-on-brand: #ffffff;
   color: #171717;
 }
 .auth-page input::placeholder {

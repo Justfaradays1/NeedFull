@@ -85,7 +85,7 @@ function RunnerCard({ runner, onTap }: RunnerCardProps) {
 function TrustScoreSection({ score }: { score: number }) {
   const seg = Math.min(Math.round((score / 100) * 100), 100);
   const color =
-    score >= 70 ? "text-brand" : score >= 40 ? "text-gold" : "text-danger";
+    score >= 70 ? "text-brand-text" : score >= 40 ? "text-gold" : "text-danger";
   const tips = [
     "Complete tasks on time to earn positive reviews",
     "Respond to messages within 2 hours",
@@ -141,7 +141,7 @@ function TrustScoreSection({ score }: { score: number }) {
       </div>
       <Link
         href="/profile"
-        className="tap-target mt-3 inline-flex items-center gap-1 text-xs font-bold text-brand"
+        className="tap-target mt-3 inline-flex items-center gap-1 text-xs font-bold text-brand-text"
       >
         View full profile <ChevronRight className="h-3 w-3" />
       </Link>
@@ -186,7 +186,7 @@ function CreditsSection({ balanceKobo }: { balanceKobo: number }) {
           per task
         </p>
         <p className="flex items-center gap-1.5">
-          <Users className="h-3 w-3 text-brand" /> Refer friends — earn bonus
+          <Users className="h-3 w-3 text-brand-text" /> Refer friends — earn bonus
           credits
         </p>
       </div>
@@ -252,17 +252,17 @@ export default function ExplorePage() {
         <section>
           <div className="mb-2 flex items-center justify-between">
             <h2 className="flex items-center gap-1.5 text-sm font-bold text-gray-900">
-              <MapPin className="h-4 w-4 text-brand" />
+              <MapPin className="h-4 w-4 text-brand-text" />
               Available Runners Nearby
             </h2>
-            <Link href="/feed" className="text-xs font-bold text-brand">
+            <Link href="/feed" className="text-xs font-bold text-brand-text">
               Browse tasks
             </Link>
           </div>
 
           {loadingRunners ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-5 w-5 animate-spin text-brand" />
+              <Loader2 className="h-5 w-5 animate-spin text-brand-text" />
             </div>
           ) : geoError ? (
             <div className="rounded-xl bg-amber-50 p-4 text-center text-xs text-amber-700">

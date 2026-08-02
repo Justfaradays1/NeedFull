@@ -43,7 +43,7 @@ export function ActiveRoleSwitcher() {
         onClick={() => setOpen(!open)}
         className="tap-target flex items-center gap-2 rounded-xl border border-card-border bg-surface px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
       >
-        <Icon className="h-4 w-4 text-brand" />
+        <Icon className="h-4 w-4 text-brand-text" />
         <span>{meta.label}</span>
         <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>

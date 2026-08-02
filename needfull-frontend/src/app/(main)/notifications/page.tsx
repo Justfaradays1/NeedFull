@@ -232,7 +232,7 @@ export default function NotificationsPage() {
                 <CheckCheck className="h-10 w-10 text-green-400" />
               </div>
               <div className="absolute -bottom-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full bg-surface shadow-md border border-card-border">
-                <Bell className="h-5 w-5 text-brand" />
+                <Bell className="h-5 w-5 text-brand-text" />
               </div>
             </div>
             <p className="font-display text-xl font-bold text-gray-900">
@@ -314,7 +314,7 @@ export default function NotificationsPage() {
                                 onClick={() => handleMarkRead(n.id)}
                                 className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50"
                               >
-                                <CheckCheck className="h-3.5 w-3.5 text-brand" />{" "}
+                                <CheckCheck className="h-3.5 w-3.5 text-brand-text" />{" "}
                                 Mark as read
                               </button>
                             )}

@@ -27,11 +27,11 @@ export function BecomeRunnerBanner() {
       <div className="hidden md:flex w-full items-stretch">
         {/* Text content — ~65% */}
         <div className="flex flex-1 flex-col justify-center px-6 py-5">
-          <h3 className="font-display text-lg font-extrabold text-white">
+          <h3 className="font-display text-lg font-extrabold text-on-brand">
             Become a Runner
           </h3>
 
-          <p className="mt-1 max-w-md text-[13px] leading-relaxed text-white/70">
+          <p className="mt-1 max-w-md text-[13px] leading-relaxed text-on-brand/70">
             Earn money by completing tasks around your campus and community.
           </p>
 
@@ -39,7 +39,7 @@ export function BecomeRunnerBanner() {
             {PERKS.map((perk) => (
               <span
                 key={perk}
-                className="flex items-center gap-1.5 text-[12px] text-white/80"
+                className="flex items-center gap-1.5 text-[12px] text-on-brand/80"
               >
                 <Check className="h-3 w-3 shrink-0 text-gold" />
                 {perk}
@@ -80,7 +80,7 @@ export function BecomeRunnerBanner() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm">
                   <Users className="h-6 w-6 text-gold" />
                 </div>
-                <p className="text-xs font-medium text-white/60">
+                <p className="text-xs font-medium text-on-brand/60">
                   Student Runner
                 </p>
               </div>
@@ -111,7 +111,7 @@ export function BecomeRunnerBanner() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm">
                   <Users className="h-5 w-5 text-gold" />
                 </div>
-                <p className="text-xs font-medium text-white/70">
+                <p className="text-xs font-medium text-on-brand/70">
                   Student Runner
                 </p>
               </div>
@@ -121,11 +121,11 @@ export function BecomeRunnerBanner() {
 
         {/* Content */}
         <div className="px-4 py-3 space-y-2.5">
-          <h3 className="font-display text-base font-extrabold text-white">
+          <h3 className="font-display text-base font-extrabold text-on-brand">
             Become a Runner
           </h3>
 
-          <p className="text-[13px] leading-relaxed text-white/70">
+          <p className="text-[13px] leading-relaxed text-on-brand/70">
             Earn money on your own schedule.
           </p>
 
@@ -133,7 +133,7 @@ export function BecomeRunnerBanner() {
             {PERKS.map((perk) => (
               <span
                 key={perk}
-                className="flex items-center gap-1.5 text-[12px] text-white/80"
+                className="flex items-center gap-1.5 text-[12px] text-on-brand/80"
               >
                 <Check className="h-3 w-3 shrink-0 text-gold" />
                 {perk}

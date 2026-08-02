@@ -282,13 +282,13 @@ export default function RegisterPage() {
           </form>
           <p className="mt-4 text-center text-xs text-gray-500">
             By creating an account, you agree to our{" "}
-            <Link href="/terms" className="font-medium text-brand hover:underline">Terms of Service</Link>{" "}
+            <Link href="/terms" className="font-medium text-brand-text hover:underline">Terms of Service</Link>{" "}
             and{" "}
-            <Link href="/privacy" className="font-medium text-brand hover:underline">Privacy Policy</Link>.
+            <Link href="/privacy" className="font-medium text-brand-text hover:underline">Privacy Policy</Link>.
           </p>
           <p className="mt-6 text-center text-sm text-gray-500">
             Already have an account?{" "}
-            <a href="/login" className="font-semibold text-brand hover:underline">Sign in</a>
+            <a href="/login" className="font-semibold text-brand-text hover:underline">Sign in</a>
           </p>
         </>
       )}
@@ -343,7 +343,7 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => { setStep(0); setError(""); }}
-                className="font-semibold text-brand hover:underline"
+                className="font-semibold text-brand-text hover:underline"
               >
                 try again
               </button>

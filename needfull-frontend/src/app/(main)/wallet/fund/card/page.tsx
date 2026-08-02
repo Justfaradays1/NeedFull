@@ -164,7 +164,7 @@ function CardPaymentInner() {
     return (
       <div className="min-h-screen page-shell safe-all flex items-center justify-center">
         <div className="text-center px-6">
-          <Loader2 className="mx-auto h-12 w-12 animate-spin text-brand" />
+          <Loader2 className="mx-auto h-12 w-12 animate-spin text-brand-text" />
           <p className="mt-4 font-display text-lg font-bold text-gray-900">
             Verifying your payment...
           </p>
@@ -193,7 +193,7 @@ function CardPaymentInner() {
           <p className="mt-1 text-sm text-gray-500">Redirecting to wallet...</p>
           <Link
             href="/wallet"
-            className="tap-target mt-6 inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 font-semibold text-white hover:bg-brand-dark"
+            className="tap-target mt-6 inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 font-semibold text-on-brand hover:bg-brand-dark"
           >
             <Wallet className="h-5 w-5" />
             Go to Wallet
@@ -347,7 +347,7 @@ export default function CardPaymentPage() {
     <Suspense
       fallback={
         <div className="min-h-screen page-shell safe-all flex items-center justify-center">
-          <Loader2 className="h-10 w-10 animate-spin text-brand" />
+          <Loader2 className="h-10 w-10 animate-spin text-brand-text" />
         </div>
       }
     >

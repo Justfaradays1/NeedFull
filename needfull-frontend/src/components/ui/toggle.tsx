@@ -17,7 +17,7 @@ export function ToggleRow({ label, enabled, onToggle, disabled, disabledHint }: 
         <span className={`text-sm font-semibold ${disabled ? 'text-gray-500' : 'text-gray-700'}`}>{label}</span>
         {disabled && disabledHint && <p className="text-[10px] text-gray-500">{disabledHint}</p>}
       </div>
-      <button type="button" onClick={onToggle} disabled={disabled} className="tap-target text-brand disabled:text-gray-300">
+      <button type="button" onClick={onToggle} disabled={disabled} className="tap-target text-brand-text disabled:text-gray-300">
         {enabled ? <ToggleRight className="h-7 w-7" /> : <ToggleLeft className="h-7 w-7" />}
       </button>
     </div>

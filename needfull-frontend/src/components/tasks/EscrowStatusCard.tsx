@@ -20,7 +20,7 @@ export function EscrowStatusCard({
   return (
     <div className="rounded-2xl border border-brand/20 bg-brand-light p-4">
       <div className="flex items-center gap-2">
-        <ShieldCheck className="h-4 w-4 text-brand" />
+        <ShieldCheck className="h-4 w-4 text-brand-text" />
         <span className="text-xs font-bold uppercase tracking-wider text-brand-dark">
           Funds in Escrow
         </span>

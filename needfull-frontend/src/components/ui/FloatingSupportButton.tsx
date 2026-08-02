@@ -33,7 +33,7 @@ export function FloatingSupportButton() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="group fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-brand px-4 py-3 text-sm font-bold text-white shadow-lifted transition-all duration-200 hover:bg-brand-mid hover:shadow-lg active:scale-95"
+        className="group fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-brand px-4 py-3 text-sm font-bold text-on-brand shadow-lifted transition-all duration-200 hover:bg-brand-mid hover:shadow-lg active:scale-95"
         aria-label="Open support menu"
       >
         {open ? (

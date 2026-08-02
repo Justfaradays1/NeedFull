@@ -2,7 +2,7 @@ import { Skeleton, SkeletonLine, SkeletonCircle, SkeletonCard, SkeletonStatCard 
 
 export function GreetingCardSkeleton() {
   return (
-    <div className="rounded-2xl bg-brand p-5 text-white shadow-sm">
+    <div className="rounded-2xl bg-brand p-5 text-on-brand shadow-sm">
       <div className="flex items-center gap-3">
         <SkeletonCircle size="48px" />
         <div className="space-y-2 flex-1">
@@ -20,7 +20,7 @@ export function GreetingCardSkeleton() {
 
 export function WalletCardSkeleton() {
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-brand to-brand-dark p-5 text-white shadow-sm">
+    <div className="rounded-2xl bg-gradient-to-br from-brand to-brand-dark p-5 text-on-brand shadow-sm">
       <SkeletonLine width="80px" height="10px" />
       <SkeletonLine width="140px" height="32px" className="mt-2" />
       <div className="mt-4 flex gap-3">

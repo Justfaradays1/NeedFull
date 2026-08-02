@@ -130,7 +130,7 @@ export default function NotFound() {
           Looking for something?{" "}
           <Link
             href="/tasks"
-            className="font-semibold text-brand hover:text-brand-mid transition-colors"
+            className="font-semibold text-brand-text hover:text-brand-mid transition-colors"
           >
             Browse the Errand Marketplace
           </Link>

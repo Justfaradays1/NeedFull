@@ -663,7 +663,7 @@ export default function WithdrawPage() {
                             }`}
                           >
                             {selectedBank?.name === bank.name && (
-                              <Check className="h-4 w-4 shrink-0 text-brand" />
+                              <Check className="h-4 w-4 shrink-0 text-brand-text" />
                             )}
                             {bank.name}
                           </button>
@@ -733,7 +733,7 @@ export default function WithdrawPage() {
                     }`}
                   />
                   {accountNameLoading && (
-                    <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-brand" />
+                    <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-brand-text" />
                   )}
                   {!accountNameLoading && accountName && (
                     <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-600" />

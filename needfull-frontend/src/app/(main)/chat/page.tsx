@@ -170,7 +170,7 @@ function EmptyIllustration() {
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="text-brand/50"
+        className="text-brand-text/50"
       />
     </svg>
   );
@@ -276,7 +276,7 @@ export default function ChatPage() {
               <div className="mt-5 flex items-center gap-3">
                 <Link
                   href="/feed"
-                  className="tap-target inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-brand-dark active:scale-[0.97]"
+                  className="tap-target inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-on-brand shadow-sm transition-all hover:bg-brand-dark active:scale-[0.97]"
                 >
                   <Briefcase className="h-4 w-4" />
                   Explore Tasks
@@ -295,12 +295,12 @@ export default function ChatPage() {
             <section>
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="flex items-center gap-1.5 text-sm font-bold text-gray-900">
-                  <TrendingUp className="h-4 w-4 text-brand" />
+                  <TrendingUp className="h-4 w-4 text-brand-text" />
                   Recommended Tasks
                 </h3>
                 <Link
                   href="/tasks"
-                  className="flex items-center gap-0.5 text-[11px] font-bold text-brand"
+                  className="flex items-center gap-0.5 text-[11px] font-bold text-brand-text"
                 >
                   View all <ChevronRight className="h-3 w-3" />
                 </Link>
@@ -344,7 +344,7 @@ export default function ChatPage() {
                         {task.title}
                       </p>
                       <div className="mt-2 flex items-center gap-1.5 text-xs">
-                        <span className="font-bold text-brand">
+                        <span className="font-bold text-brand-text">
                           ₦{task.budget.naira.toLocaleString()}
                         </span>
                       </div>
@@ -388,7 +388,7 @@ export default function ChatPage() {
             <section>
               <div className="flex items-center gap-3 rounded-xl border border-card-border bg-surface p-4 shadow-sm">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-light">
-                  <Shield className="h-5 w-5 text-brand" />
+                  <Shield className="h-5 w-5 text-brand-text" />
                 </div>
                 <div>
                   <p className="text-sm font-bold text-gray-900">

@@ -129,7 +129,7 @@ export default function TaskCard({ task, onPress }: TaskCardProps) {
         </div>
 
         {/* Budget */}
-        <span className="shrink-0 font-display text-lg font-bold leading-none text-brand">
+        <span className="shrink-0 font-display text-lg font-bold leading-none text-brand-text">
           {formatCurrency(budget)}
         </span>
       </div>
@@ -175,7 +175,7 @@ export default function TaskCard({ task, onPress }: TaskCardProps) {
                 {task.poster.fullName}
               </span>
               {task.poster.verified && (
-                <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-brand" />
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-brand-text" />
               )}
             </div>
             <div className="flex items-center gap-1">

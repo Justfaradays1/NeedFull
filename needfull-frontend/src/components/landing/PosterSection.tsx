@@ -30,7 +30,7 @@ export function PosterSection() {
         <div className="mx-auto max-w-2xl text-center">
           <span className="text-section-label inline-flex items-center rounded-full bg-brand-light px-3.5 py-1 text-brand">For task posters</span>
           <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>
-            Get campus tasks done <span className="text-brand">faster</span>
+            Get campus tasks done <span className="text-brand-text">faster</span>
           </h2>
           <p className="text-section-desc mt-3" style={{ color: 'var(--color-muted)' }}>
             Post what you need, get matched with verified students, and only pay when it&apos;s done right.

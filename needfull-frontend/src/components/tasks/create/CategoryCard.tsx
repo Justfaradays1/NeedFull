@@ -27,7 +27,7 @@ export function CategoryCard({
     >
       {/* Checkmark overlay when selected */}
       {selected && (
-        <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-brand text-white animate-scale-in">
+        <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-brand text-on-brand animate-scale-in">
           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
@@ -42,7 +42,7 @@ export function CategoryCard({
       {/* Name */}
       <span
         className={`text-sm font-bold leading-tight ${
-          selected ? "text-brand" : "text-gray-800"
+          selected ? "text-brand-text" : "text-gray-800"
         }`}
       >
         {name}

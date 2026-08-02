@@ -89,7 +89,7 @@ export default function AdminPurchaseDetailPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-brand" />
+        <Loader2 className="h-8 w-8 animate-spin text-brand-text" />
       </div>
     );
   }
@@ -145,7 +145,7 @@ export default function AdminPurchaseDetailPage() {
 
         {/* People */}
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand-text">
             {t?.poster?.fullName?.charAt(0) || "?"}
           </div>
           <div>
@@ -186,7 +186,7 @@ export default function AdminPurchaseDetailPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Platform Fee</span>
-              <span className="font-medium text-brand">₦{(p.platform_fee / 100).toLocaleString()}</span>
+              <span className="font-medium text-brand-text">₦{(p.platform_fee / 100).toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Spending Buffer</span>
@@ -212,7 +212,7 @@ export default function AdminPurchaseDetailPage() {
               href={p.receipt_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-brand underline"
+              className="inline-flex items-center gap-1 text-xs text-brand-text underline"
             >
               <FileImage className="h-3 w-3" /> View Receipt
             </a>

@@ -166,7 +166,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleLinkGoogle}
                   disabled={linkingGoogle}
-                  className="rounded-lg bg-brand px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-brand-mid disabled:opacity-50"
+                  className="rounded-lg bg-brand px-3 py-1.5 text-xs font-medium text-on-brand transition-colors hover:bg-brand-mid disabled:opacity-50"
                 >
                   {linkingGoogle ? "Linking..." : "Link"}
                 </button>

@@ -199,7 +199,7 @@ function LoginForm() {
             <label htmlFor="password" className="block text-sm font-medium" style={{ color: "var(--color-foreground, #171717)" }}>
               Password
             </label>
-            <a href="/forgot-password" className="text-xs font-medium text-brand hover:underline">
+            <a href="/forgot-password" className="text-xs font-medium text-brand-text hover:underline">
               Forgot password?
             </a>
           </div>
@@ -227,7 +227,7 @@ function LoginForm() {
       {/* Footer */}
       <p className="mt-8 text-center text-sm text-gray-500">
         Don&apos;t have an account?{" "}
-        <a href="/register" className="font-semibold text-brand hover:underline">
+        <a href="/register" className="font-semibold text-brand-text hover:underline">
           Create one
         </a>
       </p>

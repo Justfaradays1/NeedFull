@@ -58,7 +58,7 @@ export function SupportPanel({ onClose }: SupportPanelProps) {
         <div className="border-b border-gray-100 px-5 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-light">
-              <Search className="h-4 w-4 text-brand" />
+              <Search className="h-4 w-4 text-brand-text" />
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900">How can we help?</p>

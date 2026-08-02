@@ -111,7 +111,7 @@ export default function AdminPurchasesPage() {
       {stats && (
         <div className="grid grid-cols-2 gap-3">
           <StatCard
-            icon={<ShieldCheck className="h-4 w-4 text-brand" />}
+            icon={<ShieldCheck className="h-4 w-4 text-brand-text" />}
             label="Total in Escrow"
             value={`₦${stats.totalEscrowNaira.toLocaleString()}`}
             bg="bg-brand-light/30"
@@ -169,7 +169,7 @@ export default function AdminPurchasesPage() {
       {/* Purchase tasks list */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-brand" />
+          <Loader2 className="h-6 w-6 animate-spin text-brand-text" />
         </div>
       ) : tasks.length === 0 ? (
         <div className="rounded-2xl bg-surface p-8 text-center border border-card-border">

@@ -28,7 +28,7 @@ export default function MainError({
       <button
         type="button"
         onClick={reset}
-        className="rounded-xl bg-brand px-5 py-2.5 text-sm font-bold text-white"
+        className="rounded-xl bg-brand px-5 py-2.5 text-sm font-bold text-on-brand"
       >
         Try again
       </button>

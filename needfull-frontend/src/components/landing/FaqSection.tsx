@@ -27,7 +27,7 @@ export function FaqSection() {
         <div className="mt-10 text-center">
           <Link
             href="/faq"
-            className="inline-flex items-center gap-2 rounded-[10px] border-2 border-brand px-6 py-3 text-sm font-bold text-brand transition-all duration-150 hover:bg-brand hover:text-white active:scale-[0.97] sm:text-base"
+            className="inline-flex items-center gap-2 rounded-[10px] border-2 border-brand px-6 py-3 text-sm font-bold text-brand-text transition-all duration-150 hover:bg-brand hover:text-on-brand active:scale-[0.97] sm:text-base"
           >
             View All FAQs
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
@@ -43,7 +43,7 @@ export function FaqSection() {
             <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <a
                 href="/chat"
-                className="inline-flex items-center gap-2 rounded-[10px] bg-brand px-6 py-3 text-sm font-bold text-white shadow-card transition-all duration-150 hover:bg-brand-mid active:scale-[0.97] sm:text-base"
+                className="inline-flex items-center gap-2 rounded-[10px] bg-brand px-6 py-3 text-sm font-bold text-on-brand shadow-card transition-all duration-150 hover:bg-brand-mid active:scale-[0.97] sm:text-base"
               >
                 Chat with Us
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>

@@ -358,7 +358,7 @@ export default function WalletPage() {
           <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-light">
-                <TrendingUp className="h-4 w-4 text-brand" />
+                <TrendingUp className="h-4 w-4 text-brand-text" />
               </div>
               <p className="text-xs font-medium text-gray-500">
                 Earned This Month
@@ -533,7 +533,7 @@ export default function WalletPage() {
                 type="button"
                 onClick={loadMore}
                 disabled={isLoadingTx}
-                className="tap-target flex w-full items-center justify-center gap-2 rounded-lg border-2 border-card-border py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:border-brand hover:text-brand disabled:opacity-50"
+                className="tap-target flex w-full items-center justify-center gap-2 rounded-lg border-2 border-card-border py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:border-brand hover:text-brand-text disabled:opacity-50"
               >
                 {isLoadingTx ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
