@@ -31,6 +31,7 @@ import { DesktopContextPanel } from "@/components/layout/DesktopContextPanel";
 import { DesktopFloatingActions } from "@/components/layout/DesktopFloatingActions";
 
 import { useNotifications } from "@/hooks/useNotifications";
+import { useChatUnread } from "@/hooks/useChatUnread";
 import { POSTER_NAV, RUNNER_NAV } from "@/lib/navConfig";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -153,7 +154,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     loading: notificationsLoading,
     markAllAsRead,
   } = useNotifications();
+  const { unreadCount: chatUnreadCount, refreshChatUnread } = useChatUnread();
   const router = useRouter();
+
+  // Refresh chat unread count whenever the route changes (e.g. after
+  // reading messages in /chat, the badge updates on the way back)
+  useEffect(() => {
+    refreshChatUnread();
+  }, [pathname, refreshChatUnread]);
 
   const avatarMenuItems = [
     {
@@ -272,7 +280,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         user={user}
         activeRole={activeRole}
         pathname={pathname}
-        unreadCount={unreadCount}
+        chatUnreadCount={chatUnreadCount}
       />
 
       {/* ─── Main Content Area ─── */}
@@ -500,9 +508,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       icon={icon}
                       className={`h-6 w-6 transition-all duration-200 ${isActive ? activeIconColor : "text-slate-500"}`}
                     />
-                    {label === "Chat" && unreadCount > 0 ? (
+                    {label === "Chat" && chatUnreadCount > 0 ? (
                       <span className="absolute -right-1.5 -top-1 flex min-w-4 items-center justify-center rounded-full bg-danger px-1 py-px text-[9px] font-bold leading-none text-white">
-                        {unreadCount > 9 ? "9+" : unreadCount}
+                        {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
                       </span>
                     ) : null}
                   </div>
@@ -526,7 +534,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <DesktopContextPanel pathname={pathname} />
 
       {/* ─── Floating Actions (tablet+) ─── */}
-      <DesktopFloatingActions pathname={pathname} unreadCount={unreadCount} />
+      <DesktopFloatingActions
+        pathname={pathname}
+        chatUnreadCount={chatUnreadCount}
+      />
     </div>
   );
 }

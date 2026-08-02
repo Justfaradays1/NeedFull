@@ -9,10 +9,10 @@ import { MessageCircle, Plus } from "lucide-react";
 
 export function DesktopFloatingActions({
   pathname,
-  unreadCount,
+  chatUnreadCount,
 }: {
   pathname: string;
-  unreadCount: number;
+  chatUnreadCount: number;
 }) {
   if (pathname.startsWith("/tasks/create")) return null;
 
@@ -26,9 +26,9 @@ export function DesktopFloatingActions({
       >
         <span className="relative">
           <MessageCircle className="h-7 w-7" />
-          {unreadCount > 0 && (
+          {chatUnreadCount > 0 && (
             <span className="absolute -right-3 -top-2.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1.5 text-[10px] font-bold leading-none text-white">
-              {unreadCount > 9 ? "9+" : unreadCount}
+              {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
             </span>
           )}
         </span>

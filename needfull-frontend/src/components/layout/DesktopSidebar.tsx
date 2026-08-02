@@ -94,12 +94,12 @@ export function DesktopSidebar({
   user,
   activeRole,
   pathname,
-  unreadCount,
+  chatUnreadCount,
 }: {
   user: any;
   activeRole: string;
   pathname: string;
-  unreadCount: number;
+  chatUnreadCount: number;
 }) {
   const isRunner = activeRole === "runner";
   const navItems: NavItem[] = isRunner ? RUNNER_NAV : POSTER_NAV;
@@ -163,7 +163,7 @@ export function DesktopSidebar({
       );
     }
 
-    const showChatBadge = item.href === "/chat" && unreadCount > 0;
+    const showChatBadge = item.href === "/chat" && chatUnreadCount > 0;
 
     if (rail) {
       return (
@@ -187,7 +187,7 @@ export function DesktopSidebar({
             />
             {showChatBadge && (
               <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold leading-none text-white">
-                {unreadCount > 9 ? "9+" : unreadCount}
+                {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
               </span>
             )}
           </span>
@@ -214,7 +214,7 @@ export function DesktopSidebar({
           />
           {showChatBadge && (
             <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold leading-none text-white">
-              {unreadCount > 9 ? "9+" : unreadCount}
+              {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
             </span>
           )}
         </span>
