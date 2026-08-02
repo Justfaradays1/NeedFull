@@ -271,10 +271,10 @@ export default function FeedPage() {
           </div>
 
           {/* Row 4: Active Tasks (8) + Recommended Runners (4) */}
-          <div className="col-span-8">
+          <div className="col-span-8 xl:col-span-12">
             <ActiveTasksSection tasks={allTasks} loading={tasksLoading} />
           </div>
-          <div className="col-span-4">
+          <div className="col-span-4 xl:hidden">
             <RecommendedRunners runners={[]} loading={false} />
             <div className="mt-4">
               <NearbyActivity />
@@ -282,10 +282,10 @@ export default function FeedPage() {
           </div>
 
           {/* Row 5: Recent Activity (8) + Insights (4) */}
-          <div className="col-span-8">
+          <div className="col-span-8 xl:col-span-12">
             <RecentActivity activities={activities} loading={tasksLoading} />
           </div>
-          <div className="col-span-4">
+          <div className="col-span-4 xl:hidden">
             <SmartInsights />
             <div className="mt-4 rounded-xl border border-card-border bg-surface p-4 shadow-sm">
               <BecomeRunnerBanner />

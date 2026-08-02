@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -14,8 +14,6 @@ import {
   Shield,
   User,
   LogOut,
-  Zap,
-  ChevronRight,
 } from "lucide-react";
 import {
   useAuthStore,
@@ -28,343 +26,12 @@ import { Dropdown } from "@/components/ui/dropdown";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import { NotificationDrawer } from "@/components/ui/NotificationDrawer";
+import { DesktopSidebar, NavIcon } from "@/components/layout/DesktopSidebar";
+import { DesktopContextPanel } from "@/components/layout/DesktopContextPanel";
+import { DesktopFloatingActions } from "@/components/layout/DesktopFloatingActions";
 
 import { useNotifications } from "@/hooks/useNotifications";
 import { POSTER_NAV, RUNNER_NAV } from "@/lib/navConfig";
-import type { NavItem } from "@/lib/navConfig";
-
-// WHAT: Lazy-load a lucide icon by name
-// WHY: WASM SWC can fail on lucide-react dynamic icon resolution; this avoids
-//      importing all icons upfront in the nav-heavy layout
-function NavIcon({ icon, className }: { icon: string; className?: string }) {
-  const [Icon, setIcon] = useState<React.ComponentType<{
-    className?: string;
-  }> | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    import("lucide-react")
-      .then((mod) => {
-        if (cancelled) return;
-        const Icons: Record<string, React.ComponentType<{ className?: string }>> = {
-          BellRing: mod.BellRing,
-          Bookmark: mod.Bookmark,
-          CirclePlus: mod.CirclePlus,
-          ClipboardCheck: mod.ClipboardCheck,
-          Compass: mod.Compass,
-          HelpCircle: mod.HelpCircle,
-          House: mod.House,
-          ListTodo: mod.ListTodo,
-          MessageCircle: mod.MessageCircle,
-          Settings: mod.Settings,
-          User: mod.User,
-          Wallet: mod.Wallet,
-        };
-        setIcon(() => Icons[icon]);
-      })
-      .catch(() => {
-        if (!cancelled)
-          setIcon(() => () => (
-            <span style={{ width: 20, height: 20 }} />
-          ));
-      });
-    return () => { cancelled = true; };
-  }, [icon]);
-
-  if (!Icon) return <span style={{ width: 20, height: 20 }} />;
-  return <Icon className={className || "h-5 w-5"} />;
-}
-
-function SidebarSection({
-  label,
-  defaultOpen,
-  children,
-}: {
-  label: string;
-  defaultOpen?: boolean;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(defaultOpen ?? false);
-
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="tap-target flex w-full items-center justify-between rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400 transition-colors hover:text-gray-600"
-      >
-        {label}
-        <ChevronDown
-          className={`h-3.5 w-3.5 transition-transform duration-200 ${
-            open ? "rotate-180" : ""
-          }`}
-        />
-      </button>
-      <div
-        className="grid transition-all duration-300 ease-in-out"
-        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
-      >
-        <div className="overflow-hidden">
-          <div className="space-y-0.5 pb-1.5">{children}</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RunnerIllustration() {
-  return (
-    <svg
-      viewBox="0 0 80 60"
-      fill="none"
-      className="h-14 w-auto"
-      aria-hidden="true"
-    >
-      {/* Head */}
-      <circle cx="52" cy="10" r="6" fill="#EAA325" fillOpacity="0.3" />
-      <circle cx="52" cy="10" r="4" fill="#EAA325" />
-      {/* Body lean */}
-      <path
-        d="M50 16l-4 16 8 2 2-10z"
-        fill="#EAA325"
-        fillOpacity="0.25"
-        stroke="#EAA325"
-        strokeWidth="0.8"
-      />
-      {/* Back arm */}
-      <path
-        d="M48 18l-8 6 2 3 6-5z"
-        fill="#EAA325"
-        fillOpacity="0.2"
-        stroke="#EAA325"
-        strokeWidth="0.8"
-      />
-      {/* Front arm */}
-      <path
-        d="M52 18l10-4-1-4-7 3z"
-        fill="#EAA325"
-        fillOpacity="0.2"
-        stroke="#EAA325"
-        strokeWidth="0.8"
-      />
-      {/* Back leg */}
-      <path
-        d="M46 34l-4 10 4 2 3-8z"
-        fill="#EAA325"
-        fillOpacity="0.2"
-        stroke="#EAA325"
-        strokeWidth="0.8"
-      />
-      {/* Front leg */}
-      <path
-        d="M52 34l2 12 5-1-1-9z"
-        fill="#EAA325"
-        fillOpacity="0.2"
-        stroke="#EAA325"
-        strokeWidth="0.8"
-      />
-      {/* Motion lines */}
-      <path
-        d="M62 20l6-2M64 26l7-1M60 32l8 2"
-        stroke="#EAA325"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeOpacity="0.4"
-      />
-      {/* Ground */}
-      <line
-        x1="20"
-        y1="52"
-        x2="70"
-        y2="52"
-        stroke="#EAA325"
-        strokeWidth="1"
-        strokeOpacity="0.2"
-        strokeDasharray="3 3"
-      />
-    </svg>
-  );
-}
-
-function NavSidebarContent({
-  user,
-  activeRole,
-  pathname,
-}: {
-  user: any;
-  activeRole: string;
-  pathname: string;
-}) {
-  const isRunner = activeRole === "runner";
-  const navItems: NavItem[] = isRunner ? RUNNER_NAV : POSTER_NAV;
-
-  useEffect(() => {
-    useAuthStore.getState().refreshUser();
-  }, [pathname]);
-
-  const isPending = user?.runnerStatus === "pending";
-
-  function renderLink(item: NavItem) {
-    if (item.disabled) {
-      return (
-        <div
-          key={item.label}
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 cursor-not-allowed"
-        >
-          <NavIcon icon={item.icon} className="h-5 w-5 shrink-0 text-gray-300" />
-          <span>{item.label}</span>
-          <span className="ml-auto text-[9px] font-medium text-gray-300">Soon</span>
-        </div>
-      );
-    }
-
-    const isActive =
-      pathname === item.href || pathname.startsWith(item.href + "/");
-
-    if (item.isCta) {
-      return (
-        <Link
-          key={item.label}
-          href={item.href}
-          className="tap-target group mt-1 flex items-center gap-3 rounded-xl bg-brand px-3 py-3 text-sm font-bold text-on-brand shadow-md shadow-brand/20 transition-all duration-150 hover:shadow-lg hover:shadow-brand/25 active:scale-[0.98]"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 transition-colors group-hover:bg-white/25">
-            <NavIcon icon={item.icon} className="h-5 w-5" />
-          </div>
-          <span>{item.label}</span>
-          <ChevronRight className="ml-auto h-4 w-4 text-white/60" />
-        </Link>
-      );
-    }
-
-    return (
-      <Link
-        key={item.label}
-        href={item.href}
-        className={`tap-target flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
-          isActive
-            ? "bg-brand-light/80 text-brand font-bold shadow-sm ring-1 ring-brand/20"
-            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-        }`}
-      >
-        <NavIcon
-          icon={item.icon}
-          className={`h-5 w-5 shrink-0 transition-colors ${
-            isActive ? "text-brand-text" : "text-gray-400"
-          }`}
-        />
-        <span>{item.label}</span>
-      </Link>
-    );
-  }
-
-  const sections: { key: "main" | "community" | "account"; label: string; collapsible: boolean }[] = [
-    { key: "main", label: "Main", collapsible: false },
-    { key: "community", label: "Community", collapsible: true },
-    { key: "account", label: "Account", collapsible: true },
-  ];
-
-  return (
-    <div className="flex flex-col h-full px-3 py-4 sidebar-scroll">
-      {/* ─── CTA Card ─── */}
-      {isRunner ? (
-        <div className="mb-4 rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100/40 p-3 shadow-sm dark:border-amber-800/50 dark:from-amber-950/60 dark:to-amber-900/30">
-          <div className="flex items-center gap-2">
-            <Zap className="h-4 w-4 text-amber-500" />
-            <p className="text-sm font-bold text-gray-900 dark:text-amber-100">
-              NeedRunner Dashboard
-            </p>
-          </div>
-          <p className="mt-1 text-xs text-gray-600 dark:text-amber-200/70">
-            View available tasks and your earnings at a glance.
-          </p>
-          <Link
-            href="/tasks"
-            className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-amber-600 active:scale-[0.97]"
-          >
-            Open Dashboard
-            <ChevronRight className="h-3 w-3" />
-          </Link>
-        </div>
-      ) : (
-        <div className="relative mb-4 overflow-hidden rounded-xl border border-amber-200/70 bg-gradient-to-br from-amber-50 via-amber-50/60 to-white p-3 shadow-sm transition-all hover:shadow-md dark:border-amber-800/40 dark:from-amber-950/50 dark:via-amber-950/30 dark:to-amber-950/20">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <p className="text-sm font-bold text-gray-900 dark:text-amber-100">
-                {isPending ? "Application Pending" : "Become a NeedRunner"}
-              </p>
-              <p className="mt-0.5 text-xs leading-relaxed text-gray-500 dark:text-amber-200/70">
-                {isPending
-                  ? "Your application is under review. Check back soon."
-                  : "Earn money by completing tasks around campus."}
-              </p>
-              <div className="mt-2.5 flex flex-nowrap items-center gap-1.5">
-                <Link
-                  href="/become-runner"
-                  className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-400 px-2.5 py-1.5 text-[11px] font-bold text-white shadow-sm transition-all hover:from-amber-600 hover:to-amber-500 active:scale-[0.97] whitespace-nowrap"
-                >
-                  {isPending ? "View Status" : "Get Started"}
-                  <ChevronRight className="h-3 w-3" />
-                </Link>
-                {!isPending && (
-                  <Link
-                    href="/become-runner"
-                    className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-amber-300/50 px-2.5 py-1.5 text-[11px] font-semibold transition-all hover:bg-amber-50 active:scale-[0.97] whitespace-nowrap dark:border-amber-700/50 dark:text-amber-400 dark:hover:bg-amber-950/50"
-                  >
-                    Learn More
-                  </Link>
-                )}
-              </div>
-            </div>
-            <div className="shrink-0 -mr-1 -mt-1">
-              <RunnerIllustration />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─── Navigation ─── */}
-      <nav className="flex-1 space-y-2">
-        {sections.map((section) => {
-          const items = navItems.filter((n) => n.section === section.key);
-          if (items.length === 0) return null;
-
-          if (section.collapsible) {
-            return (
-              <SidebarSection key={section.key} label={section.label}>
-                {items.map(renderLink)}
-              </SidebarSection>
-            );
-          }
-
-          return (
-            <div key={section.key}>
-              <p className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">
-                {section.label}
-              </p>
-              <div className="space-y-0.5">{items.map(renderLink)}</div>
-            </div>
-          );
-        })}
-      </nav>
-
-      {/* ─── Sign Out ─── */}
-      <div className="mt-4 shrink-0 border-t border-gray-100 pt-3">
-        <button
-          type="button"
-          onClick={() => {
-            useAuthStore.getState().logout();
-            window.location.href = "/login";
-          }}
-          className="tap-target flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-600 transition-all hover:bg-red-50 active:scale-[0.98]"
-        >
-          <LogOut className="h-5 w-5 shrink-0" />
-          <span>Sign Out</span>
-        </button>
-      </div>
-    </div>
-  );
-}
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -468,28 +135,6 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
-}
-
-function UnreadBadge() {
-  const [count, setCount] = useState(0);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    import("@/lib/apiClient").then((mod) => {
-      mod.default
-        .get("/notifications/unread-count")
-        .then((res) => setCount(res.data?.count ?? 0))
-        .catch(() => {});
-    });
-  }, [isAuthenticated]);
-
-  return count > 0 ? (
-    <span className="absolute -right-1.5 -top-1 flex min-w-4 items-center justify-center rounded-full bg-danger px-1 py-px text-[9px] font-bold leading-none text-white">
-      {count > 99 ? "99+" : count}
-    </span>
-  ) : null;
 }
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -622,14 +267,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       className="flex flex-col md:flex-row page-shell"
       style={{ minHeight: "100dvh" }}
     >
-      {/* ─── Desktop Sidebar ─── */}
-      <aside className="hidden md:flex md:flex-col md:w-72 md:shrink-0 md:border-r md:border-gray-200 md:bg-surface/95 md:backdrop-blur-xl" style={{ height: "100dvh" }}>
-        <NavSidebarContent
-          user={user}
-          activeRole={activeRole}
-          pathname={pathname}
-        />
-      </aside>
+      {/* ─── Desktop / Tablet Sidebar ─── */}
+      <DesktopSidebar
+        user={user}
+        activeRole={activeRole}
+        pathname={pathname}
+        unreadCount={unreadCount}
+      />
 
       {/* ─── Main Content Area ─── */}
       <div className="flex flex-col flex-1 min-w-0" style={{ height: "100dvh" }}>
@@ -856,7 +500,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       icon={icon}
                       className={`h-6 w-6 transition-all duration-200 ${isActive ? activeIconColor : "text-slate-500"}`}
                     />
-                    {label === "Chat" && <UnreadBadge />}
+                    {label === "Chat" && unreadCount > 0 ? (
+                      <span className="absolute -right-1.5 -top-1 flex min-w-4 items-center justify-center rounded-full bg-danger px-1 py-px text-[9px] font-bold leading-none text-white">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    ) : null}
                   </div>
                   <span
                     className={`text-[11px] transition-all duration-200 ${
@@ -873,6 +521,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </nav>
       </div>
+
+      {/* ─── Right Context Panel (xl+) ─── */}
+      <DesktopContextPanel pathname={pathname} />
+
+      {/* ─── Floating Actions (tablet+) ─── */}
+      <DesktopFloatingActions pathname={pathname} unreadCount={unreadCount} />
     </div>
   );
 }

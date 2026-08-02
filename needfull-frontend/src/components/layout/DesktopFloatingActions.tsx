@@ -1,0 +1,54 @@
+// WHAT: Floating action buttons for desktop (Messages + Post a Task)
+// WHY: Keeps the two most-used actions one tap away without crowding the header;
+//      hidden on mobile where the bottom nav already provides both
+
+"use client";
+
+import Link from "next/link";
+import { MessageSquare, Plus } from "lucide-react";
+
+export function DesktopFloatingActions({
+  pathname,
+  unreadCount,
+}: {
+  pathname: string;
+  unreadCount: number;
+}) {
+  if (pathname.startsWith("/tasks/create")) return null;
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50 hidden flex-col items-end gap-3 md:flex">
+      {/* ─── Messages (laptop+) ─── */}
+      <Link
+        href="/chat"
+        className="group relative hidden items-center rounded-full border border-slate-200/70 bg-surface px-4 py-3 text-brand-text shadow-lifted transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-95 lg:flex"
+        aria-label="Open messages"
+      >
+        <span className="relative">
+          <MessageSquare className="h-5 w-5" />
+          {unreadCount > 0 && (
+            <span className="absolute -right-2.5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold leading-none text-white">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
+        </span>
+        <span className="pointer-events-none absolute right-full mr-3 hidden whitespace-nowrap rounded-lg bg-gray-900 px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
+          Messages
+        </span>
+      </Link>
+
+      {/* ─── Post a Task (tablet+) ─── */}
+      <Link
+        href="/tasks/create"
+        className="group relative flex items-center rounded-full bg-gold px-4 py-3 text-white shadow-lifted transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg active:scale-95"
+        aria-label="Post a task"
+      >
+        <Plus className="h-5 w-5" />
+        <span className="ml-2 hidden text-sm font-bold sm:inline">Post a Task</span>
+        <span className="pointer-events-none absolute right-full mr-3 hidden whitespace-nowrap rounded-lg bg-gray-900 px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 lg:hidden">
+          Post a Task
+        </span>
+      </Link>
+    </div>
+  );
+}
