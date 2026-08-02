@@ -14,8 +14,8 @@ const actions = [
     label: "Post a Task",
     href: "/tasks/create",
     icon: Plus,
-    color: "#1A6B4A",
-    bg: "bg-brand",
+    color: "#EAA325",
+    bg: "bg-gold",
     textColor: "text-white",
     emphasis: "high",
     desc: "Get help from a NeedRunner",
@@ -62,14 +62,14 @@ export function QuickActions() {
             <Link
               key={action.label}
               href={action.href}
-              className="col-span-2 flex items-center gap-3 rounded-xl bg-gradient-to-r from-brand to-brand-dark px-4 py-3.5 text-on-brand shadow-md transition-all hover:brightness-105 active:scale-[0.98]"
+              className="col-span-2 flex items-center gap-3 rounded-xl bg-gradient-to-r from-gold to-gold-dark px-4 py-3.5 text-white shadow-md shadow-gold/20 transition-all hover:brightness-105 active:scale-[0.98]"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-on-brand/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
                 <Icon className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold">{action.label}</p>
-                <p className="text-xs text-on-brand/70">{action.desc}</p>
+                <p className="text-xs text-white/80">{action.desc}</p>
               </div>
             </Link>
           );

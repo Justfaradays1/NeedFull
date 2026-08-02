@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, ChevronRight, LogOut, Zap } from "lucide-react";
+import { ChevronDown, ChevronRight, Coins, LogOut, Zap } from "lucide-react";
 import { useAuthStore } from "@/store";
 import { POSTER_NAV, RUNNER_NAV } from "@/lib/navConfig";
 import type { NavItem } from "@/lib/navConfig";
@@ -90,80 +90,6 @@ function SidebarSection({
   );
 }
 
-function RunnerIllustration() {
-  return (
-    <svg
-      viewBox="0 0 80 60"
-      fill="none"
-      className="h-14 w-auto"
-      aria-hidden="true"
-    >
-      {/* Head */}
-      <circle cx="52" cy="10" r="6" fill="#EAA325" fillOpacity="0.3" />
-      <circle cx="52" cy="10" r="4" fill="#EAA325" />
-      {/* Body lean */}
-      <path
-        d="M50 16l-4 16 8 2 2-10z"
-        fill="#EAA325"
-        fillOpacity="0.25"
-        stroke="#EAA325"
-        strokeWidth="0.8"
-      />
-      {/* Back arm */}
-      <path
-        d="M48 18l-8 6 2 3 6-5z"
-        fill="#EAA325"
-        fillOpacity="0.2"
-        stroke="#EAA325"
-        strokeWidth="0.8"
-      />
-      {/* Front arm */}
-      <path
-        d="M52 18l10-4-1-4-7 3z"
-        fill="#EAA325"
-        fillOpacity="0.2"
-        stroke="#EAA325"
-        strokeWidth="0.8"
-      />
-      {/* Back leg */}
-      <path
-        d="M46 34l-4 10 4 2 3-8z"
-        fill="#EAA325"
-        fillOpacity="0.2"
-        stroke="#EAA325"
-        strokeWidth="0.8"
-      />
-      {/* Front leg */}
-      <path
-        d="M52 34l2 12 5-1-1-9z"
-        fill="#EAA325"
-        fillOpacity="0.2"
-        stroke="#EAA325"
-        strokeWidth="0.8"
-      />
-      {/* Motion lines */}
-      <path
-        d="M62 20l6-2M64 26l7-1M60 32l8 2"
-        stroke="#EAA325"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeOpacity="0.4"
-      />
-      {/* Ground */}
-      <line
-        x1="20"
-        y1="52"
-        x2="70"
-        y2="52"
-        stroke="#EAA325"
-        strokeWidth="1"
-        strokeOpacity="0.2"
-        strokeDasharray="3 3"
-      />
-    </svg>
-  );
-}
-
 export function DesktopSidebar({
   user,
   activeRole,
@@ -215,7 +141,7 @@ export function DesktopSidebar({
             key={item.label}
             href={item.href}
             title={item.label}
-            className="group relative mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand text-on-brand shadow-md shadow-brand/20 transition-all duration-150 hover:bg-brand-mid hover:shadow-lg active:scale-95"
+            className="group relative mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gold text-white shadow-md shadow-gold/25 transition-all duration-150 hover:brightness-105 hover:shadow-lg active:scale-95"
             aria-label={item.label}
           >
             <NavIcon icon={item.icon} className="h-6 w-6" />
@@ -226,7 +152,7 @@ export function DesktopSidebar({
         <Link
           key={item.label}
           href={item.href}
-          className="tap-target group mt-1 flex items-center gap-3 rounded-xl bg-brand px-3 py-3 text-sm font-bold text-on-brand shadow-md shadow-brand/20 transition-all duration-150 hover:shadow-lg hover:shadow-brand/25 active:scale-[0.98]"
+          className="tap-target group mt-1 flex items-center gap-3 rounded-xl bg-gold px-3 py-3 text-sm font-bold text-white shadow-md shadow-gold/25 transition-all duration-150 hover:brightness-105 hover:shadow-lg hover:shadow-gold/30 active:scale-[0.98]"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 transition-colors group-hover:bg-white/25">
             <NavIcon icon={item.icon} className="h-5 w-5" />
@@ -330,39 +256,46 @@ export function DesktopSidebar({
             </Link>
           </div>
         ) : isCta ? (
-          <div className="mb-4">
-            <div className="relative hidden overflow-hidden rounded-xl border border-amber-200/70 bg-gradient-to-br from-amber-50 via-amber-50/60 to-white p-3 shadow-sm transition-all hover:shadow-md dark:border-amber-800/40 dark:from-amber-950/50 dark:via-amber-950/30 dark:to-amber-950/20 lg:block">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <p className="text-sm font-bold text-gray-900 dark:text-amber-100">
-                    {isPending ? "Application Pending" : "Become a NeedRunner"}
+          <div className="mb-4 hidden lg:block">
+            <div className="group relative overflow-hidden rounded-xl border border-card-border bg-surface p-3.5 shadow-sm transition-all duration-200 hover:shadow-md">
+              <div className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-gold/10" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/40 to-transparent" />
+              <div className="relative flex items-start gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gold-light">
+                  <Coins className="h-4 w-4 text-gold-dark" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-gray-900 dark:text-white">
+                    {isPending ? "Application Pending" : "Start Earning"}
                   </p>
-                  <p className="mt-0.5 text-xs leading-relaxed text-gray-500 dark:text-amber-200/70">
+                  <p className="mt-0.5 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
                     {isPending
                       ? "Your application is under review. Check back soon."
-                      : "Earn money by completing tasks around campus."}
+                      : (
+                        <>
+                          Complete nearby tasks and{" "}
+                          <span className="font-semibold text-brand-text">earn</span>{" "}
+                          with NeedFull.
+                        </>
+                      )}
                   </p>
-                  <div className="mt-2.5 flex flex-nowrap items-center gap-1.5">
-                    <Link
-                      href="/become-runner"
-                      className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-400 px-2.5 py-1.5 text-[11px] font-bold text-white shadow-sm transition-all hover:from-amber-600 hover:to-amber-500 active:scale-[0.97] whitespace-nowrap"
-                    >
-                      {isPending ? "View Status" : "Get Started"}
-                      <ChevronRight className="h-3 w-3" />
-                    </Link>
-                    {!isPending && (
-                      <Link
-                        href="/become-runner"
-                        className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-amber-300/50 px-2.5 py-1.5 text-[11px] font-semibold transition-all hover:bg-amber-50 active:scale-[0.97] whitespace-nowrap dark:border-amber-700/50 dark:text-amber-400 dark:hover:bg-amber-950/50"
-                      >
-                        Learn More
-                      </Link>
-                    )}
-                  </div>
                 </div>
-                <div className="shrink-0 -mr-1 -mt-1">
-                  <RunnerIllustration />
-                </div>
+              </div>
+              <div className="relative mt-3 flex gap-1.5">
+                <Link
+                  href="/become-runner"
+                  className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-gold px-2.5 py-2 text-[11px] font-bold text-white shadow-sm transition-all duration-150 hover:brightness-105 active:scale-[0.97] whitespace-nowrap"
+                >
+                  {isPending ? "View Status" : "Start Earning"}
+                </Link>
+                {!isPending && (
+                  <Link
+                    href="/faq"
+                    className="inline-flex items-center justify-center gap-1 rounded-lg border-[1.5px] border-brand/25 px-3 py-2 text-[11px] font-semibold text-brand-text transition-all duration-150 hover:border-brand/50 hover:bg-brand-light/40 active:scale-[0.97] whitespace-nowrap"
+                  >
+                    Learn More
+                  </Link>
+                )}
               </div>
             </div>
           </div>

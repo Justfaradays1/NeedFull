@@ -1,13 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Check, Users } from "lucide-react";
+import {
+  ArrowRight,
+  Clock,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Wallet,
+} from "lucide-react";
 import { useAuthUser } from "@/store";
 
-const PERKS = [
-  "Work when you\u2019re free",
-  "Secure payments",
-  "Build your reputation",
+// WHAT: "Start Earning" promotional card for the dashboard and feed
+// WHY: Benefit-driven CTA with clean hierarchy, restrained color and rich trust
+//      signals — feels like part of the product, not an ad
+
+const STATS = [
+  {
+    icon: Wallet,
+    value: "₦1,850",
+    label: "Avg. payout",
+  },
+  {
+    icon: MapPin,
+    value: "12 tasks",
+    label: "Nearby now",
+  },
+  {
+    icon: Clock,
+    value: "45 min",
+    label: "Avg. completion",
+  },
 ] as const;
 
 export function BecomeRunnerBanner() {
@@ -18,136 +42,89 @@ export function BecomeRunnerBanner() {
   if (user.roles?.includes("runner")) return null;
 
   return (
-    <section className="relative flex min-h-55 max-h-75 overflow-hidden rounded-2xl border border-brand/15 bg-linear-to-br from-brand-dark via-brand to-brand-mid shadow-md md:min-h-0 md:h-60">
-      {/* Subtle ambient glow */}
-      <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-gold/5 blur-2xl" />
-      <div className="pointer-events-none absolute -bottom-8 -right-8 h-32 w-32 rounded-full bg-white/5 blur-xl" />
+    <section className="group relative overflow-hidden rounded-2xl border border-card-border bg-surface shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lifted">
+      {/* ─── Subtle ambient decoration (no illustration) ─── */}
+      <div className="pointer-events-none absolute -left-12 -top-12 h-40 w-40 rounded-full bg-brand/10 blur-2xl transition-opacity duration-300 group-hover:opacity-70" />
+      <div className="pointer-events-none absolute -bottom-14 -right-10 h-44 w-44 rounded-full bg-gold/10 blur-2xl" />
+      <div className="pointer-events-none absolute right-6 top-5 text-gold/30">
+        <Sparkles className="h-6 w-6" />
+      </div>
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/40 to-transparent" />
 
-      {/* ─── Desktop: side-by-side ─── */}
-      <div className="hidden md:flex w-full items-stretch">
-        {/* Text content — ~65% */}
-        <div className="flex flex-1 flex-col justify-center px-6 py-5">
-          <h3 className="font-display text-lg font-extrabold text-on-brand">
-            Become a Runner
+      <div className="relative z-10 flex flex-col gap-6 p-5 sm:p-7 lg:flex-row lg:items-center lg:justify-between">
+        {/* ─── Copy ─── */}
+        <div className="max-w-xl">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-gold-light px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-gold-dark">
+            <Sparkles className="h-3 w-3" />
+            For students who earn
+          </div>
+          <h3 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-[28px]">
+            Start Earning
           </h3>
-
-          <p className="mt-1 max-w-md text-[13px] leading-relaxed text-on-brand/70">
-            Earn money by completing tasks around your campus and community.
+          <p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-300 sm:text-[15px]">
+            Complete nearby tasks and{" "}
+            <span className="font-bold text-brand-text">earn</span> extra income
+            around your <span className="font-bold text-brand-text">campus</span>{" "}
+            with <span className="font-bold text-brand-text">NeedFull</span>.
           </p>
 
-          <div className="mt-2.5 flex flex-wrap gap-x-5 gap-y-1">
-            {PERKS.map((perk) => (
-              <span
-                key={perk}
-                className="flex items-center gap-1.5 text-[12px] text-on-brand/80"
-              >
-                <Check className="h-3 w-3 shrink-0 text-gold" />
-                {perk}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-3">
+          <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
             <Link
               href="/become-runner"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-gold px-4 py-2 text-[13px] font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97]"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gold px-6 py-3 text-sm font-bold text-white shadow-md shadow-gold/25 transition-all duration-150 hover:brightness-105 hover:shadow-lg hover:shadow-gold/30 active:scale-[0.97]"
             >
-              Become a Runner
-              <ArrowRight className="h-3.5 w-3.5" />
+              Start Earning
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/faq"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border-[1.5px] border-brand/25 px-6 py-3 text-sm font-semibold text-brand-text transition-all duration-150 hover:border-brand/50 hover:bg-brand-light/40 active:scale-[0.97]"
+            >
+              How it Works
             </Link>
           </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-medium text-gray-500 dark:text-gray-400">
+            <span className="inline-flex items-center gap-1">
+              <ShieldCheck className="h-3.5 w-3.5 text-brand-text" />
+              Escrow-protected payouts
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Star className="h-3.5 w-3.5 text-gold" />
+              4.8 avg. runner rating
+            </span>
+          </div>
         </div>
 
-        {/* Image area — ~35% */}
-        <div className="relative w-[35%] shrink-0 overflow-hidden">
-          {/* Left-edge gradient fade */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-1/2 bg-linear-to-r from-brand-dark to-transparent" />
-
-          <div
-            className="h-full w-full bg-cover bg-center"
-            style={{ backgroundImage: 'url("/images/runner-placeholder.jpg")' }}
-            role="img"
-            aria-label="Student runner"
-          >
-            <div
-              className="flex h-full w-full items-center justify-center bg-linear-to-br from-brand/70 to-brand-dark/80 bg-cover bg-center"
-              style={{
-                backgroundImage:
-                  "radial-gradient(ellipse at 30% 50%, rgba(234,163,37,0.1) 0%, transparent 60%)",
-              }}
-            >
-              <div className="flex flex-col items-center gap-2 p-4 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm">
-                  <Users className="h-6 w-6 text-gold" />
-                </div>
-                <p className="text-xs font-medium text-on-brand/60">
-                  Student Runner
-                </p>
-              </div>
+        {/* ─── Trust / earnings cluster ─── */}
+        <div className="lg:w-72 lg:shrink-0">
+          <div className="rounded-xl border border-card-border bg-brand-light/20 p-4 transition-colors duration-300 group-hover:bg-brand-light/30">
+            <p className="font-display text-2xl font-extrabold tracking-tight text-brand-text">
+              ₦250,000+
+            </p>
+            <p className="mt-0.5 text-xs font-medium text-gray-600 dark:text-gray-300">
+              earned by students this week
+            </p>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {STATS.map((stat) => {
+                const Icon = stat.icon;
+                return (
+                  <div
+                    key={stat.label}
+                    className="rounded-lg border border-card-border bg-surface px-2 py-2 text-center"
+                  >
+                    <Icon className="mx-auto h-3.5 w-3.5 text-gold" />
+                    <p className="mt-1 text-[11px] font-bold text-gray-900 dark:text-white">
+                      {stat.value}
+                    </p>
+                    <p className="text-[9px] leading-tight text-gray-500 dark:text-gray-400">
+                      {stat.label}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* ─── Mobile: stacked ─── */}
-      <div className="flex md:hidden flex-col">
-        {/* Image strip */}
-        <div className="relative h-28 overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-brand-dark via-brand-dark/60 to-transparent z-10" />
-          <div
-            className="h-full w-full bg-cover bg-position-[center_35%]"
-            style={{ backgroundImage: 'url("/images/runner-placeholder.jpg")' }}
-            role="img"
-            aria-label="Student runner"
-          >
-            <div
-              className="flex h-full w-full items-center justify-center bg-linear-to-br from-brand/60 to-brand-dark/70"
-              style={{
-                backgroundImage:
-                  "radial-gradient(ellipse at 30% 50%, rgba(234,163,37,0.08) 0%, transparent 60%)",
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm">
-                  <Users className="h-5 w-5 text-gold" />
-                </div>
-                <p className="text-xs font-medium text-on-brand/70">
-                  Student Runner
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="px-4 py-3 space-y-2.5">
-          <h3 className="font-display text-base font-extrabold text-on-brand">
-            Become a Runner
-          </h3>
-
-          <p className="text-[13px] leading-relaxed text-on-brand/70">
-            Earn money on your own schedule.
-          </p>
-
-          <div className="flex flex-wrap gap-x-4 gap-y-1">
-            {PERKS.map((perk) => (
-              <span
-                key={perk}
-                className="flex items-center gap-1.5 text-[12px] text-on-brand/80"
-              >
-                <Check className="h-3 w-3 shrink-0 text-gold" />
-                {perk}
-              </span>
-            ))}
-          </div>
-
-          <Link
-            href="/become-runner"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-gold px-4 py-2 text-[13px] font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97]"
-          >
-            Become a Runner
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
         </div>
       </div>
     </section>

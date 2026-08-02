@@ -337,8 +337,8 @@ export default function ProfilePage() {
                       <UserCheck className="h-5 w-5 text-brand-text" />
                     </div>
                     <div className="text-left">
-                      <p className="text-sm font-bold text-brand-text">Become a Runner</p>
-                      <p className="text-xs text-gray-600">Earn money by completing tasks</p>
+                      <p className="text-sm font-bold text-brand-text">Start Earning</p>
+                      <p className="text-xs text-gray-600">Complete nearby tasks for extra income</p>
                     </div>
                   </div>
                   <ChevronRight className="h-5 w-5 text-brand-text" />
