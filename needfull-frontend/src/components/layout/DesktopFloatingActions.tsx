@@ -5,7 +5,7 @@
 "use client";
 
 import Link from "next/link";
-import { MessageSquare, Plus } from "lucide-react";
+import { MessageCircle, Plus } from "lucide-react";
 
 export function DesktopFloatingActions({
   pathname,
@@ -21,13 +21,13 @@ export function DesktopFloatingActions({
       {/* ─── Messages (laptop+) ─── */}
       <Link
         href="/chat"
-        className="group relative hidden items-center rounded-full border border-slate-200/70 bg-surface px-4 py-3 text-brand-text shadow-lifted transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-95 lg:flex"
+        className="group relative hidden h-16 w-16 items-center justify-center rounded-full border border-slate-200/70 bg-surface text-brand-text shadow-lifted transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-95 lg:flex"
         aria-label="Open messages"
       >
         <span className="relative">
-          <MessageSquare className="h-5 w-5" />
+          <MessageCircle className="h-7 w-7" />
           {unreadCount > 0 && (
-            <span className="absolute -right-2.5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold leading-none text-white">
+            <span className="absolute -right-3 -top-2.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1.5 text-[10px] font-bold leading-none text-white">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
