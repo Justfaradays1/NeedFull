@@ -20,13 +20,19 @@ interface DepositUser {
 }
 
 interface Deposit {
-  id: string; user_id: string; amount_kobo: number; amount_naira: number;
+  id: string; user_id: string; amount_kobo: number; amount_naira: number | null;
   bank_reference: string; sender_bank: string; sender_name: string;
   receipt_url: string | null; status: string;
   wallet_tx_id: string | null; reviewed_by: string | null;
   reviewed_at: string | null; rejection_reason: string | null;
   created_at: string; updated_at: string;
   user: DepositUser;
+}
+
+// WHAT: Display amount in naira, falling back to kobo for legacy rows created
+// before the amount_naira column existed (otherwise NULL crashes the page)
+function depositNaira(d: Deposit): number {
+  return d.amount_naira ?? d.amount_kobo / 100;
 }
 
 function timeAgo(dateStr: string): string {
@@ -156,7 +162,7 @@ export default function AdminDepositsPage() {
               <div className="flex items-start justify-between gap-2">
                 {userRow(d)}
                 <div className="text-right shrink-0">
-                  <p className="font-display text-lg font-black text-brand-text">₦{d.amount_naira.toLocaleString()}</p>
+                  <p className="font-display text-lg font-black text-brand-text">₦{depositNaira(d).toLocaleString()}</p>
                   <p className="text-[10px] text-gray-400">{timeAgo(d.created_at)}</p>
                 </div>
               </div>
@@ -239,14 +245,14 @@ export default function AdminDepositsPage() {
                   <div className="rounded-xl bg-amber-50 p-3 text-xs text-amber-800">
                     <div className="flex items-start gap-2">
                       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-                      <p>This will add <strong>₦{d.amount_naira.toLocaleString()}</strong> to <strong>{d.user.fullName}</strong>&apos;s wallet. Have you verified this transfer on your bank dashboard?</p>
+                      <p>This will add <strong>₦{depositNaira(d).toLocaleString()}</strong> to <strong>{d.user.fullName}</strong>&apos;s wallet. Have you verified this transfer on your bank dashboard?</p>
                     </div>
                   </div>
                   <div className="mt-3 space-y-1 text-xs text-gray-500">
                     <p><strong>User:</strong> {d.user.fullName} ({d.user.email})</p>
                     <p><strong>Reference:</strong> {d.bank_reference}</p>
                     <p><strong>Bank:</strong> {d.sender_bank}</p>
-                    <p><strong>Amount:</strong> ₦{d.amount_naira.toLocaleString()}</p>
+                    <p><strong>Amount:</strong> ₦{depositNaira(d).toLocaleString()}</p>
                   </div>
                   <div className="mt-5 flex gap-2">
                     <button type="button" onClick={() => setConfirmId(null)} className="tap-target flex-1 rounded-xl border border-gray-200 py-3 text-sm font-bold text-gray-600">Cancel</button>
