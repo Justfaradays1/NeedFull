@@ -210,7 +210,7 @@ export async function confirmManualTransfer(
           "confirmed",
           adminUserId,
           now,
-          wallet.id, // wallet.id is the wallet transaction ID (from wallet_transactions table)
+          wallet.walletTxId ?? null, // wallet transaction id (FK to wallet_transactions.id)
           now,
           transferId,
         ],

@@ -13,6 +13,12 @@ interface Wallet {
   balance_kobo: number;
   escrow_kobo: number;
   updated_at: string;
+  // WHAT: Id of the wallet_transactions row created by this operation (or the
+  // matching existing row when the idempotency key hit). Undefined when no
+  // transaction row was created.
+  // WHY: Callers like confirmManualTransfer store it as wallet_tx_id (FK to
+  // wallet_transactions.id) — the wallet id itself is NOT a valid FK value.
+  walletTxId?: string;
 }
 
 // WHAT: Helper to alias wallet DB columns (balance/escrow → balance_kobo/escrow_kobo)
@@ -59,7 +65,7 @@ export async function creditWallet(
       if (existing.rows.length > 0) {
         // WHAT: Return existing wallet state on duplicate request
         // WHY: Idempotent operation - same result as first request
-        return walletRow;
+        return { ...walletRow, walletTxId: existing.rows[0].id };
       }
     }
 
@@ -74,11 +80,12 @@ export async function creditWallet(
 
     // WHAT: Record transaction for audit trail
     // WHY: Maintain complete history of all wallet movements
-    await client.query(
+    const txResult = await client.query<{ id: string }>(
       `INSERT INTO wallet_transactions 
        (wallet_id, type, amount, balance_before, balance_after, 
         reference, idempotency_key, task_id, note, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+       RETURNING id`,
       [
         walletRow.id,
         type,
@@ -92,7 +99,7 @@ export async function creditWallet(
       ],
     );
 
-    return updated.rows[0];
+    return { ...updated.rows[0], walletTxId: txResult.rows[0]?.id };
   } catch (error) {
     throw new Error(
       `Failed to credit wallet for user ${userId}: ${error instanceof Error ? error.message : "Unknown error"}`,
