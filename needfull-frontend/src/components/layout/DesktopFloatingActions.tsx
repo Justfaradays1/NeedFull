@@ -21,7 +21,7 @@ export function DesktopFloatingActions({
       {/* ─── Messages (laptop+) ─── */}
       <Link
         href="/chat"
-        className="group relative hidden h-16 w-16 items-center justify-center rounded-full border-2 border-gold bg-surface text-brand-text shadow-lg shadow-gold/25 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-gold/30 active:scale-95 lg:flex"
+        className="group relative hidden h-16 w-16 items-center justify-center rounded-full border-2 border-amber-300 bg-surface text-brand-text shadow-xl shadow-amber-300/45 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-amber-300/55 active:scale-95 lg:flex"
         aria-label="Open messages"
       >
         <span className="relative">
