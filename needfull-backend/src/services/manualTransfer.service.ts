@@ -109,31 +109,41 @@ export async function submitManualTransfer(
 
     // WHAT: Notify all admins about new pending transfer
     // WHY: Admins can review and confirm/reject in timely manner
-    const adminIds = await getAdminUserIds();
-    if (adminIds.length > 0) {
-      await notifyMany(adminIds, {
-        type: "manual_transfer_pending",
-        title: "Manual Transfer Received",
-        body: `New manual transfer of ₦${params.amountNaira.toLocaleString()} from ${params.senderBank} needs verification`,
-        taskId: undefined,
-        conversationId: undefined,
-        actorId: userId,
-      });
+    // SAFETY: Notification failure must never fail the transfer record — it is already saved
+    try {
+      const adminIds = await getAdminUserIds();
+      if (adminIds.length > 0) {
+        await notifyMany(adminIds, {
+          type: "manual_transfer_pending",
+          title: "Manual Transfer Received",
+          body: `New manual transfer of ₦${params.amountNaira.toLocaleString()} from ${params.senderBank} needs verification`,
+          taskId: undefined,
+          conversationId: undefined,
+          actorId: userId,
+        });
+      }
+    } catch (notifyError) {
+      console.warn("[ManualTransfer] Admin notification failed (non-fatal):", notifyError);
     }
 
     // WHAT: Send user email confirming receipt
     // WHY: User knows transfer was registered and is being verified
-    const user = await queryOne<{ full_name: string; email: string }>(
-      `SELECT full_name, email FROM users WHERE id = $1`,
-      [userId],
-    );
-
-    if (user) {
-      await sendManualTransferReceived(
-        user.email,
-        user.full_name,
-        params.amountNaira,
+    // SAFETY: Email failure must never fail the transfer record — it is already saved
+    try {
+      const user = await queryOne<{ full_name: string; email: string }>(
+        `SELECT full_name, email FROM users WHERE id = $1`,
+        [userId],
       );
+
+      if (user) {
+        await sendManualTransferReceived(
+          user.email,
+          user.full_name,
+          params.amountNaira,
+        );
+      }
+    } catch (emailError) {
+      console.warn("[ManualTransfer] Receipt email failed (non-fatal):", emailError);
     }
 
     // WHAT: Return created transfer record
@@ -214,29 +224,39 @@ export async function confirmManualTransfer(
 
     // WHAT: Notify user and admins of confirmation
     // WHY: User needs to know funds are available, admins for audit
-    await notifyUser(result.transfer.user_id, {
-      type: "manual_transfer_confirmed",
-      title: "Transfer Confirmed",
-      body: `Your manual transfer of ₦${result.transfer.amount_naira.toLocaleString()} has been confirmed and added to your wallet`,
-      taskId: undefined,
-      conversationId: undefined,
-      actorId: adminUserId,
-    });
+    // SAFETY: Notification failure must never fail the credit — it is already committed
+    try {
+      await notifyUser(result.transfer.user_id, {
+        type: "manual_transfer_confirmed",
+        title: "Transfer Confirmed",
+        body: `Your manual transfer of ₦${result.transfer.amount_naira.toLocaleString()} has been confirmed and added to your wallet`,
+        taskId: undefined,
+        conversationId: undefined,
+        actorId: adminUserId,
+      });
+    } catch (notifyError) {
+      console.warn("[ManualTransfer] Confirmation notification failed (non-fatal):", notifyError);
+    }
 
     // WHAT: Send user confirmation email
     // WHY: Email confirmation outside of app
-    const user = await queryOne<{ full_name: string; email: string }>(
-      `SELECT full_name, email FROM users WHERE id = $1`,
-      [result.transfer.user_id],
-    );
-
-    if (user) {
-      await sendTransferConfirmed(
-        user.email,
-        user.full_name,
-        result.transfer.amount_naira,
-        result.wallet.balance_kobo / 100, // new balance in Naira
+    // SAFETY: Email failure must never fail the credit — it is already committed
+    try {
+      const user = await queryOne<{ full_name: string; email: string }>(
+        `SELECT full_name, email FROM users WHERE id = $1`,
+        [result.transfer.user_id],
       );
+
+      if (user) {
+        await sendTransferConfirmed(
+          user.email,
+          user.full_name,
+          result.transfer.amount_naira,
+          result.wallet.balance_kobo / 100, // new balance in Naira
+        );
+      }
+    } catch (emailError) {
+      console.warn("[ManualTransfer] Confirmation email failed (non-fatal):", emailError);
     }
 
     return {
@@ -294,14 +314,19 @@ export async function rejectManualTransfer(
 
     // WHAT: Notify user of rejection
     // WHY: User needs to know transfer was declined
-    await notifyUser(updated.user_id, {
-      type: "manual_transfer_rejected",
-      title: "Transfer Rejected",
-      body: `Your manual transfer of ₦${updated.amount_naira.toLocaleString()} was not verified. Reason: ${reason}`,
-      taskId: undefined,
-      conversationId: undefined,
-      actorId: adminUserId,
-    });
+    // SAFETY: Notification failure must never fail the rejection — it is already committed
+    try {
+      await notifyUser(updated.user_id, {
+        type: "manual_transfer_rejected",
+        title: "Transfer Rejected",
+        body: `Your manual transfer of ₦${updated.amount_naira.toLocaleString()} was not verified. Reason: ${reason}`,
+        taskId: undefined,
+        conversationId: undefined,
+        actorId: adminUserId,
+      });
+    } catch (notifyError) {
+      console.warn("[ManualTransfer] Rejection notification failed (non-fatal):", notifyError);
+    }
 
     // WHAT: Send user rejection email
     // WHY: Email notification outside of app

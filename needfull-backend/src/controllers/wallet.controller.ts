@@ -61,9 +61,33 @@ export async function submitManualTransferHandler(req: Request, res: Response): 
     res.status(201).json({ success: true, message: "Transfer submitted. Admin will verify within 1-2 hours on business days.", data: { transferId: transfer.id, status: transfer.status, amount: { kobo: transfer.amount_kobo, naira: transfer.amount_naira }, bankReference: transfer.bank_reference, createdAt: transfer.created_at } });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Failed to submit transfer";
-    if (msg.includes("already pending") || msg.includes("already confirmed")) { res.status(409).json({ success: false, message: msg }); return; }
-    console.error("[Wallet] submitManualTransferHandler error:", error);
-    res.status(400).json({ success: false, message: msg });
+
+    // WHAT: Known business-rule failures → meaningful 4xx responses (safe to show users)
+    // WHY: Duplicate submissions and amount rejections are expected flows, not server faults
+    if (msg.includes("already pending or confirmed")) {
+      res.status(409).json({ success: false, message: msg });
+      return;
+    }
+    if (msg.includes("Amount must be greater than")) {
+      res.status(400).json({ success: false, message: msg });
+      return;
+    }
+
+    // WHAT: Unexpected/system errors (DB failures, email failures, etc.) → 500, never leak internals
+    // WHY: A server fault is not a user-input problem; users get a generic message, devs get the full log
+    console.error("[Wallet] submitManualTransferHandler error:", {
+      userId: req.user?.id,
+      body: req.body,
+      error:
+        error instanceof Error
+          ? { name: error.name, message: error.message, stack: error.stack }
+          : error,
+    });
+    res.status(500).json({
+      success: false,
+      message:
+        "Something went wrong while submitting your transfer. Please try again in a moment.",
+    });
   }
 }
 

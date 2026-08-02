@@ -21,11 +21,22 @@ router.get("/transactions",
 );
 
 router.post("/fund/manual",
-  body("amountNaira").isFloat({ min: 100 }),
-  body("bankReference").trim().notEmpty(),
-  body("senderBank").trim().notEmpty(),
-  body("senderName").trim().notEmpty(),
-  body("receiptUrl").optional().isURL(),
+  body("amountNaira")
+    .isFloat({ min: 100 })
+    .withMessage("Amount must be at least N100"),
+  body("bankReference")
+    .trim()
+    .notEmpty()
+    .withMessage("Bank reference is required"),
+  body("senderBank")
+    .trim()
+    .notEmpty()
+    .withMessage("Select the bank you sent from"),
+  body("senderName")
+    .trim()
+    .notEmpty()
+    .withMessage("Enter the name on the sending account"),
+  body("receiptUrl").optional().isURL().withMessage("Receipt URL is invalid"),
   validate,
   wallet.submitManualTransferHandler,
 );
