@@ -61,7 +61,7 @@ export function CategorySearch() {
             <li key={cat.name}>
               <Link
                 href={`/tasks/create?category=${encodeURIComponent(cat.name)}`}
-                className="flex items-center gap-2.5 rounded-xl border border-card-border bg-surface px-2.5 py-2.5 text-[13px] font-semibold text-gray-800 transition-all duration-150 hover:-translate-y-px hover:border-brand/30 hover:bg-brand-light/40 hover:shadow-sm active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 dark:text-white"
+                className="flex items-center gap-2.5 rounded-xl border border-card-border bg-surface px-2.5 py-2.5 text-[13px] font-semibold text-gray-700 transition-all duration-150 hover:-translate-y-px hover:border-brand/30 hover:bg-brand-light/40 hover:shadow-sm active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 dark:text-white"
               >
                 <span
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm shadow-inner"

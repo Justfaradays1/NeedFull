@@ -103,7 +103,7 @@ function SupportCard() {
       <div className="space-y-2">
         <Link
           href="/faq"
-          className="flex items-center gap-3 rounded-xl border border-card-border bg-surface px-3 py-2.5 text-sm font-medium text-gray-800 transition-all hover:border-brand/30 hover:bg-brand-light/40 dark:text-white"
+          className="flex items-center gap-3 rounded-xl border border-card-border bg-surface px-3 py-2.5 text-sm font-medium text-gray-700 transition-all hover:border-brand/30 hover:bg-brand-light/40 dark:text-white"
         >
           <LifeBuoy className="h-4 w-4 shrink-0 text-brand-text" />
           Help & Support
@@ -111,7 +111,7 @@ function SupportCard() {
         </Link>
         <Link
           href="/settings"
-          className="flex items-center gap-3 rounded-xl border border-card-border bg-surface px-3 py-2.5 text-sm font-medium text-gray-800 transition-all hover:border-brand/30 hover:bg-brand-light/40 dark:text-white"
+          className="flex items-center gap-3 rounded-xl border border-card-border bg-surface px-3 py-2.5 text-sm font-medium text-gray-700 transition-all hover:border-brand/30 hover:bg-brand-light/40 dark:text-white"
         >
           <WalletIcon className="h-4 w-4 shrink-0 text-brand-text" />
           Payment Settings
