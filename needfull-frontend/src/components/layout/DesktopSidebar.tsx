@@ -477,28 +477,38 @@ export function DesktopSidebar({
             />
           </button>
 
+          {/* WHY: left offset pads the dropdown's left edge flush to the
+              avatar (md: 16px, lg: 20px) so the menu grows out of the avatar
+              instead of the sidebar edge; caret bridges the gap at the avatar's
+              center (16px from the dropdown's left edge at both breakpoints) */}
           <FloatingMenu
             open={profileOpen}
             onClose={() => setProfileOpen(false)}
             anchorRef={profileRef}
             ariaLabel="Profile menu"
-            className="bottom-full left-0 mb-2 w-64 lg:left-2"
+            className="bottom-full left-0 mb-2 w-64 md:left-4 lg:left-5"
           >
-            <div className="border-b border-gray-100 px-3 py-2.5 dark:border-white/10">
-              <p className="truncate text-[15px] font-bold text-gray-900 dark:text-white">
-                {user?.fullName || "Unnamed user"}
-              </p>
-              <p className="truncate text-xs text-gray-500 dark:text-gray-400">
-                {user?.email}
-              </p>
-            </div>
-            <div className="pt-1.5">
-              <MenuLink href="/profile" icon={User} label="View Profile" onNavigate={() => setProfileOpen(false)} />
-              <MenuLink href="/settings" icon={Settings} label="Settings" onNavigate={() => setProfileOpen(false)} />
-              <MenuLink href="/wallet" icon={Wallet} label="Wallet" onNavigate={() => setProfileOpen(false)} />
-              <div className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />
-              <MenuLink href="/" icon={RefreshCcw} label="Switch Account" disabled />
-              <MenuLink href="/login" icon={LogOut} label="Logout" danger onNavigate={logout} />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute bottom-[-7px] left-[11px] h-2.5 w-2.5 rotate-45 rounded-[2px] border-b border-r border-card-border bg-surface"
+            />
+            <div className="max-h-[min(70vh,480px)] overflow-y-auto sidebar-scroll">
+              <div className="border-b border-gray-100 px-3 py-2.5 dark:border-white/10">
+                <p className="truncate text-[15px] font-bold text-gray-900 dark:text-white">
+                  {user?.fullName || "Unnamed user"}
+                </p>
+                <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                  {user?.email}
+                </p>
+              </div>
+              <div className="pt-1.5">
+                <MenuLink href="/profile" icon={User} label="View Profile" onNavigate={() => setProfileOpen(false)} />
+                <MenuLink href="/settings" icon={Settings} label="Settings" onNavigate={() => setProfileOpen(false)} />
+                <MenuLink href="/wallet" icon={Wallet} label="Wallet" onNavigate={() => setProfileOpen(false)} />
+                <div className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />
+                <MenuLink href="/" icon={RefreshCcw} label="Switch Account" disabled />
+                <MenuLink href="/login" icon={LogOut} label="Logout" danger onNavigate={logout} />
+              </div>
             </div>
           </FloatingMenu>
         </div>
