@@ -260,7 +260,7 @@ export function DesktopSidebar({
 
   return (
     <aside
-      className="hidden md:flex md:shrink-0 md:sticky md:top-0 md:self-start md:border-r md:border-gray-200 md:bg-surface/95 md:backdrop-blur-xl"
+      className="hidden md:flex md:shrink-0 md:sticky md:top-0 md:self-start md:border-r md:border-gray-200 md:bg-surface/95 md:backdrop-blur-xl md:z-40"
       style={{ height: "100dvh" }}
     >
       <div className="flex h-full w-full flex-col md:w-20 lg:w-[280px] xl:w-80">
