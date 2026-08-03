@@ -285,7 +285,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       />
 
       {/* ─── Main Content Area ─── */}
-      <div className="flex flex-col flex-1 min-w-0" style={{ height: "100dvh" }}>
+      <div className="flex flex-col flex-1 min-w-0">
         <AuthGuard>
           <div className="glass-dark sticky top-0 z-30">
             <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -363,10 +363,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             markAllAsRead={markAllAsRead}
           />
 
-          <div
-            className="flex-1 overflow-y-auto pb-nav md:pb-0"
-            style={{ minHeight: 0 }}
-          >
+          <div className="pb-nav md:pb-0">
             {children}
           </div>
         </AuthGuard>

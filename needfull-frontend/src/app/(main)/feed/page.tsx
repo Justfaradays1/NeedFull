@@ -262,26 +262,15 @@ export default function FeedPage() {
             />
           </div>
 
-          {/* Row 3: Quick Actions (4) + Categories (8) */}
+          {/* Row 3: Quick Actions (3) + Active Tasks (9) */}
           <div className="col-span-3">
             <QuickActions />
           </div>
           <div className="col-span-9">
-            <CategoryShortcuts />
-          </div>
-
-          {/* Row 4: Active Tasks (8) + Recommended Runners (4) */}
-          <div className="col-span-8 xl:col-span-12">
             <ActiveTasksSection tasks={allTasks} loading={tasksLoading} />
           </div>
-          <div className="col-span-4 xl:hidden">
-            <RecommendedRunners runners={[]} loading={false} />
-            <div className="mt-4">
-              <NearbyActivity />
-            </div>
-          </div>
 
-          {/* Row 5: Recent Activity (8) + Insights (4) */}
+          {/* Row 4: Recent Activity (8) + Insights (4) */}
           <div className="col-span-8 xl:col-span-12">
             <RecentActivity activities={activities} loading={tasksLoading} />
           </div>
@@ -292,7 +281,7 @@ export default function FeedPage() {
             </div>
           </div>
 
-          {/* Row 6: Callout */}
+          {/* Row 5: Callout */}
           <div className="col-span-12">
             <Callout variant="tip">
               Complete your profile with a bio and photo to build trust and get more task opportunities.

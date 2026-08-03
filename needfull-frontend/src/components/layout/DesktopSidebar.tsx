@@ -184,11 +184,11 @@ function MenuLink({
       onClick={onNavigate}
       className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-semibold transition-colors duration-150 active:scale-[0.99] ${
         danger
-          ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10"
-          : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-white/10"
+          ? "text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
+          : "text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10"
       }`}
     >
-      <Icon className="h-5 w-5 shrink-0 text-gray-500" />
+      <Icon className="h-5 w-5 shrink-0 text-gray-600 dark:text-gray-300" />
       <span>{label}</span>
     </Link>
   );
@@ -232,6 +232,19 @@ export function DesktopSidebar({
     window.location.href = "/login";
   };
 
+  // WHAT: Shared nav item spec — every item (main nav, More, profile) uses the
+  // exact same height, padding, icon size and typography so the sidebar reads
+  // as one design system instead of individual buttons
+  // WHAT: Shared nav item spec — only the ACTIVE item gets the green pill;
+  // hover stays a neutral background. The pill color is a fixed green tint
+  // (identical in light and dark mode), and link text color never changes.
+  const NAV_BASE =
+    "flex h-11 items-center gap-3.5 rounded-xl text-[17px] transition-all duration-200 md:justify-center lg:justify-start lg:px-4 active:scale-[0.98]";
+  const NAV_TEXT = "text-black dark:text-white";
+  const NAV_INACTIVE = `${NAV_TEXT} font-semibold hover:bg-gray-100 dark:hover:bg-white/10`;
+  const NAV_ACTIVE =
+    `bg-[rgba(26,107,74,0.12)] font-bold shadow-sm ring-1 ring-[rgba(26,107,74,0.22)] ${NAV_TEXT}`;
+
   const moreItems = [
     { href: "/wallet", label: "Wallet", icon: Wallet },
     { href: "/tasks", label: "My Tasks", icon: ClipboardList },
@@ -247,7 +260,7 @@ export function DesktopSidebar({
 
   return (
     <aside
-      className="hidden md:flex md:shrink-0 md:border-r md:border-gray-200 md:bg-surface/95 md:backdrop-blur-xl"
+      className="hidden md:flex md:shrink-0 md:sticky md:top-0 md:self-start md:border-r md:border-gray-200 md:bg-surface/95 md:backdrop-blur-xl"
       style={{ height: "100dvh" }}
     >
       <div className="flex h-full w-full flex-col md:w-20 lg:w-[280px] xl:w-80">
@@ -273,22 +286,15 @@ export function DesktopSidebar({
                 key={item.href}
                 href={item.href}
                 title={item.label}
-                className={`group relative flex items-center gap-4 rounded-xl py-3 transition-all duration-150 active:scale-[0.98] md:justify-center lg:justify-start lg:px-4 ${
-                  active
-                    ? "bg-brand-light/70 font-bold text-brand shadow-sm ring-1 ring-brand/20"
-                    : "font-semibold text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-white/10"
+                className={`group relative ${NAV_BASE} ${
+                  active ? NAV_ACTIVE : NAV_INACTIVE
                 }`}
                 aria-current={active ? "page" : undefined}
               >
-                {active && (
-                  <span className="absolute left-0 top-1/2 hidden h-6 w-1 -translate-y-1/2 rounded-r-full bg-brand lg:block" />
-                )}
                 <span className="relative">
                   <NavIcon
                     icon={item.icon}
-                    className={`h-6 w-6 shrink-0 transition-colors duration-150 ${
-                      active ? "text-brand-text" : "text-gray-500"
-                    }`}
+                    className="h-5 w-5 shrink-0 text-gray-600 dark:text-gray-300"
                   />
                   {showBadge && (
                     <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold leading-none text-white">
@@ -296,7 +302,7 @@ export function DesktopSidebar({
                     </span>
                   )}
                 </span>
-                <span className="hidden text-[17px] lg:block">{item.label}</span>
+                <span className="hidden lg:block">{item.label}</span>
               </Link>
             );
           })}
@@ -306,7 +312,7 @@ export function DesktopSidebar({
             <Link
               href="/tasks/create"
               title="Post a task"
-              className={`flex items-center rounded-full bg-gold font-bold text-white shadow-md shadow-gold/25 transition-all duration-150 hover:brightness-105 hover:shadow-lg active:scale-[0.97] md:mx-auto md:mt-3 md:h-12 md:w-12 lg:mx-0 lg:h-auto lg:w-full lg:justify-center lg:gap-2 lg:py-3.5 lg:text-[17px]`}
+              className={`flex items-center rounded-full bg-gold font-bold text-white shadow-md shadow-gold/25 transition-all duration-150 hover:brightness-105 hover:shadow-lg active:scale-[0.97] md:mx-auto md:mt-3 md:h-12 md:w-12 lg:mx-0 lg:h-11 lg:w-full lg:justify-center lg:gap-2 lg:px-4 lg:text-[17px]`}
             >
               <Plus className="h-6 w-6 md:h-5 md:w-5" />
               <span className="hidden lg:block">Post</span>
@@ -324,18 +330,12 @@ export function DesktopSidebar({
               title="More"
               aria-expanded={moreOpen}
               aria-haspopup="menu"
-              className={`flex items-center gap-4 rounded-xl py-3 transition-all duration-150 active:scale-[0.98] md:justify-center lg:justify-start lg:px-4 ${
-                moreOpen
-                  ? "bg-brand-light/70 font-bold text-brand shadow-sm ring-1 ring-brand/20"
-                  : "font-semibold text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-white/10"
+              className={`group relative ${NAV_BASE} ${
+                moreOpen ? NAV_ACTIVE : NAV_INACTIVE
               }`}
             >
-              <MoreHorizontal
-                className={`h-6 w-6 shrink-0 transition-colors duration-150 ${
-                  moreOpen ? "text-brand-text" : "text-gray-500"
-                }`}
-              />
-              <span className="hidden text-[17px] lg:block">More</span>
+              <MoreHorizontal className="h-5 w-5 shrink-0 text-gray-600 dark:text-gray-300" />
+              <span className="hidden lg:block">More</span>
             </button>
 
             <FloatingMenu

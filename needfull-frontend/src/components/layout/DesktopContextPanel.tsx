@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { useAuthUser } from "@/store";
 import { formatCurrency } from "@/lib/format";
-import { CategoryShortcuts } from "@/components/dashboard/post/CategoryShortcuts";
+import { CategorySearch } from "@/components/dashboard/post/CategorySearch";
 import { NearbyActivity } from "@/components/dashboard/post/NearbyActivity";
 import { QuickActions } from "@/components/dashboard/post/QuickActions";
 import { SmartInsights } from "@/components/dashboard/post/SmartInsights";
@@ -23,7 +23,7 @@ import { SmartInsights } from "@/components/dashboard/post/SmartInsights";
 type WidgetKey = "wallet" | "categories" | "nearby" | "insights" | "quick" | "support";
 
 const WIDGET_TITLES: Partial<Record<WidgetKey, string>> = {
-  categories: "Quick Post by Category",
+  categories: "Browse Categories",
   nearby: "Around Campus",
   insights: "Smart Insights",
   quick: "Quick Actions",
@@ -39,7 +39,7 @@ function PanelCard({
   return (
     <section className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
       {title ? (
-        <h3 className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">
+        <h3 className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-600 dark:text-gray-300">
           {title}
         </h3>
       ) : null}
@@ -103,7 +103,7 @@ function SupportCard() {
       <div className="space-y-2">
         <Link
           href="/faq"
-          className="flex items-center gap-3 rounded-xl border border-card-border bg-surface px-3 py-2.5 text-sm font-medium text-gray-700 transition-all hover:border-brand/30 hover:bg-brand-light/20 dark:text-gray-200"
+          className="flex items-center gap-3 rounded-xl border border-card-border bg-surface px-3 py-2.5 text-sm font-medium text-gray-800 transition-all hover:border-brand/30 hover:bg-brand-light/40 dark:text-white"
         >
           <LifeBuoy className="h-4 w-4 shrink-0 text-brand-text" />
           Help & Support
@@ -111,7 +111,7 @@ function SupportCard() {
         </Link>
         <Link
           href="/settings"
-          className="flex items-center gap-3 rounded-xl border border-card-border bg-surface px-3 py-2.5 text-sm font-medium text-gray-700 transition-all hover:border-brand/30 hover:bg-brand-light/20 dark:text-gray-200"
+          className="flex items-center gap-3 rounded-xl border border-card-border bg-surface px-3 py-2.5 text-sm font-medium text-gray-800 transition-all hover:border-brand/30 hover:bg-brand-light/40 dark:text-white"
         >
           <WalletIcon className="h-4 w-4 shrink-0 text-brand-text" />
           Payment Settings
@@ -125,7 +125,7 @@ function SupportCard() {
 // WHAT: Route-prefix → widget sets; first matching prefix wins
 // WHY: Keeps panel curated per page; unknown routes get a sensible default
 const REGISTRY: { match: string; widgets: WidgetKey[] }[] = [
-  { match: "/feed", widgets: ["wallet", "nearby", "insights", "support"] },
+  { match: "/feed", widgets: ["wallet", "categories"] },
   { match: "/explore", widgets: ["categories", "nearby", "support"] },
   { match: "/tasks/create", widgets: [] },
   { match: "/tasks/", widgets: ["wallet", "quick", "insights"] },
@@ -150,10 +150,13 @@ export function DesktopContextPanel({ pathname }: { pathname: string }) {
 
   return (
     <aside
-      className="hidden xl:flex xl:w-80 xl:shrink-0 xl:flex-col xl:border-l xl:border-gray-200 xl:bg-surface/60 xl:backdrop-blur-xl"
+      className="hidden xl:flex xl:w-80 xl:shrink-0 xl:sticky xl:top-0 xl:self-start xl:flex-col xl:border-l xl:border-gray-200 xl:bg-surface/60 xl:backdrop-blur-xl"
       style={{ height: "100dvh" }}
       aria-label="Page context panel"
     >
+      {/* WHAT: Internal scroll is a fallback only — it only engages when panel
+         content exceeds the viewport, keeping a single browser scrollbar
+         in the common case */}
       <div className="sidebar-scroll flex-1 space-y-4 overflow-y-auto px-4 py-4">
         {widgets.map((key) => {
           switch (key) {
@@ -162,7 +165,7 @@ export function DesktopContextPanel({ pathname }: { pathname: string }) {
             case "categories":
               return (
                 <PanelCard key={key} title={WIDGET_TITLES.categories}>
-                  <CategoryShortcuts />
+                  <CategorySearch />
                 </PanelCard>
               );
             case "nearby":

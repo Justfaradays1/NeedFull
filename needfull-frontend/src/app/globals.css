@@ -48,7 +48,7 @@
 :root {
   --color-background: #ffffff;
   --color-foreground: #171717;
-  --color-placeholder: #9ca3af;
+  --color-placeholder: #6b7280;
   --color-border: #e5e7eb;
   --color-muted: #6b7280;
   --color-surface-2: #f0f2f0;
@@ -100,7 +100,7 @@
 .dark {
   --color-background: #0a0a0b;
   --color-foreground: #f5f5f4;
-  --color-placeholder: #6b7280;
+  --color-placeholder: #9ca3af;
   --color-border: #27272a;
   --color-muted: #a1a1aa;
   --clr-surface: #18181b;
