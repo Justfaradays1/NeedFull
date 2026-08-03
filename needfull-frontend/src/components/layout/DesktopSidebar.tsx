@@ -1,15 +1,36 @@
-// WHAT: Desktop/tablet sidebar for the main app shell
-// WHY: md-lg renders an icon rail (hover reveals labels), lg+ renders the full
-//      labeled sidebar; single component keeps both states in sync
+// WHAT: Desktop/tablet sidebar for the main app shell — X-style information
+//       architecture: a short curated main nav, a "More" overflow menu, fixed
+//       bottom profile card, and NO scrollbar
+// WHY: Lightweight, scannable navigation that scales without crowding;
+//      secondary destinations live in the More menu instead of the sidebar
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, ChevronRight, Coins, LogOut, Zap } from "lucide-react";
+import {
+  BellRing,
+  ChevronDown,
+  ClipboardList,
+  Coins,
+  FileText,
+  Flag,
+  HelpCircle,
+  Info,
+  LogOut,
+  MoreHorizontal,
+  Plus,
+  RefreshCcw,
+  Settings,
+  Shield,
+  ShieldCheck,
+  User,
+  Wallet,
+  Zap,
+} from "lucide-react";
 import { useAuthStore } from "@/store";
-import { POSTER_NAV, RUNNER_NAV } from "@/lib/navConfig";
-import type { NavItem } from "@/lib/navConfig";
+import { Avatar } from "@/components/ui/avatar";
+import { BrandMark } from "@/components/ui/BrandMark";
 
 // WHAT: Lazy-load a lucide icon by name
 // WHY: WASM SWC can fail on lucide-react dynamic icon resolution; this avoids
@@ -43,50 +64,133 @@ export function NavIcon({ icon, className }: { icon: string; className?: string 
       .catch(() => {
         if (!cancelled)
           setIcon(() => () => (
-            <span style={{ width: 20, height: 20 }} />
+            <span style={{ width: 24, height: 24 }} />
           ));
       });
     return () => { cancelled = true; };
   }, [icon]);
 
-  if (!Icon) return <span style={{ width: 20, height: 20 }} />;
-  return <Icon className={className || "h-5 w-5"} />;
+  if (!Icon) return <span style={{ width: 24, height: 24 }} />;
+  return <Icon className={className || "h-6 w-6"} />;
 }
 
-function SidebarSection({
-  label,
-  defaultOpen,
+// WHAT: Curated main navigation — only the most important destinations
+// WHY: X-style: a short list that fits without scrolling; everything else → More
+const POSTER_MAIN: { href: string; label: string; icon: string }[] = [
+  { href: "/feed", label: "Home", icon: "House" },
+  { href: "/explore", label: "Explore", icon: "Compass" },
+  { href: "/tasks", label: "Browse Tasks", icon: "ListTodo" },
+  { href: "/chat", label: "Messages", icon: "MessageCircle" },
+  { href: "/profile", label: "Profile", icon: "User" },
+];
+
+const RUNNER_MAIN: { href: string; label: string; icon: string }[] = [
+  { href: "/feed", label: "Home", icon: "House" },
+  { href: "/tasks", label: "Find Tasks", icon: "ListTodo" },
+  { href: "/wallet", label: "Earnings", icon: "Wallet" },
+  { href: "/chat", label: "Messages", icon: "MessageCircle" },
+  { href: "/profile", label: "Profile", icon: "User" },
+];
+
+// WHAT: Floating menu card shared by More + profile dropdown
+// WHY: Consistent behavior: outside click + Escape close, animated entrance
+function FloatingMenu({
+  open,
+  onClose,
+  anchorRef,
+  className = "",
+  ariaLabel,
   children,
 }: {
-  label: string;
-  defaultOpen?: boolean;
+  open: boolean;
+  onClose: () => void;
+  anchorRef: React.RefObject<HTMLDivElement | null>;
+  className?: string;
+  ariaLabel: string;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(defaultOpen ?? false);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (
+        ref.current && !ref.current.contains(t) &&
+        anchorRef.current && !anchorRef.current.contains(t)
+      ) {
+        onClose();
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open, onClose, anchorRef]);
+
+  if (!open) return null;
 
   return (
-    <div>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="tap-target flex w-full items-center justify-between rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400 transition-colors hover:text-gray-600"
-      >
-        {label}
-        <ChevronDown
-          className={`h-3.5 w-3.5 transition-transform duration-200 ${
-            open ? "rotate-180" : ""
-          }`}
-        />
-      </button>
-      <div
-        className="grid transition-all duration-300 ease-in-out"
-        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
-      >
-        <div className="overflow-hidden">
-          <div className="space-y-0.5 pb-1.5">{children}</div>
-        </div>
-      </div>
+    <div
+      ref={ref}
+      role="menu"
+      aria-label={ariaLabel}
+      className={`absolute z-50 w-64 overflow-hidden rounded-2xl border border-card-border bg-surface p-1.5 shadow-lifted animate-[fade-in_0.15s_ease-out] ${className}`}
+    >
+      {children}
     </div>
+  );
+}
+
+function MenuLink({
+  href,
+  icon: Icon,
+  label,
+  onNavigate,
+  disabled,
+  danger,
+}: {
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  onNavigate?: () => void;
+  disabled?: boolean;
+  danger?: boolean;
+}) {
+  if (disabled) {
+    return (
+      <div
+        role="menuitem"
+        aria-disabled="true"
+        className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-semibold text-gray-400"
+      >
+        <Icon className="h-5 w-5 shrink-0 text-gray-400" />
+        <span>{label}</span>
+        <span className="ml-auto text-[10px] font-bold uppercase tracking-wider text-gray-400">
+          Soon
+        </span>
+      </div>
+    );
+  }
+  return (
+    <Link
+      href={href}
+      role="menuitem"
+      onClick={onNavigate}
+      className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-semibold transition-colors duration-150 active:scale-[0.99] ${
+        danger
+          ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10"
+          : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-white/10"
+      }`}
+    >
+      <Icon className="h-5 w-5 shrink-0 text-gray-500" />
+      <span>{label}</span>
+    </Link>
   );
 }
 
@@ -102,162 +206,198 @@ export function DesktopSidebar({
   chatUnreadCount: number;
 }) {
   const isRunner = activeRole === "runner";
-  const navItems: NavItem[] = isRunner ? RUNNER_NAV : POSTER_NAV;
+  const isAdmin = user?.role === "admin";
+  const isPending = user?.runnerStatus === "pending";
+  const mainNav = isRunner ? RUNNER_MAIN : POSTER_MAIN;
+
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement | null>(null);
+  const profileRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     useAuthStore.getState().refreshUser();
   }, [pathname]);
 
-  const isPending = user?.runnerStatus === "pending";
-  const isCta = navItems.some((n) => n.isCta);
+  useEffect(() => {
+    setMoreOpen(false);
+    setProfileOpen(false);
+  }, [pathname]);
 
-  function renderLink(item: NavItem, rail: boolean) {
-    if (item.disabled) {
-      return (
-        <div
-          key={item.label}
-          className={`flex items-center gap-3 rounded-xl text-sm font-medium text-gray-400 cursor-not-allowed ${
-            rail ? "justify-center px-2 py-2.5" : "px-3 py-2.5"
-          }`}
-        >
-          <NavIcon icon={item.icon} className="h-5 w-5 shrink-0 text-gray-300" />
-          {!rail && (
-            <>
-              <span>{item.label}</span>
-              <span className="ml-auto text-[9px] font-medium text-gray-300">Soon</span>
-            </>
-          )}
-        </div>
-      );
-    }
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(href + "/");
 
-    const isActive =
-      pathname === item.href || pathname.startsWith(item.href + "/");
+  const logout = () => {
+    useAuthStore.getState().logout();
+    window.location.href = "/login";
+  };
 
-    if (item.isCta) {
-      if (rail) {
-        return (
-          <Link
-            key={item.label}
-            href={item.href}
-            title={item.label}
-            className="group relative mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gold text-white shadow-md shadow-gold/25 transition-all duration-150 hover:brightness-105 hover:shadow-lg active:scale-95"
-            aria-label={item.label}
-          >
-            <NavIcon icon={item.icon} className="h-6 w-6" />
-          </Link>
-        );
-      }
-      return (
-        <Link
-          key={item.label}
-          href={item.href}
-          className="tap-target group mt-1 flex items-center gap-3 rounded-xl bg-gold px-3 py-3 text-sm font-bold text-white shadow-md shadow-gold/25 transition-all duration-150 hover:brightness-105 hover:shadow-lg hover:shadow-gold/30 active:scale-[0.98]"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 transition-colors group-hover:bg-white/25">
-            <NavIcon icon={item.icon} className="h-5 w-5" />
-          </div>
-          <span>{item.label}</span>
-          <ChevronRight className="ml-auto h-4 w-4 text-white/60" />
-        </Link>
-      );
-    }
-
-    const showChatBadge = item.href === "/chat" && chatUnreadCount > 0;
-
-    if (rail) {
-      return (
-        <Link
-          key={item.label}
-          href={item.href}
-          title={item.label}
-          aria-label={item.label}
-          className={`group relative flex items-center justify-center rounded-xl px-2 py-2.5 transition-all duration-150 ${
-            isActive
-              ? "bg-brand-light/80 text-brand font-bold shadow-sm ring-1 ring-brand/20"
-              : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-          }`}
-        >
-          <span className="relative">
-            <NavIcon
-              icon={item.icon}
-              className={`h-5 w-5 shrink-0 transition-colors ${
-                isActive ? "text-brand-text" : "text-gray-400"
-              }`}
-            />
-            {showChatBadge && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold leading-none text-white">
-                {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
-              </span>
-            )}
-          </span>
-        </Link>
-      );
-    }
-
-    return (
-      <Link
-        key={item.label}
-        href={item.href}
-        className={`tap-target flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
-          isActive
-            ? "bg-brand-light/80 text-brand font-bold shadow-sm ring-1 ring-brand/20"
-            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-        }`}
-      >
-        <span className="relative">
-          <NavIcon
-            icon={item.icon}
-            className={`h-5 w-5 shrink-0 transition-colors ${
-              isActive ? "text-brand-text" : "text-gray-400"
-            }`}
-          />
-          {showChatBadge && (
-            <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold leading-none text-white">
-              {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
-            </span>
-          )}
-        </span>
-        <span>{item.label}</span>
-      </Link>
-    );
-  }
-
-  const sections: { key: "main" | "community" | "account"; label: string; collapsible: boolean }[] = [
-    { key: "main", label: "Main", collapsible: false },
-    { key: "community", label: "Community", collapsible: true },
-    { key: "account", label: "Account", collapsible: true },
-  ];
+  const moreItems = [
+    { href: "/wallet", label: "Wallet", icon: Wallet },
+    { href: "/tasks", label: "My Tasks", icon: ClipboardList },
+    { href: "/notifications", label: "Notifications", icon: BellRing },
+    { href: "/settings", label: "Settings", icon: Settings },
+    { divider: true },
+    { href: "/faq", label: "Help Center", icon: HelpCircle },
+    { href: "/privacy", label: "Privacy & Security", icon: ShieldCheck },
+    { href: "/terms", label: "Terms", icon: FileText },
+    { href: "/about", label: "About NeedFull", icon: Info },
+    { href: "/faq", label: "Report a Problem", icon: Flag },
+  ] as const;
 
   return (
     <aside
       className="hidden md:flex md:shrink-0 md:border-r md:border-gray-200 md:bg-surface/95 md:backdrop-blur-xl"
       style={{ height: "100dvh" }}
     >
-      <div className="sidebar-scroll flex h-full w-full flex-col overflow-x-visible px-3 py-4 md:w-20 lg:w-64 lg:px-3">
-        {/* ─── CTA Card / rail CTA ─── */}
-        {isRunner ? (
-          <div className="mb-4 hidden rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100/40 p-3 shadow-sm dark:border-amber-800/50 dark:from-amber-950/60 dark:to-amber-900/30 lg:block">
-            <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4 text-amber-500" />
-              <p className="text-sm font-bold text-gray-900 dark:text-amber-100">
-                NeedRunner Dashboard
-              </p>
-            </div>
-            <p className="mt-1 text-xs text-gray-600 dark:text-amber-200/70">
-              View available tasks and your earnings at a glance.
-            </p>
+      <div className="flex h-full w-full flex-col md:w-20 lg:w-[280px] xl:w-80">
+        {/* ─── Brand ─── */}
+        <Link
+          href="/feed"
+          aria-label="NeedFull home"
+          className="flex items-center px-3 py-5 md:justify-center lg:justify-start lg:px-5"
+        >
+          <span className="hidden md:block">
+            <BrandMark wordmarkClass="hidden lg:block text-gray-900 dark:text-white" />
+          </span>
+        </Link>
+
+        {/* ─── Main Navigation (never scrolls) ─── */}
+        <nav className="flex-1 space-y-1 overflow-visible px-2 md:px-2 lg:px-4">
+          {mainNav.map((item) => {
+            const active = isActive(item.href);
+            const showBadge = item.href === "/chat" && chatUnreadCount > 0;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                title={item.label}
+                className={`group relative flex items-center gap-4 rounded-xl py-3 transition-all duration-150 active:scale-[0.98] md:justify-center lg:justify-start lg:px-4 ${
+                  active
+                    ? "bg-brand-light/70 font-bold text-brand shadow-sm ring-1 ring-brand/20"
+                    : "font-semibold text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-white/10"
+                }`}
+                aria-current={active ? "page" : undefined}
+              >
+                {active && (
+                  <span className="absolute left-0 top-1/2 hidden h-6 w-1 -translate-y-1/2 rounded-r-full bg-brand lg:block" />
+                )}
+                <span className="relative">
+                  <NavIcon
+                    icon={item.icon}
+                    className={`h-6 w-6 shrink-0 transition-colors duration-150 ${
+                      active ? "text-brand-text" : "text-gray-500"
+                    }`}
+                  />
+                  {showBadge && (
+                    <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold leading-none text-white">
+                      {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
+                    </span>
+                  )}
+                </span>
+                <span className="hidden text-[17px] lg:block">{item.label}</span>
+              </Link>
+            );
+          })}
+
+          {/* ─── Post (primary CTA) ─── */}
+          {!isRunner && (
             <Link
-              href="/tasks"
-              className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-amber-600 active:scale-[0.97]"
+              href="/tasks/create"
+              title="Post a task"
+              className={`flex items-center rounded-full bg-gold font-bold text-white shadow-md shadow-gold/25 transition-all duration-150 hover:brightness-105 hover:shadow-lg active:scale-[0.97] md:mx-auto md:mt-3 md:h-12 md:w-12 lg:mx-0 lg:h-auto lg:w-full lg:justify-center lg:gap-2 lg:py-3.5 lg:text-[17px]`}
             >
-              Open Dashboard
-              <ChevronRight className="h-3 w-3" />
+              <Plus className="h-6 w-6 md:h-5 md:w-5" />
+              <span className="hidden lg:block">Post</span>
             </Link>
+          )}
+
+          {/* ─── More ─── */}
+          <div ref={moreRef} className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setMoreOpen(!moreOpen);
+                setProfileOpen(false);
+              }}
+              title="More"
+              aria-expanded={moreOpen}
+              aria-haspopup="menu"
+              className={`flex items-center gap-4 rounded-xl py-3 transition-all duration-150 active:scale-[0.98] md:justify-center lg:justify-start lg:px-4 ${
+                moreOpen
+                  ? "bg-brand-light/70 font-bold text-brand shadow-sm ring-1 ring-brand/20"
+                  : "font-semibold text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-white/10"
+              }`}
+            >
+              <MoreHorizontal
+                className={`h-6 w-6 shrink-0 transition-colors duration-150 ${
+                  moreOpen ? "text-brand-text" : "text-gray-500"
+                }`}
+              />
+              <span className="hidden text-[17px] lg:block">More</span>
+            </button>
+
+            <FloatingMenu
+              open={moreOpen}
+              onClose={() => setMoreOpen(false)}
+              anchorRef={moreRef}
+              ariaLabel="More menu"
+              className="bottom-full left-0 mb-2 w-64 lg:left-3"
+            >
+              <div className="max-h-[min(60vh,480px)] overflow-y-auto sidebar-scroll">
+                {moreItems.map((item, i) => {
+                  if ("divider" in item) {
+                    return <div key={i} className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />;
+                  }
+                  return (
+                    <MenuLink
+                      key={item.label}
+                      href={item.href}
+                      icon={item.icon}
+                      label={item.label}
+                      onNavigate={() => setMoreOpen(false)}
+                    />
+                  );
+                })}
+                {isAdmin && (
+                  <>
+                    <div className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />
+                    <MenuLink
+                      href="/admin"
+                      icon={Shield}
+                      label="Admin Dashboard"
+                      onNavigate={() => setMoreOpen(false)}
+                    />
+                  </>
+                )}
+              </div>
+            </FloatingMenu>
           </div>
-        ) : isCta ? (
-          <div className="mb-4 hidden lg:block">
-            <div className="group relative overflow-hidden rounded-xl border border-card-border bg-surface p-3.5 shadow-sm transition-all duration-200 hover:shadow-md">
+        </nav>
+
+        {/* ─── Promo card (tall screens only — sidebar never scrolls) ─── */}
+        <div className="hidden lg:[@media(min-height:860px)]:block lg:px-3 lg:pb-2">
+          {isRunner ? (
+            <div className="rounded-xl border border-card-border bg-surface p-3 shadow-sm">
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-gold" />
+                <p className="text-sm font-bold text-gray-900 dark:text-white">
+                  NeedRunner Dashboard
+                </p>
+              </div>
+              <p className="mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                View available tasks and your earnings at a glance.
+              </p>
+              <Link
+                href="/tasks"
+                className="mt-2 inline-flex w-full items-center justify-center gap-1 rounded-lg bg-gold px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97]"
+              >
+                Open Dashboard
+              </Link>
+            </div>
+          ) : (
+            <div className="group relative overflow-hidden rounded-xl border border-card-border bg-surface p-3 shadow-sm transition-all duration-200 hover:shadow-md">
               <div className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-gold/10" />
               <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/40 to-transparent" />
               <div className="relative flex items-start gap-2.5">
@@ -298,62 +438,69 @@ export function DesktopSidebar({
                 )}
               </div>
             </div>
-          </div>
-        ) : null}
+          )}
+        </div>
 
-        {/* ─── Navigation ─── */}
-        <nav className="flex-1 space-y-2">
-          {sections.map((section) => {
-            const items = navItems.filter((n) => n.section === section.key);
-            if (items.length === 0) return null;
-
-            if (section.collapsible) {
-              return (
-                <div key={section.key} className="hidden lg:block">
-                  <SidebarSection label={section.label}>
-                    {items.map((n) => renderLink(n, false))}
-                  </SidebarSection>
-                </div>
-              );
-            }
-
-            return (
-              <div key={section.key} className="hidden lg:block">
-                <p className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">
-                  {section.label}
-                </p>
-                <div className="space-y-0.5">{items.map((n) => renderLink(n, false))}</div>
-              </div>
-            );
-          })}
-
-          {/* ─── Rail-only nav (icons for all non-hidden items) ─── */}
-          <div className="flex flex-col items-center space-y-1 lg:hidden">
-            {navItems
-              .filter((n) => n.section === "main" || n.section === "community")
-              .map((n) => renderLink(n, true))}
-            <div className="my-2 h-px w-8 bg-gray-200 dark:bg-gray-700" />
-            {navItems
-              .filter((n) => n.section === "account")
-              .map((n) => renderLink(n, true))}
-          </div>
-        </nav>
-
-        {/* ─── Sign Out ─── */}
-        <div className="mt-4 shrink-0 border-t border-gray-100 pt-3">
+        {/* ─── Profile (fixed bottom) ─── */}
+        <div
+          ref={profileRef}
+          className="relative border-t border-gray-100 p-2 dark:border-white/10 lg:p-3"
+        >
           <button
             type="button"
             onClick={() => {
-              useAuthStore.getState().logout();
-              window.location.href = "/login";
+              setProfileOpen(!profileOpen);
+              setMoreOpen(false);
             }}
-            className={`group flex w-full items-center gap-3 rounded-xl text-sm font-semibold text-red-600 transition-all hover:bg-red-50 active:scale-[0.98] justify-center px-2 lg:justify-start lg:px-3`}
-            aria-label="Sign Out"
-            title="Sign Out"
+            aria-expanded={profileOpen}
+            aria-haspopup="menu"
+            className="flex w-full items-center gap-3 rounded-xl p-2 transition-all duration-150 hover:bg-gray-100 active:scale-[0.98] md:justify-center lg:justify-start dark:hover:bg-white/10"
           >
-            <LogOut className="h-5 w-5 shrink-0" />
-            <span className="hidden lg:inline">Sign Out</span>
+            <Avatar
+              src={user?.profilePictureUrl}
+              name={user?.fullName}
+              email={user?.email}
+              size="md"
+            />
+            <span className="hidden min-w-0 flex-1 text-left lg:block">
+              <span className="block truncate text-[15px] font-bold text-gray-900 dark:text-white">
+                {user?.fullName?.split(" ")[0] || "You"}
+              </span>
+              <span className="block truncate text-xs text-gray-500 dark:text-gray-400">
+                {user?.email}
+              </span>
+            </span>
+            <ChevronDown
+              className={`hidden h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200 lg:block ${
+                profileOpen ? "rotate-180" : ""
+              }`}
+            />
           </button>
+
+          <FloatingMenu
+            open={profileOpen}
+            onClose={() => setProfileOpen(false)}
+            anchorRef={profileRef}
+            ariaLabel="Profile menu"
+            className="bottom-full left-0 mb-2 w-64 lg:left-2"
+          >
+            <div className="border-b border-gray-100 px-3 py-2.5 dark:border-white/10">
+              <p className="truncate text-[15px] font-bold text-gray-900 dark:text-white">
+                {user?.fullName || "Unnamed user"}
+              </p>
+              <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                {user?.email}
+              </p>
+            </div>
+            <div className="pt-1.5">
+              <MenuLink href="/profile" icon={User} label="View Profile" onNavigate={() => setProfileOpen(false)} />
+              <MenuLink href="/settings" icon={Settings} label="Settings" onNavigate={() => setProfileOpen(false)} />
+              <MenuLink href="/wallet" icon={Wallet} label="Wallet" onNavigate={() => setProfileOpen(false)} />
+              <div className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />
+              <MenuLink href="/" icon={RefreshCcw} label="Switch Account" disabled />
+              <MenuLink href="/login" icon={LogOut} label="Logout" danger onNavigate={logout} />
+            </div>
+          </FloatingMenu>
         </div>
       </div>
     </aside>
