@@ -39,7 +39,7 @@ function PanelCard({
   return (
     <section className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
       {title ? (
-        <h3 className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-600 dark:text-gray-300">
+        <h3 className="mb-3 inline-flex items-center rounded-lg bg-brand px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-white shadow-sm">
           {title}
         </h3>
       ) : null}
