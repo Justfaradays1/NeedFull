@@ -87,7 +87,10 @@ function GoogleSuccessHandler() {
   }, [router, searchParams, setUser]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4">
+    <div
+      className="flex min-h-screen flex-col items-center justify-center px-4"
+      style={{ backgroundColor: "var(--color-background, #ffffff)" }}
+    >
       <div className="flex flex-col items-center gap-4 text-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
         <p className="text-sm text-gray-500">Completing sign in...</p>
@@ -99,7 +102,10 @@ function GoogleSuccessHandler() {
 export default function GoogleSuccessPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4">
+      <div
+        className="flex min-h-screen flex-col items-center justify-center px-4"
+        style={{ backgroundColor: "var(--color-background, #ffffff)" }}
+      >
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
           <p className="text-sm text-gray-500">Completing sign in...</p>
