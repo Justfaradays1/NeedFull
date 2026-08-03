@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { SmartMenu } from "@/components/ui/SmartMenu";
 
 interface DropdownItem {
   key: string;
@@ -30,6 +31,7 @@ export function Dropdown({
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -52,6 +54,7 @@ export function Dropdown({
   return (
     <div ref={ref} className={`relative ${className}`}>
       <div
+        ref={triggerRef}
         onClick={() => setOpen((p) => !p)}
         role="button"
         tabIndex={0}
@@ -64,55 +67,49 @@ export function Dropdown({
         {children}
       </div>
       {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div
-            className={`absolute z-50 mt-2 min-w-50 overflow-hidden rounded-xl py-1 profile-dropdown ${align === "right" ? "right-0" : "left-0"}`}
-            role="menu"
-            style={{
-              zIndex: 9999,
-              background: "#ffffff",
-              border: "1px solid rgba(0,0,0,0.08)",
-              boxShadow:
-                "0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.10)",
-            }}
-          >
-            {items.map((item) => {
-              if (item.render) return <div key={item.key}>{item.render()}</div>;
-              return (
-                <button
-                  key={item.key}
-                  type="button"
-                  role="menuitem"
-                  disabled={item.disabled}
-                  onClick={() => {
-                    if (item.disabled) return;
-                    setOpen(false);
-                    item.onClick?.();
-                    onItemClick?.(item);
-                  }}
-                  className={`tap-target flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors
-                    ${
-                      item.variant === "danger"
-                        ? "text-error hover:bg-error-light"
-                        : item.disabled
-                          ? "cursor-not-allowed text-gray-400"
-                          : "text-gray-700 hover:bg-gray-50"
-                    }`}
-                >
-                  {item.icon && (
-                    <span
-                      className={`${item.variant === "danger" ? "text-error" : "text-gray-400"}`}
-                    >
-                      {item.icon}
-                    </span>
-                  )}
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
-        </>
+        <SmartMenu
+          open={open}
+          onClose={() => setOpen(false)}
+          anchorRef={triggerRef}
+          align={align}
+          ariaLabel="Menu"
+          className="w-64"
+        >
+          {items.map((item) => {
+            if (item.render) return <div key={item.key}>{item.render()}</div>;
+            return (
+              <button
+                key={item.key}
+                type="button"
+                role="menuitem"
+                disabled={item.disabled}
+                onClick={() => {
+                  if (item.disabled) return;
+                  setOpen(false);
+                  item.onClick?.();
+                  onItemClick?.(item);
+                }}
+                className={`tap-target flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors
+                  ${
+                    item.variant === "danger"
+                      ? "text-error hover:bg-error-light"
+                      : item.disabled
+                        ? "cursor-not-allowed text-gray-400"
+                        : "text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-white/10"
+                  }`}
+              >
+                {item.icon && (
+                  <span
+                    className={`${item.variant === "danger" ? "text-error" : "text-gray-400 dark:text-gray-500"}`}
+                  >
+                    {item.icon}
+                  </span>
+                )}
+                {item.label}
+              </button>
+            );
+          })}
+        </SmartMenu>
       )}
     </div>
   );

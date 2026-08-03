@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/store";
 import { Avatar } from "@/components/ui/avatar";
+import { SmartMenu } from "@/components/ui/SmartMenu";
 import { BrandMark } from "@/components/ui/BrandMark";
 
 // WHAT: Lazy-load a lucide icon by name
@@ -92,60 +93,7 @@ const RUNNER_MAIN: { href: string; label: string; icon: string }[] = [
   { href: "/profile", label: "Profile", icon: "User" },
 ];
 
-// WHAT: Floating menu card shared by More + profile dropdown
-// WHY: Consistent behavior: outside click + Escape close, animated entrance
-function FloatingMenu({
-  open,
-  onClose,
-  anchorRef,
-  className = "",
-  ariaLabel,
-  children,
-}: {
-  open: boolean;
-  onClose: () => void;
-  anchorRef: React.RefObject<HTMLDivElement | null>;
-  className?: string;
-  ariaLabel: string;
-  children: React.ReactNode;
-}) {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      const t = e.target as Node;
-      if (
-        ref.current && !ref.current.contains(t) &&
-        anchorRef.current && !anchorRef.current.contains(t)
-      ) {
-        onClose();
-      }
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open, onClose, anchorRef]);
-
-  if (!open) return null;
-
-  return (
-    <div
-      ref={ref}
-      role="menu"
-      aria-label={ariaLabel}
-      className={`absolute z-50 w-64 overflow-hidden rounded-2xl border border-card-border bg-surface p-1.5 shadow-lifted animate-[fade-in_0.15s_ease-out] ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
+// NOTE: Sidebar menus use the viewport-aware SmartMenu (see components/ui/SmartMenu.tsx)
 
 function MenuLink({
   href,
@@ -214,6 +162,7 @@ export function DesktopSidebar({
   const [profileOpen, setProfileOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement | null>(null);
   const profileRef = useRef<HTMLDivElement | null>(null);
+  const profileAvatarRef = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
     useAuthStore.getState().refreshUser();
@@ -338,41 +287,39 @@ export function DesktopSidebar({
               <span className="hidden lg:block">More</span>
             </button>
 
-            <FloatingMenu
+            <SmartMenu
               open={moreOpen}
               onClose={() => setMoreOpen(false)}
               anchorRef={moreRef}
               ariaLabel="More menu"
-              className="bottom-full left-0 mb-2 w-64 lg:left-3"
+              className="w-64"
             >
-              <div className="max-h-[min(60vh,480px)] overflow-y-auto sidebar-scroll">
-                {moreItems.map((item, i) => {
-                  if ("divider" in item) {
-                    return <div key={i} className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />;
-                  }
-                  return (
-                    <MenuLink
-                      key={item.label}
-                      href={item.href}
-                      icon={item.icon}
-                      label={item.label}
-                      onNavigate={() => setMoreOpen(false)}
-                    />
-                  );
-                })}
-                {isAdmin && (
-                  <>
-                    <div className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />
-                    <MenuLink
-                      href="/admin"
-                      icon={Shield}
-                      label="Admin Dashboard"
-                      onNavigate={() => setMoreOpen(false)}
-                    />
-                  </>
-                )}
-              </div>
-            </FloatingMenu>
+              {moreItems.map((item, i) => {
+                if ("divider" in item) {
+                  return <div key={i} className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />;
+                }
+                return (
+                  <MenuLink
+                    key={item.label}
+                    href={item.href}
+                    icon={item.icon}
+                    label={item.label}
+                    onNavigate={() => setMoreOpen(false)}
+                  />
+                );
+              })}
+              {isAdmin && (
+                <>
+                  <div className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />
+                  <MenuLink
+                    href="/admin"
+                    icon={Shield}
+                    label="Admin Dashboard"
+                    onNavigate={() => setMoreOpen(false)}
+                  />
+                </>
+              )}
+            </SmartMenu>
           </div>
         </nav>
 
@@ -456,12 +403,14 @@ export function DesktopSidebar({
             aria-haspopup="menu"
             className="flex w-full items-center gap-3 rounded-xl p-2 transition-all duration-150 hover:bg-gray-100 active:scale-[0.98] md:justify-center lg:justify-start dark:hover:bg-white/10"
           >
-            <Avatar
-              src={user?.profilePictureUrl}
-              name={user?.fullName}
-              email={user?.email}
-              size="md"
-            />
+            <span ref={profileAvatarRef} className="inline-flex shrink-0">
+              <Avatar
+                src={user?.profilePictureUrl}
+                name={user?.fullName}
+                email={user?.email}
+                size="md"
+              />
+            </span>
             <span className="hidden min-w-0 flex-1 text-left lg:block">
               <span className="block truncate text-[15px] font-bold text-gray-900 dark:text-white">
                 {user?.fullName?.split(" ")[0] || "You"}
@@ -477,40 +426,31 @@ export function DesktopSidebar({
             />
           </button>
 
-          {/* WHY: left offset pads the dropdown's left edge flush to the
-              avatar (md: 16px, lg: 20px) so the menu grows out of the avatar
-              instead of the sidebar edge; caret bridges the gap at the avatar's
-              center (16px from the dropdown's left edge at both breakpoints) */}
-          <FloatingMenu
+          <SmartMenu
             open={profileOpen}
             onClose={() => setProfileOpen(false)}
-            anchorRef={profileRef}
+            anchorRef={profileAvatarRef}
             ariaLabel="Profile menu"
-            className="bottom-full left-0 mb-2 w-64 md:left-4 lg:left-5"
+            caretLeft={11}
+            className="w-64"
           >
-            <span
-              aria-hidden
-              className="pointer-events-none absolute bottom-[-7px] left-[11px] h-2.5 w-2.5 rotate-45 rounded-[2px] border-b border-r border-card-border bg-surface"
-            />
-            <div className="max-h-[min(70vh,480px)] overflow-y-auto sidebar-scroll">
-              <div className="border-b border-gray-100 px-3 py-2.5 dark:border-white/10">
-                <p className="truncate text-[15px] font-bold text-gray-900 dark:text-white">
-                  {user?.fullName || "Unnamed user"}
-                </p>
-                <p className="truncate text-xs text-gray-500 dark:text-gray-400">
-                  {user?.email}
-                </p>
-              </div>
-              <div className="pt-1.5">
-                <MenuLink href="/profile" icon={User} label="View Profile" onNavigate={() => setProfileOpen(false)} />
-                <MenuLink href="/settings" icon={Settings} label="Settings" onNavigate={() => setProfileOpen(false)} />
-                <MenuLink href="/wallet" icon={Wallet} label="Wallet" onNavigate={() => setProfileOpen(false)} />
-                <div className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />
-                <MenuLink href="/" icon={RefreshCcw} label="Switch Account" disabled />
-                <MenuLink href="/login" icon={LogOut} label="Logout" danger onNavigate={logout} />
-              </div>
+            <div className="border-b border-gray-100 px-3 py-2.5 dark:border-white/10">
+              <p className="truncate text-[15px] font-bold text-gray-900 dark:text-white">
+                {user?.fullName || "Unnamed user"}
+              </p>
+              <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                {user?.email}
+              </p>
             </div>
-          </FloatingMenu>
+            <div className="pt-1.5">
+              <MenuLink href="/profile" icon={User} label="View Profile" onNavigate={() => setProfileOpen(false)} />
+              <MenuLink href="/settings" icon={Settings} label="Settings" onNavigate={() => setProfileOpen(false)} />
+              <MenuLink href="/wallet" icon={Wallet} label="Wallet" onNavigate={() => setProfileOpen(false)} />
+              <div className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />
+              <MenuLink href="/" icon={RefreshCcw} label="Switch Account" disabled />
+              <MenuLink href="/login" icon={LogOut} label="Logout" danger onNavigate={logout} />
+            </div>
+          </SmartMenu>
         </div>
       </div>
     </aside>
