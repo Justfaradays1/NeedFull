@@ -199,7 +199,10 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="auth-page flex min-h-screen flex-col bg-white">
+    <div
+      className="auth-page flex min-h-screen flex-col"
+      style={{ backgroundColor: "var(--color-background, #ffffff)" }}
+    >
       <div className="border-b border-gray-200 px-4 py-6 sm:px-6">
         <Link
           href="/"

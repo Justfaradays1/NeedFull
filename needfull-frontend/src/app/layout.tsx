@@ -27,6 +27,32 @@ export const viewport = {
   viewportFit: "cover",
 };
 
+// WHAT: Synchronous, inline theme bootstrap — runs before first paint
+// WHY: Reads the persisted theme directly from localStorage and applies
+//      data-theme + background BEFORE the browser paints, eliminating the
+//      light→dark flash (FOUC). Theming must never gate interactivity.
+const THEME_BOOTSTRAP = `(function(){
+  try {
+    var t = null;
+    try {
+      var raw = localStorage.getItem('nf_prefs');
+      if (raw) { var p = JSON.parse(raw); if (p && typeof p.theme === 'string') t = p.theme; }
+    } catch (e) {}
+    var dark = false;
+    if (t === 'dark') dark = true;
+    else if (t !== 'light') {
+      try { dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {}
+    }
+    var r = document.documentElement;
+    r.classList.remove('light', 'dark');
+    r.classList.add(dark ? 'dark' : 'light');
+    r.setAttribute('data-theme', dark ? 'dark' : 'light');
+    r.style.backgroundColor = dark ? '#0a0a0b' : '#ffffff';
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute('content', dark ? '#0a0a0b' : '#1A6B4A');
+  } catch (e) {}
+})();`;
+
 export default function RootLayout({
   children,
 }: {
@@ -35,6 +61,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }}
+          suppressHydrationWarning
+        />
         <meta name="theme-color" content="#1A6B4A" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
