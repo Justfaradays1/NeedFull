@@ -4,6 +4,14 @@
 
 @import "tailwindcss";
 
+/* WHAT: Make Tailwind's `dark:` variant follow the app's theme class instead
+   of the OS `prefers-color-scheme` media query (Tailwind v4 default)
+   WHY: The app theme is user-controlled (nf_prefs) and applied as the .dark
+        class on <html>. With the media-query default, every `dark:` override
+        fired whenever the OS was dark — even when the app was in Light mode,
+        breaking contrast (e.g. white text on a white sidebar). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-brand: var(--clr-brand);
   --color-brand-mid: var(--clr-brand-mid);
