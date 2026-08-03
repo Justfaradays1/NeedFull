@@ -42,7 +42,7 @@ const actions = [
   },
   {
     label: "Task History",
-    href: "/tasks/mine",
+    href: "/tasks",
     icon: ClipboardList,
     color: "#6B7280",
     bg: "bg-gray-50",

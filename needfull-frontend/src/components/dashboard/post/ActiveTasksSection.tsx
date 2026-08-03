@@ -89,7 +89,7 @@ export function ActiveTasksSection({ tasks, loading }: ActiveTasksSectionProps) 
           </span>
         </h3>
         <Link
-          href="/tasks/mine"
+          href="/tasks"
           className="flex items-center gap-0.5 text-[11px] font-bold text-brand-text"
         >
           View all <ChevronRight className="h-3 w-3" />
