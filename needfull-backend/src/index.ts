@@ -36,11 +36,26 @@ if (env.NODE_ENV === "development") {
   allowedOrigins.push("http://localhost:3000");
 }
 
+// WHAT: Single origin check used by both HTTP and Socket.io CORS
+// WHY: Vercel preview deployments use random subdomains (e.g. needfull-git-feat-x-abc.vercel.app)
+//      that aren't known ahead of time, so they must be matched by pattern, not exact string.
+const isOriginAllowed = (
+  origin: string | undefined,
+  callback: (err: Error | null, allow?: boolean) => void,
+): void => {
+  if (!origin) return callback(null, true); // server-to-server / health checks / curl
+  if (allowedOrigins.includes(origin)) return callback(null, true);
+  if (/^https?:\/\/[a-z0-9-]+\.vercel\.(app|sh)$/.test(origin)) {
+    return callback(null, true);
+  }
+  callback(new Error("Origin not allowed by CORS policy"));
+};
+
 // WHAT: Initialize Socket.io for real-time notifications
 // WHY: Push notifications to connected clients without polling
 export const io = new SocketIOServer(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: isOriginAllowed,
     credentials: true,
   },
 });
@@ -56,7 +71,7 @@ app.use(helmet());
 // WHY: Allow frontend to make requests to backend
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: isOriginAllowed,
     credentials: true,
   }),
 );

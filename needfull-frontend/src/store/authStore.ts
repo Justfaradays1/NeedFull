@@ -125,6 +125,7 @@ const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: 30000,
 });
 
 // WHAT: Add request interceptor to include auth token
@@ -264,38 +265,65 @@ export const useAuthStore = create<AuthStore>()(
 
       // WHAT: Refresh user profile from API
       // WHY: Silently fetches /auth/me to update user data and wallet balance
-      // Handles 401 by clearing state (token expired or invalid)
+      // Handles 401 by clearing state (token expired or invalid). Transport-level
+      // failures (offline / Render cold start) are retried briefly, then logged
+      // quietly — never treated as a logged-out session.
       refreshUser: async () => {
         const { isAuthenticated } = get();
 
         // WHAT: Skip if not authenticated
         if (!isAuthenticated) return;
 
-        try {
-          const response = await apiClient.get<MeResponse>("/auth/me");
-          const { user: raw, wallet } = response.data;
-          const user = toAuthUser(raw);
+        let lastError: AxiosError | null = null;
 
-          // WHAT: Update user with wallet data
-          set({
-            user: {
-              ...user,
-              wallet: {
-                id: wallet.id,
-                balanceKobo: wallet.balanceKobo,
-                escrowKobo: wallet.escrowKobo,
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            const response = await apiClient.get<MeResponse>("/auth/me");
+            const { user: raw, wallet } = response.data;
+            const user = toAuthUser(raw);
+
+            // WHAT: Update user with wallet data
+            set({
+              user: {
+                ...user,
+                wallet: {
+                  id: wallet.id,
+                  balanceKobo: wallet.balanceKobo,
+                  escrowKobo: wallet.escrowKobo,
+                },
               },
-            },
-          });
-        } catch (err) {
-          const axiosError = err as AxiosError;
+            });
+            return;
+          } catch (err) {
+            lastError = err as AxiosError;
 
-          // WHAT: On 401, session expired — show message and redirect
-          if (axiosError.response?.status === 401) {
-            handleSessionExpired();
+            // WHAT: On 401, session expired — show message and redirect (no retry)
+            if (lastError.response?.status === 401) {
+              handleSessionExpired();
+              return;
+            }
+
+            // WHAT: Retry only transport-level failures (no HTTP response), e.g.
+            // cold starts or temporary CORS/network hiccups. Back off 1s, 2s, then stop.
+            if (!lastError.response && attempt < 2) {
+              await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+              continue;
+            }
+            break;
+          }
+        }
+
+        if (lastError) {
+          if (!lastError.response) {
+            // WHAT: Server unreachable/offline — keep the user where they are, log quietly
+            console.warn(
+              "Could not refresh user profile (network) — the server may be starting up. Details:",
+              lastError.message,
+            );
           } else {
-            // WHAT: Log other errors but don't fail silently
-            console.error("Failed to refresh user:", err);
+            console.error(
+              `Failed to refresh user: ${lastError.response.status} ${lastError.message}`,
+            );
           }
         }
       },

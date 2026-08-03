@@ -71,25 +71,22 @@ function LoginForm() {
 
     const formData = new FormData(e.currentTarget);
 
-    const loadingToast = toast.loading("Signing in...");
     try {
       await login(
         formData.get("email") as string,
         formData.get("password") as string,
       );
-      toast.dismiss(loadingToast);
       toast.success("Welcome back to NeedFull!");
       const user = useAuthStore.getState().user;
       const returnTo = sessionStorage.getItem("nf_return_to");
       if (returnTo) {
         sessionStorage.removeItem("nf_return_to");
-        setTimeout(() => router.replace(returnTo), 1200);
+        router.replace(returnTo);
       } else {
-        const dest = user?.role === "admin" ? "/admin" : "/feed";
-        setTimeout(() => router.replace(dest), 1200);
+        router.replace(user?.role === "admin" ? "/admin" : "/feed");
       }
     } catch {
-      toast.dismiss(loadingToast);
+      // Error surfaces inline via the auth store's error state
     }
   }
 
