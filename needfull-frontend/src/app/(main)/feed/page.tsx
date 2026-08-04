@@ -218,23 +218,25 @@ export default function FeedPage() {
             <WelcomeHeader firstName={firstName} />
           </div>
 
-          {/* Row 2: Wallet (8) + Quick Actions (4) — balanced vertical split */}
-          <div className="col-span-8">
+          {/* Row 2: Wallet spans the full width */}
+          <div className="col-span-12">
             <WalletSummaryCard
               balanceKobo={balanceKobo}
               escrowKobo={escrowKobo}
               hasEarnings={hasEarnings}
             />
           </div>
+
+          {/* Row 3: Quick Actions (4) + Active Tasks (8) */}
           <div className="col-span-4">
             <QuickActions />
           </div>
-
-          {/* Row 3: Active Tasks (8) + My Stats (4) */}
           <div className="col-span-8">
             <ActiveTasksSection tasks={allTasks} loading={tasksLoading} />
           </div>
-          <div className="col-span-4">
+
+          {/* Row 4: My Stats (4) + Recent Activity (8, full width at xl) */}
+          <div className="col-span-4 xl:hidden">
             <QuickStats
               layout="compact"
               tasksPosted={tasksPosted}
@@ -246,12 +248,12 @@ export default function FeedPage() {
               trustScore={trustScore}
             />
           </div>
-
-          {/* Row 4: Recent Activity (8, full width at xl) + Insights/Banner (4,
-              hidden on xl where the right panel duplicates them) */}
           <div className="col-span-8 xl:col-span-12">
             <RecentActivity activities={activities} loading={tasksLoading} />
           </div>
+
+          {/* Row 5: Insights/Banner (4, hidden on xl where the right panel
+              duplicates them) */}
           <div className="col-span-4 xl:hidden">
             <div className="flex flex-col gap-5">
               <SmartInsights />
@@ -261,7 +263,7 @@ export default function FeedPage() {
             </div>
           </div>
 
-          {/* Row 5: Callout */}
+          {/* Row 6: Callout */}
           <div className="col-span-12">
             <Callout variant="tip">
               Complete your profile with a bio and photo to build trust and get more task opportunities.
