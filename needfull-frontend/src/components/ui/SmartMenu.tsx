@@ -118,7 +118,9 @@ export function SmartMenu({
 
   useEffect(() => {
     if (!open) return;
-    const onDown = (e: MouseEvent) => {
+    // WHY: close on `click`, not `mousedown` — a trigger that toggles on click
+    // would otherwise be re-opened by its own click after the mousedown close
+    const onOutside = (e: MouseEvent) => {
       const t = e.target as Node;
       if (
         menuRef.current &&
@@ -132,10 +134,10 @@ export function SmartMenu({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-    document.addEventListener("mousedown", onDown);
+    document.addEventListener("click", onOutside);
     document.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("click", onOutside);
       document.removeEventListener("keydown", onKey);
     };
   }, [open, onClose, anchorRef]);
