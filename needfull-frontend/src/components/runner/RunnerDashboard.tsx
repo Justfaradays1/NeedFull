@@ -23,6 +23,7 @@ import {
 import { useAuthUser, useAuthStore } from "@/store";
 import { patch } from "@/lib/apiClient";
 import { formatCurrency } from "@/lib/format";
+import { useGreeting } from "@/hooks/useGreeting";
 import { Avatar } from "@/components/ui/avatar";
 import { StartEarningModal } from "@/components/runner/StartEarningModal";
 
@@ -73,14 +74,6 @@ function timeAgo(dateStr: string): string {
   });
 }
 
-function greeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  if (h < 21) return "Good evening";
-  return "Good night";
-}
-
 const EARNINGS_FILTER_TYPES = new Set([
   "escrow_release",
   "earnings",
@@ -126,6 +119,7 @@ function weeklyEarnings(transactions: WalletTransaction[]): number {
 /* ─── RunnerHero ─── */
 
 function RunnerHero({ name, tasksCount }: { name: string; tasksCount: number }) {
+  const greeting = useGreeting();
   const hasTasks = tasksCount > 0;
   return (
     <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-amber-600 to-amber-700 p-5 text-white shadow-lg">
@@ -134,7 +128,7 @@ function RunnerHero({ name, tasksCount }: { name: string; tasksCount: number }) 
       <div className="relative z-10 space-y-1">
         <h1 className="font-display text-xl font-bold leading-tight sm:text-2xl">
           {hasTasks
-            ? `${greeting()}, ${name} 👋\n${tasksCount} tasks are waiting near you`
+            ? `${greeting.text} ${greeting.emoji}, ${name} 👋\n${tasksCount} tasks are waiting near you`
             : "Ready to earn today? 💼"}
         </h1>
       </div>
