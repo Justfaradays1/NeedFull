@@ -24,6 +24,7 @@ import { useAuthUser, useAuthStore } from "@/store";
 import { patch } from "@/lib/apiClient";
 import { formatCurrency } from "@/lib/format";
 import { Avatar } from "@/components/ui/avatar";
+import { StartEarningModal } from "@/components/runner/StartEarningModal";
 
 /* ─── Types ─── */
 
@@ -195,15 +196,33 @@ function OnlineToggle({ isAvailable, onToggle }: { isAvailable: boolean; onToggl
 
 /* ─── Primary CTA ─── */
 
-function PrimaryCTA() {
+function PrimaryCTA({
+  isAvailable,
+  onStart,
+}: {
+  isAvailable: boolean;
+  onStart: () => void;
+}) {
+  if (isAvailable) {
+    return (
+      <Link
+        href="/hustle"
+        className="tap-target flex items-center justify-center gap-2.5 rounded-xl bg-gold px-4 py-3.5 text-base font-bold text-white shadow-md shadow-gold/25 transition-all hover:brightness-105 hover:shadow-lg active:scale-[0.97]"
+      >
+        <Navigation className="h-5 w-5" />
+        Find Tasks
+      </Link>
+    );
+  }
   return (
-    <Link
-      href="/tasks"
-      className="tap-target flex items-center justify-center gap-2.5 rounded-xl bg-gold px-4 py-3.5 text-base font-bold text-white shadow-md shadow-gold/25 transition-all hover:brightness-105 hover:shadow-lg active:scale-[0.97]"
+    <button
+      type="button"
+      onClick={onStart}
+      className="tap-target flex w-full items-center justify-center gap-2.5 rounded-xl bg-gold px-4 py-3.5 text-base font-bold text-white shadow-md shadow-gold/25 transition-all hover:brightness-105 hover:shadow-lg active:scale-[0.97]"
     >
-      <Navigation className="h-5 w-5" />
-      Find Tasks
-    </Link>
+      <Zap className="h-5 w-5" />
+      Start Earning
+    </button>
   );
 }
 
@@ -274,7 +293,7 @@ function NearbyTasks({
           Available Tasks
         </h2>
         <Link
-          href="/tasks"
+          href="/hustle"
           className="flex items-center gap-0.5 text-[11px] font-bold text-gold"
         >
           View all <ChevronRight className="h-3 w-3" />
@@ -526,6 +545,7 @@ export default function RunnerDashboard({
   const name = user?.fullName?.split(" ")[0] || "there";
 
   const [isAvailable, setIsAvailable] = useState(user?.isAvailable ?? false);
+  const [startFlowOpen, setStartFlowOpen] = useState(false);
 
   const earnedToday = useMemo(() => todayEarnings(transactions), [transactions]);
   const weeklyEarned = useMemo(
@@ -548,7 +568,14 @@ export default function RunnerDashboard({
 
         <OnlineToggle isAvailable={isAvailable} onToggle={setIsAvailable} />
 
-        <PrimaryCTA />
+        <PrimaryCTA isAvailable={isAvailable} onStart={() => setStartFlowOpen(true)} />
+
+        <StartEarningModal
+          open={startFlowOpen}
+          onClose={() => setStartFlowOpen(false)}
+          tasks={tasks}
+          onGoLive={() => setIsAvailable(true)}
+        />
 
         <RunnerStats
           todayEarned={earnedToday}

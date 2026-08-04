@@ -40,7 +40,7 @@ export const POSTER_NAV: NavItem[] = [
 export const RUNNER_NAV: NavItem[] = [
   // Main section
   { href: "/feed", label: "Home", icon: "House", section: "main", mobileTab: true },
-  { href: "/tasks", label: "Find Tasks", icon: "ListTodo", section: "main", mobileTab: true },
+  { href: "/hustle", label: "Find Tasks", icon: "ListTodo", section: "main", mobileTab: true },
   { href: "/wallet", label: "Earnings", icon: "Wallet", section: "main", mobileTab: true },
 
   // Community section
