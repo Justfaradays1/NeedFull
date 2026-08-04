@@ -6,6 +6,10 @@
 
     "target": "ES2022",
     "module": "CommonJS",
+    // WHY: node10 resolution is deprecated in TS 6/7. The proper fix is
+    // Node16 resolution + .js extensions on all relative imports (133 across
+    // 42 files) — deferred until that refactor lands, so silence for now.
+    "ignoreDeprecations": "5.0",
     "moduleResolution": "node",
     "lib": ["ES2022"],
     "outDir": "./dist",
