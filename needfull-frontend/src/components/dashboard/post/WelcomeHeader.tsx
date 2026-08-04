@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, CheckCircle } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
+import { CheckCircle } from "lucide-react";
 
 function getGreeting(): { text: string; emoji: string } {
   const h = new Date().getHours();
@@ -14,66 +13,32 @@ function getGreeting(): { text: string; emoji: string } {
 
 interface WelcomeHeaderProps {
   firstName: string;
-  fullName: string;
-  email: string;
-  profilePictureUrl?: string | null;
   emailVerified: boolean;
-  unreadNotifications: number;
 }
 
-export function WelcomeHeader({
-  firstName,
-  fullName,
-  email,
-  profilePictureUrl,
-  emailVerified,
-  unreadNotifications,
-}: WelcomeHeaderProps) {
+// WHAT: Greeting block only — notification bell and avatar live in the global
+// top bar, so this stays a single clean line on every screen size
+export function WelcomeHeader({ firstName, emailVerified }: WelcomeHeaderProps) {
   const greeting = getGreeting();
 
   return (
-    <div className="flex items-center justify-between gap-4">
-      <div className="min-w-0 flex-1">
-        <h1 className="text-xl font-black tracking-tight text-gray-900 sm:text-2xl">
-          {greeting.text}, {firstName}{" "}
-          <span className="inline-block">{greeting.emoji}</span>
-        </h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Welcome back — your campus, your hustle.
-        </p>
-        {!emailVerified && (
-          <Link
-            href="/verify-email"
-            className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200"
-          >
-            <CheckCircle className="h-3 w-3" />
-            Verify email
-          </Link>
-        )}
-      </div>
-
-      <div className="flex items-center gap-3 shrink-0">
+    <div className="min-w-0">
+      <h1 className="truncate text-lg font-black tracking-tight text-gray-900 sm:text-xl lg:text-2xl">
+        {greeting.text}, {firstName}{" "}
+        <span className="inline-block">{greeting.emoji}</span>
+      </h1>
+      <p className="mt-0.5 truncate text-xs text-gray-500 sm:text-sm dark:text-gray-400">
+        Welcome back — your campus, your hustle.
+      </p>
+      {!emailVerified && (
         <Link
-          href="/notifications"
-          className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:scale-95"
+          href="/verify-email"
+          className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200"
         >
-          <Bell className="h-5 w-5" />
-          {unreadNotifications > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white ring-2 ring-white">
-              {unreadNotifications > 99 ? "99+" : unreadNotifications}
-            </span>
-          )}
+          <CheckCircle className="h-3 w-3" />
+          Verify email
         </Link>
-
-        <Link href="/profile">
-          <Avatar
-            src={profilePictureUrl}
-            name={fullName}
-            email={email}
-            size="md"
-          />
-        </Link>
-      </div>
+      )}
     </div>
   );
 }

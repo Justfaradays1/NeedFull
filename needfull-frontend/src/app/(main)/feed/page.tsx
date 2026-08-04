@@ -62,7 +62,6 @@ export default function FeedPage() {
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [tasksLoading, setTasksLoading] = useState(true);
   const [postedCount, setPostedCount] = useState<number | null>(null);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [allTasks, setAllTasks] = useState<TaskItem[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -96,13 +95,11 @@ export default function FeedPage() {
         const [
           openTasksRes,
           postedRes,
-          convRes,
           txRes,
           myTasksRes,
         ] = await Promise.all([
           get<{ success: boolean; data: TaskItem[] }>("/tasks?sortBy=newest&status=open&perPage=6").catch(() => null),
           get<{ success: boolean; data: TaskItem[] }>("/tasks/me/posted").catch(() => null),
-          get<{ success: boolean; data: { unreadCount: number }[] }>("/chat/conversations").catch(() => null),
           get<{ success: boolean; data: WalletTransaction[] }>("/wallet/transactions?perPage=10").catch(() => null),
           get<{ success: boolean; data: TaskItem[] }>("/tasks/me?perPage=20").catch(() => null),
         ]);
@@ -110,13 +107,6 @@ export default function FeedPage() {
         if (openTasksRes?.success) setTasks(openTasksRes.data);
         if (myTasksRes?.success) setAllTasks(myTasksRes.data);
         if (postedRes?.success) setPostedCount(postedRes.data.length);
-        if (convRes?.success) {
-          const count = (convRes.data as any).reduce?.(
-            (s: number, c: any) => s + (c.unreadCount || 0),
-            0,
-          ) ?? 0;
-          setUnreadCount(count);
-        }
         if (txRes?.success) {
           setTransactions(txRes.data);
 
@@ -195,11 +185,7 @@ export default function FeedPage() {
         <div className="flex flex-col gap-4 lg:hidden">
           <WelcomeHeader
             firstName={firstName}
-            fullName={user?.fullName ?? ""}
-            email={user?.email ?? ""}
-            profilePictureUrl={(user as any)?.profilePictureUrl}
             emailVerified={emailVerified}
-            unreadNotifications={unreadCount}
           />
           <WalletSummaryCard
             balanceKobo={balanceKobo}
@@ -234,11 +220,7 @@ export default function FeedPage() {
           <div className="col-span-12">
             <WelcomeHeader
               firstName={firstName}
-              fullName={user?.fullName ?? ""}
-              email={user?.email ?? ""}
-              profilePictureUrl={(user as any)?.profilePictureUrl}
               emailVerified={emailVerified}
-              unreadNotifications={unreadCount}
             />
           </div>
 
