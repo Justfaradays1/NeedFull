@@ -156,7 +156,6 @@ export function SmartMenu({
         top: pos?.top,
         left: pos?.left,
         right: pos?.right,
-        maxHeight: pos?.maxHeight,
         visibility: pos ? "visible" : "hidden",
       }}
     >
@@ -171,7 +170,12 @@ export function SmartMenu({
           style={{ left: caretLeft }}
         />
       )}
-      <div className="h-full max-h-full overflow-y-auto sidebar-scroll p-1.5">
+      {/* WHY: a real pixel max-height (not h-full/max-h-full) lets this container
+         actually scroll when content exceeds the viewport-constrained height */}
+      <div
+        className="overflow-y-auto sidebar-scroll p-1.5"
+        style={{ maxHeight: pos?.maxHeight }}
+      >
         {children}
       </div>
     </div>
