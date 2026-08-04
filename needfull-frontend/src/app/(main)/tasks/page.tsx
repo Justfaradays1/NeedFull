@@ -275,7 +275,7 @@ export default function MyTasksPage() {
   return (
     <div className="min-h-screen page-shell">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-surface shadow-sm">
+      <div className="bg-surface shadow-sm">
         <div className="flex items-center justify-between px-4 py-3">
           <h1 className="font-display text-lg font-bold text-gray-900 sm:text-xl">
             My Tasks

@@ -174,7 +174,7 @@ export default function CreatePurchaseTaskPage() {
   return (
     <>
       <div className="min-h-screen page-shell">
-        <div className="sticky top-0 z-10 bg-surface px-4 py-3 shadow-sm">
+        <div className="bg-surface px-4 py-3 shadow-sm">
           <div className="mx-auto flex max-w-lg items-center gap-3">
             <button
               type="button"

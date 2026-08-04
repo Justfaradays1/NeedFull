@@ -278,7 +278,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Tab bar */}
-      <div className="sticky top-0 z-10 mx-4 mt-4 flex gap-1 rounded-xl bg-gray-100 p-1">
+      <div className="mx-4 mt-4 flex gap-1 rounded-xl bg-gray-100 p-1">
         {(['overview', 'reviews', 'activity', 'settings'] as TabKey[]).map((t) => (
           <button key={t} type="button" onClick={() => setActiveTab(t)}
             className={`tap-target flex-1 rounded-lg py-2 text-xs font-bold uppercase tracking-wider transition-colors ${activeTab === t ? 'bg-surface text-brand-text shadow-sm' : 'text-gray-500'}`}

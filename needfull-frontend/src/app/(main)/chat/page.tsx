@@ -218,7 +218,7 @@ export default function ChatPage() {
   return (
     <div className="min-h-screen page-shell safe-all">
       {/* ─── Header ─── */}
-      <div className="glass-dark sticky top-0 z-30 px-4 pb-3 pt-4">
+      <div className="glass-dark px-4 pb-3 pt-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-display text-2xl font-bold text-white">

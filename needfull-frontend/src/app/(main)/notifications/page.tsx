@@ -200,7 +200,7 @@ export default function NotificationsPage() {
   return (
     <div className="min-h-screen page-shell">
       {/* Top bar */}
-      <div className="glass-dark sticky top-0 z-30 flex items-center justify-between px-4 py-3">
+      <div className="glass-dark flex items-center justify-between px-4 py-3">
         <div>
           <h1 className="font-display text-xl font-bold text-white sm:text-2xl">
             Notifications

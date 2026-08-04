@@ -11,14 +11,20 @@ import { MessageCircle, Plus } from "lucide-react";
 export function DesktopFloatingActions({
   pathname,
   chatUnreadCount,
+  dimmed = false,
 }: {
   pathname: string;
   chatUnreadCount: number;
+  dimmed?: boolean;
 }) {
   if (pathname.startsWith("/tasks/create")) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 hidden flex-col items-center gap-3 md:flex xl:hidden">
+    <div
+      className={`fixed bottom-6 right-6 z-50 hidden flex-col items-center gap-3 transition-opacity duration-300 md:flex xl:hidden ${
+        dimmed ? "opacity-60" : "opacity-100"
+      }`}
+    >
       {/* ─── Messages (laptop+) ─── */}
       <Link
         href="/chat"

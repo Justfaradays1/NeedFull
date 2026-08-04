@@ -104,7 +104,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen page-shell">
-      <div className="sticky top-0 z-10 bg-surface px-4 py-3 border-b border-card-border">
+      <div className="bg-surface px-4 py-3 border-b border-card-border">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.back()}

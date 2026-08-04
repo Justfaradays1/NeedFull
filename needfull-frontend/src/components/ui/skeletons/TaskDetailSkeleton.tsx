@@ -3,7 +3,7 @@ import { Skeleton, SkeletonLine, SkeletonCircle, SkeletonImage, SkeletonButton }
 export function TaskDetailSkeleton() {
   return (
     <div className="min-h-screen page-shell">
-      <div className="sticky top-0 z-10 bg-surface px-4 py-3 shadow-sm border-b border-card-border">
+      <div className="bg-surface px-4 py-3 shadow-sm border-b border-card-border">
         <div className="flex items-center gap-3">
           <Skeleton className="rounded-lg" style={{ width: 36, height: 36 }} />
           <SkeletonLine width="180px" height="18px" />
@@ -46,7 +46,7 @@ export function TaskDetailSkeleton() {
 export function FeedDetailSkeleton() {
   return (
     <div className="min-h-screen page-shell">
-      <div className="glass-dark sticky top-0 z-30 px-4 py-3">
+      <div className="glass-dark px-4 py-3">
         <div className="flex items-center gap-3">
           <Skeleton className="rounded-lg" style={{ width: 36, height: 36 }} />
           <SkeletonLine width="180px" height="18px" />

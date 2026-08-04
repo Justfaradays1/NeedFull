@@ -33,6 +33,7 @@ import { DesktopFloatingActions } from "@/components/layout/DesktopFloatingActio
 
 import { useNotifications } from "@/hooks/useNotifications";
 import { useChatUnread } from "@/hooks/useChatUnread";
+import { useSmartScroll } from "@/hooks/useSmartScroll";
 import { POSTER_NAV, RUNNER_NAV } from "@/lib/navConfig";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -157,6 +158,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   } = useNotifications();
   const { unreadCount: chatUnreadCount, refreshChatUnread } = useChatUnread();
   const router = useRouter();
+  const { hidden: chromeHidden } = useSmartScroll();
 
   // Refresh chat unread count whenever the route changes (e.g. after
   // reading messages in /chat, the badge updates on the way back)
@@ -294,7 +296,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* ─── Main Content Area ─── */}
       <div className="flex flex-col flex-1 min-w-0">
         <AuthGuard>
-          <div className="glass-dark sticky top-0 z-30">
+          <div
+            className={`glass-dark sticky top-0 z-30 transition-transform duration-300 ease-out ${
+              chromeHidden ? "-translate-y-full" : ""
+            }`}
+          >
             <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
               <Link
                 href="/feed"
@@ -376,7 +382,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </AuthGuard>
 
         <nav
-          className="glass-white fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-lg rounded-3xl border border-slate-200/70 px-3 py-3 shadow-2xl shadow-slate-900/10 backdrop-blur-2xl md:hidden"
+          className={`glass-white fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-lg rounded-3xl border border-slate-200/70 px-3 py-3 shadow-2xl shadow-slate-900/10 backdrop-blur-2xl transition-opacity duration-300 md:hidden ${
+            chromeHidden ? "opacity-75" : "opacity-100"
+          }`}
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         >
           <div className="flex items-center justify-between gap-2 px-1">
@@ -454,6 +462,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <DesktopFloatingActions
         pathname={pathname}
         chatUnreadCount={chatUnreadCount}
+        dimmed={chromeHidden}
       />
     </div>
   );
