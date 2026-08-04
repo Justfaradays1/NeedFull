@@ -225,7 +225,10 @@ export function DesktopSidebar({
         </Link>
 
         {/* ─── Main Navigation (never scrolls) ─── */}
-        <nav className="flex-1 space-y-1 overflow-visible px-2 md:px-2 lg:px-4">
+        {/* WHY: pt-4 pushes the first nav item onto the same horizontal line as
+           the greeting (center column) and the wallet card (right rail), which
+           both start 16px below their 56px top bands */}
+        <nav className="flex-1 space-y-1 overflow-visible px-2 pt-4 md:px-2 lg:px-4">
           {mainNav.map((item) => {
             const active = isActive(item.href);
             const showBadge = item.href === "/chat" && chatUnreadCount > 0;
