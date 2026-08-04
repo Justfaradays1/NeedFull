@@ -79,7 +79,6 @@ export default function FeedPage() {
   const totalSpent = (user as any)?.totalSpentKobo ?? 0;
   const successRate = tasksPosted > 0 ? Math.round((tasksCompleted / tasksPosted) * 100) : 0;
   const activeTasks = tasks.filter((t) => t.status === "in_progress" || t.status === "awaiting_confirmation").length;
-  const emailVerified = Boolean((user as any)?.emailVerified);
   const hasEarnings = (user as any)?.hasEarnings ?? transactions.some((t) =>
     ["escrow_release", "earnings"].includes(t.type)
   );
@@ -183,10 +182,7 @@ export default function FeedPage() {
       <div className="mx-auto max-w-7xl px-4 pb-10 pt-4 sm:px-6 lg:px-8">
         {/* ─── Mobile & Tablet Layout (< 1024px) ─── */}
         <div className="flex flex-col gap-4 lg:hidden">
-          <WelcomeHeader
-            firstName={firstName}
-            emailVerified={emailVerified}
-          />
+          <WelcomeHeader firstName={firstName} />
           <WalletSummaryCard
             balanceKobo={balanceKobo}
             escrowKobo={escrowKobo}
@@ -218,10 +214,7 @@ export default function FeedPage() {
         <div className="hidden lg:grid lg:grid-cols-12 lg:gap-5">
           {/* Row 1: Greeting spans full width */}
           <div className="col-span-12">
-            <WelcomeHeader
-              firstName={firstName}
-              emailVerified={emailVerified}
-            />
+            <WelcomeHeader firstName={firstName} />
           </div>
 
           {/* Row 2: Wallet (8) + Quick Actions (4) — balanced vertical split */}
