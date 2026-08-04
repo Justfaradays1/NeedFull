@@ -32,18 +32,19 @@ export function WelcomeHeader({
   const greeting = getGreeting();
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between gap-4">
       <div className="min-w-0 flex-1">
-        <h1 className="text-lg font-bold text-gray-900 sm:text-xl">
-          {greeting.text} <span className="inline-block">{greeting.emoji}</span>
+        <h1 className="text-xl font-black tracking-tight text-gray-900 sm:text-2xl">
+          {greeting.text}, {firstName}{" "}
+          <span className="inline-block">{greeting.emoji}</span>
         </h1>
-        <p className="-mt-0.5 text-2xl font-black text-gray-900 sm:text-3xl">
-          {firstName}
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Welcome back — your campus, your hustle.
         </p>
         {!emailVerified && (
           <Link
             href="/verify-email"
-            className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200"
+            className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200"
           >
             <CheckCircle className="h-3 w-3" />
             Verify email

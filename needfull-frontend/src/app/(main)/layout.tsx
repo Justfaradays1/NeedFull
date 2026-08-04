@@ -164,6 +164,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     refreshChatUnread();
   }, [pathname, refreshChatUnread]);
 
+  // Open the command palette from the right context panel's search bar
+  useEffect(() => {
+    const onOpen = () => setIsPaletteOpen(true);
+    window.addEventListener("nf:open-command-palette", onOpen);
+    return () => window.removeEventListener("nf:open-command-palette", onOpen);
+  }, []);
+
   const avatarMenuItems = [
     {
       key: "header",

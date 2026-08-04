@@ -189,8 +189,8 @@ export default function FeedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="mx-auto max-w-7xl px-4 pb-8 pt-4">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-neutral-950">
+      <div className="mx-auto max-w-7xl px-4 pb-10 pt-4 sm:px-6 lg:px-8">
         {/* ─── Mobile & Tablet Layout (< 1024px) ─── */}
         <div className="flex flex-col gap-4 lg:hidden">
           <WelcomeHeader
@@ -206,6 +206,8 @@ export default function FeedPage() {
             escrowKobo={escrowKobo}
             hasEarnings={hasEarnings}
           />
+          <QuickActions />
+          <ActiveTasksSection tasks={allTasks} loading={tasksLoading} />
           <QuickStats
             tasksPosted={tasksPosted}
             tasksCompleted={tasksCompleted}
@@ -215,9 +217,7 @@ export default function FeedPage() {
             successRate={successRate}
             trustScore={trustScore}
           />
-          <QuickActions />
           <CategoryShortcuts />
-          <ActiveTasksSection tasks={allTasks} loading={tasksLoading} />
           <NearbyActivity />
           <RecommendedRunners runners={[]} loading={false} />
           <RecentActivity activities={activities} loading={tasksLoading} />
@@ -229,9 +229,9 @@ export default function FeedPage() {
         </div>
 
         {/* ─── Desktop Layout (>= 1024px) ─── */}
-        <div className="hidden lg:grid lg:grid-cols-12 lg:gap-4">
-          {/* Row 1: Header spans full width */}
-          <div className="col-span-12 mb-1">
+        <div className="hidden lg:grid lg:grid-cols-12 lg:gap-5">
+          {/* Row 1: Greeting spans full width */}
+          <div className="col-span-12">
             <WelcomeHeader
               firstName={firstName}
               fullName={user?.fullName ?? ""}
@@ -242,7 +242,7 @@ export default function FeedPage() {
             />
           </div>
 
-          {/* Row 2: Wallet (8) + Stats (4) */}
+          {/* Row 2: Wallet (8) + Quick Actions (4) — balanced vertical split */}
           <div className="col-span-8">
             <WalletSummaryCard
               balanceKobo={balanceKobo}
@@ -251,7 +251,16 @@ export default function FeedPage() {
             />
           </div>
           <div className="col-span-4">
+            <QuickActions />
+          </div>
+
+          {/* Row 3: Active Tasks (8) + My Stats (4) */}
+          <div className="col-span-8">
+            <ActiveTasksSection tasks={allTasks} loading={tasksLoading} />
+          </div>
+          <div className="col-span-4">
             <QuickStats
+              layout="compact"
               tasksPosted={tasksPosted}
               tasksCompleted={tasksCompleted}
               activeTasks={activeTasks}
@@ -262,22 +271,17 @@ export default function FeedPage() {
             />
           </div>
 
-          {/* Row 3: Quick Actions (3) + Active Tasks (9) */}
-          <div className="col-span-3">
-            <QuickActions />
-          </div>
-          <div className="col-span-9">
-            <ActiveTasksSection tasks={allTasks} loading={tasksLoading} />
-          </div>
-
-          {/* Row 4: Recent Activity (8) + Insights (4) */}
+          {/* Row 4: Recent Activity (8, full width at xl) + Insights/Banner (4,
+              hidden on xl where the right panel duplicates them) */}
           <div className="col-span-8 xl:col-span-12">
             <RecentActivity activities={activities} loading={tasksLoading} />
           </div>
           <div className="col-span-4 xl:hidden">
-            <SmartInsights />
-            <div className="mt-4 rounded-xl border border-card-border bg-surface p-4 shadow-sm">
-              <BecomeRunnerBanner />
+            <div className="flex flex-col gap-5">
+              <SmartInsights />
+              <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
+                <BecomeRunnerBanner />
+              </div>
             </div>
           </div>
 

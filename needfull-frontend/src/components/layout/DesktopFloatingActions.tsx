@@ -1,6 +1,7 @@
 // WHAT: Floating action buttons for desktop (Messages + Post a Task)
-// WHY: Keeps the two most-used actions one tap away without crowding the header;
-//      hidden on mobile where the bottom nav already provides both
+// WHY: Keeps the two most-used actions one tap away on lg screens; hidden on
+//      xl where the right context panel owns that corner, and on mobile where
+//      the bottom nav already provides both
 
 "use client";
 
@@ -17,7 +18,7 @@ export function DesktopFloatingActions({
   if (pathname.startsWith("/tasks/create")) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 hidden flex-col items-center gap-3 md:flex">
+    <div className="fixed bottom-6 right-6 z-50 hidden flex-col items-center gap-3 md:flex xl:hidden">
       {/* ─── Messages (laptop+) ─── */}
       <Link
         href="/chat"

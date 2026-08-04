@@ -40,7 +40,7 @@ const typeConfig: Record<string, { icon: typeof Clock; bg: string; color: string
 export function RecentActivity({ activities, loading }: RecentActivityProps) {
   if (loading) {
     return (
-      <div className="rounded-xl border border-card-border bg-surface p-4 shadow-sm">
+      <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
         <div className="mb-3 h-5 w-28 animate-pulse rounded bg-gray-100" />
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
@@ -62,7 +62,7 @@ export function RecentActivity({ activities, loading }: RecentActivityProps) {
   }
 
   return (
-    <div className="rounded-xl border border-card-border bg-surface p-4 shadow-sm">
+    <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
       <h3 className="mb-3 text-sm font-bold text-gray-900">Recent Activity</h3>
 
       <div className="space-y-1">

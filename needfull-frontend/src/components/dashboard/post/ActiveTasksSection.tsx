@@ -47,7 +47,7 @@ function statusBadge(status: string) {
 export function ActiveTasksSection({ tasks, loading }: ActiveTasksSectionProps) {
   if (loading) {
     return (
-      <div className="rounded-xl border border-card-border bg-surface p-4 shadow-sm">
+      <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
         <div className="mb-3 h-5 w-28 animate-pulse rounded bg-gray-100" />
         <div className="space-y-2">
           {[1, 2].map((i) => (
@@ -60,17 +60,25 @@ export function ActiveTasksSection({ tasks, loading }: ActiveTasksSectionProps) 
 
   if (tasks.length === 0) {
     return (
-      <div className="rounded-xl border border-card-border bg-surface p-5 shadow-sm">
-        <h3 className="mb-3 text-sm font-bold text-gray-900">Active Tasks</h3>
-        <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-gray-200 px-4 py-6 text-center">
-          <ClipboardCheck className="h-8 w-8 text-gray-300" />
-          <p className="text-sm font-bold text-gray-900">No active tasks</p>
-          <p className="text-xs text-gray-500">
-            Post a task and a NeedRunner will pick it up
-          </p>
+      <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
+        <h3 className="mb-3 text-sm font-bold text-gray-900 dark:text-white">
+          Active Tasks
+        </h3>
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-gray-200 px-4 py-3 dark:border-white/10">
+          <div className="flex min-w-0 items-center gap-3">
+            <ClipboardCheck className="h-6 w-6 shrink-0 text-gray-300" />
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-gray-900 dark:text-white">
+                No active tasks yet
+              </p>
+              <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                Post a task and a NeedRunner will pick it up
+              </p>
+            </div>
+          </div>
           <Link
             href="/tasks/create"
-            className="mt-1 inline-flex items-center gap-1 rounded-lg bg-gold px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97]"
+            className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-gold px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97]"
           >
             + Post Your First Task
           </Link>
@@ -80,7 +88,7 @@ export function ActiveTasksSection({ tasks, loading }: ActiveTasksSectionProps) 
   }
 
   return (
-    <div className="rounded-xl border border-card-border bg-surface p-4 shadow-sm">
+    <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-bold text-gray-900">
           Active Tasks

@@ -35,7 +35,7 @@ const insights = [
 
 export function SmartInsights() {
   return (
-    <div className="rounded-xl border border-card-border bg-surface p-4 shadow-sm">
+    <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
       <h3 className="mb-3 flex items-center gap-1.5 text-sm font-bold text-gray-900">
         <Lightbulb className="h-4 w-4 text-gold" />
         Insights

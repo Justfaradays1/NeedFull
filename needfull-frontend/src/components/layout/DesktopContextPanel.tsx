@@ -11,6 +11,7 @@ import {
   Eye,
   EyeOff,
   LifeBuoy,
+  Search,
   Wallet as WalletIcon,
 } from "lucide-react";
 import { useAuthUser } from "@/store";
@@ -125,7 +126,7 @@ function SupportCard() {
 // WHAT: Route-prefix → widget sets; first matching prefix wins
 // WHY: Keeps panel curated per page; unknown routes get a sensible default
 const REGISTRY: { match: string; widgets: WidgetKey[] }[] = [
-  { match: "/feed", widgets: ["wallet", "categories"] },
+  { match: "/feed", widgets: ["wallet", "categories", "nearby", "insights"] },
   { match: "/explore", widgets: ["categories", "nearby", "support"] },
   { match: "/tasks/create", widgets: [] },
   { match: "/tasks/", widgets: ["wallet", "quick", "insights"] },
@@ -154,6 +155,23 @@ export function DesktopContextPanel({ pathname }: { pathname: string }) {
       style={{ height: "100dvh" }}
       aria-label="Page context panel"
     >
+      {/* WHAT: Alignment header — a 56px band (h-14) matching the main column's
+         top header, so the panel's first card starts on the same horizontal
+         line as the rest of the workspace, exactly like X's right rail */}
+      <div className="flex h-14 shrink-0 items-center border-b border-gray-200 px-4 dark:border-white/10">
+        <button
+          type="button"
+          onClick={() =>
+            window.dispatchEvent(new Event("nf:open-command-palette"))
+          }
+          aria-label="Search tasks and runners"
+          className="flex h-9 w-full items-center gap-2 rounded-xl border border-card-border bg-surface px-3 text-sm text-gray-400 shadow-sm transition-colors hover:border-brand/30 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
+        >
+          <Search className="h-4 w-4 shrink-0" />
+          <span className="truncate">Search tasks, runners…</span>
+        </button>
+      </div>
+
       {/* WHAT: Internal scroll is a fallback only — it only engages when panel
          content exceeds the viewport, keeping a single browser scrollbar
          in the common case */}
@@ -169,17 +187,9 @@ export function DesktopContextPanel({ pathname }: { pathname: string }) {
                 </PanelCard>
               );
             case "nearby":
-              return (
-                <PanelCard key={key} title={WIDGET_TITLES.nearby}>
-                  <NearbyActivity />
-                </PanelCard>
-              );
+              return <div key={key}><NearbyActivity /></div>;
             case "insights":
-              return (
-                <PanelCard key={key} title={WIDGET_TITLES.insights}>
-                  <SmartInsights />
-                </PanelCard>
-              );
+              return <div key={key}><SmartInsights /></div>;
             case "quick":
               return (
                 <PanelCard key={key} title={WIDGET_TITLES.quick}>

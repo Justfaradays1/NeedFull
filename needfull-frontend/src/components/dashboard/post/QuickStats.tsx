@@ -18,6 +18,8 @@ interface QuickStatsProps {
   totalSpent: number;
   successRate: number;
   trustScore: number;
+  /** "row" = 2/4-across horizontal tiles (mobile & full width); "compact" = 2x2 mini tiles (desktop column) */
+  layout?: "row" | "compact";
 }
 
 const statDefs = [
@@ -82,15 +84,15 @@ const extraStatDefs = [
   },
 ];
 
-export function QuickStats(props: QuickStatsProps) {
+export function QuickStats({ layout = "row", ...props }: QuickStatsProps) {
   const showExtra = props.tasksPosted > 0 || props.tasksCompleted > 0;
   const stats = showExtra
     ? [...statDefs, ...extraStatDefs]
     : statDefs.slice(0, 4);
 
-  return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-      {stats.map((stat) => {
+  const tiles = (
+    <div className={`grid gap-2 ${layout === "compact" ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4"}`}>
+      {stats.slice(0, layout === "compact" ? 4 : 7).map((stat) => {
         const Icon = stat.icon;
         return (
           <div
@@ -113,4 +115,17 @@ export function QuickStats(props: QuickStatsProps) {
       })}
     </div>
   );
+
+  if (layout === "compact") {
+    return (
+      <section className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
+        <h3 className="mb-3 text-sm font-bold text-gray-900 dark:text-white">
+          My Stats
+        </h3>
+        {tiles}
+      </section>
+    );
+  }
+
+  return tiles;
 }

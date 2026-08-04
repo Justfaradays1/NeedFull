@@ -217,7 +217,7 @@ export function DesktopSidebar({
         <Link
           href="/feed"
           aria-label="NeedFull home"
-          className="flex items-center px-3 py-5 md:justify-center lg:justify-start lg:px-5"
+          className="flex h-14 shrink-0 items-center px-3 md:justify-center lg:justify-start lg:px-5"
         >
           <span className="hidden md:block">
             <BrandMark wordmarkClass="hidden lg:block text-gray-900 dark:text-white" />

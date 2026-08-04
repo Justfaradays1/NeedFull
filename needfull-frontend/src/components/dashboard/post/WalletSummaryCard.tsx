@@ -27,7 +27,7 @@ export function WalletSummaryCard({
   const [hidden, setHidden] = useState(false);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-brand-dark via-brand to-brand-mid p-5 text-on-brand shadow-lg">
+    <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-brand-dark via-brand to-brand-mid p-4 text-on-brand shadow-md sm:p-5">
       <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/5" />
       <div className="pointer-events-none absolute -bottom-8 -left-8 h-28 w-28 rounded-full bg-white/5" />
       <div className="pointer-events-none absolute bottom-12 right-24 h-20 w-20 rounded-full bg-white/[0.03]" />
@@ -49,7 +49,7 @@ export function WalletSummaryCard({
           </button>
         </div>
 
-        <p className="mt-1 text-3xl font-black tracking-tight sm:text-4xl">
+        <p className="mt-1 text-2xl font-black tracking-tight sm:text-3xl">
           {hidden ? "••••••" : formatCurrency(balanceKobo)}
         </p>
         <p className="text-xs text-on-brand/50">Ready to Spend</p>
@@ -63,10 +63,10 @@ export function WalletSummaryCard({
           </div>
         )}
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           <Link
             href="/wallet/fund"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-on-brand px-4 py-2 text-xs font-bold text-brand shadow-sm transition-all hover:brightness-95 active:scale-[0.97]"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-on-brand px-3.5 py-1.5 text-xs font-bold text-brand shadow-sm transition-all hover:brightness-95 active:scale-[0.97]"
           >
             <Plus className="h-3.5 w-3.5" />
             Fund Wallet
@@ -75,14 +75,14 @@ export function WalletSummaryCard({
           {hasEarnings ? (
             <Link
               href="/wallet/withdraw"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-on-brand/15 px-4 py-2 text-xs font-bold text-on-brand transition-all hover:bg-on-brand/25 active:scale-[0.97]"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-on-brand/15 px-3.5 py-1.5 text-xs font-bold text-on-brand transition-all hover:bg-on-brand/25 active:scale-[0.97]"
             >
               <ArrowUpRight className="h-3.5 w-3.5" />
               Withdraw
             </Link>
           ) : (
             <span
-              className="group relative inline-flex items-center gap-1.5 rounded-lg bg-on-brand/10 px-4 py-2 text-xs font-medium text-on-brand/50 cursor-not-allowed"
+              className="group relative inline-flex items-center gap-1.5 rounded-lg bg-on-brand/10 px-3.5 py-1.5 text-xs font-medium text-on-brand/50 cursor-not-allowed"
               title="Withdraw available after completing your first paid task"
             >
               <ArrowUpRight className="h-3.5 w-3.5" />
