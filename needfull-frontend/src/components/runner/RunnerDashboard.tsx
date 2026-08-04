@@ -17,6 +17,8 @@ import {
   Briefcase,
   Navigation,
   Activity,
+  RefreshCw,
+  Plus,
 } from "lucide-react";
 import { useAuthUser, useAuthStore } from "@/store";
 import { patch } from "@/lib/apiClient";
@@ -50,6 +52,7 @@ interface RunnerDashboardProps {
   transactions: WalletTransaction[];
   tasksCompleted: number;
   trustScore: number;
+  refresh?: () => Promise<void>;
 }
 
 /* ─── Helpers ─── */
@@ -241,8 +244,27 @@ function RunnerStats({
 
 /* ─── NearbyTasks ─── */
 
-function NearbyTasks({ tasks, loading }: { tasks: TaskItem[]; loading: boolean }) {
+function NearbyTasks({
+  tasks,
+  loading,
+  refresh,
+}: {
+  tasks: TaskItem[];
+  loading: boolean;
+  refresh?: () => Promise<void>;
+}) {
   const openTasks = tasks.filter((t) => t.status === "open").slice(0, 10);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    if (!refresh || refreshing) return;
+    setRefreshing(true);
+    try {
+      await refresh();
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   return (
     <section>
@@ -273,10 +295,30 @@ function NearbyTasks({ tasks, loading }: { tasks: TaskItem[]; loading: boolean }
           ))}
         </div>
       ) : openTasks.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 px-4 py-6 text-center">
-          <Briefcase className="mx-auto h-6 w-6 text-gray-300" />
-          <p className="mt-1.5 text-sm font-bold text-gray-900">No tasks available</p>
-          <p className="text-xs text-gray-500">Check back later for new tasks</p>
+        <div className="rounded-xl border border-dashed border-gray-200 px-4 py-8 text-center">
+          <Briefcase className="mx-auto h-7 w-7 text-gray-300" />
+          <p className="mt-2 text-sm font-bold text-gray-900">No tasks near you right now</p>
+          <p className="mx-auto mt-1 max-w-[16rem] text-xs leading-relaxed text-gray-500">
+            New tasks drop all day. Refresh to catch the latest, or post one you can nail yourself.
+          </p>
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-gold px-3.5 py-2 text-xs font-bold text-white shadow-sm transition-all active:scale-[0.97] disabled:opacity-60"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
+              {refreshing ? "Refreshing..." : "Refresh"}
+            </button>
+            <Link
+              href="/tasks/create"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-card-border px-3.5 py-2 text-xs font-bold text-gray-700 transition-all active:scale-[0.97]"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Post a Task
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="space-y-2">
@@ -478,6 +520,7 @@ export default function RunnerDashboard({
   transactions,
   tasksCompleted,
   trustScore,
+  refresh,
 }: RunnerDashboardProps) {
   const user = useAuthUser();
   const name = user?.fullName?.split(" ")[0] || "there";
@@ -514,7 +557,7 @@ export default function RunnerDashboard({
           trustScore={trustScore}
         />
 
-        <NearbyTasks tasks={tasks} loading={tasksLoading} />
+        <NearbyTasks tasks={tasks} loading={tasksLoading} refresh={refresh} />
 
         <RunnerPerformance trustScore={trustScore} averageRating={null} dayStreak={null} />
 

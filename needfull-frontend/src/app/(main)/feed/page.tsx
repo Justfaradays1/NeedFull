@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { get } from "@/lib/apiClient";
 import { useAuthUser, useAuthStore, useActiveRole } from "@/store";
@@ -83,83 +83,83 @@ export default function FeedPage() {
     ["escrow_release", "earnings"].includes(t.type)
   );
 
+  const fetchAll = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      const [
+        openTasksRes,
+        postedRes,
+        txRes,
+        myTasksRes,
+      ] = await Promise.all([
+        get<{ success: boolean; data: TaskItem[] }>("/tasks?sortBy=newest&status=open&perPage=6").catch(() => null),
+        get<{ success: boolean; data: TaskItem[] }>("/tasks/me/posted").catch(() => null),
+        get<{ success: boolean; data: WalletTransaction[] }>("/wallet/transactions?perPage=10").catch(() => null),
+        get<{ success: boolean; data: TaskItem[] }>("/tasks/me?perPage=20").catch(() => null),
+      ]);
+
+      if (openTasksRes?.success) setTasks(openTasksRes.data);
+      if (myTasksRes?.success) setAllTasks(myTasksRes.data);
+      if (postedRes?.success) setPostedCount(postedRes.data.length);
+      if (txRes?.success) {
+        setTransactions(txRes.data);
+
+        const derived: Activity[] = txRes.data.slice(0, 10).map((tx: any) => {
+          const typeMap: Record<string, string> = {
+            escrow_release: "task_completed",
+            escrow_lock: "runner_hired",
+            manual_deposit_confirmed: "wallet_funded",
+          };
+          const titleMap: Record<string, string> = {
+            escrow_release: "Task payment received",
+            escrow_lock: "NeedRunner hired",
+            manual_deposit_confirmed: "Wallet funded",
+          };
+          const descMap: Record<string, string> = {
+            escrow_release: "Payment released for a completed task",
+            escrow_lock: "A NeedRunner was assigned to your task",
+            manual_deposit_confirmed: "Bank transfer confirmed",
+          };
+          return {
+            id: tx.id,
+            type: typeMap[tx.type] ?? "wallet_funded",
+            title: titleMap[tx.type] ?? "Account activity",
+            description: descMap[tx.type] ?? "A transaction occurred",
+            createdAt: tx.createdAt,
+          };
+        });
+
+        if (myTasksRes?.success) {
+          myTasksRes.data.slice(0, 5).forEach((t: any) => {
+            if (t.status === "completed") {
+              derived.unshift({
+                id: `task-completed-${t.id}`,
+                type: "task_completed",
+                title: "Task completed",
+                description: `"${t.title}" was marked complete`,
+                createdAt: t.updatedAt || t.createdAt,
+              });
+            }
+          });
+        }
+
+        setActivities(derived.slice(0, 10));
+      }
+    } catch {
+      /* silent */
+    } finally {
+      setTasksLoading(false);
+      setPageReady(true);
+    }
+  }, [isAuthenticated]);
+
   useEffect(() => {
     if (!isAuthenticated) {
       router.push("/login");
       return;
     }
-
-    const fetchAll = async () => {
-      try {
-        const [
-          openTasksRes,
-          postedRes,
-          txRes,
-          myTasksRes,
-        ] = await Promise.all([
-          get<{ success: boolean; data: TaskItem[] }>("/tasks?sortBy=newest&status=open&perPage=6").catch(() => null),
-          get<{ success: boolean; data: TaskItem[] }>("/tasks/me/posted").catch(() => null),
-          get<{ success: boolean; data: WalletTransaction[] }>("/wallet/transactions?perPage=10").catch(() => null),
-          get<{ success: boolean; data: TaskItem[] }>("/tasks/me?perPage=20").catch(() => null),
-        ]);
-
-        if (openTasksRes?.success) setTasks(openTasksRes.data);
-        if (myTasksRes?.success) setAllTasks(myTasksRes.data);
-        if (postedRes?.success) setPostedCount(postedRes.data.length);
-        if (txRes?.success) {
-          setTransactions(txRes.data);
-
-          const derived: Activity[] = txRes.data.slice(0, 10).map((tx: any) => {
-            const typeMap: Record<string, string> = {
-              escrow_release: "task_completed",
-              escrow_lock: "runner_hired",
-              manual_deposit_confirmed: "wallet_funded",
-            };
-            const titleMap: Record<string, string> = {
-              escrow_release: "Task payment received",
-              escrow_lock: "NeedRunner hired",
-              manual_deposit_confirmed: "Wallet funded",
-            };
-            const descMap: Record<string, string> = {
-              escrow_release: "Payment released for a completed task",
-              escrow_lock: "A NeedRunner was assigned to your task",
-              manual_deposit_confirmed: "Bank transfer confirmed",
-            };
-            return {
-              id: tx.id,
-              type: typeMap[tx.type] ?? "wallet_funded",
-              title: titleMap[tx.type] ?? "Account activity",
-              description: descMap[tx.type] ?? "A transaction occurred",
-              createdAt: tx.createdAt,
-            };
-          });
-
-          if (myTasksRes?.success) {
-            myTasksRes.data.slice(0, 5).forEach((t: any) => {
-              if (t.status === "completed") {
-                derived.unshift({
-                  id: `task-completed-${t.id}`,
-                  type: "task_completed",
-                  title: "Task completed",
-                  description: `"${t.title}" was marked complete`,
-                  createdAt: t.updatedAt || t.createdAt,
-                });
-              }
-            });
-          }
-
-          setActivities(derived.slice(0, 10));
-        }
-      } catch {
-        /* silent */
-      } finally {
-        setTasksLoading(false);
-        setPageReady(true);
-      }
-    };
-
     fetchAll();
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, fetchAll]);
 
   if (!isAuthenticated || !pageReady) {
     return <DashboardSkeleton />;
@@ -173,6 +173,7 @@ export default function FeedPage() {
         transactions={transactions}
         tasksCompleted={tasksCompleted}
         trustScore={trustScore}
+        refresh={fetchAll}
       />
     );
   }

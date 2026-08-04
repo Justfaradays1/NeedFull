@@ -6,6 +6,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import type { TouchEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Bell,
   CheckCheck,
@@ -242,6 +243,13 @@ export default function NotificationsPage() {
               Notifications about task applications, messages, and platform
               updates will show up here.
             </p>
+            <Link
+              href="/feed"
+              className="tap-target mt-5 inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-2.5 text-sm font-bold text-on-brand shadow-sm transition-all hover:bg-brand-dark active:scale-[0.97]"
+            >
+              <Briefcase className="h-4 w-4" />
+              Explore Tasks
+            </Link>
           </div>
         ) : (
           Array.from(groups.entries()).map(([label, items]) => (
