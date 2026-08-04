@@ -16,12 +16,13 @@ import {
 } from "lucide-react";
 import { useAuthUser } from "@/store";
 import { formatCurrency } from "@/lib/format";
+import { Callout } from "@/components/ui/callout";
 import { CategorySearch } from "@/components/dashboard/post/CategorySearch";
 import { NearbyActivity } from "@/components/dashboard/post/NearbyActivity";
 import { QuickActions } from "@/components/dashboard/post/QuickActions";
 import { SmartInsights } from "@/components/dashboard/post/SmartInsights";
 
-type WidgetKey = "wallet" | "categories" | "nearby" | "insights" | "quick" | "support";
+type WidgetKey = "wallet" | "categories" | "nearby" | "insights" | "quick" | "support" | "tip";
 
 const WIDGET_TITLES: Partial<Record<WidgetKey, string>> = {
   categories: "Browse Categories",
@@ -126,7 +127,7 @@ function SupportCard() {
 // WHAT: Route-prefix → widget sets; first matching prefix wins
 // WHY: Keeps panel curated per page; unknown routes get a sensible default
 const REGISTRY: { match: string; widgets: WidgetKey[] }[] = [
-  { match: "/feed", widgets: ["wallet", "categories", "nearby", "insights"] },
+  { match: "/feed", widgets: ["wallet", "tip", "categories", "nearby", "insights"] },
   { match: "/explore", widgets: ["categories", "nearby", "support"] },
   { match: "/tasks/create", widgets: [] },
   { match: "/tasks/", widgets: ["wallet", "quick", "insights"] },
@@ -195,6 +196,12 @@ export function DesktopContextPanel({ pathname }: { pathname: string }) {
                 <PanelCard key={key} title={WIDGET_TITLES.quick}>
                   <QuickActions />
                 </PanelCard>
+              );
+            case "tip":
+              return (
+                <Callout key={key} variant="tip">
+                  Complete your profile with a bio and photo to build trust and get more task opportunities.
+                </Callout>
               );
             case "support":
               return <SupportCard key={key} />;

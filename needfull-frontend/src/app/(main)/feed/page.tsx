@@ -18,7 +18,6 @@ import { RecentActivity } from "@/components/dashboard/post/RecentActivity";
 import { SmartInsights } from "@/components/dashboard/post/SmartInsights";
 import { DashboardSkeleton } from "@/components/dashboard/post/DashboardSkeleton";
 import { BecomeRunnerBanner } from "@/components/home/BecomeRunnerBanner";
-import { Callout } from "@/components/ui/callout";
 import RunnerDashboard from "@/components/runner/RunnerDashboard";
 
 /* ─── Types ─── */
@@ -204,9 +203,6 @@ export default function FeedPage() {
         <RecentActivity activities={activities} loading={tasksLoading} />
         <SmartInsights />
         <BecomeRunnerBanner />
-        <Callout variant="tip">
-          Complete your profile with a bio and photo to build trust and get more task opportunities.
-        </Callout>
       </div>
     </div>
   );
