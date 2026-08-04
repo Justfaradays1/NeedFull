@@ -180,96 +180,33 @@ export default function FeedPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-neutral-950">
-      <div className="mx-auto max-w-7xl px-4 pb-10 pt-4 sm:px-6 lg:px-8">
-        {/* ─── Mobile & Tablet Layout (< 1024px) ─── */}
-        <div className="flex flex-col gap-4 lg:hidden">
-          <WelcomeHeader firstName={firstName} />
-          <WalletSummaryCard
-            balanceKobo={balanceKobo}
-            escrowKobo={escrowKobo}
-            hasEarnings={hasEarnings}
-          />
-          <QuickActions />
-          <ActiveTasksSection tasks={allTasks} loading={tasksLoading} />
-          <QuickStats
-            tasksPosted={tasksPosted}
-            tasksCompleted={tasksCompleted}
-            activeTasks={activeTasks}
-            averageRating={averageRating}
-            totalSpent={totalSpent}
-            successRate={successRate}
-            trustScore={trustScore}
-          />
-          <CategoryShortcuts />
-          <NearbyActivity />
-          <RecommendedRunners runners={[]} loading={false} />
-          <RecentActivity activities={activities} loading={tasksLoading} />
-          <SmartInsights />
-          <BecomeRunnerBanner />
-          <Callout variant="tip">
-            Complete your profile with a bio and photo to build trust and get more task opportunities.
-          </Callout>
-        </div>
-
-        {/* ─── Desktop Layout (>= 1024px) ─── */}
-        <div className="hidden lg:grid lg:grid-cols-12 lg:gap-5">
-          {/* Row 1: Greeting spans full width */}
-          <div className="col-span-12">
-            <WelcomeHeader firstName={firstName} />
-          </div>
-
-          {/* Row 2: Wallet spans the full width */}
-          <div className="col-span-12">
-            <WalletSummaryCard
-              balanceKobo={balanceKobo}
-              escrowKobo={escrowKobo}
-              hasEarnings={hasEarnings}
-            />
-          </div>
-
-          {/* Row 3: Quick Actions (4) + Active Tasks (8) */}
-          <div className="col-span-4">
-            <QuickActions />
-          </div>
-          <div className="col-span-8">
-            <ActiveTasksSection tasks={allTasks} loading={tasksLoading} />
-          </div>
-
-          {/* Row 4: My Stats (4) + Recent Activity (8, full width at xl) */}
-          <div className="col-span-4 xl:hidden">
-            <QuickStats
-              layout="compact"
-              tasksPosted={tasksPosted}
-              tasksCompleted={tasksCompleted}
-              activeTasks={activeTasks}
-              averageRating={averageRating}
-              totalSpent={totalSpent}
-              successRate={successRate}
-              trustScore={trustScore}
-            />
-          </div>
-          <div className="col-span-8 xl:col-span-12">
-            <RecentActivity activities={activities} loading={tasksLoading} />
-          </div>
-
-          {/* Row 5: Insights/Banner (4, hidden on xl where the right panel
-              duplicates them) */}
-          <div className="col-span-4 xl:hidden">
-            <div className="flex flex-col gap-5">
-              <SmartInsights />
-              <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
-                <BecomeRunnerBanner />
-              </div>
-            </div>
-          </div>
-
-          {/* Row 6: Callout */}
-          <div className="col-span-12">
-            <Callout variant="tip">
-              Complete your profile with a bio and photo to build trust and get more task opportunities.
-            </Callout>
-          </div>
-        </div>
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-10 pt-4 sm:px-6 lg:px-8">
+        <WelcomeHeader firstName={firstName} />
+        <WalletSummaryCard
+          balanceKobo={balanceKobo}
+          escrowKobo={escrowKobo}
+          hasEarnings={hasEarnings}
+        />
+        <QuickActions />
+        <ActiveTasksSection tasks={allTasks} loading={tasksLoading} />
+        <QuickStats
+          tasksPosted={tasksPosted}
+          tasksCompleted={tasksCompleted}
+          activeTasks={activeTasks}
+          averageRating={averageRating}
+          totalSpent={totalSpent}
+          successRate={successRate}
+          trustScore={trustScore}
+        />
+        <CategoryShortcuts />
+        <NearbyActivity />
+        <RecommendedRunners runners={[]} loading={false} />
+        <RecentActivity activities={activities} loading={tasksLoading} />
+        <SmartInsights />
+        <BecomeRunnerBanner />
+        <Callout variant="tip">
+          Complete your profile with a bio and photo to build trust and get more task opportunities.
+        </Callout>
       </div>
     </div>
   );
