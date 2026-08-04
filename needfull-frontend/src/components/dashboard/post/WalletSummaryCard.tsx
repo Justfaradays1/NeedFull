@@ -52,7 +52,7 @@ export function WalletSummaryCard({
         <p className="mt-1 text-2xl font-black tracking-tight sm:text-3xl">
           {hidden ? "••••••" : formatCurrency(balanceKobo)}
         </p>
-        <p className="text-xs text-on-brand/50">Ready to Spend</p>
+        <p className="text-xs text-on-brand/50">Escrow Balance</p>
 
         {escrowKobo > 0 && (
           <div className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-on-brand/10 px-2.5 py-1.5">

@@ -83,7 +83,10 @@ const EARNINGS_FILTER_TYPES = new Set([
   "purchase_escrow_release",
   "purchase_runner_fee",
   "purchase_item_reimbursement",
+  "withdrawal_failed_refund",
 ]);
+
+const WITHDRAWAL_TYPES = new Set(["withdrawal"]);
 
 function filterEarnings(transactions: WalletTransaction[], since: Date): number {
   return transactions
@@ -92,6 +95,15 @@ function filterEarnings(transactions: WalletTransaction[], since: Date): number 
       return d >= since && EARNINGS_FILTER_TYPES.has(tx.type);
     })
     .reduce((sum, tx) => sum + tx.amount.kobo, 0);
+}
+
+function availableEarnings(transactions: WalletTransaction[]): number {
+  let sum = 0;
+  for (const tx of transactions) {
+    if (EARNINGS_FILTER_TYPES.has(tx.type)) sum += tx.amount.kobo;
+    else if (WITHDRAWAL_TYPES.has(tx.type)) sum -= Math.abs(tx.amount.kobo);
+  }
+  return sum;
 }
 
 function todayEarnings(transactions: WalletTransaction[]): number {
@@ -347,21 +359,33 @@ function RunnerPerformance({ trustScore, averageRating, dayStreak }: { trustScor
 
 /* ─── EarningsCard (with DailyGoal) ─── */
 
-function EarningsCard({ todayEarned }: { todayEarned: number }) {
+function EarningsCard({
+  availableEarnings,
+  todayEarned,
+}: {
+  availableEarnings: number;
+  todayEarned: number;
+}) {
   const dailyGoal = 500000; // 5000 naira in kobo
   const progress = Math.min((todayEarned / dailyGoal) * 100, 100);
 
   return (
     <section className="rounded-xl border border-card-border bg-surface p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
+      <div className="mb-1 flex items-center justify-between">
         <h2 className="font-display text-sm font-bold text-gray-900 flex items-center gap-1.5">
           <WalletIcon className="h-4 w-4 text-gold" />
-          Today&apos;s Earnings
+          Your Earnings
         </h2>
-        <span className="font-display text-lg font-black text-gold">{formatCurrency(todayEarned)}</span>
+        <span className="text-[11px] font-medium text-gray-500">Available Earnings</span>
       </div>
-      <div className="mb-3">
-        <div className="flex items-center justify-between text-[11px] text-gray-500 mb-1">
+      <p className="font-display text-2xl font-black text-gold">
+        {formatCurrency(availableEarnings)}
+      </p>
+      <p className="mt-0.5 text-xs text-gray-500">
+        Today: <span className="font-bold text-gray-700">{formatCurrency(todayEarned)}</span>
+      </p>
+      <div className="mt-3 mb-3">
+        <div className="mb-1 flex items-center justify-between text-[11px] text-gray-500">
           <span>Today&apos;s Goal: {formatCurrency(dailyGoal)}</span>
           <span>{Math.round(progress)}%</span>
         </div>
@@ -465,6 +489,10 @@ export default function RunnerDashboard({
     () => weeklyEarnings(transactions),
     [transactions],
   );
+  const availableEarned = useMemo(
+    () => availableEarnings(transactions),
+    [transactions],
+  );
   const acceptanceRate = useMemo(
     () => Math.min(Math.round((tasksCompleted / Math.max(tasksCompleted + 2, 1)) * 100), 100),
     [tasksCompleted],
@@ -490,7 +518,7 @@ export default function RunnerDashboard({
 
         <RunnerPerformance trustScore={trustScore} averageRating={null} dayStreak={null} />
 
-        <EarningsCard todayEarned={earnedToday} />
+        <EarningsCard availableEarnings={availableEarned} todayEarned={earnedToday} />
 
         <ActivityFeed transactions={transactions} />
       </div>
