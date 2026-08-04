@@ -49,19 +49,22 @@ export function WalletSummaryCard({
           </button>
         </div>
 
-        <p className="mt-1 text-2xl font-black tracking-tight sm:text-3xl">
-          {hidden ? "••••••" : formatCurrency(balanceKobo)}
-        </p>
-        <p className="text-xs text-on-brand/50">Escrow Balance</p>
-
-        {escrowKobo > 0 && (
-          <div className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-on-brand/10 px-2.5 py-1.5">
-            <Lock className="h-3 w-3 text-on-brand/70" />
-            <span className="text-xs text-on-brand/80">
-              {formatCurrency(escrowKobo)} in escrow
-            </span>
+        <div className="mt-1 flex items-end justify-between gap-4">
+          <div className="min-w-0">
+            <p className="truncate text-2xl font-black tracking-tight sm:text-3xl">
+              {hidden ? "••••••" : formatCurrency(balanceKobo)}
+            </p>
           </div>
-        )}
+          <div className="flex min-w-0 flex-col items-end">
+            <span className="flex items-center gap-1 whitespace-nowrap text-xs font-medium text-on-brand/60">
+              <Lock className="h-3 w-3 text-on-brand/60" />
+              In Escrow
+            </span>
+            <p className="mt-1 truncate text-2xl font-black tracking-tight text-on-brand/90 sm:text-3xl">
+              {hidden ? "••••••" : formatCurrency(escrowKobo)}
+            </p>
+          </div>
+        </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Link
