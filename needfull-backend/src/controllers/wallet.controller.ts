@@ -17,7 +17,7 @@ export async function getWalletHandler(req: Request, res: Response): Promise<voi
       const { getUserVirtualAccount } = await import("../services/monnify.service");
       virtualAccount = await getUserVirtualAccount(req.user!.id);
     } catch { /* optional */ }
-    res.json({ success: true, data: { id: wallet.id, balance: { kobo: wallet.balance_kobo, naira: wallet.balance_naira }, escrow: { kobo: wallet.escrow_kobo, naira: wallet.escrow_naira }, virtualAccount: virtualAccount ? { accountNumber: virtualAccount.account_number, bankName: virtualAccount.bank_name, accountName: virtualAccount.account_name } : null } });
+    res.json({ success: true, data: { id: wallet.id, balance: { kobo: wallet.balance_kobo, naira: wallet.balance_naira }, escrow: { kobo: wallet.escrow_kobo, naira: wallet.escrow_naira }, earnings: { kobo: wallet.earnings_kobo, naira: wallet.earnings_naira }, pending: { kobo: wallet.pending_kobo, naira: wallet.pending_naira }, virtualAccount: virtualAccount ? { accountNumber: virtualAccount.account_number, bankName: virtualAccount.bank_name, accountName: virtualAccount.account_name } : null } });
   } catch (error) {
     console.error("[Wallet] getWalletHandler error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch wallet" });

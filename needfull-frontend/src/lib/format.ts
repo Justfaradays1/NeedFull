@@ -6,6 +6,11 @@ export const EARNINGS_TYPES = [
   "purchase_item_reimbursement",
 ] as const;
 
+export const EARNINGS_WITHDRAWAL_TYPES = [
+  "earnings_withdrawal",
+  "withdrawal_failed_refund",
+] as const;
+
 export function isEarningsType(type: string): boolean {
   return (EARNINGS_TYPES as readonly string[]).includes(type);
 }

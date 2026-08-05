@@ -779,6 +779,33 @@ export async function resolveDispute(
         [purchase.total_escrow, refundAmount, task.poster_id],
       );
 
+      // WHAT: Runner's share goes to EARNINGS bucket, never spendable balance
+      // WHY: Runner money is earned money — same rule as releaseEscrow
+      const runnerWallet = await client.query<any>(
+        `SELECT id, earnings FROM wallets WHERE user_id = $1 FOR UPDATE`,
+        [task.assigned_to],
+      );
+      if (runnerWallet.rows.length === 0) {
+        throw new Error(`Runner wallet not found for user ${task.assigned_to}`);
+      }
+      await client.query(
+        `UPDATE wallets SET earnings = earnings + $1, updated_at = NOW() WHERE user_id = $2`,
+        [runnerGets, task.assigned_to],
+      );
+      await client.query(
+        `INSERT INTO wallet_transactions 
+         (wallet_id, type, amount, balance_before, balance_after, task_id, note, created_at)
+         VALUES ($1, 'earnings', $2, $3, $4, $5, $6, NOW())`,
+        [
+          runnerWallet.rows[0].id,
+          runnerGets,
+          runnerWallet.rows[0].earnings,
+          runnerWallet.rows[0].earnings + runnerGets,
+          task.id,
+          `Runner fee from purchase dispute split (task ${task.id})`,
+        ],
+      );
+
       await client.query(
         "UPDATE purchase_tasks SET status = 'completed', updated_at = NOW() WHERE id = $1",
         [purchase.id],

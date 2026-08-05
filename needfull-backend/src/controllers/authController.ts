@@ -514,11 +514,18 @@ export async function getMe(req: Request, res: Response): Promise<void> {
       wallet_id: string;
       balance: number;
       escrow: number;
+      earnings: number;
+      pending_kobo: number;
       trust_score: number;
     }>(
       `SELECT 
         u.id, u.email, u.full_name, u.role, u.roles, u.active_role, u.email_verified_at, u.google_id, u.is_available,
-        w.id as wallet_id, w.balance, w.escrow,
+        w.id as wallet_id, w.balance, w.escrow, w.earnings,
+        COALESCE((
+          SELECT SUM(COALESCE(t.agreed_amount_kobo, t.budget_kobo))
+          FROM tasks t
+          WHERE t.assigned_to = u.id AND t.status = 'in_progress' AND t.runner_done_at IS NOT NULL
+        ), 0)::int AS pending_kobo,
         COALESCE(u.trust_score, 50) as trust_score
        FROM users u
        LEFT JOIN wallets w ON w.user_id = u.id
@@ -543,6 +550,8 @@ export async function getMe(req: Request, res: Response): Promise<void> {
         id: result.wallet_id,
         balanceKobo: result.balance,
         escrowKobo: result.escrow,
+        earningsKobo: result.earnings,
+        pendingKobo: result.pending_kobo,
       },
     });
   } catch (error) {

@@ -174,12 +174,13 @@ router.post(
           const reference = transferData.reference;
 
           // WHAT: Fetch withdrawal request
-          // WHY: Get user_id and amount to refund
+          // WHY: Get user_id, amount, and source bucket to refund
           const withdrawal = await queryOne<{
             user_id: string;
             amount_kobo: number;
+            source: string;
           }>(
-            `SELECT user_id, amount_kobo FROM withdrawal_requests WHERE reference = $1`,
+            `SELECT user_id, amount_kobo, source FROM withdrawal_requests WHERE reference = $1`,
             [reference],
           );
 
@@ -193,18 +194,31 @@ router.post(
           );
 
           // WHAT: Refund wallet if escrow is held
-          // WHY: Return funds to user's balance when transfer fails
+          // WHY: Return funds to the SAME bucket they were debited from so
+          //      earned money is never refunded into the funded balance (or
+          //      vice versa)
           await withTransaction(async (client) => {
-            // NOTE: Assume escrow was locked for withdrawal
-            // This is a simplified refund - real implementation may need adjustment
-            await creditWallet(
-              client,
-              withdrawal.user_id,
-              withdrawal.amount_kobo,
-              "withdrawal_failed_refund",
-              `Withdrawal refunded due to transfer failure: ${transferData.reason || "Unknown reason"}`,
-              `paystack_failure_${reference}`, // idempotencyKey
-            );
+            if (withdrawal.source === "earnings") {
+              const { creditEarnings } = await import("../services/wallet.service");
+              await creditEarnings(
+                client,
+                withdrawal.user_id,
+                withdrawal.amount_kobo,
+                "withdrawal_failed_refund",
+                `Withdrawal refunded due to transfer failure: ${transferData.reason || "Unknown reason"}`,
+                `paystack_failure_${reference}`, // idempotencyKey
+              );
+            } else {
+              const { creditWallet } = await import("../services/wallet.service");
+              await creditWallet(
+                client,
+                withdrawal.user_id,
+                withdrawal.amount_kobo,
+                "withdrawal_failed_refund",
+                `Withdrawal refunded due to transfer failure: ${transferData.reason || "Unknown reason"}`,
+                `paystack_failure_${reference}`, // idempotencyKey
+              );
+            }
           });
 
           // WHAT: Notify user of failed transfer

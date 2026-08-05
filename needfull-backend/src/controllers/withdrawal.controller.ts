@@ -19,13 +19,27 @@ export async function requestWithdrawal(req: Request, res: Response): Promise<vo
       return;
     }
 
-    const userResult = await db.query<any>("SELECT email_verified_at FROM users WHERE id = $1", [userId]);
+    const userResult = await db.query<any>("SELECT email_verified_at, active_role FROM users WHERE id = $1", [userId]);
     if (userResult.rows.length === 0) { res.status(404).json({ success: false, message: "User not found" }); return; }
     if (!userResult.rows[0].email_verified_at) { res.status(403).json({ success: false, message: "Verify your email before withdrawing" }); return; }
 
-    const walletResult = await db.query<any>("SELECT id, balance AS balance_kobo FROM wallets WHERE user_id = $1", [userId]);
+    // WHAT: Role-aware withdrawal source — runners withdraw EARNINGS, posters
+    //      withdraw their funded BALANCE back
+    // WHY: Funded money and earned money can never mix; a funded deposit cannot
+    //      be drained through the runner earnings flow
+    const isRunner = userResult.rows[0].active_role === "runner";
+    const source = isRunner ? "earnings" : "balance";
+
+    const walletResult = isRunner
+      ? await db.query<any>("SELECT id, earnings AS balance_kobo, balance AS funded_kobo FROM wallets WHERE user_id = $1", [userId])
+      : await db.query<any>("SELECT id, balance AS balance_kobo, earnings AS earnings_kobo FROM wallets WHERE user_id = $1", [userId]);
+
     if (walletResult.rows.length === 0) { res.status(404).json({ success: false, message: "Wallet not found" }); return; }
-    if (walletResult.rows[0].balance_kobo < totalDebit) { res.status(400).json({ success: false, message: `Insufficient balance. Need ₦${(totalDebit / 100).toFixed(2)} including ₦${(WITHDRAWAL_FEE_KOBO / 100).toFixed(2)} fee` }); return; }
+    if (walletResult.rows[0].balance_kobo < totalDebit) {
+      const label = isRunner ? "available earnings" : "balance";
+      res.status(400).json({ success: false, message: `Insufficient ${label}. Need ₦${(totalDebit / 100).toFixed(2)} including ₦${(WITHDRAWAL_FEE_KOBO / 100).toFixed(2)} fee` });
+      return;
+    }
 
     const { resolveAccountNumber, createTransferRecipient, initiateTransfer } = await import("../services/paystack.service");
 
@@ -36,14 +50,27 @@ export async function requestWithdrawal(req: Request, res: Response): Promise<vo
     const withdrawalId = uuidv4();
 
     await withTransaction(async (client) => {
-      const { debitWallet } = await import("../services/wallet.service.js");
-      await debitWallet(
-        client,
-        userId,
-        totalDebit,
-        "withdrawal",
-        `Withdrawal to ${bankName} ${accountNumber}`
-      );
+      // WHAT: Debit from the role-appropriate bucket
+      // WHY: Runner → earnings balance; Poster → funded spendable balance
+      if (isRunner) {
+        const { debitEarnings } = await import("../services/wallet.service.js");
+        await debitEarnings(
+          client,
+          userId,
+          totalDebit,
+          "earnings_withdrawal",
+          `Withdrawal to ${bankName} ${accountNumber}`,
+        );
+      } else {
+        const { debitWallet } = await import("../services/wallet.service.js");
+        await debitWallet(
+          client,
+          userId,
+          totalDebit,
+          "withdrawal",
+          `Withdrawal to ${bankName} ${accountNumber}`,
+        );
+      }
 
       // WHAT: Create recipient on Paystack
       const rc = await createTransferRecipient({ name: resolvedName, accountNumber, bankCode });
@@ -55,8 +82,8 @@ export async function requestWithdrawal(req: Request, res: Response): Promise<vo
 
       // WHAT: Insert withdrawal request
       await client.query(
-        "INSERT INTO withdrawal_requests (id, user_id, amount_kobo, fee_kobo, account_number, bank_code, bank_name, account_name, recipient_code, transfer_id, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'processing', NOW(), NOW())",
-        [withdrawalId, userId, amountKobo, WITHDRAWAL_FEE_KOBO, accountNumber, bankCode, bankName, resolvedName, rc, tr.transferCode || ""],
+        "INSERT INTO withdrawal_requests (id, user_id, amount_kobo, fee_kobo, account_number, bank_code, bank_name, account_name, recipient_code, transfer_id, source, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'processing', NOW(), NOW())",
+        [withdrawalId, userId, amountKobo, WITHDRAWAL_FEE_KOBO, accountNumber, bankCode, bankName, resolvedName, rc, tr.transferCode || "", source],
       );
     });
 

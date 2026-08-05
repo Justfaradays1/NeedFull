@@ -184,7 +184,11 @@ export default function WithdrawPage() {
     return null;
   }
 
-  const balanceKobo = user?.wallet?.balanceKobo ?? 0;
+  const isRunner = user?.activeRole === "runner";
+  const balanceKobo = isRunner
+    ? (user?.wallet?.earningsKobo ?? 0)
+    : (user?.wallet?.balanceKobo ?? 0);
+  const balanceLabel = isRunner ? "Available Earnings" : "Available Balance";
   const balanceNaira = balanceKobo / 100;
   const amountNum = parseFloat(amount) || 0;
   const totalDeduction = amountNum + WITHDRAWAL_FEE_NAIRA;
@@ -244,7 +248,7 @@ export default function WithdrawPage() {
     const e: Record<string, string> = {};
     if (!amountNum || amountNum < 100) e.amount = "Minimum withdrawal is ₦100";
     if (totalDeduction > balanceNaira)
-      e.amount = `Insufficient balance. You need ${formatCurrency(Math.round(totalDeduction * 100))}`;
+      e.amount = `Insufficient ${balanceLabel.toLowerCase()}. You need ${formatCurrency(Math.round(totalDeduction * 100))}`;
     if (!selectedBank) e.bank = "Select your bank";
     if (accountNumber.length !== 10)
       e.accountNumber = "Enter a valid 10-digit account number";
@@ -499,7 +503,7 @@ export default function WithdrawPage() {
           <div className="rounded-xl bg-white/10 px-5 py-3 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-white/70">
-                Available Balance
+                {balanceLabel}
               </p>
               <span className="font-display text-xl font-bold text-white">
                 {formatCurrency(Math.round(balanceNaira * 100))}

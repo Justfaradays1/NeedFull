@@ -83,7 +83,7 @@ const EARNINGS_FILTER_TYPES = new Set([
   "withdrawal_failed_refund",
 ]);
 
-const WITHDRAWAL_TYPES = new Set(["withdrawal"]);
+const WITHDRAWAL_TYPES = new Set(["withdrawal", "earnings_withdrawal"]);
 
 function filterEarnings(transactions: WalletTransaction[], since: Date): number {
   return transactions

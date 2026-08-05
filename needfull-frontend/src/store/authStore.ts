@@ -25,6 +25,8 @@ export interface AuthUser {
     id: string;
     balanceKobo: number;
     escrowKobo: number;
+    earningsKobo: number;
+    pendingKobo: number;
   };
 }
 
@@ -69,6 +71,8 @@ interface MeResponse {
     id: string;
     balanceKobo: number;
     escrowKobo: number;
+    earningsKobo: number;
+    pendingKobo: number;
   };
 }
 
@@ -288,8 +292,10 @@ export const useAuthStore = create<AuthStore>()(
                 ...user,
                 wallet: {
                   id: wallet.id,
-                  balanceKobo: wallet.balanceKobo,
-                  escrowKobo: wallet.escrowKobo,
+                  balanceKobo: wallet.balanceKobo ?? 0,
+                  escrowKobo: wallet.escrowKobo ?? 0,
+                  earningsKobo: wallet.earningsKobo ?? 0,
+                  pendingKobo: wallet.pendingKobo ?? 0,
                 },
               },
             });

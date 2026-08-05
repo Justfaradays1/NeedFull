@@ -29,7 +29,8 @@ import { formatCurrency, isEarningsType } from "@/lib/format";
 interface WalletData {
   balance: { kobo: number; naira: number };
   escrow: { kobo: number; naira: number };
-  pending?: { kobo: number; naira: number };
+  earnings: { kobo: number; naira: number };
+  pending: { kobo: number; naira: number };
 }
 
 // WHAT: Single transaction from API
@@ -60,6 +61,7 @@ const TX_LABELS: Record<string, string> = {
   monnify_deposit: "Virtual Account Deposit",
   manual_deposit_confirmed: "Bank Transfer",
   withdrawal: "Withdrawal",
+  earnings_withdrawal: "Earnings Withdrawal",
   escrow_lock: "Escrow Hold",
   escrow_release: "Escrow Released",
   earnings: "Task Earnings",
@@ -76,7 +78,12 @@ const TX_LABELS: Record<string, string> = {
 type TxCategory = "credit" | "debit" | "escrow" | "fee";
 function getTxCategory(type: string): TxCategory {
   if (type === "escrow_lock") return "escrow";
-  if (type === "fee" || type === "withdrawal") return "debit";
+  if (
+    type === "fee" ||
+    type === "withdrawal" ||
+    type === "earnings_withdrawal"
+  )
+    return "debit";
   return "credit";
 }
 
@@ -261,6 +268,9 @@ export default function WalletPage() {
 
   const balanceKobo = wallet?.balance?.kobo ?? user?.wallet?.balanceKobo ?? 0;
   const escrowKobo = wallet?.escrow?.kobo ?? user?.wallet?.escrowKobo ?? 0;
+  const earningsKobo = wallet?.earnings?.kobo ?? user?.wallet?.earningsKobo ?? 0;
+  const pendingKobo = wallet?.pending?.kobo ?? user?.wallet?.pendingKobo ?? 0;
+  const isRunner = user?.activeRole === "runner";
   const hasMore = pagination ? pagination.page < pagination.totalPages : false;
 
   return (
@@ -283,7 +293,7 @@ export default function WalletPage() {
           </button>
         </div>
 
-        {/* Balance display */}
+        {/* Balance display — role-aware: runners see earnings, posters see funded balance */}
         {isLoadingWallet ? (
           <div className="space-y-3 py-4">
             <div className="h-3 w-24 skeleton rounded" />
@@ -292,25 +302,36 @@ export default function WalletPage() {
           </div>
         ) : (
           <div className="space-y-1">
-            <p className="text-sm font-medium text-white/70">Available Balance</p>
+            <p className="text-sm font-medium text-white/70">
+              {isRunner ? "Available Earnings" : "Available Balance"}
+            </p>
             <p className="font-display text-4xl font-bold text-white">
-              {formatCurrency(balanceKobo)}
+              {formatCurrency(isRunner ? earningsKobo : balanceKobo)}
             </p>
             <div className="space-y-0.5 pt-1">
-              <div className="flex items-center gap-1.5">
-                <Lock className="h-3.5 w-3.5 text-gold" />
-                <p className="text-sm text-white/70">
-                  {formatCurrency(escrowKobo)} in escrow
-                </p>
-              </div>
-              {wallet?.pending && wallet.pending.kobo > 0 && (
+              {pendingKobo > 0 && isRunner && (
                 <div className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-white/50" />
-                  <p className="text-sm text-white/50">
-                    {formatCurrency(wallet.pending.kobo)} pending
+                  <Clock className="h-3.5 w-3.5 text-gold" />
+                  <p className="text-sm text-white/70">
+                    {formatCurrency(pendingKobo)} awaiting poster confirmation
                   </p>
                 </div>
               )}
+              {!isRunner && escrowKobo > 0 && (
+                <div className="flex items-center gap-1.5">
+                  <Lock className="h-3.5 w-3.5 text-gold" />
+                  <p className="text-sm text-white/70">
+                    {formatCurrency(escrowKobo)} in escrow
+                  </p>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5">
+                <Wallet className="h-3.5 w-3.5 text-white/50" />
+                <p className="text-sm text-white/50">
+                  {formatCurrency(isRunner ? balanceKobo : earningsKobo)}{" "}
+                  {isRunner ? "funded balance" : "earned as runner"}
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -324,15 +345,13 @@ export default function WalletPage() {
             <Wallet className="h-5 w-5" />
             Fund Wallet
           </Link>
-          {user?.activeRole === "runner" && (
-            <Link
-              href="/wallet/withdraw"
-              className="tap-target flex flex-1 items-center justify-center gap-2 rounded-lg border-2 border-white/40 px-4 py-3 font-semibold text-white transition-colors hover:bg-white/10"
-            >
-              <ArrowUpRight className="h-5 w-5" />
-              Withdraw
-            </Link>
-          )}
+          <Link
+            href="/wallet/withdraw"
+            className="tap-target flex flex-1 items-center justify-center gap-2 rounded-lg border-2 border-white/40 px-4 py-3 font-semibold text-white transition-colors hover:bg-white/10"
+          >
+            <ArrowUpRight className="h-5 w-5" />
+            Withdraw
+          </Link>
         </div>
       </div>
 

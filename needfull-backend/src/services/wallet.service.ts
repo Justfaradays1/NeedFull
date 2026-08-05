@@ -12,6 +12,8 @@ interface Wallet {
   user_id: string;
   balance_kobo: number;
   escrow_kobo: number;
+  earnings_kobo: number;
+  pending_earnings_kobo: number;
   updated_at: string;
   // WHAT: Id of the wallet_transactions row created by this operation (or the
   // matching existing row when the idempotency key hit). Undefined when no
@@ -23,7 +25,8 @@ interface Wallet {
 
 // WHAT: Helper to alias wallet DB columns (balance/escrow → balance_kobo/escrow_kobo)
 // WHY: DB uses `balance`/`escrow` but TypeScript uses `_kobo` suffix for consistency
-const WALLET_SELECT = "id, user_id, balance AS balance_kobo, escrow AS escrow_kobo, updated_at";
+const WALLET_SELECT =
+  "id, user_id, balance AS balance_kobo, escrow AS escrow_kobo, earnings AS earnings_kobo, pending_earnings AS pending_earnings_kobo, updated_at";
 
 // WHAT: Credit wallet with amount (deposit, earnings, refund)
 // WHY: Add funds to user wallet with idempotency protection and audit trail
@@ -303,7 +306,6 @@ export async function releaseEscrow(
     const posterWalletRow = posterWallet.rows[0];
     const runnerWalletRow = runnerWallet.rows[0];
     const posterEscrowBefore = posterWalletRow.escrow_kobo;
-    const runnerBalanceBefore = runnerWalletRow.balance_kobo;
 
     // WHAT: Release escrow from poster's wallet
     // WHY: Remove from escrow hold, funds go to platform
@@ -315,18 +317,20 @@ export async function releaseEscrow(
       [amountKobo, posterWalletRow.id],
     );
 
-    // WHAT: Credit runner with payout minus fee
-    // WHY: Give runner their earnings
+    // WHAT: Credit runner's earnings bucket — NOT the spendable balance
+    // WHY: Runner money is earned money. Keeping it in a separate bucket means
+    //      funded deposits (poster wallet) can never be withdrawn as earnings
     const runnerUpdated = await client.query<Wallet>(
       `UPDATE wallets 
-       SET balance = balance + $1, updated_at = NOW()
+       SET earnings = earnings + $1, updated_at = NOW()
        WHERE id = $2 
        RETURNING ${WALLET_SELECT}`,
       [runnerReceives, runnerWalletRow.id],
     );
 
     // WHAT: Record escrow release transaction for runner (earnings)
-    // WHY: Show runner what they earned
+    // WHY: Show runner what they earned; before/after reflect the earnings
+    //      bucket, not the (untouched) spendable balance
     await client.query(
       `INSERT INTO wallet_transactions 
        (wallet_id, type, amount, balance_before, balance_after, 
@@ -336,10 +340,10 @@ export async function releaseEscrow(
         runnerWalletRow.id,
         "earnings",
         runnerReceives,
-        runnerBalanceBefore,
-        runnerBalanceBefore + runnerReceives,
+        runnerWalletRow.earnings_kobo,
+        runnerWalletRow.earnings_kobo + runnerReceives,
         taskId,
-        `Earnings from task ${taskId}`,
+        `Available earnings from task ${taskId}`,
       ],
     );
 
@@ -448,9 +452,12 @@ export async function getWallet(userId: string): Promise<{
   id: string;
   balance_kobo: number;
   escrow_kobo: number;
-  pending_kobo: number;
+  earnings_kobo: number;
+  pending_earnings_kobo: number;
   balance_naira: number;
   escrow_naira: number;
+  earnings_naira: number;
+  pending_kobo: number;
   pending_naira: number;
 }> {
   try {
@@ -460,23 +467,162 @@ export async function getWallet(userId: string): Promise<{
       id: string;
       balance_kobo: number;
       escrow_kobo: number;
-      pending_kobo: number;
-    }    >(`SELECT id, balance AS balance_kobo, escrow AS escrow_kobo FROM wallets WHERE user_id = $1`, [
+      earnings_kobo: number;
+      pending_earnings_kobo: number;
+    }>(`SELECT id, balance AS balance_kobo, escrow AS escrow_kobo, earnings AS earnings_kobo, pending_earnings AS pending_earnings_kobo FROM wallets WHERE user_id = $1`, [
       userId,
     ]);
+
+    // WHAT: Runner's pending release — the payout slice of tasks the runner has
+    // marked done but the poster has not confirmed yet
+    // WHY: Money is still held in the poster's escrow until confirmation; this
+    //      is a live, computed number, not a stored balance
+    const pendingRes = await queryOne<{ pending_kobo: number }>(
+      `SELECT COALESCE(SUM(COALESCE(agreed_amount_kobo, budget_kobo)), 0)::int AS pending_kobo
+       FROM tasks
+       WHERE assigned_to = $1 AND status = 'in_progress' AND runner_done_at IS NOT NULL`,
+      [userId],
+    );
+    const pendingKobo = pendingRes?.pending_kobo ?? 0;
 
     return {
       id: result.id,
       balance_kobo: result.balance_kobo,
       escrow_kobo: result.escrow_kobo,
-      pending_kobo: 0,
+      earnings_kobo: result.earnings_kobo,
+      pending_earnings_kobo: pendingKobo,
       balance_naira: result.balance_kobo / 100,
       escrow_naira: result.escrow_kobo / 100,
-      pending_naira: 0,
+      earnings_naira: result.earnings_kobo / 100,
+      pending_kobo: pendingKobo,
+      pending_naira: pendingKobo / 100,
     };
   } catch (error) {
     throw new Error(
       `Failed to get wallet for user ${userId}: ${error instanceof Error ? error.message : "Unknown error"}`,
     );
   }
+}
+
+// WHAT: Debit Available Earnings (runner withdrawals only)
+// WHY: Runner withdrawals draw solely from earned money — never from the
+//      funded balance. Locked + ledgered like every other wallet movement.
+export async function debitEarnings(
+  client: PoolClient,
+  userId: string,
+  amountKobo: number,
+  type: string,
+  note: string,
+  idempotencyKey?: string,
+): Promise<Wallet> {
+  const wallet = await client.query<Wallet>(
+    `SELECT ${WALLET_SELECT}
+      FROM wallets WHERE user_id = $1 FOR UPDATE`,
+    [userId],
+  );
+
+  if (wallet.rows.length === 0) {
+    throw new Error(`Wallet not found for user ${userId}`);
+  }
+
+  const walletRow = wallet.rows[0];
+  if (walletRow.earnings_kobo < amountKobo) {
+    throw new Error(
+      `Insufficient available earnings. Required: ₦${(amountKobo / 100).toFixed(2)}, Available: ₦${(walletRow.earnings_kobo / 100).toFixed(2)}`,
+    );
+  }
+
+  if (idempotencyKey) {
+    const existing = await client.query(
+      `SELECT id FROM wallet_transactions 
+       WHERE wallet_id = $1 AND idempotency_key = $2`,
+      [walletRow.id, idempotencyKey],
+    );
+    if (existing.rows.length > 0) {
+      return walletRow;
+    }
+  }
+
+  const earningsBefore = walletRow.earnings_kobo;
+  const updated = await client.query<Wallet>(
+    `UPDATE wallets SET earnings = earnings - $1, updated_at = NOW()
+     WHERE id = $2 RETURNING ${WALLET_SELECT}`,
+    [amountKobo, walletRow.id],
+  );
+
+  await client.query(
+    `INSERT INTO wallet_transactions 
+     (wallet_id, type, amount, balance_before, balance_after, 
+      idempotency_key, note, created_at)
+     VALUES ($1, $2, -$3, $4, $5, $6, $7, NOW())`,
+    [
+      walletRow.id,
+      type,
+      amountKobo,
+      earningsBefore,
+      walletRow.earnings_kobo - amountKobo,
+      idempotencyKey || null,
+      note,
+    ],
+  );
+
+  return updated.rows[0];
+}
+
+// WHAT: Credit Available Earnings back (failed-runner-withdrawal refunds, etc.)
+export async function creditEarnings(
+  client: PoolClient,
+  userId: string,
+  amountKobo: number,
+  type: string,
+  note: string,
+  idempotencyKey?: string,
+): Promise<Wallet> {
+  const wallet = await client.query<Wallet>(
+    `SELECT ${WALLET_SELECT}
+      FROM wallets WHERE user_id = $1 FOR UPDATE`,
+    [userId],
+  );
+
+  if (wallet.rows.length === 0) {
+    throw new Error(`Wallet not found for user ${userId}`);
+  }
+
+  const walletRow = wallet.rows[0];
+
+  if (idempotencyKey) {
+    const existing = await client.query(
+      `SELECT id FROM wallet_transactions 
+       WHERE wallet_id = $1 AND idempotency_key = $2`,
+      [walletRow.id, idempotencyKey],
+    );
+    if (existing.rows.length > 0) {
+      return walletRow;
+    }
+  }
+
+  const earningsBefore = walletRow.earnings_kobo;
+  const updated = await client.query<Wallet>(
+    `UPDATE wallets SET earnings = earnings + $1, updated_at = NOW()
+     WHERE id = $2 RETURNING ${WALLET_SELECT}`,
+    [amountKobo, walletRow.id],
+  );
+
+  await client.query(
+    `INSERT INTO wallet_transactions 
+     (wallet_id, type, amount, balance_before, balance_after, 
+      idempotency_key, note, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
+    [
+      walletRow.id,
+      type,
+      amountKobo,
+      earningsBefore,
+      walletRow.earnings_kobo + amountKobo,
+      idempotencyKey || null,
+      note,
+    ],
+  );
+
+  return updated.rows[0];
 }
