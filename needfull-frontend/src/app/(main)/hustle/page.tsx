@@ -17,6 +17,7 @@ import {
   ArrowUpRight,
   CircleDollarSign,
   Flame,
+  Star,
 } from "lucide-react";
 import { get } from "@/lib/apiClient";
 import { useAuthUser, useAuthStore } from "@/store";
@@ -30,12 +31,28 @@ interface TaskItem {
   status: string;
   isUrgent: boolean;
   createdAt: string;
+  deadline: string | null;
+  locationLabel: string | null;
+  distance: number | null;
   applicationCount: number;
   category: { id: string; name: string; icon: string } | null;
-  poster: { id: string; fullName: string };
+  poster: { id: string; fullName: string; trustScore?: number };
 }
 
-type SortMode = "ranked" | "newest" | "highest";
+type SortMode = "ranked" | "newest" | "highest" | "nearest";
+
+// WHAT: Read the runner's saved location (set during onboarding/Start Earning)
+// WHY: Enables server-side distance on every task so cards can show "2.1km away"
+function getRunnerLocation(): { lat: number; lng: number } | null {
+  try {
+    const raw = localStorage.getItem("nf_runner_location");
+    if (!raw) return null;
+    const loc = JSON.parse(raw);
+    return loc && typeof loc.lat === "number" && typeof loc.lng === "number" ? loc : null;
+  } catch {
+    return null;
+  }
+}
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -52,7 +69,26 @@ function timeAgo(dateStr: string): string {
   });
 }
 
+function timeLeft(dateStr: string): string | null {
+  const ms = new Date(dateStr).getTime() - Date.now();
+  if (ms <= 0) return "Due now";
+  const mins = Math.floor(ms / 60000);
+  if (mins < 60) return `Due in ${mins}m`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 48) return `Due in ${hrs}h`;
+  return null;
+}
+
+function formatDistance(meters: number | null): string | null {
+  if (meters === null || meters === undefined) return null;
+  if (meters < 1000) return `${Math.round(meters)}m away`;
+  return `${(meters / 1000).toFixed(1)}km away`;
+}
+
 function TaskCard({ task, index }: { task: TaskItem; index: number }) {
+  const distance = formatDistance(task.distance);
+  const due = task.deadline ? timeLeft(task.deadline) : null;
+
   return (
     <Link
       href={`/feed/${task.id}`}
@@ -88,10 +124,24 @@ function TaskCard({ task, index }: { task: TaskItem; index: number }) {
               <Clock className="h-3 w-3" />
               {timeAgo(task.createdAt)}
             </span>
-            <span className="inline-flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              {task.poster?.fullName?.split(" ")[0] || "Campus"}
-            </span>
+            {distance && (
+              <span className="inline-flex items-center gap-1 font-semibold text-brand-text">
+                <MapPin className="h-3 w-3" />
+                {distance}
+              </span>
+            )}
+            {due && (
+              <span className="inline-flex items-center gap-1 text-red-600">
+                <Clock className="h-3 w-3" />
+                {due}
+              </span>
+            )}
+            {typeof task.poster?.trustScore === "number" && (
+              <span className="inline-flex items-center gap-1">
+                <Star className="h-3 w-3 fill-gold text-gold" />
+                Poster {task.poster.trustScore}
+              </span>
+            )}
             {task.applicationCount > 0 ? (
               <span className="inline-flex items-center gap-1">
                 <Briefcase className="h-3 w-3" />
@@ -119,6 +169,7 @@ function TaskCard({ task, index }: { task: TaskItem; index: number }) {
 
 const SORT_OPTIONS: { value: SortMode; label: string }[] = [
   { value: "ranked", label: "Top Ranked" },
+  { value: "nearest", label: "Nearest" },
   { value: "newest", label: "Newest" },
   { value: "highest", label: "Highest Pay" },
 ];
@@ -136,9 +187,11 @@ export default function HustlePage() {
     try {
       setLoading(true);
       setError(false);
-      const res = await get<{ success: boolean; data: TaskItem[] }>(
-        "/tasks?status=open&sortBy=newest&perPage=50",
-      );
+      const loc = getRunnerLocation();
+      const query = loc
+        ? `/tasks?status=open&sortBy=newest&perPage=50&lat=${loc.lat}&lng=${loc.lng}&radiusKm=10`
+        : "/tasks?status=open&sortBy=newest&perPage=50";
+      const res = await get<{ success: boolean; data: TaskItem[] }>(query);
       if (res.success) setTasks(res.data);
     } catch {
       setError(true);
@@ -171,6 +224,8 @@ export default function HustlePage() {
       sorted.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
     } else if (sort === "highest") {
       sorted.sort((a, b) => b.budget.kobo - a.budget.kobo);
+    } else if (sort === "nearest") {
+      sorted.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
     } else {
       // ranked: urgent first, then newest within each band
       sorted.sort((a, b) => {
