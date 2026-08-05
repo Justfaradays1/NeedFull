@@ -192,6 +192,17 @@ export default function WalletFundPage() {
 
       {/* WHAT: Info footer */}
       <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+        {user?.activeRole === "runner" && (
+          <div className="mb-3 rounded-xl border border-gold/30 bg-gold-light/60 px-4 py-3">
+            <p className="text-xs font-medium text-gray-700">
+              Funds you add here go to your{" "}
+              <strong className="font-bold">spendable balance</strong> for
+              posting tasks and escrow. Money you earn from doing tasks is
+              tracked separately as Available Earnings — it can&apos;t be added,
+              only withdrawn.
+            </p>
+          </div>
+        )}
         <div className="rounded-xl bg-brand-light px-4 py-3">
           <p className="text-xs font-medium text-brand-dark">
             All payments are processed securely through PCI-compliant gateways.

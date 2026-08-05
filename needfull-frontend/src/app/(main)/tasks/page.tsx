@@ -150,11 +150,16 @@ function PostedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
 
 function AcceptedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
   const canContinue = task.capabilities?.canChat;
+  const isActive = task.status === "in_progress";
   return (
     <button
       type="button"
       onClick={onTap}
-      className={`tap-target w-full rounded-2xl border bg-surface p-4 text-left shadow-card transition-shadow duration-200 active:scale-[0.99] hover:border-brand/30 ${canContinue ? "border-brand/20 ring-1 ring-brand/10" : "border-card-border"}`}
+      className={`tap-target w-full rounded-2xl border bg-surface p-4 text-left shadow-card transition-shadow duration-200 active:scale-[0.99] hover:border-brand/30 ${
+        isActive
+          ? "border-amber-300/60 ring-1 ring-amber-200/40"
+          : "border-card-border"
+      }`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
@@ -162,10 +167,24 @@ function AcceptedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
             <h3 className="text-sm font-semibold text-gray-900 line-clamp-1">
               {task.title}
             </h3>
+            {task.isUrgent && (
+              <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-bold text-red-700">
+                URGENT
+              </span>
+            )}
           </div>
-          <div className="mt-1 flex items-center gap-2 text-[11px] text-gray-500">
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-gray-500">
             <Avatar name={task.poster?.fullName} size="xs" />
             <span>{task.poster?.fullName || "Unknown"}</span>
+            {isActive && (
+              <span className="inline-flex items-center gap-1 font-semibold text-amber-700">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-500" />
+                </span>
+                Working on this
+              </span>
+            )}
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
@@ -179,7 +198,7 @@ function AcceptedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
         <div className="mt-3 flex justify-end">
           <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-on-brand">
             <MessageCircle className="h-3.5 w-3.5" />
-            Continue
+            {isActive ? "Open Chat" : "Continue"}
           </span>
         </div>
       )}
@@ -416,9 +435,10 @@ export default function MyTasksPage() {
                     key={task.id}
                     task={task}
                     onTap={() => {
+                      // WHAT: Active tasks open the live conversation; finished
+                      // tasks open the task record
                       if (task.status === "in_progress") {
-                        // WHAT: Navigate to chat — TODO: create the chat route
-                        router.push(`/feed/${task.id}`);
+                        router.push(`/chat/${task.id}`);
                       } else {
                         router.push(`/feed/${task.id}`);
                       }
