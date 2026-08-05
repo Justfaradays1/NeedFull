@@ -16,6 +16,8 @@ import {
   XCircle,
   Loader2,
   MessageCircle,
+  Users,
+  Star,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthInit, useIsAuthenticated, useAuthUser } from "@/store";
@@ -44,6 +46,8 @@ interface TaskDetail {
   status: string;
   isUrgent: boolean;
   locationLabel: string | null;
+  lat?: number | null;
+  lng?: number | null;
   deadline: string | null;
   imageUrl: string | null;
   createdAt: string;
@@ -89,6 +93,45 @@ export default function MyTaskDetailPage() {
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
   const [completeConfirmOpen, setCompleteConfirmOpen] = useState(false);
   const celebration = useCelebration();
+
+  // WHAT: Nearby available runners shown to a poster on an open task
+  interface NearbyRunner {
+    id: string;
+    fullName: string;
+    bio: string | null;
+    profilePictureUrl: string | null;
+    department: string | null;
+    level: string | null;
+    trustScore: number;
+    tasksCompleted: number;
+    distanceMeters: number;
+  }
+  const [nearbyRunners, setNearbyRunners] = useState<NearbyRunner[] | null>(null);
+  const [nearbyLoading, setNearbyLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated || !task) return;
+    const isOpenPosterView = task.id === params.id && task.status === "open" && task.poster?.id === user?.id;
+    if (!isOpenPosterView || !task.lat || !task.lng) return;
+    let cancelled = false;
+    const fetchNearby = async () => {
+      setNearbyLoading(true);
+      try {
+        const res = await apiClient.get(
+          `/users/nearby-runners?lat=${task.lat}&lng=${task.lng}&radiusMeters=5000`,
+        );
+        if (!cancelled) setNearbyRunners(res.data?.data ?? []);
+      } catch {
+        // Non-critical — silently ignore runner discovery failures
+      } finally {
+        if (!cancelled) setNearbyLoading(false);
+      }
+    };
+    fetchNearby();
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated, task, params.id, user?.id]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -337,6 +380,84 @@ export default function MyTaskDetailPage() {
             </div>
           </div>
         </div>
+
+        {task.status === "open" && task.lat && task.lng && (
+          <div className="px-4 pb-6">
+            <div className="overflow-hidden rounded-2xl border border-card-border bg-surface shadow-sm">
+              <div className="flex items-center justify-between border-b border-card-border px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-brand-text" />
+                  <h2 className="text-sm font-bold text-gray-900">
+                    Available runners near this task
+                  </h2>
+                </div>
+                {!nearbyLoading && nearbyRunners && (
+                  <span className="text-xs font-medium text-gray-500">
+                    {nearbyRunners.length} online within 5km
+                  </span>
+                )}
+              </div>
+
+              {nearbyLoading ? (
+                <div className="space-y-2 px-4 py-4">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="h-14 skeleton rounded-xl" />
+                  ))}
+                </div>
+              ) : nearbyRunners && nearbyRunners.length > 0 ? (
+                <div className="divide-y divide-card-border">
+                  {nearbyRunners.map((r) => (
+                    <div key={r.id} className="flex items-center gap-3 px-4 py-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand-text">
+                        {r.profilePictureUrl ? (
+                          <img
+                            src={r.profilePictureUrl}
+                            alt={r.fullName}
+                            className="h-10 w-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          r.fullName.charAt(0).toUpperCase()
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-gray-900">
+                          {r.fullName}
+                        </p>
+                        <p className="truncate text-xs text-gray-500">
+                          {[r.department, r.level].filter(Boolean).join(" · ") ||
+                            r.bio ||
+                            "Runner"}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <span className="flex items-center gap-1 text-xs font-semibold text-gray-600">
+                          <Star className="h-3.5 w-3.5 fill-gold text-gold" />
+                          {r.trustScore}
+                        </span>
+                        <span className="flex items-center gap-1 text-xs text-gray-500">
+                          <MapPin className="h-3.5 w-3.5 text-gray-400" />
+                          {r.distanceMeters < 1000
+                            ? `${Math.round(r.distanceMeters)}m`
+                            : `${(r.distanceMeters / 1000).toFixed(1)}km`}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="px-4 py-8 text-center">
+                  <Users className="mx-auto h-8 w-8 text-gray-300" />
+                  <p className="mt-2 text-sm text-gray-500">
+                    No runners are online right now
+                  </p>
+                  <p className="mt-1 text-xs text-gray-400">
+                    Applications will still reach you when posted
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
       <ConfirmationDialog
         open={cancelConfirmOpen}
