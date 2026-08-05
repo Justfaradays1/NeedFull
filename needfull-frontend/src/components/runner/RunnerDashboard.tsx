@@ -138,7 +138,15 @@ function RunnerHero({ name, tasksCount }: { name: string; tasksCount: number }) 
 
 /* ─── Online Toggle ─── */
 
-function OnlineToggle({ isAvailable, onToggle }: { isAvailable: boolean; onToggle: (v: boolean) => void }) {
+function OnlineToggle({
+  isAvailable,
+  isBusy,
+  onToggle,
+}: {
+  isAvailable: boolean;
+  isBusy: boolean;
+  onToggle: (v: boolean) => void;
+}) {
   const [toggling, setToggling] = useState(false);
 
   const handleClick = async () => {
@@ -155,29 +163,49 @@ function OnlineToggle({ isAvailable, onToggle }: { isAvailable: boolean; onToggl
     }
   };
 
+  const label = isBusy
+    ? "Working on a task"
+    : toggling
+      ? "Updating..."
+      : isAvailable
+        ? "You are Online"
+        : "Go Online";
+
   return (
     <label
       className={`tap-target flex w-full cursor-pointer items-center justify-between rounded-xl border-2 px-4 py-3 transition-all active:scale-[0.98] ${
-        isAvailable
-          ? "border-green-300 bg-green-50"
-          : "border-gray-200 bg-surface hover:border-gray-300"
+        isBusy
+          ? "border-gold bg-gold-light/60"
+          : isAvailable
+            ? "border-green-300 bg-green-50"
+            : "border-gray-200 bg-surface hover:border-gray-300"
       }`}
     >
       <span
-        className={`text-sm font-bold ${
-          isAvailable ? "text-green-800" : "text-gray-500"
+        className={`flex items-center gap-2 text-sm font-bold ${
+          isBusy ? "text-gold-dark" : isAvailable ? "text-green-800" : "text-gray-500"
         }`}
       >
-        {toggling ? "Updating..." : isAvailable ? "You are Online" : "Go Online"}
+        {isBusy && (
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-gold" />
+          </span>
+        )}
+        {label}
       </span>
       <input
         type="checkbox"
         className="sr-only peer"
         checked={isAvailable}
         onChange={handleClick}
-        disabled={toggling}
+        disabled={toggling || isBusy}
       />
-      <div className="relative h-6 w-11 rounded-full bg-gray-300 transition-colors peer-checked:bg-green-500 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand/20">
+      <div
+        className={`relative h-6 w-11 rounded-full transition-colors peer-checked:bg-green-500 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand/20 ${
+          isBusy ? "bg-gold" : "bg-gray-300"
+        }`}
+      >
         <div
           className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
             isAvailable ? "translate-x-5" : "translate-x-0"
@@ -192,11 +220,24 @@ function OnlineToggle({ isAvailable, onToggle }: { isAvailable: boolean; onToggl
 
 function PrimaryCTA({
   isAvailable,
+  isBusy,
   onStart,
 }: {
   isAvailable: boolean;
+  isBusy: boolean;
   onStart: () => void;
 }) {
+  if (isBusy) {
+    return (
+      <Link
+        href="/tasks"
+        className="tap-target flex items-center justify-center gap-2.5 rounded-xl bg-brand px-4 py-3.5 text-base font-bold text-white shadow-md transition-all hover:brightness-105 active:scale-[0.97]"
+      >
+        <Briefcase className="h-5 w-5" />
+        View My Task
+      </Link>
+    );
+  }
   if (isAvailable) {
     return (
       <Link
@@ -540,6 +581,7 @@ export default function RunnerDashboard({
 
   const [isAvailable, setIsAvailable] = useState(user?.isAvailable ?? false);
   const [startFlowOpen, setStartFlowOpen] = useState(false);
+  const isBusy = user?.runnerBusy ?? false;
 
   const earnedToday = useMemo(() => todayEarnings(transactions), [transactions]);
   const weeklyEarned = useMemo(
@@ -560,9 +602,9 @@ export default function RunnerDashboard({
       <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 pb-6 pt-4">
         <RunnerHero name={name} tasksCount={tasks.filter((t) => t.status === "open").length} />
 
-        <OnlineToggle isAvailable={isAvailable} onToggle={setIsAvailable} />
+        <OnlineToggle isAvailable={isAvailable} isBusy={isBusy} onToggle={setIsAvailable} />
 
-        <PrimaryCTA isAvailable={isAvailable} onStart={() => setStartFlowOpen(true)} />
+        <PrimaryCTA isAvailable={isAvailable} isBusy={isBusy} onStart={() => setStartFlowOpen(true)} />
 
         <StartEarningModal
           open={startFlowOpen}

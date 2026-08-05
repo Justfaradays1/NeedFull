@@ -156,6 +156,14 @@ export async function acceptApplication(
       [runnerId, agreedAmountKobo, taskId],
     );
 
+    // WHAT: Mark runner BUSY — they now have a task in flight and cannot be
+    // matched or notified about new nearby tasks
+    // WHY: Availability is a real state machine (OFF/ONLINE/BUSY), not just a toggle
+    await client.query(
+      `UPDATE users SET runner_busy = true, updated_at = NOW() WHERE id = $1`,
+      [runnerId],
+    );
+
     // WHAT: Mark accepted application
     await client.query(
       `UPDATE task_applications
@@ -351,6 +359,12 @@ export async function acceptCounterOffer(
        SET status = 'in_progress', assigned_to = $1, agreed_amount_kobo = $2, updated_at = NOW()
        WHERE id = $3`,
       [runnerId, agreedAmountKobo, taskId],
+    );
+
+    // WHAT: Mark runner BUSY — accepted work means no new task matching
+    await client.query(
+      `UPDATE users SET runner_busy = true, updated_at = NOW() WHERE id = $1`,
+      [runnerId],
     );
 
     await client.query(

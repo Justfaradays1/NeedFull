@@ -106,6 +106,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
             trustScore: raw.trustScore ?? raw.trust_score ?? 0,
             profilePictureUrl: raw.profilePictureUrl ?? null,
             isAvailable: raw.isAvailable ?? raw.is_available ?? false,
+            runnerBusy: raw.runnerBusy ?? raw.runner_busy ?? false,
             runnerStatus: raw.runnerStatus ?? "none",
             wallet: (json.wallet ?? raw.wallet)
               ? { id: (json.wallet ?? raw.wallet).id, balanceKobo: (json.wallet ?? raw.wallet).balanceKobo ?? 0, escrowKobo: (json.wallet ?? raw.wallet).escrowKobo ?? 0, earningsKobo: (json.wallet ?? raw.wallet).earningsKobo ?? 0, pendingKobo: (json.wallet ?? raw.wallet).pendingKobo ?? 0 }

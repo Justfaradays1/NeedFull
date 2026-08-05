@@ -21,6 +21,7 @@ export interface AuthUser {
   profilePictureUrl?: string | null;
   runnerStatus?: string;
   isAvailable?: boolean;
+  runnerBusy?: boolean;
   wallet?: {
     id: string;
     balanceKobo: number;
@@ -47,6 +48,8 @@ interface AuthUserResponse {
   profilePictureUrl?: string | null;
   isAvailable?: boolean;
   is_available?: boolean;
+  runnerBusy?: boolean;
+  runner_busy?: boolean;
 }
 
 interface LoginResponse {
@@ -89,6 +92,7 @@ function toAuthUser(raw: AuthUserResponse): AuthUser {
     runnerStatus: raw.runnerStatus ?? "none",
     profilePictureUrl: raw.profilePictureUrl ?? null,
     isAvailable: raw.isAvailable ?? raw.is_available ?? false,
+    runnerBusy: raw.runnerBusy ?? raw.runner_busy ?? false,
   };
 }
 

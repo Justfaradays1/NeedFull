@@ -35,6 +35,7 @@ export async function notifyNearbyRunners(task: {
      WHERE u.id != $1
        AND u.is_runner = true
        AND u.is_available = true
+       AND u.runner_busy = false
        AND u.is_banned = false
        AND u.trust_score >= 30
        AND u.location IS NOT NULL
@@ -82,6 +83,7 @@ export async function getAvailableRunnersNear(
      FROM users u
      WHERE u.is_runner = true
        AND u.is_available = true
+       AND u.runner_busy = false
        AND u.is_banned = false
        AND u.trust_score >= 30
        AND u.location IS NOT NULL

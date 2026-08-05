@@ -635,6 +635,16 @@ export async function cancelTask(
       `UPDATE tasks SET status = 'cancelled', updated_at = NOW() WHERE id = $1`,
       [taskId],
     );
+
+    // WHAT: Free the runner if one was assigned — cancelled task, no more busy
+    // WHY: An in_progress cancellation releases the runner slot for matching
+    if (task.runner_id) {
+      await client.query(
+        `UPDATE users SET runner_busy = false, updated_at = NOW()
+         WHERE id = $1 AND runner_busy = true`,
+        [task.runner_id],
+      );
+    }
   });
 
   // WHAT: Notify runner if assigned
@@ -701,6 +711,13 @@ export async function confirmCompletion(
     await client.query(
       `UPDATE tasks SET status = 'completed', updated_at = NOW() WHERE id = $1`,
       [taskId],
+    );
+
+    // WHAT: Runner is free again — task resolved, resume new-task matching
+    await client.query(
+      `UPDATE users SET runner_busy = false, updated_at = NOW()
+       WHERE id = $1 AND runner_busy = true`,
+      [task.runner_id],
     );
 
     // WHAT: Increment poster's tasks_completed

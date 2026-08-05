@@ -199,6 +199,11 @@ export async function acceptPurchaseTask(userId: string, taskId: string) {
       "UPDATE purchase_tasks SET status = 'accepted', updated_at = NOW() WHERE id = $1",
       [purchase.id],
     );
+    // WHAT: Runner is now BUSY — no new task matching until this task resolves
+    await client.query(
+      "UPDATE users SET runner_busy = true, updated_at = NOW() WHERE id = $1",
+      [userId],
+    );
   });
 
   const poster = await queryOne<UserRow>("SELECT id, full_name FROM users WHERE id = $1", [task.poster_id]);
@@ -608,6 +613,12 @@ export async function confirmDelivery(taskId: string, posterId: string) {
       "UPDATE tasks SET status = 'completed', updated_at = NOW() WHERE id = $1",
       [taskId],
     );
+
+    // WHAT: Runner is free — purchase resolved
+    await client.query(
+      "UPDATE users SET runner_busy = false, updated_at = NOW() WHERE id = $1 AND runner_busy = true",
+      [task.assigned_to],
+    );
   });
 
   await logAudit(purchase.id, "purchase_completed", posterId, {
@@ -755,6 +766,11 @@ export async function resolveDispute(
         "UPDATE tasks SET status = 'completed', updated_at = NOW() WHERE id = $1",
         [purchase.task_id],
       );
+      // WHAT: Runner free after resolution
+      await client.query(
+        "UPDATE users SET runner_busy = false, updated_at = NOW() WHERE id = $1 AND runner_busy = true",
+        [task.assigned_to],
+      );
     } else if (resolution === "refund_poster") {
       await refundEscrow(client, task.poster_id, purchase.total_escrow, purchase.task_id);
       await client.query(
@@ -765,15 +781,16 @@ export async function resolveDispute(
         "UPDATE tasks SET status = 'cancelled', updated_at = NOW() WHERE id = $1",
         [purchase.task_id],
       );
+      // WHAT: Runner free — no payment due, but assignment is over
+      await client.query(
+        "UPDATE users SET runner_busy = false, updated_at = NOW() WHERE id = $1 AND runner_busy = true",
+        [task.assigned_to],
+      );
     } else if (resolution === "split") {
       // Split: runner gets runner_fee, poster gets rest refunded
       const runnerGets = purchase.runner_fee;
       const refundAmount = purchase.total_escrow - runnerGets - purchase.platform_fee;
 
-      await client.query(
-        `UPDATE wallets SET balance = balance + $1, updated_at = NOW() WHERE user_id = $2`,
-        [runnerGets, task.assigned_to],
-      );
       await client.query(
         `UPDATE wallets SET escrow = escrow - $1, balance = balance + $2, updated_at = NOW() WHERE user_id = $3`,
         [purchase.total_escrow, refundAmount, task.poster_id],
@@ -813,6 +830,11 @@ export async function resolveDispute(
       await client.query(
         "UPDATE tasks SET status = 'completed', updated_at = NOW() WHERE id = $1",
         [purchase.task_id],
+      );
+      // WHAT: Runner free after split resolution
+      await client.query(
+        "UPDATE users SET runner_busy = false, updated_at = NOW() WHERE id = $1 AND runner_busy = true",
+        [task.assigned_to],
       );
     }
   });

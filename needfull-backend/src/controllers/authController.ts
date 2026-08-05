@@ -511,6 +511,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
       email_verified_at: string | null;
       google_id: string | null;
       is_available: boolean;
+      runner_busy: boolean;
       wallet_id: string;
       balance: number;
       escrow: number;
@@ -519,7 +520,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
       trust_score: number;
     }>(
       `SELECT 
-        u.id, u.email, u.full_name, u.role, u.roles, u.active_role, u.email_verified_at, u.google_id, u.is_available,
+        u.id, u.email, u.full_name, u.role, u.roles, u.active_role, u.email_verified_at, u.google_id, u.is_available, u.runner_busy,
         w.id as wallet_id, w.balance, w.escrow, w.earnings,
         COALESCE((
           SELECT SUM(COALESCE(t.agreed_amount_kobo, t.budget_kobo))
@@ -545,6 +546,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
         trustScore: result.trust_score,
         googleId: result.google_id,
         isAvailable: result.is_available,
+        runnerBusy: result.runner_busy,
       },
       wallet: {
         id: result.wallet_id,

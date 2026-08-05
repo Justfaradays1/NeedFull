@@ -406,11 +406,19 @@ export async function listTasks(req: Request, res: Response): Promise<void> {
 // WHAT: Admin cancel any task regardless of status, refund escrow if in_progress
 export async function cancelTaskAdmin(req: Request, res: Response): Promise<void> {
   try {
-    const task = await db.query<any>("SELECT id, status, budget_kobo, poster_id, title FROM tasks WHERE id = $1", [req.params.id]);
+    const task = await db.query<any>("SELECT id, status, budget_kobo, poster_id, title, assigned_to FROM tasks WHERE id = $1", [req.params.id]);
     if (task.rows.length === 0) { res.status(404).json({ success: false, message: "Task not found" }); return; }
     const t = task.rows[0];
 
     await db.query("UPDATE tasks SET status = 'cancelled', updated_at = NOW() WHERE id = $1", [t.id]);
+
+    // WHAT: Free the runner if one was assigned — admin cancel ends the assignment
+    if (t.assigned_to) {
+      await db.query(
+        "UPDATE users SET runner_busy = false, updated_at = NOW() WHERE id = $1 AND runner_busy = true",
+        [t.assigned_to],
+      );
+    }
 
     if (t.status === 'in_progress') {
       const { refundEscrow } = await import("../services/wallet.service");

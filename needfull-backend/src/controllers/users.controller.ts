@@ -337,7 +337,7 @@ export async function getNearbyRunners(req: Request, res: Response): Promise<voi
       `SELECT u.id, u.full_name, u.bio, u.profile_picture_url, u.trust_score, u.tasks_completed, u.department, u.level, u.hostel, u.skills,
         ROUND(ST_Distance(u.location, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography)::numeric, 0)::float as distance_meters
        FROM users u
-       WHERE u.is_runner = true AND u.is_available = true AND u.location IS NOT NULL
+       WHERE u.is_runner = true AND u.is_available = true AND u.runner_busy = false AND u.is_banned = false AND u.location IS NOT NULL
          AND ST_DWithin(u.location, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, $3)
        ORDER BY distance_meters ASC LIMIT 20`,
       [lng, lat, radiusMeters],
