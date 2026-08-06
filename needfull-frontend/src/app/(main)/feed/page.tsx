@@ -13,7 +13,7 @@ import { QuickActions } from "@/components/dashboard/post/QuickActions";
 import { CategoryShortcuts } from "@/components/dashboard/post/CategoryShortcuts";
 import { ActiveTasksSection } from "@/components/dashboard/post/ActiveTasksSection";
 import { NearbyActivity } from "@/components/dashboard/post/NearbyActivity";
-import { RecommendedRunners } from "@/components/dashboard/post/RecommendedRunners";
+import { AvailableHelpers } from "@/components/helpers/AvailableHelpers";
 import { RecentActivity } from "@/components/dashboard/post/RecentActivity";
 import { SmartInsights } from "@/components/dashboard/post/SmartInsights";
 import { DashboardSkeleton } from "@/components/dashboard/post/DashboardSkeleton";
@@ -197,6 +197,7 @@ export default function FeedPage() {
           escrowKobo={escrowKobo}
           hasEarnings={hasEarnings}
         />
+        <AvailableHelpers />
         <QuickActions />
         <ActiveTasksSection tasks={allTasks} loading={tasksLoading} />
         <QuickStats
@@ -210,7 +211,6 @@ export default function FeedPage() {
         />
         <CategoryShortcuts />
         <NearbyActivity />
-        <RecommendedRunners runners={[]} loading={false} />
         <RecentActivity activities={activities} loading={tasksLoading} />
         <SmartInsights />
         <BecomeRunnerBanner />

@@ -19,6 +19,21 @@ export async function listHandler(req: Request, res: Response): Promise<void> {
       radiusMeters: req.query.radiusMeters
         ? parseFloat(req.query.radiusMeters as string)
         : undefined,
+      verifiedOnly:
+        req.query.verifiedOnly === "true" ? true : undefined,
+      minRating: req.query.minRating
+        ? parseFloat(req.query.minRating as string)
+        : undefined,
+      onlineToday:
+        req.query.onlineToday === "true"
+          ? true
+          : req.query.onlineToday === "false"
+            ? false
+            : undefined,
+      search: req.query.search as string | undefined,
+      perPage: req.query.perPage
+        ? parseInt(req.query.perPage as string, 10)
+        : undefined,
     });
     res.json({ success: true, data: items });
   } catch (error) {

@@ -50,6 +50,12 @@ router.patch("/:taskId", authenticate, param("taskId").isUUID(), validate, tasks
 
 router.post("/:taskId/cancel", authenticate, param("taskId").isUUID(), validate, tasks.cancelTaskHandler);
 
+router.post("/:taskId/invite", authenticate, requireRole("poster"), param("taskId").isUUID(),
+  body("runnerId").isUUID(),
+  validate,
+  tasks.inviteRunnerHandler,
+);
+
 router.post("/:taskId/done", authenticate, param("taskId").isUUID(), validate, tasks.markAsDoneHandler);
 
 router.post("/:taskId/complete", authenticate, param("taskId").isUUID(), validate, tasks.confirmCompletionHandler);

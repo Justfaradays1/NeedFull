@@ -19,6 +19,7 @@ import { ProgressSteps } from "@/components/ui/progress-steps";
 import { EscrowSummaryCard } from "@/components/tasks/EscrowSummaryCard";
 import { BudgetStep, type BudgetStepData } from "@/components/tasks/budget/BudgetStep";
 import { CategorySelectionStep } from "@/components/tasks/create/CategorySelectionStep";
+import { HelperSuggestions } from "@/components/helpers/HelperSuggestions";
 import { TaskDetailsStep } from "@/components/tasks/create/TaskDetailsStep";
 import { CelebrationModal } from "@/components/ui/celebration-modal";
 import { useCelebration } from "@/hooks/useCelebration";
@@ -232,6 +233,7 @@ export default function CreateTaskPage() {
               {errors.categoryId && (
                 <p className="text-xs text-red-500">{errors.categoryId}</p>
               )}
+              <HelperSuggestions categoryId={categoryId} />
               {/* Next button for Step 1 */}
               <div className="pt-2">
                 <button

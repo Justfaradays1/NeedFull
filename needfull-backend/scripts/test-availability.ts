@@ -103,6 +103,19 @@ async function main() {
   const byCat = await listAvailability({ categoryId });
   ok(byCat.length >= 2, "category filter returns offers");
 
+  // WHAT: New discovery filters — search, onlineToday, perPage, enriched runner payload
+  const searchHit = await listAvailability({ search: "Errands" });
+  ok(searchHit.some((o) => o.runnerId === runnerId), "search matches offer note");
+  const offToday = await listAvailability({ onlineToday: false });
+  ok(offToday.some((o) => o.runnerId === runnerId && o.isOnlineToday === false), "onlineToday=false filter works");
+  const onToday = await listAvailability({ onlineToday: true });
+  ok(!onToday.some((o) => o.runnerId === runnerId && o.isOnlineToday === false), "onlineToday=true excludes offline offer");
+  const paged = await listAvailability({ perPage: 1 });
+  ok(paged.length === 1, "perPage limits results (got " + paged.length + ")");
+  const enriched = await listAvailability({ runnerId });
+  ok(typeof enriched[0]?.runner?.averageRating !== "undefined", "runner payload has averageRating");
+  ok(typeof enriched[0]?.runner?.tasksCompleted !== "undefined", "runner payload has tasksCompleted");
+
   // WHAT: deactivate one — mine drops to 1, discovery no longer shows it
   ok(await deactivateAvailability(runnerId, noLoc.id), "deactivate offer (owner)");
   ok(!(await deactivateAvailability(posterId, noLoc.id)), "deactivate fails for non-owner");

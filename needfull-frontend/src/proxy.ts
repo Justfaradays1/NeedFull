@@ -34,7 +34,8 @@ export default function proxy(request: NextRequest) {
     pathname === '/terms' ||
     pathname === '/privacy' ||
     pathname.startsWith('/faq') ||
-    pathname.startsWith('/help') ||
+    pathname === '/help' ||
+    pathname.startsWith('/help/') ||
     pathname.startsWith('/contact') ||
     pathname.startsWith('/support') ||
     pathname.startsWith('/guides') ||

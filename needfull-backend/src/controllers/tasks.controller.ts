@@ -4,6 +4,7 @@
 
 import { Request, Response } from "express";
 import { listTasks, getTask, createTask, updateTask, cancelTask, confirmCompletion, markAsDone, getTaskCapabilities } from "../services/task.service";
+import { notifyUser } from "../services/notification.service";
 
 export async function listTasksHandler(req: Request, res: Response): Promise<void> {
   try {
@@ -119,5 +120,52 @@ export async function getMyAssignedTasks(req: Request, res: Response): Promise<v
   } catch (error) {
     console.error("[Tasks] getMyAssignedTasks error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch assigned tasks" });
+  }
+}
+
+// WHAT: Notify a runner that a poster wants them on an existing open task
+// WHY: Posters discover available runners and invite them directly to apply
+export async function inviteRunnerHandler(req: Request, res: Response): Promise<void> {
+  try {
+    const { default: db } = await import("../config/db");
+    const taskQuery = await db.query<any>(
+      `SELECT t.id, t.title, t.status, t.poster_id
+       FROM tasks t WHERE t.id = $1`,
+      [req.params.taskId],
+    );
+    const task = taskQuery.rows[0];
+    if (!task) { res.status(404).json({ success: false, message: "Task not found" }); return; }
+    if (task.poster_id !== req.user!.id || task.status !== "open") {
+      res.status(400).json({ success: false, message: "You can only invite runners to your own open tasks" });
+      return;
+    }
+
+    const runnerQuery = await db.query<any>(
+      `SELECT u.id, u.is_runner, u.is_banned FROM users u WHERE u.id = $1`,
+      [req.body.runnerId],
+    );
+    const runner = runnerQuery.rows[0];
+    if (!runner || !runner.is_runner || runner.is_banned) {
+      res.status(400).json({ success: false, message: "Runner not found" });
+      return;
+    }
+    if (runner.id === req.user!.id) {
+      res.status(400).json({ success: false, message: "You cannot invite yourself" });
+      return;
+    }
+
+    notifyUser(runner.id, {
+      type: "task_invite",
+      title: `You've been invited to "${task.title}"`,
+      body: `A poster wants you on their task — open it to apply.`,
+      taskId: task.id,
+      conversationId: undefined,
+      actorId: req.user!.id,
+    }).catch(() => {});
+
+    res.json({ success: true, message: "Invite sent" });
+  } catch (error) {
+    console.error("[Tasks] inviteRunnerHandler error:", error);
+    res.status(500).json({ success: false, message: "Failed to send invite" });
   }
 }

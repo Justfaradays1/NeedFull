@@ -23,6 +23,11 @@ export interface AvailabilityFilters {
   lat?: number;
   lng?: number;
   radiusMeters?: number;
+  verifiedOnly?: boolean;
+  minRating?: number;
+  onlineToday?: boolean;
+  search?: string;
+  perPage?: number;
 }
 
 const MAX_NOTE_LENGTH = 200;
@@ -128,6 +133,12 @@ export async function listAvailability(
   const lat = typeof filters.lat === "number" ? filters.lat : null;
   const lng = typeof filters.lng === "number" ? filters.lng : null;
   const radiusMeters = filters.radiusMeters ?? 5000;
+  const verifiedOnly = filters.verifiedOnly ?? false;
+  const minRating =
+    typeof filters.minRating === "number" ? filters.minRating : null;
+  const onlineToday = filters.onlineToday ?? null;
+  const search = filters.search?.trim() || null;
+  const perPage = Math.min(Math.max(filters.perPage ?? 30, 1), 50);
 
   const result = await db.query<any>(
     `SELECT a.id, a.runner_id, a.category_id, a.note, a.available_until,
@@ -140,7 +151,9 @@ export async function listAvailability(
               'fullName', u.full_name,
               'trustScore', u.trust_score,
               'avatarUrl', u.avatar_url,
-              'isVerifiedStudent', u.is_verified_student
+              'isVerifiedStudent', u.is_verified_student,
+              'tasksCompleted', u.tasks_completed,
+              'averageRating', (SELECT ROUND(AVG(r.rating)::numeric, 1) FROM reviews r WHERE r.reviewee_id = u.id)
             ) as runner,
             jsonb_build_object('id', c.id, 'name', c.name, 'icon', c.icon) as category
      FROM runner_availability a
@@ -152,6 +165,10 @@ export async function listAvailability(
        AND u.is_available = true
        AND ($1::uuid IS NULL OR a.category_id = $1::uuid)
        AND ($2::uuid IS NULL OR a.runner_id = $2::uuid)
+       AND ($6::boolean IS NULL OR a.is_online_today = $6::boolean)
+       AND ($7::boolean IS NULL OR u.is_verified_student = $7::boolean)
+       AND (COALESCE((SELECT AVG(r.rating) FROM reviews r WHERE r.reviewee_id = u.id), 0) >= COALESCE($8::float8, 0))
+       AND ($9::text IS NULL OR (u.full_name ILIKE '%' || $9::text || '%' OR a.note ILIKE '%' || $9::text || '%' OR c.name ILIKE '%' || $9::text || '%'))
        AND (
          $3::float8 IS NULL OR $4::float8 IS NULL
          OR (a.location IS NOT NULL AND ST_DWithin(
@@ -161,8 +178,19 @@ export async function listAvailability(
          ))
        )
      ORDER BY distance ASC NULLS LAST, a.created_at DESC
-     LIMIT 30`,
-    [categoryId, runnerId, lat, lng, radiusMeters],
+     LIMIT $10`,
+    [
+      categoryId,
+      runnerId,
+      lat,
+      lng,
+      radiusMeters,
+      onlineToday,
+      verifiedOnly,
+      minRating,
+      search,
+      perPage,
+    ],
   );
 
   return result.rows.map(shapeRow);

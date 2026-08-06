@@ -129,6 +129,7 @@ function SupportCard() {
 const REGISTRY: { match: string; widgets: WidgetKey[] }[] = [
   { match: "/feed", widgets: ["wallet", "tip", "categories", "nearby", "insights"] },
   { match: "/explore", widgets: ["categories", "nearby", "support"] },
+  { match: "/helpers", widgets: ["nearby", "categories", "support"] },
   { match: "/tasks/create", widgets: [] },
   { match: "/tasks/", widgets: ["wallet", "quick", "insights"] },
   { match: "/tasks", widgets: ["wallet", "nearby", "insights"] },
