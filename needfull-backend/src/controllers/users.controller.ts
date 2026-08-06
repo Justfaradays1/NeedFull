@@ -18,7 +18,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
         u.trust_score, u.tasks_completed, u.is_available, u.is_runner,
         u.email_verified, u.is_verified_student, u.created_at,
         u.roles, u.active_role, u.runner_status,
-        jsonb_build_object('id', w.id, 'balanceKobo', w.balance, 'escrowKobo', w.escrow) as wallet
+        jsonb_build_object('id', w.id, 'balanceKobo', (w.balance)::int, 'escrowKobo', (w.escrow)::int) as wallet
       FROM users u
       JOIN wallets w ON w.user_id = u.id
       WHERE u.id = $1`,
@@ -186,7 +186,7 @@ export async function getPublicProfile(req: Request, res: Response): Promise<voi
     const targetId = req.params.userId;
 
     const userResult = await db.query<any>(
-      "SELECT id, full_name, bio, department, level, hostel, location_label, profile_picture_url, trust_score, tasks_completed, is_available, is_runner, created_at FROM users WHERE id = $1",
+      "SELECT id, full_name, bio, department, level, hostel, school, location_label, profile_picture_url, trust_score, tasks_completed, is_available, is_runner, is_verified_student, created_at, (SELECT ROUND(AVG(r.rating)::numeric, 1) FROM reviews r WHERE r.reviewee_id = users.id) as average_rating FROM users WHERE id = $1",
       [targetId],
     );
     if (userResult.rows.length === 0) { res.status(404).json({ success: false, message: "User not found" }); return; }
@@ -208,7 +208,7 @@ export async function getPublicProfile(req: Request, res: Response): Promise<voi
 
     const reviews = await db.query<any>("SELECT r.id, r.rating, r.comment, r.created_at, jsonb_build_object('id', rev.id, 'fullName', rev.full_name) as reviewer FROM reviews r JOIN users rev ON r.reviewer_id = rev.id WHERE r.reviewee_id = $1 ORDER BY r.created_at DESC LIMIT 5", [targetId]);
 
-    const data: Record<string, any> = { id: u.id, fullName: u.full_name, bio: u.bio, department: u.department, level: u.level, hostel: u.hostel, locationLabel: u.location_label, profilePictureUrl: u.profile_picture_url, trustScore: u.trust_score, tasksCompleted: u.tasks_completed, isAvailable: u.is_available, isRunner: u.is_runner, memberSince: u.created_at };
+    const data: Record<string, any> = { id: u.id, fullName: u.full_name, bio: u.bio, department: u.department, level: u.level, hostel: u.hostel, school: u.school, locationLabel: u.location_label, profilePictureUrl: u.profile_picture_url, trustScore: u.trust_score, tasksCompleted: u.tasks_completed, isAvailable: u.is_available, isRunner: u.is_runner, isVerifiedStudent: u.is_verified_student, averageRating: u.average_rating, memberSince: u.created_at };
     if (trustHistory.length > 0) data.trustHistory = trustHistory;
     if (reviews.rows.length > 0) data.recentReviews = reviews.rows.map((r: any) => ({ id: r.id, rating: r.rating, comment: r.comment, createdAt: r.created_at, reviewer: r.reviewer }));
     res.json({ success: true, data });

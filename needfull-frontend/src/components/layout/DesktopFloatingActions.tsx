@@ -1,12 +1,14 @@
-// WHAT: Floating action buttons for desktop (Messages + Post a Task)
+// WHAT: Floating action buttons for desktop (Messages + role-aware primary action)
 // WHY: Keeps the two most-used actions one tap away on lg screens; hidden on
 //      xl where the right context panel owns that corner, and on mobile where
-//      the bottom nav already provides both
+//      the bottom nav already provides both.
+//      Role-aware: Posters post tasks; Runners announce availability.
 
 "use client";
 
 import Link from "next/link";
-import { MessageCircle, Plus } from "lucide-react";
+import { MessageCircle, Plus, Wifi } from "lucide-react";
+import { useActiveRole } from "@/store";
 
 export function DesktopFloatingActions({
   pathname,
@@ -17,7 +19,10 @@ export function DesktopFloatingActions({
   chatUnreadCount: number;
   dimmed?: boolean;
 }) {
-  if (pathname.startsWith("/tasks/create")) return null;
+  const isRunner = useActiveRole() === "runner";
+  if (pathname.startsWith("/tasks/create") || pathname.startsWith("/hustle/available")) {
+    return null;
+  }
 
   return (
     <div
@@ -44,18 +49,32 @@ export function DesktopFloatingActions({
         </span>
       </Link>
 
-      {/* ─── Post a Task (tablet+) ─── */}
-      <Link
-        href="/tasks/create"
-        className="group relative flex items-center rounded-full bg-gold px-4 py-3 text-white shadow-lifted transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg active:scale-95"
-        aria-label="Post a task"
-      >
-        <Plus className="h-5 w-5" />
-        <span className="ml-2 hidden text-sm font-bold sm:inline">Post a Task</span>
-        <span className="pointer-events-none absolute right-full mr-3 hidden whitespace-nowrap rounded-lg bg-gray-900 px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 lg:hidden">
-          Post a Task
-        </span>
-      </Link>
+      {/* ─── Primary action (tablet+) ─── */}
+      {isRunner ? (
+        <Link
+          href="/hustle/available"
+          className="group relative flex items-center rounded-full bg-gold px-4 py-3 text-white shadow-lifted transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg active:scale-95"
+          aria-label="I'm available"
+        >
+          <Wifi className="h-5 w-5" />
+          <span className="ml-2 hidden text-sm font-bold sm:inline">I&apos;m Available</span>
+          <span className="pointer-events-none absolute right-full mr-3 hidden whitespace-nowrap rounded-lg bg-gray-900 px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 lg:hidden">
+            I&apos;m Available
+          </span>
+        </Link>
+      ) : (
+        <Link
+          href="/tasks/create"
+          className="group relative flex items-center rounded-full bg-gold px-4 py-3 text-white shadow-lifted transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg active:scale-95"
+          aria-label="Post a task"
+        >
+          <Plus className="h-5 w-5" />
+          <span className="ml-2 hidden text-sm font-bold sm:inline">Post a Task</span>
+          <span className="pointer-events-none absolute right-full mr-3 hidden whitespace-nowrap rounded-lg bg-gray-900 px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 lg:hidden">
+            Post a Task
+          </span>
+        </Link>
+      )}
     </div>
   );
 }

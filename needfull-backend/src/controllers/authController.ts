@@ -550,10 +550,10 @@ export async function getMe(req: Request, res: Response): Promise<void> {
       },
       wallet: {
         id: result.wallet_id,
-        balanceKobo: result.balance,
-        escrowKobo: result.escrow,
-        earningsKobo: result.earnings,
-        pendingKobo: result.pending_kobo,
+        balanceKobo: Number(result.balance),
+        escrowKobo: Number(result.escrow),
+        earningsKobo: Number(result.earnings),
+        pendingKobo: Number(result.pending_kobo),
       },
     });
   } catch (error) {

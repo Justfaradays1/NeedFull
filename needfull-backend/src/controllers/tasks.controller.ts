@@ -31,7 +31,7 @@ export async function getTaskHandler(req: Request, res: Response): Promise<void>
 
 export async function createTaskHandler(req: Request, res: Response): Promise<void> {
   try {
-    const task = await createTask(req.user!.id, { categoryId: req.body.categoryId, title: req.body.title, description: req.body.description, budgetNaira: req.body.budgetNaira, deadline: req.body.deadline, isUrgent: req.body.isUrgent, locationLabel: req.body.locationLabel, lat: req.body.lat, lng: req.body.lng, image: req.file });
+    const task = await createTask(req.user!.id, { categoryId: req.body.categoryId, title: req.body.title, description: req.body.description, budgetNaira: req.body.budgetNaira, deadline: req.body.deadline, isUrgent: req.body.isUrgent, locationLabel: req.body.locationLabel, lat: req.body.lat, lng: req.body.lng, image: req.file, inviteRunnerId: req.body.inviteRunnerId });
     res.status(201).json({ success: true, message: "Task created successfully", data: task });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Failed to create task";

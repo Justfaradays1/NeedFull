@@ -133,6 +133,11 @@ app.use("/api/admin", adminRoutes);
 import tasksRoutes from "./routes/tasks.routes";
 app.use("/api/tasks", tasksRoutes);
 
+// WHAT: Mount availability routes
+// WHY: Runner availability posts + poster discovery
+import availabilityRoutes from "./routes/availability.routes";
+app.use("/api/availability", availabilityRoutes);
+
 // WHAT: Mount application routes
 // WHY: Task application workflow
 import applicationsRoutes from "./routes/applications.routes";

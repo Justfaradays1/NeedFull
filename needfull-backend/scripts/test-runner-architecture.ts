@@ -254,6 +254,21 @@ async function main() {
   const earnWith = ledger.rows.filter((r) => r.type === "earnings_withdrawal");
   eq(earnWith.length, 1, "one earnings_withdrawal entry");
 
+  // 11b. Ledger invariant: balance_after must always be real math on the stored
+  // bigints (guards against string-concat regressions like before=10000,
+  // amt=90000, after=1000090000)
+  const pLedger = await db.query<{ type: string; amount: bigint; balance_before: bigint; balance_after: bigint }>(
+    `SELECT type, amount, balance_before, balance_after
+     FROM wallet_transactions WHERE wallet_id = $1 ORDER BY created_at`,
+    [poster.wallet],
+  );
+  const depTx = pLedger.rows.find((r) => r.type === "manual_deposit_confirmed");
+  ok(!!depTx, "deposit tx recorded on poster wallet");
+  if (depTx) eq(Number(depTx.balance_after), Number(depTx.balance_before) + Number(depTx.amount), "deposit after = before + amount");
+  const wdrTx = pLedger.rows.find((r) => r.type === "withdrawal_requested");
+  ok(!!wdrTx, "withdrawal tx recorded on poster wallet");
+  if (wdrTx) eq(Number(wdrTx.balance_after), Number(wdrTx.balance_before) - Number(wdrTx.amount), "withdrawal after = before - amount");
+
   // 12. Insufficient earnings rejected
   let insufficient = false;
   try {

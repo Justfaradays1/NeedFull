@@ -87,7 +87,7 @@ const POSTER_MAIN: { href: string; label: string; icon: string }[] = [
 
 const RUNNER_MAIN: { href: string; label: string; icon: string }[] = [
   { href: "/feed", label: "Home", icon: "House" },
-  { href: "/tasks", label: "Find Tasks", icon: "ListTodo" },
+  { href: "/hustle", label: "Find Tasks", icon: "ListTodo" },
   { href: "/wallet", label: "Earnings", icon: "Wallet" },
   { href: "/chat", label: "Messages", icon: "MessageCircle" },
   { href: "/profile", label: "Profile", icon: "User" },

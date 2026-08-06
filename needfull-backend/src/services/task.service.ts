@@ -79,7 +79,13 @@ export interface TaskFilters {
   status?: string;
   isUrgent?: boolean;
   search?: string;
-  sortBy?: "newest" | "nearest" | "budget_high" | "budget_low" | "urgent_first";
+  sortBy?:
+    | "newest"
+    | "nearest"
+    | "budget_high"
+    | "budget_low"
+    | "urgent_first"
+    | "ending_soon";
   lat?: number;
   lng?: number;
   radiusKm?: number;
@@ -99,6 +105,7 @@ export interface CreateTaskInput {
   lat?: number;
   lng?: number;
   image?: Express.Multer.File;
+  inviteRunnerId?: string;
 }
 
 // WHAT: Paginated task list result
@@ -149,10 +156,11 @@ export async function listTasks(
     params.push(isUrgent);
   }
 
-  // WHAT: Text search across title and description
+  // WHAT: Text search across title, description, poster name, location, and category
+  // WHY: Runners search for tasks by keyword, but also by who posted it and where
   if (search && search.trim()) {
     whereClauses.push(
-      `(t.title ILIKE $${paramIndex} OR t.description ILIKE $${paramIndex})`,
+      `(t.title ILIKE $${paramIndex} OR t.description ILIKE $${paramIndex} OR u.full_name ILIKE $${paramIndex} OR t.location_label ILIKE $${paramIndex} OR c.name ILIKE $${paramIndex})`,
     );
     params.push(`%${search.trim()}%`);
     paramIndex++;
@@ -206,6 +214,9 @@ export async function listTasks(
     case "urgent_first":
       orderSQL = "ORDER BY t.is_urgent DESC, t.created_at DESC";
       break;
+    case "ending_soon":
+      orderSQL = "ORDER BY t.deadline ASC NULLS LAST, t.created_at DESC";
+      break;
     default:
       orderSQL = "ORDER BY t.created_at DESC";
   }
@@ -227,11 +238,14 @@ export async function listTasks(
       ST_X(t.location::geometry) as lat, ST_Y(t.location::geometry) as lng,
       t.image_url, t.assigned_to as runner_id, t.created_at, t.updated_at,
       ${distanceSelect},
+      (SELECT COUNT(*) FROM task_applications WHERE task_id = t.id)::int as application_count,
       jsonb_build_object(
         'id', u.id,
         'fullName', u.full_name,
         'email', u.email,
-        'trustScore', u.trust_score
+        'trustScore', u.trust_score,
+        'avatarUrl', u.avatar_url,
+        'isVerifiedStudent', u.is_verified_student
       ) as poster,
       jsonb_build_object(
         'id', c.id,
@@ -274,6 +288,7 @@ export async function listTasks(
       runnerId: row.runner_id,
       runnerDoneAt: row.runner_done_at,
       distance: row.distance,
+      applicationCount: row.application_count,
       poster: row.poster,
       category: row.category,
       capabilities,
@@ -318,6 +333,7 @@ export async function getTask(
       ST_X(t.location::geometry) as lat, ST_Y(t.location::geometry) as lng,
       t.image_url, t.assigned_to as runner_id, t.created_at, t.updated_at,
       ${distanceSelect},
+      (SELECT COUNT(*) FROM task_applications WHERE task_id = t.id)::int as application_count,
       jsonb_build_object(
         'id', u.id,
         'fullName', u.full_name,
@@ -327,8 +343,14 @@ export async function getTask(
         'department', u.department,
         'level', u.level,
         'hostel', u.hostel,
+        'school', u.school,
         'avatarUrl', u.avatar_url,
-        'tasksCompleted', u.tasks_completed
+        'profilePictureUrl', u.avatar_url,
+        'tasksCompleted', u.tasks_completed,
+        'tasksPosted', (SELECT COUNT(*) FROM tasks tp WHERE tp.poster_id = u.id),
+        'isVerifiedStudent', u.is_verified_student,
+        'memberSince', u.created_at,
+        'averageRating', (SELECT ROUND(AVG(r.rating)::numeric, 1) FROM reviews r WHERE r.reviewee_id = u.id)
       ) as poster,
       jsonb_build_object(
         'id', c.id,
@@ -368,6 +390,7 @@ export async function getTask(
     runnerId: row.runner_id,
     runnerDoneAt: row.runner_done_at,
     distance: row.distance,
+    applicationCount: row.application_count,
     poster: row.poster,
     category: row.category,
     capabilities,
@@ -448,6 +471,25 @@ export async function createTask(
   notifyNearbyRunners(task).catch((err) =>
     console.warn("[Matching] notifyNearbyRunners error:", err),
   );
+
+  // WHAT: Notify a directly invited runner (poster picked this runner from a
+  //      profile/availability page). Task stays a normal open task — the invite
+  //      is a nudge, escrow/apply flow is unchanged.
+  if (input.inviteRunnerId && input.inviteRunnerId !== userId) {
+    const inviter = await queryOne<any>(
+      "SELECT full_name FROM users WHERE id = $1",
+      [userId],
+    ).catch(() => null);
+    notifyUser(input.inviteRunnerId, {
+      type: "task_invite",
+      title: "A poster wants you",
+      body: `${inviter?.full_name || "A poster"} posted "${task.title}" and invited you to apply first.`,
+      taskId: task.id,
+      actorId: userId,
+    }).catch((err) =>
+      console.warn("[Task] invite notification error:", err),
+    );
+  }
 
   return {
     id: task.id,

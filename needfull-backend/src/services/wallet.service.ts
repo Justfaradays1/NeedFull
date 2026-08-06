@@ -54,7 +54,9 @@ export async function creditWallet(
     }
 
     const walletRow = wallet.rows[0];
-    const balanceBefore = walletRow.balance_kobo;
+    // WHAT: bigint columns come back from pg as strings — force numeric before
+    //       any arithmetic so "+" is addition, never string concatenation
+    const balanceBefore = Number(walletRow.balance_kobo);
 
     // WHAT: Check idempotency key if provided
     // WHY: Prevent duplicate credits from retried requests
@@ -135,7 +137,7 @@ export async function debitWallet(
     }
 
     const walletRow = wallet.rows[0];
-    const balanceBefore = walletRow.balance_kobo;
+    const balanceBefore = Number(walletRow.balance_kobo);
 
     // WHAT: Check sufficient balance before debit
     // WHY: Prevent negative balances (hard constraint)
@@ -217,7 +219,7 @@ export async function lockEscrow(
     }
 
     const walletRow = wallet.rows[0];
-    const balanceBefore = walletRow.balance_kobo;
+    const balanceBefore = Number(walletRow.balance_kobo);
 
     // WHAT: Check sufficient balance for escrow lock
     // WHY: Prevent locking funds that don't exist
@@ -305,7 +307,8 @@ export async function releaseEscrow(
 
     const posterWalletRow = posterWallet.rows[0];
     const runnerWalletRow = runnerWallet.rows[0];
-    const posterEscrowBefore = posterWalletRow.escrow_kobo;
+    const posterEscrowBefore = Number(posterWalletRow.escrow_kobo);
+    const runnerEarningsBefore = Number(runnerWalletRow.earnings_kobo);
 
     // WHAT: Release escrow from poster's wallet
     // WHY: Remove from escrow hold, funds go to platform
@@ -340,8 +343,8 @@ export async function releaseEscrow(
         runnerWalletRow.id,
         "earnings",
         runnerReceives,
-        runnerWalletRow.earnings_kobo,
-        runnerWalletRow.earnings_kobo + runnerReceives,
+        runnerEarningsBefore,
+        runnerEarningsBefore + runnerReceives,
         taskId,
         `Available earnings from task ${taskId}`,
       ],
@@ -398,7 +401,7 @@ export async function refundEscrow(
     }
 
     const walletRow = wallet.rows[0];
-    const escrowBefore = walletRow.escrow_kobo;
+    const escrowBefore = Number(walletRow.escrow_kobo);
 
     // WHAT: Check sufficient escrow to refund
     // WHY: Prevent refunding more than was locked
@@ -431,8 +434,8 @@ export async function refundEscrow(
         walletRow.id,
         "escrow_refund",
         amountKobo,
-        walletRow.balance_kobo,
-        walletRow.balance_kobo + amountKobo,
+        Number(walletRow.balance_kobo),
+        Number(walletRow.balance_kobo) + amountKobo,
         taskId,
         `Escrow refunded for cancelled task ${taskId}`,
       ],
@@ -485,15 +488,21 @@ export async function getWallet(userId: string): Promise<{
     );
     const pendingKobo = pendingRes?.pending_kobo ?? 0;
 
+    // WHAT: Coerce bigint strings to numbers before serializing for the API
+    // WHY:  pg returns bigint as string — clients must never see string balances
+    const balanceKobo = Number(result.balance_kobo);
+    const escrowKobo = Number(result.escrow_kobo);
+    const earningsKobo = Number(result.earnings_kobo);
+
     return {
       id: result.id,
-      balance_kobo: result.balance_kobo,
-      escrow_kobo: result.escrow_kobo,
-      earnings_kobo: result.earnings_kobo,
+      balance_kobo: balanceKobo,
+      escrow_kobo: escrowKobo,
+      earnings_kobo: earningsKobo,
       pending_earnings_kobo: pendingKobo,
-      balance_naira: result.balance_kobo / 100,
-      escrow_naira: result.escrow_kobo / 100,
-      earnings_naira: result.earnings_kobo / 100,
+      balance_naira: balanceKobo / 100,
+      escrow_naira: escrowKobo / 100,
+      earnings_naira: earningsKobo / 100,
       pending_kobo: pendingKobo,
       pending_naira: pendingKobo / 100,
     };
@@ -543,7 +552,7 @@ export async function debitEarnings(
     }
   }
 
-  const earningsBefore = walletRow.earnings_kobo;
+  const earningsBefore = Number(walletRow.earnings_kobo);
   const updated = await client.query<Wallet>(
     `UPDATE wallets SET earnings = earnings - $1, updated_at = NOW()
      WHERE id = $2 RETURNING ${WALLET_SELECT}`,
@@ -560,7 +569,7 @@ export async function debitEarnings(
       type,
       amountKobo,
       earningsBefore,
-      walletRow.earnings_kobo - amountKobo,
+      earningsBefore - amountKobo,
       idempotencyKey || null,
       note,
     ],
@@ -601,7 +610,7 @@ export async function creditEarnings(
     }
   }
 
-  const earningsBefore = walletRow.earnings_kobo;
+  const earningsBefore = Number(walletRow.earnings_kobo);
   const updated = await client.query<Wallet>(
     `UPDATE wallets SET earnings = earnings + $1, updated_at = NOW()
      WHERE id = $2 RETURNING ${WALLET_SELECT}`,
@@ -618,7 +627,7 @@ export async function creditEarnings(
       type,
       amountKobo,
       earningsBefore,
-      walletRow.earnings_kobo + amountKobo,
+      earningsBefore + amountKobo,
       idempotencyKey || null,
       note,
     ],

@@ -31,8 +31,9 @@ interface TaskItem {
   isUrgent: boolean;
   createdAt: string;
   applicationCount: number;
+  distance?: number | null;
   category: { id: string; name: string; icon: string } | null;
-  poster: { id: string; fullName: string };
+  poster: { id: string; fullName: string; trustScore?: number; avatarUrl?: string | null };
 }
 
 interface WalletTransaction {
@@ -85,13 +86,23 @@ export default function FeedPage() {
   const fetchAll = useCallback(async () => {
     if (!isAuthenticated) return;
     try {
+      let locationQuery = "";
+      try {
+        const raw = localStorage.getItem("nf_runner_location");
+        if (raw) {
+          const loc = JSON.parse(raw);
+          if (loc && typeof loc.lat === "number" && typeof loc.lng === "number") {
+            locationQuery = `&lat=${loc.lat}&lng=${loc.lng}&radiusKm=10`;
+          }
+        }
+      } catch { /* no saved location — fetch without distance */ }
       const [
         openTasksRes,
         postedRes,
         txRes,
         myTasksRes,
       ] = await Promise.all([
-        get<{ success: boolean; data: TaskItem[] }>("/tasks?sortBy=newest&status=open&perPage=6").catch(() => null),
+        get<{ success: boolean; data: TaskItem[] }>(`/tasks?sortBy=newest&status=open&perPage=6${locationQuery}`).catch(() => null),
         get<{ success: boolean; data: TaskItem[] }>("/tasks/me/posted").catch(() => null),
         get<{ success: boolean; data: WalletTransaction[] }>("/wallet/transactions?perPage=10").catch(() => null),
         get<{ success: boolean; data: TaskItem[] }>("/tasks/me?perPage=20").catch(() => null),

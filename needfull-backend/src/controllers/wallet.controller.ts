@@ -46,7 +46,7 @@ export async function getTransactions(req: Request, res: Response): Promise<void
     const total = parseInt(countRes.rows[0]?.count || "0", 10);
     res.json({
       success: true,
-      data: txns.rows.map((tx: any) => ({ id: tx.id, type: tx.type, amount: { kobo: tx.amount_kobo, naira: tx.amount_kobo / 100 }, balanceBefore: { kobo: tx.balance_before_kobo, naira: tx.balance_before_kobo / 100 }, balanceAfter: { kobo: tx.balance_after_kobo, naira: tx.balance_after_kobo / 100 }, taskId: tx.task_id, taskTitle: tx.task_title, note: tx.note, createdAt: tx.created_at })),
+      data: txns.rows.map((tx: any) => ({ id: tx.id, type: tx.type, amount: { kobo: Number(tx.amount_kobo), naira: Number(tx.amount_kobo) / 100 }, balanceBefore: { kobo: Number(tx.balance_before_kobo), naira: Number(tx.balance_before_kobo) / 100 }, balanceAfter: { kobo: Number(tx.balance_after_kobo), naira: Number(tx.balance_after_kobo) / 100 }, taskId: tx.task_id, taskTitle: tx.task_title, note: tx.note, createdAt: tx.created_at })),
       pagination: { page, perPage, total, totalPages: Math.ceil(total / perPage) },
     });
   } catch (error) {
@@ -138,7 +138,7 @@ export async function verifyCardPayment(req: Request, res: Response): Promise<vo
     if (transaction.status !== "success") { res.status(400).json({ success: false, message: `Payment status is ${transaction.status}. Expected success.` }); return; }
 
     const result = await withTransaction(async (client) => creditWallet(client, userId, transaction.amountKobo, "card_deposit", "Card payment deposit", reference, reference));
-    res.json({ success: true, message: `₦${transaction.amountKobo / 100} added to your wallet`, data: { balance: { kobo: result.balance_kobo, naira: result.balance_kobo / 100 } } });
+    res.json({ success: true, message: `₦${transaction.amountKobo / 100} added to your wallet`, data: { balance: { kobo: Number(result.balance_kobo), naira: Number(result.balance_kobo) / 100 } } });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Failed to verify payment";
     console.error("[Wallet] verifyCardPayment error:", error);

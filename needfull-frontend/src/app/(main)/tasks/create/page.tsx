@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ChevronLeft,
   MapPin,
@@ -10,6 +10,7 @@ import {
   Loader2,
   DollarSign,
   ShoppingBag,
+  BadgeCheck,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { get, post } from "@/lib/apiClient";
@@ -40,6 +41,8 @@ const PLATFORM_FEE_PERCENT = 10;
 
 export default function CreateTaskPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const inviteRunnerId = searchParams.get("runnerId") ?? undefined;
   const user = useAuthStore((s) => s.user);
   useAuthInit();
 
@@ -131,6 +134,7 @@ export default function CreateTaskPage() {
           locationLabel,
           lat,
           lng,
+          inviteRunnerId,
         },
       );
 
@@ -192,6 +196,17 @@ export default function CreateTaskPage() {
             </div>
           </div>
         </div>
+
+        {/* Invited runner banner */}
+        {inviteRunnerId && (
+          <div className="flex items-center gap-2 bg-brand-light/70 px-4 py-2.5 border-b border-brand/15">
+            <BadgeCheck className="h-4 w-4 shrink-0 text-brand-text" />
+            <p className="text-xs font-semibold text-gray-700">
+              This task is being posted for a specific runner — they&apos;ll get a
+              notification and can apply first. Escrow still protects the payment.
+            </p>
+          </div>
+        )}
 
         {/* Content */}
         <div className="mx-auto max-w-lg px-4 pb-8 pt-6">

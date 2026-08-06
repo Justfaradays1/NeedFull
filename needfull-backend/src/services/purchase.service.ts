@@ -816,8 +816,8 @@ export async function resolveDispute(
         [
           runnerWallet.rows[0].id,
           runnerGets,
-          runnerWallet.rows[0].earnings,
-          runnerWallet.rows[0].earnings + runnerGets,
+          Number(runnerWallet.rows[0].earnings),
+          Number(runnerWallet.rows[0].earnings) + runnerGets,
           task.id,
           `Runner fee from purchase dispute split (task ${task.id})`,
         ],

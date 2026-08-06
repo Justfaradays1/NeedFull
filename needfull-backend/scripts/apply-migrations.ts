@@ -19,6 +19,7 @@ async function main() {
     "015_runner_busy.sql",
     "016_task_applications_runner_id.sql",
     "017_wallet_tx_enum.sql",
+    "018_runner_availability.sql",
   ];
   for (const file of migrations) {
     const sql = await readFile(join(migrationsDir, file), "utf8");
