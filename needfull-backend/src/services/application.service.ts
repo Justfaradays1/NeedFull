@@ -3,7 +3,7 @@
 // FUTURE: Add auto-accept for trusted runners, add application deadline, add interview/question flow
 
 import db, { queryOne, withTransaction } from "../config/db";
-import { lockEscrow } from "./wallet.service";
+import { lockEscrow, refundEscrow } from "./wallet.service";
 import { notifyUser, notifyMany } from "./notification.service";
 import { v4 as uuidv4 } from "uuid";
 
@@ -72,8 +72,8 @@ export async function apply(
   const now = new Date().toISOString();
   const application = await queryOne<ApplicationRow>(
     `INSERT INTO task_applications
-     (id, task_id, runner_id, message, proposed_amount_kobo, status, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, 'pending', $6, $6)
+     (id, task_id, applicant_id, runner_id, message, proposed_amount_kobo, status, created_at, updated_at)
+     VALUES ($1, $2, $3, $3, $4, $5, 'pending', $6, $6)
      RETURNING *`,
     [applicationId, params.taskId, userId, params.message.trim(), proposedAmountKobo, now],
   );
@@ -143,10 +143,27 @@ export async function acceptApplication(
   const taskId = appAndTask.task_id;
   const taskTitle = appAndTask.title;
 
-  // WHAT: Atomic accept — lock escrow, update task, update applications
+  // WHAT: Atomic accept — top up escrow, update task, update applications
+  // WHY: createTask already locked the posted budget at publication time, so
+  //      escrow must be adjusted to the agreed amount — never budget + agreed
   await withTransaction(async (client) => {
-    // WHAT: Lock escrow for agreed amount
-    await lockEscrow(client, posterId, agreedAmountKobo, taskId);
+    // WHAT: Lock only the difference above the posted budget (or refund below it)
+    // WHY: Prevents the double-lock where escrow = budget + agreed
+    if (agreedAmountKobo > appAndTask.budget_kobo) {
+      await lockEscrow(
+        client,
+        posterId,
+        agreedAmountKobo - appAndTask.budget_kobo,
+        taskId,
+      );
+    } else if (agreedAmountKobo < appAndTask.budget_kobo) {
+      await refundEscrow(
+        client,
+        posterId,
+        appAndTask.budget_kobo - agreedAmountKobo,
+        taskId,
+      );
+    }
 
     // WHAT: Update task to in_progress with runner and agreed amount
     await client.query(
@@ -352,7 +369,23 @@ export async function acceptCounterOffer(
   }
 
   await withTransaction(async (client) => {
-    await lockEscrow(client, posterId, agreedAmountKobo, taskId);
+    // WHAT: Adjust escrow to the counter-agreed amount (delta vs posted budget)
+    // WHY: createTask already locked the budget; locking again would double it
+    if (agreedAmountKobo > app.budget_kobo) {
+      await lockEscrow(
+        client,
+        posterId,
+        agreedAmountKobo - app.budget_kobo,
+        taskId,
+      );
+    } else if (agreedAmountKobo < app.budget_kobo) {
+      await refundEscrow(
+        client,
+        posterId,
+        app.budget_kobo - agreedAmountKobo,
+        taskId,
+      );
+    }
 
     await client.query(
       `UPDATE tasks

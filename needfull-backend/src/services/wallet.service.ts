@@ -554,7 +554,7 @@ export async function debitEarnings(
     `INSERT INTO wallet_transactions 
      (wallet_id, type, amount, balance_before, balance_after, 
       idempotency_key, note, created_at)
-     VALUES ($1, $2, -$3, $4, $5, $6, $7, NOW())`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
     [
       walletRow.id,
       type,

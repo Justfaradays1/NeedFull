@@ -416,7 +416,7 @@ export async function createTask(
         deadline, is_urgent, location_label, location, image_url,
         status, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
-        CASE WHEN $10 IS NOT NULL AND $11 IS NOT NULL THEN ST_SetSRID(ST_MakePoint($11::float, $10::float), 4326)::geography ELSE NULL END,
+        CASE WHEN $10::float8 IS NOT NULL AND $11::float8 IS NOT NULL THEN ST_SetSRID(ST_MakePoint($11::float, $10::float), 4326)::geography ELSE NULL END,
         $12, 'open', $13, $13)
        RETURNING *`,
       [
@@ -675,7 +675,7 @@ export async function confirmCompletion(
   userId: string,
 ): Promise<any> {
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, assigned_to as runner_id, budget_kobo, title
+    `SELECT id, poster_id, assigned_to as runner_id, budget_kobo, title, status
      FROM tasks WHERE id = $1`,
     [taskId],
   );

@@ -61,6 +61,7 @@ const TX_LABELS: Record<string, string> = {
   monnify_deposit: "Virtual Account Deposit",
   manual_deposit_confirmed: "Bank Transfer",
   withdrawal: "Withdrawal",
+  withdrawal_requested: "Withdrawal",
   earnings_withdrawal: "Earnings Withdrawal",
   escrow_lock: "Escrow Hold",
   escrow_release: "Escrow Released",
@@ -81,6 +82,7 @@ function getTxCategory(type: string): TxCategory {
   if (
     type === "fee" ||
     type === "withdrawal" ||
+    type === "withdrawal_requested" ||
     type === "earnings_withdrawal"
   )
     return "debit";

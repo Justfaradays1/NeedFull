@@ -67,7 +67,7 @@ export async function requestWithdrawal(req: Request, res: Response): Promise<vo
           client,
           userId,
           totalDebit,
-          "withdrawal",
+          "withdrawal_requested",
           `Withdrawal to ${bankName} ${accountNumber}`,
         );
       }

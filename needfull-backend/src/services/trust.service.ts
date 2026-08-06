@@ -94,12 +94,12 @@ export async function recalculateTrustScore(userId: string): Promise<number> {
         -- TENURE: Account age in months
         u.created_at
       FROM users u
-      LEFT JOIN reviews r ON r.reviewed_user_id = $1 AND r.is_deleted = false
+      LEFT JOIN reviews r ON r.reviewee_id = $1
       LEFT JOIN task_applications ta ON ta.runner_id = $1
       LEFT JOIN tasks t ON t.id = ta.task_id
       LEFT JOIN reports rep ON rep.reported_user_id = $1
       WHERE u.id = $1
-      GROUP BY u.id, u.email_verified, u.phone_verified, u.metadata, u.created_at
+      GROUP BY u.id, u.email_verified, u.phone_verified, u.created_at
       `,
       [userId],
     );
@@ -175,19 +175,16 @@ export async function recalculateTrustScore(userId: string): Promise<number> {
       [trustScore, now, userId],
     );
 
-    // WHAT: UPSERT trust_score_log for audit trail
+// WHAT: UPSERT trust_score_log for audit trail (one row per user per day)
     // WHY: Track score changes over time; understand what affects each user's score
     await db.query(
+      `DELETE FROM trust_score_log WHERE user_id = $1 AND calculated_at >= date_trunc('day', NOW())`,
+      [userId],
+    );
+    await db.query(
       `INSERT INTO trust_score_log 
-       (user_id, score, rating_points, completion_points, verification_points, report_penalty, tenure_points, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       ON CONFLICT (user_id, created_at::date) DO UPDATE 
-       SET score = EXCLUDED.score, 
-           rating_points = EXCLUDED.rating_points,
-           completion_points = EXCLUDED.completion_points,
-           verification_points = EXCLUDED.verification_points,
-           report_penalty = EXCLUDED.report_penalty,
-           tenure_points = EXCLUDED.tenure_points`,
+       (user_id, score, rating_points, completion_points, verification_points, report_penalty, tenure_points, calculated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
       [
         userId,
         trustScore,

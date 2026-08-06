@@ -276,13 +276,17 @@ io.on("connection", (socket) => {
 
 import { initCronJobs } from "./jobs/cron.js";
 
-// WHAT: Start server
-// WHY: Listen for incoming requests
-initCronJobs();
-
 const PORT = env.PORT || 4000;
-server.listen(PORT, () => {
-  console.log(`
+
+// WHAT: Allow importing this module (services, tests, scripts) without starting
+//       the HTTP server — only the real launcher sets SKIP_HTTP_LISTEN globally
+// WHY:  Lazy imports of index.js (e.g. socket io) would otherwise collide with
+//       the dev server port or hang scripts
+if (process.env.SKIP_HTTP_LISTEN !== "1") {
+  initCronJobs();
+
+  server.listen(PORT, () => {
+    console.log(`
 ╔════════════════════════════════════════╗
 ║     NeedFull Backend - Running         ║
 ║     Environment: ${env.NODE_ENV.toUpperCase().padEnd(24)}║
@@ -290,7 +294,8 @@ server.listen(PORT, () => {
 ║     Frontend: ${env.FRONTEND_URL.padEnd(28)}║
 ╚════════════════════════════════════════╝
   `);
-});
+  });
+}
 
 // WHAT: Handle graceful shutdown
 // WHY: Clean up connections on process termination
