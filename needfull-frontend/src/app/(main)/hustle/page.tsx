@@ -8,52 +8,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
-  MapPin,
-  Clock,
-  Briefcase,
   RefreshCw,
   Plus,
   ChevronRight,
-  ArrowUpRight,
   Search,
   CircleDollarSign,
-  Flame,
-  Star,
-  BadgeCheck,
-  Sparkles,
+  Briefcase,
   ChevronDown,
 } from "lucide-react";
 import { get } from "@/lib/apiClient";
 import { useAuthUser, useAuthStore } from "@/store";
-import { formatCurrency } from "@/lib/format";
-import { Avatar } from "@/components/ui/avatar";
-
-interface TaskItem {
-  id: string;
-  title: string;
-  description?: string;
-  budget: { kobo: number; naira: number };
-  status: string;
-  isUrgent: boolean;
-  createdAt: string;
-  deadline: string | null;
-  locationLabel: string | null;
-  distance: number | null;
-  applicationCount: number;
-  category: { id: string; name: string; icon: string } | null;
-  poster: {
-    id: string;
-    fullName: string;
-    trustScore?: number;
-    avatarUrl?: string | null;
-    isVerifiedStudent?: boolean;
-  };
-}
+import { type TaskItem } from "@/types/task";
+import TaskCard from "@/components/tasks/TaskCard";
 
 interface Category {
   id: string;
   name: string;
-  icon: string;
+  icon?: string | null;
 }
 
 type SortMode =
@@ -74,167 +45,6 @@ function getRunnerLocation(): { lat: number; lng: number } | null {
   } catch {
     return null;
   }
-}
-
-function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "now";
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString("en-NG", {
-    day: "numeric",
-    month: "short",
-  });
-}
-
-function timeLeft(dateStr: string): string | null {
-  const ms = new Date(dateStr).getTime() - Date.now();
-  if (ms <= 0) return "Due now";
-  const mins = Math.floor(ms / 60000);
-  if (mins < 60) return `Due in ${mins}m`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 48) return `Due in ${hrs}h`;
-  const days = Math.floor(hrs / 24);
-  if (days < 7) return `Due in ${days}d`;
-  return null;
-}
-
-function formatDistance(meters: number | null): string | null {
-  if (meters === null || meters === undefined) return null;
-  if (meters < 1000) return `${Math.round(meters)}m away`;
-  return `${(meters / 1000).toFixed(1)}km away`;
-}
-
-function isNew(dateStr: string): boolean {
-  return Date.now() - new Date(dateStr).getTime() < 24 * 60 * 60 * 1000;
-}
-
-// WHAT: High-pay threshold — ₦5,000 budget and above earns the "High Pay" label
-const HIGH_PAY_KOBO = 500_000;
-
-/* ─── TaskCard ─── */
-
-function TaskCard({ task, index }: { task: TaskItem; index: number }) {
-  const distance = formatDistance(task.distance);
-  const due = task.deadline ? timeLeft(task.deadline) : null;
-  const labels: React.ReactNode[] = [];
-  if (index === 0)
-    labels.push(
-      <span key="top" className="inline-flex items-center gap-1 rounded-full bg-gold px-2 py-0.5 text-[9px] font-bold text-white">
-        <Flame className="h-2.5 w-2.5" /> TOP PICK
-      </span>,
-    );
-  if (task.isUrgent)
-    labels.push(
-      <span key="urgent" className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-bold text-red-700">
-        <Flame className="h-2.5 w-2.5" /> URGENT
-      </span>,
-    );
-  if (task.budget.kobo >= HIGH_PAY_KOBO)
-    labels.push(
-      <span key="pay" className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-bold text-emerald-700">
-        <Sparkles className="h-2.5 w-2.5" /> HIGH PAY
-      </span>,
-    );
-  if (task.poster?.isVerifiedStudent)
-    labels.push(
-      <span key="verified" className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[9px] font-bold text-blue-700">
-        <BadgeCheck className="h-2.5 w-2.5" /> VERIFIED POSTER
-      </span>,
-    );
-  if (isNew(task.createdAt) && index > 0)
-    labels.push(
-      <span key="new" className="rounded-full bg-teal-50 px-2 py-0.5 text-[9px] font-bold text-teal-700">
-        NEW
-      </span>,
-    );
-
-  return (
-    <Link
-      href={`/feed/${task.id}`}
-      className={`tap-target block rounded-2xl border border-card-border bg-surface p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98] ${
-        index === 0 ? "border-gold/40 ring-1 ring-gold/20" : ""
-      }`}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          {labels.length > 0 && <div className="mb-1.5 flex flex-wrap items-center gap-1.5">{labels}</div>}
-          <div className="mb-1.5 flex items-center gap-1.5">
-            {task.category?.icon && (
-              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-brand-light text-sm">
-                {task.category.icon}
-              </span>
-            )}
-            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-medium text-amber-700">
-              {task.category?.name || "General"}
-            </span>
-          </div>
-          <h3 className="text-sm font-bold text-gray-900 line-clamp-2">{task.title}</h3>
-          {task.description ? (
-            <p className="mt-1 text-xs leading-relaxed text-gray-500 line-clamp-2">
-              {task.description}
-            </p>
-          ) : null}
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-500">
-            <span className="inline-flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {timeAgo(task.createdAt)}
-            </span>
-            {distance && (
-              <span className="inline-flex items-center gap-1 font-semibold text-brand-text">
-                <MapPin className="h-3 w-3" />
-                {distance}
-              </span>
-            )}
-            {due && (
-              <span className="inline-flex items-center gap-1 text-red-600">
-                <Clock className="h-3 w-3" />
-                {due}
-              </span>
-            )}
-            {task.applicationCount > 0 ? (
-              <span className="inline-flex items-center gap-1">
-                <Briefcase className="h-3 w-3" />
-                {task.applicationCount} applied
-              </span>
-            ) : (
-              <span className="text-[10px] font-semibold text-green-600">
-                No one has applied yet
-              </span>
-            )}
-          </div>
-          <div className="mt-3 flex items-center gap-2 border-t border-card-border pt-2.5">
-            <Avatar
-              src={task.poster?.avatarUrl}
-              name={task.poster?.fullName}
-              size="xs"
-            />
-            <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-gray-700">
-              {task.poster?.fullName || "Poster"}
-            </span>
-            {typeof task.poster?.trustScore === "number" && (
-              <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-gray-500">
-                <Star className="h-3 w-3 fill-gold text-gold" />
-                Trust {task.poster.trustScore}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="flex shrink-0 flex-col items-end gap-2">
-          <span className="font-display text-lg font-black text-gold">
-            {formatCurrency(task.budget.kobo)}
-          </span>
-          <span className="inline-flex items-center gap-1 rounded-lg bg-gold px-3 py-1.5 text-[11px] font-bold text-white shadow-sm shadow-gold/20">
-            View & Apply <ArrowUpRight className="h-3 w-3" />
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
 }
 
 /* ─── Sorts ─── */
@@ -570,7 +380,7 @@ export default function HustlePage() {
         ) : (
           <div className="space-y-3">
             {visible.map((task, idx) => (
-              <TaskCard key={task.id} task={task} index={idx} />
+              <TaskCard key={task.id} task={task} featured={idx === 0} />
             ))}
           </div>
         )}

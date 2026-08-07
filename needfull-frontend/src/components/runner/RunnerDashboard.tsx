@@ -28,6 +28,7 @@ import { formatCurrency } from "@/lib/format";
 import { useGreeting } from "@/hooks/useGreeting";
 import { Avatar } from "@/components/ui/avatar";
 import { StartEarningModal } from "@/components/runner/StartEarningModal";
+import TaskCard from "@/components/tasks/TaskCard";
 
 /* ─── Types ─── */
 
@@ -379,75 +380,9 @@ function NearbyTasks({
         </div>
       ) : (
         <div className="space-y-2">
-          {openTasks.map((task) => {
-            const distance = task.distance
-              ? task.distance < 1000
-                ? `${Math.round(task.distance)}m away`
-                : `${(task.distance / 1000).toFixed(1)}km away`
-              : null;
-            return (
-              <Link
-                key={task.id}
-                href={`/feed/${task.id}`}
-                className="tap-target block rounded-xl border border-card-border bg-surface p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-gold/30 hover:shadow-md active:scale-[0.98]"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      {task.isUrgent && (
-                        <span className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-bold text-red-700">
-                          URGENT
-                        </span>
-                      )}
-                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-medium text-amber-700">
-                        {task.category?.name || "General"}
-                      </span>
-                    </div>
-                    <h3 className="text-sm font-bold text-gray-900 line-clamp-1">{task.title}</h3>
-                    <div className="mt-1.5 flex items-center gap-3 text-[11px] text-gray-500">
-                      {distance ? (
-                        <span className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {distance}
-                        </span>
-                      ) : null}
-                      <span>{timeAgo(task.createdAt)}</span>
-                      {typeof task.poster?.trustScore === "number" && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-400">
-                          <Star className="h-3 w-3 fill-gold text-gold" />
-                          {task.poster.trustScore}
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-2 flex items-center gap-1.5">
-                      {task.poster?.avatarUrl ? (
-                        <img
-                          src={task.poster.avatarUrl}
-                          alt=""
-                          className="h-4 w-4 rounded-full object-cover"
-                        />
-                      ) : (
-                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand/10 text-[8px] font-bold text-brand-text">
-                          {task.poster?.fullName?.charAt(0).toUpperCase() || "?"}
-                        </span>
-                      )}
-                      <span className="truncate text-[10px] font-semibold text-gray-600">
-                        {task.poster?.fullName}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-2">
-                    <span className="font-display text-base font-black text-gold">
-                      {formatCurrency(task.budget.kobo)}
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-lg bg-gold px-3 py-1 text-[11px] font-bold text-white">
-                      View Details
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+          {openTasks.map((task, idx) => (
+            <TaskCard key={task.id} task={task} featured={idx === 0} />
+          ))}
         </div>
       )}
     </section>

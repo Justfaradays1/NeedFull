@@ -23,6 +23,7 @@ import {
   Briefcase,
   Users,
   ChevronRight,
+  Wifi,
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -52,6 +53,7 @@ interface TaskDetail {
   budget: { kobo: number; naira: number };
   status: string;
   isUrgent: boolean;
+  workMode?: "on_site" | "remote" | null;
   locationLabel: string | null;
   deadline: string | null;
   imageUrl: string | null;
@@ -107,6 +109,23 @@ const STATUS_BADGES: Record<
   completed: { bg: "bg-blue-100", text: "text-blue-800", label: "Completed" },
   cancelled: { bg: "bg-gray-100", text: "text-gray-600", label: "Cancelled" },
 };
+
+function WorkModeBadge({ mode }: { mode?: "on_site" | "remote" | null }) {
+  if (mode === "remote") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-700">
+        <Wifi className="h-3 w-3" />
+        Remote
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-brand-light/70 px-3 py-1 text-xs font-bold text-brand-text">
+      <MapPin className="h-3 w-3" />
+      On-site
+    </span>
+  );
+}
 
 const PLATFORM_FEE_RATE = 0.1;
 
@@ -206,7 +225,8 @@ export default function TaskDetailPage() {
 
   const handleApply = async () => {
     if (!applyMessage.trim() || applyMessage.trim().length < 10) {
-      toast.error("Message must be at least 10 characters");
+      toast.error("Write a short message (at least 10 characters) first");
+      applyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
     setApplying(true);
@@ -235,8 +255,11 @@ export default function TaskDetailPage() {
     }
   };
 
-  const scrollToApply = () => {
-    applyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  // WHAT: Single submit point — the sticky Apply CTA submits directly from the
+  //      current form state (message + optional proposed amount).
+  //      handleApply scrolls to the form automatically when the message is invalid.
+  const submitApply = () => {
+    handleApply();
   };
 
   if (!isAuthenticated) return null;
@@ -333,6 +356,7 @@ export default function TaskDetailPage() {
                 >
                   {badge.label}
                 </span>
+                <WorkModeBadge mode={task.workMode} />
                 {task.isUrgent && (
                   <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">
                     URGENT
@@ -509,9 +533,13 @@ export default function TaskDetailPage() {
           <div ref={applyRef} className="scroll-mt-20">
             {canApply && (
               <div className="mt-4 overflow-hidden rounded-2xl bg-surface p-4 shadow-sm border border-card-border">
-                <h3 className="mb-3 font-semibold text-gray-900">
+                <h3 className="mb-1 font-semibold text-gray-900">
                   Apply for this task
                 </h3>
+                <p className="mb-3 text-[11px] text-gray-500">
+                  Tell the poster why you&apos;re the best fit. Your bid is protected by
+                  escrow either way.
+                </p>
                 <textarea
                   value={applyMessage}
                   onChange={(e) => setApplyMessage(e.target.value)}
@@ -520,7 +548,7 @@ export default function TaskDetailPage() {
                   rows={3}
                   maxLength={500}
                 />
-                <div className="mb-3">
+                <div className="mb-1">
                   <label className="text-xs font-medium text-gray-600">
                     Proposed amount (optional)
                   </label>
@@ -541,18 +569,6 @@ export default function TaskDetailPage() {
                     Leave empty to accept the listed budget
                   </p>
                 </div>
-                <button
-                  onClick={handleApply}
-                  disabled={applying || applyMessage.trim().length < 10}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-on-brand disabled:opacity-50"
-                >
-                  {applying ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                  {applying ? "Submitting..." : "Submit Application"}
-                </button>
               </div>
             )}
           </div>
@@ -605,26 +621,31 @@ export default function TaskDetailPage() {
         </div>
       </div>
 
-      {/* Sticky bottom CTA — mobile */}
+      {/* Sticky Apply CTA — the single submission point, all screens */}
       {canApply && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200/70 bg-white/95 px-4 pb-4 pt-3 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:hidden">
-          <div className="mx-auto flex max-w-lg items-center justify-between gap-3">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200/70 bg-white/95 px-4 pb-4 pt-3 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:inset-x-auto md:bottom-6 md:right-6 md:w-80 md:rounded-2xl md:border md:p-4 md:shadow-xl">
+          <div className="mx-auto flex max-w-lg items-center justify-between gap-3 md:block">
             <div className="min-w-0">
               <p className="flex items-center gap-1 text-[10px] font-bold text-green-700">
                 <ShieldCheck className="h-3 w-3" />
                 Escrow-protected
               </p>
               <p className="text-[10px] text-gray-500">
-                Funds held safely until task is done
+                Funds held safely until the task is done
               </p>
             </div>
             <button
               type="button"
-              onClick={scrollToApply}
-              className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gold px-5 py-3 text-sm font-bold text-white shadow-md shadow-gold/25 active:scale-[0.97]"
+              onClick={submitApply}
+              disabled={applying}
+              className="flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gold px-5 py-3 text-sm font-bold text-white shadow-md shadow-gold/25 active:scale-[0.97] disabled:opacity-60 md:mt-2 md:w-full"
             >
-              <Send className="h-4 w-4" />
-              Apply Now
+              {applying ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+              {applying ? "Submitting..." : "Apply for this Task"}
             </button>
           </div>
         </div>

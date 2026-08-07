@@ -322,6 +322,17 @@ export default function MyTaskDetailPage() {
               )}
 
               <div className="flex flex-col gap-2">
+                {task.capabilities?.canViewApplications && (
+                  <button
+                    onClick={() => router.push(`/tasks/${taskId}/applicants`)}
+                    className="flex items-center justify-center gap-2 rounded-xl bg-gold py-3 text-sm font-bold text-white shadow-sm shadow-gold/20 transition-all active:scale-[0.97]"
+                  >
+                    <Users className="h-4 w-4" />
+                    View {task.applicationCount || 0} Applicant
+                    {(task.applicationCount || 0) === 1 ? "" : "s"}
+                  </button>
+                )}
+
                 {task.capabilities?.canCancel && (
                   <button
                     onClick={() => setCancelConfirmOpen(true)}
