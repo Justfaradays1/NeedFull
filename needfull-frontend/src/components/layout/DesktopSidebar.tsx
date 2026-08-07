@@ -207,7 +207,7 @@ export function DesktopSidebar({
   const NAV_TEXT = "text-black dark:text-white";
   const NAV_INACTIVE = `${NAV_TEXT} font-semibold hover:bg-gray-100 dark:hover:bg-white/10`;
   const NAV_ACTIVE =
-    `bg-[#4ADE80] font-bold ${NAV_TEXT} dark:bg-[#1B5741]`;
+    `bg-[#2D9E6B] font-bold text-white/95 dark:bg-[#1B5741] dark:text-white/90`;
 
   const moreItems = [
     { href: "/wallet", label: "Wallet", icon: Wallet },
@@ -257,7 +257,7 @@ export function DesktopSidebar({
                     strokeWidth={active ? 2.5 : 2}
                     className={`h-5 w-5 shrink-0 ${
                       active
-                        ? "text-brand dark:text-brand-light"
+                        ? "text-white/95 dark:text-white/90"
                         : "text-gray-600 dark:text-gray-300"
                     }`}
                   />
