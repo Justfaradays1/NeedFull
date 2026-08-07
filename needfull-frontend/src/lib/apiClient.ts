@@ -66,7 +66,8 @@ const processQueue = (
 
 // WHAT: Create axios instance pointing to NeedFull API
 // WHY: Single point of configuration for all API requests
-export const API_BASE_URL = 'https://needfull.onrender.com/api';
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://needfull.onrender.com/api";
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,

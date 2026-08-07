@@ -31,6 +31,13 @@ interface Conversation {
   lastMessageAt: string | null;
   unreadCount: number;
   createdAt: string;
+  task: {
+    id: string;
+    title: string;
+    status: string;
+    runnerPhase: string | null;
+    runnerDoneAt: string | null;
+  } | null;
 }
 
 interface TaskItem {
@@ -282,11 +289,11 @@ export default function ChatPage() {
                   Explore Tasks
                 </Link>
                 <Link
-                  href="/explore"
+                  href="/tasks"
                   className="tap-target inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-surface px-5 py-3 text-sm font-bold text-gray-600 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.97]"
                 >
                   <SendHorizontal className="h-4 w-4" />
-                  Browse Services
+                  My Tasks
                 </Link>
               </div>
             </div>
@@ -434,6 +441,23 @@ export default function ChatPage() {
                       {timeAgo(c.lastMessageAt)}
                     </span>
                   </div>
+
+                  {/* Task context */}
+                  {c.task && (
+                    <div className="mt-0.5 flex items-center gap-1.5">
+                      <span className="truncate text-[11px] text-brand-text">
+                        📋 {c.task.title}
+                      </span>
+                      <span className="shrink-0 rounded-full bg-gray-100 px-1.5 py-0.5 text-[9px] font-bold capitalize text-gray-600">
+                        {c.task.status === "in_progress"
+                          ? "In progress"
+                          : c.task.status === "completed"
+                            ? "Completed"
+                            : c.task.status.replace("_", " ")}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="mt-0.5 flex items-center gap-2">
                     {c.lastMessage ? (
                       <p

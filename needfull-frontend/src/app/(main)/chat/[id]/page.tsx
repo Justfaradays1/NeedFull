@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { get, post } from "@/lib/apiClient";
+import { openTaskChat } from "@/lib/taskChat";
 import { PinnedTaskBar } from "@/components/chat/PinnedTaskBar";
 import { useSocket } from "@/hooks/useSocket";
 import { useAuthUser } from "@/store";
@@ -122,6 +123,7 @@ export default function ChatThreadPage() {
   const [sending, setSending] = useState(false);
   const [partnerTyping, setPartnerTyping] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notFound, setNotFound] = useState(false);
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -146,14 +148,20 @@ export default function ChatThreadPage() {
         ]);
 
         const found = convRes.data.find((c: Conversation) => c.id === convId);
-        if (found) {
-          setConv(found);
-          const taskRes = await get<{ success: boolean; data: TaskInfo }>(
-            `/tasks/${found.taskId}`,
-          ).catch(() => null);
-          if (taskRes?.success) setTask(taskRes.data);
+        if (!found) {
+          setNotFound(true);
+          return;
         }
+        setConv(found);
+        const taskRes = await get<{ success: boolean; data: TaskInfo }>(
+          `/tasks/${found.taskId}`,
+        ).catch(() => null);
+        if (taskRes?.success) setTask(taskRes.data);
         if (msgRes.success) setMessages(msgRes.data);
+
+        // WHAT: Mark all inbound messages in this conversation as read —
+        //       the backend resets unreadCount for the opener.
+        await post(`/chat/conversations/${convId}/read`, {}).catch(() => null);
       } catch {
         /* */
       } finally {
@@ -174,6 +182,10 @@ export default function ChatThreadPage() {
         return [...prev, data];
       });
       scrollDown();
+      // WHAT: New inbound message while open → mark as read immediately
+      if (data.senderId !== user?.id) {
+        post(`/chat/conversations/${convId}/read`, {}).catch(() => null);
+      }
     });
 
     const cleanupTyping = on("partner:typing", () => {
@@ -260,9 +272,34 @@ export default function ChatThreadPage() {
   const partnerName = conv?.otherUser.fullName || "Chat";
   const isInProgress = task?.status === "in_progress";
   const isPoster = user?.id === task?.posterId;
+  const conversationClosed =
+    !!task && !["open", "in_progress"].includes(task.status);
+  const viewTaskHref =
+    task && isInProgress
+      ? `/tasks/${task.id}/active`
+      : task
+        ? `/feed/${task.id}`
+        : "/feed";
 
   if (loading) {
     return <ChatDetailSkeleton />;
+  }
+
+  if (notFound || !conv) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center bg-gray-50 px-4 text-center">
+        <h2 className="text-lg font-semibold text-gray-900">
+          Conversation not found
+        </h2>
+        <button
+          type="button"
+          onClick={() => router.push("/chat")}
+          className="mt-4 rounded-xl bg-brand px-6 py-2.5 text-sm font-semibold text-on-brand"
+        >
+          Back to Messages
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -315,7 +352,7 @@ export default function ChatThreadPage() {
                   type="button"
                   onClick={() => {
                     setMenuOpen(false);
-                    router.push(`/feed/${task?.id}`);
+                    router.push(viewTaskHref);
                   }}
                   className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
                 >
@@ -340,7 +377,7 @@ export default function ChatThreadPage() {
       {task && (
         <PinnedTaskBar
           task={task}
-          onViewTask={() => router.push(`/feed/${task.id}`)}
+          onViewTask={() => router.push(viewTaskHref)}
         />
       )}
 
@@ -360,6 +397,11 @@ export default function ChatThreadPage() {
 
       {/* Input bar */}
       <div className="border-t border-card-border bg-surface px-3 py-2">
+        {conversationClosed ? (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-center text-xs font-semibold text-amber-800">
+            This task is {task?.status === "completed" ? "complete" : task?.status?.replace("_", " ")} — chat is now read-only.
+          </div>
+        ) : (
         <div className="flex items-center gap-2">
           <input
             type="text"
@@ -369,11 +411,12 @@ export default function ChatThreadPage() {
             placeholder="Type a message..."
             className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none transition-colors focus:border-brand focus:bg-white"
             maxLength={2000}
+            disabled={conversationClosed}
           />
           <button
             type="button"
             onClick={sendMessage}
-            disabled={!input.trim() || sending}
+            disabled={!input.trim() || sending || conversationClosed}
             className="tap-target flex h-10 w-10 items-center justify-center rounded-full bg-brand text-on-brand shadow-sm transition-all disabled:opacity-40"
           >
             {sending ? (
@@ -383,6 +426,7 @@ export default function ChatThreadPage() {
             )}
           </button>
         </div>
+        )}
       </div>
     </div>
   );

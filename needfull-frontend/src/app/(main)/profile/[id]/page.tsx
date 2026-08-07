@@ -17,14 +17,11 @@ import {
   Calendar,
   Award,
   Wifi,
-  MessageCircle,
   Plus,
-  Loader2,
 } from "lucide-react";
-import { get, post } from "@/lib/apiClient";
+import { get } from "@/lib/apiClient";
 import { useAuthInit, useAuthUser } from "@/store";
 import { Avatar } from "@/components/ui/avatar";
-import toast from "react-hot-toast";
 
 interface PublicProfile {
   id: string;
@@ -85,7 +82,6 @@ export default function PublicProfilePage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [offers, setOffers] = useState<OfferItem[]>([]);
-  const [startingChat, setStartingChat] = useState(false);
 
   const isSelf = user?.id === profileId;
 
@@ -119,21 +115,6 @@ export default function PublicProfilePage() {
       cancelled = true;
     };
   }, [profileId]);
-
-  const startChat = async () => {
-    setStartingChat(true);
-    try {
-      const res = await post<{ success: boolean; data: { id: string } }>(
-        "/chat/conversations",
-        { otherUserId: profileId },
-      );
-      if (res.success) router.push("/chat");
-    } catch {
-      toast.error("Couldn't open chat — try again");
-    } finally {
-      setStartingChat(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -177,6 +158,7 @@ export default function PublicProfilePage() {
   }
 
   const rating = profile.averageRating ?? null;
+  const ratingNum = rating === null ? null : Number(rating);
   const memberSince = new Date(profile.memberSince).toLocaleDateString("en-NG", {
     month: "short",
     year: "numeric",
@@ -185,7 +167,7 @@ export default function PublicProfilePage() {
   const trustChips: { label: string; icon: React.ReactNode }[] = [];
   if (profile.isVerifiedStudent)
     trustChips.push({ label: "Verified Student", icon: <BadgeCheck className="h-3.5 w-3.5" /> });
-  if (rating !== null && rating >= 4.5)
+  if (ratingNum !== null && ratingNum >= 4.5)
     trustChips.push({ label: "Top Rated", icon: <Star className="h-3.5 w-3.5 fill-gold text-gold" /> });
   if (profile.trustScore >= 70)
     trustChips.push({ label: "Trusted Member", icon: <ShieldCheck className="h-3.5 w-3.5" /> });
@@ -281,8 +263,8 @@ export default function PublicProfilePage() {
           </div>
           <div className="rounded-xl border border-card-border bg-surface p-3 text-center shadow-sm">
             <div className="flex items-center justify-center gap-0.5 text-lg font-black text-gold">
-              {rating !== null ? rating.toFixed(1) : "—"}
-              {rating !== null && <Star className="h-4 w-4 fill-gold text-gold" />}
+              {ratingNum !== null ? ratingNum.toFixed(1) : "—"}
+              {ratingNum !== null && <Star className="h-4 w-4 fill-gold text-gold" />}
             </div>
             <p className="mt-0.5 text-[10px] font-medium text-gray-500">Rating</p>
           </div>
@@ -350,20 +332,7 @@ export default function PublicProfilePage() {
 
         {/* Poster actions — engage this runner directly */}
         {!isSelf && profile.isRunner && (
-          <div className="mb-4 grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={startChat}
-              disabled={startingChat}
-              className="tap-target flex items-center justify-center gap-1.5 rounded-xl bg-brand px-3 py-3 text-sm font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:opacity-60"
-            >
-              {startingChat ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <MessageCircle className="h-4 w-4" />
-              )}
-              Message
-            </button>
+          <div className="mb-4">
             <Link
               href={`/tasks/create?runnerId=${profile.id}`}
               className="tap-target flex items-center justify-center gap-1.5 rounded-xl bg-gold px-3 py-3 text-sm font-bold text-white shadow-sm shadow-gold/25 transition-all hover:brightness-105 active:scale-[0.97]"
@@ -371,6 +340,9 @@ export default function PublicProfilePage() {
               <Plus className="h-4 w-4" />
               Post a task for them
             </Link>
+            <p className="mt-2 text-center text-xs text-gray-500">
+              Chat unlocks once the runner is hired for a task.
+            </p>
           </div>
         )}
 

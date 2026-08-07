@@ -1,19 +1,17 @@
 "use client";
 
 // WHAT: Reusable "Available Helper" runner card with quick actions
-// WHY:  Posters see who is available right now and can profile/message/invite —
+// WHY:  Posters see who is available right now and can profile/invite —
 //       discovery only, no payment or booking happens on the card.
 // NOTE: Invite is only meaningful for open tasks; the menu loads the poster's
 //       open tasks lazily and invites through POST /tasks/:id/invite.
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
   Clock,
   MapPin,
-  MessageCircle,
   Star,
   UserRound,
   X,
@@ -30,7 +28,6 @@ interface OpenTask {
 }
 
 export function HelperCard({ offer, wide = false }: { offer: HelperOffer; wide?: boolean }) {
-  const router = useRouter();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [openTasks, setOpenTasks] = useState<OpenTask[] | null>(null);
   const [loadingTasks, setLoadingTasks] = useState(false);
@@ -44,18 +41,6 @@ export function HelperCard({ offer, wide = false }: { offer: HelperOffer; wide?:
         month: "short",
       })}`
     : null;
-
-  const startChat = async () => {
-    try {
-      const res = await post<{ success: boolean; data: { id: string } }>(
-        "/chat/conversations",
-        { otherUserId: offer.runnerId },
-      );
-      if (res.success) router.push("/chat");
-    } catch {
-      toast.error("Couldn't open chat — try again");
-    }
-  };
 
   const openInvite = async () => {
     setInviteOpen(true);
@@ -193,13 +178,6 @@ export function HelperCard({ offer, wide = false }: { offer: HelperOffer; wide?:
         >
           View Profile
         </Link>
-        <button
-          onClick={startChat}
-          className="tap-target flex items-center justify-center gap-1 rounded-lg border border-card-border px-2.5 py-1.5 text-[11px] font-bold text-gray-700 transition-colors hover:bg-gray-50"
-          title="Send a message"
-        >
-          <MessageCircle className="h-3.5 w-3.5" />
-        </button>
         <button
           onClick={openInvite}
           className="tap-target flex items-center gap-1 rounded-lg bg-brand px-2.5 py-1.5 text-[11px] font-bold text-white transition-opacity hover:opacity-90"

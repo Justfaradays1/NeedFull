@@ -10,6 +10,7 @@ import {
 import toast from "react-hot-toast";
 import { useAuthInit, useIsAuthenticated, useAuthUser } from "@/store";
 import apiClient from "@/lib/apiClient";
+import { openTaskChat } from "@/lib/taskChat";
 import PurchaseWorkflowTimeline, { WORKFLOW_STEPS } from "@/components/tasks/PurchaseWorkflowTimeline";
 import { PurchaseDetailSkeleton } from "@/components/ui/skeletons/PurchaseDetailSkeleton";
 
@@ -311,7 +312,7 @@ export default function PurchaseTaskDetailPage() {
         {s !== "completed" && s !== "cancelled" && s !== "refunded" && s !== "pending_payment" && (
           <div className="flex gap-2">
             <button
-              onClick={() => router.push(`/chat/${taskId}`)}
+              onClick={handleChat}
               className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gray-200 py-3 text-sm font-semibold text-gray-700"
             >
               <MessageCircle className="h-4 w-4" />
@@ -531,7 +532,7 @@ export default function PurchaseTaskDetailPage() {
 
         {s !== "completed" && s !== "cancelled" && s !== "refunded" && s !== "disputed" && s !== "pending_payment" && (
           <button
-            onClick={() => router.push(`/chat/${taskId}`)}
+            onClick={handleChat}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-200 py-3 text-sm font-semibold text-gray-700"
           >
             <MessageCircle className="h-4 w-4" />
@@ -608,6 +609,17 @@ export default function PurchaseTaskDetailPage() {
 
   const isPoster = user?.id === detail.task.poster.id;
   const isRunner = user?.id === detail.task.runner?.id;
+
+  const handleChat = async () => {
+    const otherId = isRunner ? detail.task.poster.id : detail.task.runner?.id;
+    if (!otherId) {
+      toast.error("Chat is available once a runner is hired");
+      return;
+    }
+    const convId = await openTaskChat(detail.task.id, otherId);
+    if (convId) router.push(`/chat/${convId}`);
+    else toast.error("Couldn't open chat — try again");
+  };
   const s = detail.purchase.status;
 
   return (
