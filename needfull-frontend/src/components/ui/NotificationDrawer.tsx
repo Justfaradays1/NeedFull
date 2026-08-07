@@ -55,8 +55,13 @@ export function NotificationDrawer({
   return (
     <div className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm">
       <div className="flex-1" onClick={onClose} />
-      <div className="w-full max-w-md border-l border-gray-200 bg-surface shadow-2xl">
-        <div className="flex items-center justify-between border-b border-gray-200/80 px-5 py-4">
+      {/* WHAT: Full-height flex column — header/actions pinned (shrink-0),
+          list region owns scrolling (flex-1 min-h-0 overflow-y-auto).
+          WHY: Without min-h-0 the list can never shrink and would overflow
+          the viewport with no scroll container (older notifications
+          unreachable). min-h-0 lets the flex child scroll internally. */}
+      <div className="flex h-full w-full max-w-md flex-col border-l border-gray-200 bg-surface shadow-2xl">
+        <div className="flex shrink-0 items-center justify-between border-b border-gray-200/80 px-5 py-4">
           <div className="flex items-center gap-3 text-gray-900">
             <Bell className="h-5 w-5" />
             <div>
@@ -75,7 +80,9 @@ export function NotificationDrawer({
           </button>
         </div>
 
-        <div className="space-y-4 p-5">
+        {/* WHAT: Action bar — pinned above the scrollable list
+            WHY: "Mark all read" must stay reachable while the list scrolls */}
+        <div className="shrink-0 space-y-4 px-5 pt-4">
           <div className="flex items-center justify-between rounded-3xl bg-gray-100 px-4 py-3 text-sm text-gray-700">
             <span>Action</span>
             <button
@@ -86,7 +93,10 @@ export function NotificationDrawer({
               Mark all read
             </button>
           </div>
+        </div>
 
+        {/* Scrollable list region — the only area that scrolls */}
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-5">
           {loading ? (
             <div className="rounded-3xl bg-gray-100 p-6 text-center text-sm text-gray-500">
               Loading notifications...

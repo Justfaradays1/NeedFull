@@ -547,7 +547,7 @@ function RunnerPerformance({ trustScore, averageRating, dayStreak }: { trustScor
       <div className="grid grid-cols-3 gap-2">
         <div className="rounded-xl border border-card-border bg-surface p-3 text-center shadow-sm">
           <div className="flex items-center justify-center gap-0.5 text-lg font-black text-gold">
-            {averageRating !== null ? averageRating.toFixed(1) : "—"}
+            {averageRating !== null ? Number(averageRating).toFixed(1) : "—"}
             {averageRating !== null && <Star className="h-4 w-4 fill-gold text-gold" />}
           </div>
           <p className="mt-0.5 text-[10px] font-medium text-gray-500">Rating</p>

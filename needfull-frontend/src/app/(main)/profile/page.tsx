@@ -224,9 +224,9 @@ export default function ProfilePage() {
     <div className="pb-8">
       {/* Header */}
       <div className="bg-linear-to-b from-brand-dark via-brand to-brand px-4 pb-8 pt-6 text-white backdrop-blur-md">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="relative">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+            <div className="relative shrink-0">
               <button type="button" onClick={() => avatarFileRef.current?.click()} className="tap-target block">
                 {profile.profilePictureUrl ? (
                   <img src={profile.profilePictureUrl} alt="" className="h-[72px] w-[72px] rounded-full border-2 border-white/30 object-cover" />
@@ -241,16 +241,16 @@ export default function ProfilePage() {
               </button>
               <input ref={avatarFileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
             </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h2 className="font-display text-lg font-bold truncate sm:text-xl">{profile.fullName}</h2>
-                {profile.isVerifiedStudent && <BadgeCheck className="h-5 w-5 shrink-0 text-gold" />}
+            <div className="min-w-0 flex-1">
+              <div className="flex min-w-0 items-center gap-1.5">
+                <h2 className="truncate font-display text-lg font-bold sm:text-xl">{profile.fullName}</h2>
+                {profile.isVerifiedStudent && <BadgeCheck className="h-4 w-4 shrink-0 text-gold sm:h-5 sm:w-5" />}
               </div>
-              <p className="text-sm text-white/80">{profile.school || 'Your campus'}</p>
-              {profile.department && <p className="text-xs text-white/60">{profile.department}</p>}
+              <p className="truncate text-sm text-white/80">{profile.school || 'Your campus'}</p>
+              {profile.department && <p className="truncate text-xs text-white/60">{profile.department}</p>}
             </div>
           </div>
-          <button type="button" onClick={() => setEditOpen(true)} className="tap-target flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white">
+          <button type="button" onClick={() => setEditOpen(true)} className="tap-target flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/20 text-white">
             <Pencil className="h-4 w-4" />
           </button>
         </div>

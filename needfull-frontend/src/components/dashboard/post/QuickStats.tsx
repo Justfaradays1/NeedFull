@@ -53,7 +53,7 @@ const statDefs = [
     icon: Star,
     color: "#EAA325",
     bg: "bg-amber-50",
-    getValue: (s: QuickStatsProps) => s.averageRating > 0 ? s.averageRating.toFixed(1) : "—",
+    getValue: (s: QuickStatsProps) => s.averageRating > 0 ? Number(s.averageRating).toFixed(1) : "—",
   },
 ];
 

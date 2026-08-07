@@ -105,15 +105,30 @@ export function useNotifications() {
   );
 
   // WHAT: Fetch notifications from backend
-  // WHY: Load on mount and when explicitly refreshed
+  // WHY: Load on mount and when explicitly refreshed. Fetches ALL pages so the
+  //      drawer can always scroll through the complete history (backend caps
+  //      perPage at 50, so a large history requires walking the pages).
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await get<NotificationListResponse>("/notifications");
-      const mapped = res.data.map(toNotification);
+      const first = await get<NotificationListResponse>("/notifications?perPage=50");
+      const pages = Math.ceil(first.total / first.perPage);
+      const rest =
+        pages > 1
+          ? await Promise.all(
+              Array.from({ length: pages - 1 }, (_, i) =>
+                get<NotificationListResponse>(
+                  `/notifications?perPage=50&page=${i + 2}`,
+                ),
+              ),
+            )
+          : [];
+      const mapped = [first, ...rest]
+        .flatMap((res) => res.data)
+        .map(toNotification);
       setNotifications(mapped);
-      setUnreadCount(res.unreadCount);
+      setUnreadCount(first.unreadCount);
     } catch {
       setError("Failed to load notifications");
     } finally {
