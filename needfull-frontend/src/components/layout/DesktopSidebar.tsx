@@ -35,9 +35,18 @@ import { SmartMenu } from "@/components/ui/SmartMenu";
 // WHAT: Lazy-load a lucide icon by name
 // WHY: WASM SWC can fail on lucide-react dynamic icon resolution; this avoids
 //      importing all icons upfront in the nav-heavy sidebar
-export function NavIcon({ icon, className }: { icon: string; className?: string }) {
+export function NavIcon({
+  icon,
+  className,
+  strokeWidth,
+}: {
+  icon: string;
+  className?: string;
+  strokeWidth?: number;
+}) {
   const [Icon, setIcon] = useState<React.ComponentType<{
     className?: string;
+    strokeWidth?: number;
   }> | null>(null);
 
   useEffect(() => {
@@ -45,7 +54,7 @@ export function NavIcon({ icon, className }: { icon: string; className?: string 
     import("lucide-react")
       .then((mod) => {
         if (cancelled) return;
-        const Icons: Record<string, React.ComponentType<{ className?: string }>> = {
+        const Icons: Record<string, React.ComponentType<{ className?: string; strokeWidth?: number }>> = {
           BellRing: mod.BellRing,
           Bookmark: mod.Bookmark,
           CirclePlus: mod.CirclePlus,
@@ -72,7 +81,12 @@ export function NavIcon({ icon, className }: { icon: string; className?: string 
   }, [icon]);
 
   if (!Icon) return <span style={{ width: 24, height: 24 }} />;
-  return <Icon className={className || "h-6 w-6"} />;
+  return (
+    <Icon
+      className={className || "h-6 w-6"}
+      strokeWidth={strokeWidth}
+    />
+  );
 }
 
 // WHAT: Curated main navigation — only the most important destinations
@@ -185,15 +199,15 @@ export function DesktopSidebar({
   // WHAT: Shared nav item spec — every item (main nav, More, profile) uses the
   // exact same height, padding, icon size and typography so the sidebar reads
   // as one design system instead of individual buttons
-  // WHAT: Shared nav item spec — only the ACTIVE item gets the green pill;
-  // hover stays a neutral background. The pill color is a fixed green tint
-  // (identical in light and dark mode), and link text color never changes.
+  // WHAT: Shared nav item spec — only the ACTIVE item gets a soft muted fill;
+  // hover stays a neutral background. The tint is a muted light green with no
+  // border/outline in either mode.
   const NAV_BASE =
     "flex h-11 items-center gap-3.5 rounded-xl text-[17px] transition-all duration-200 md:justify-center lg:justify-start lg:px-4 active:scale-[0.98]";
   const NAV_TEXT = "text-black dark:text-white";
   const NAV_INACTIVE = `${NAV_TEXT} font-semibold hover:bg-gray-100 dark:hover:bg-white/10`;
   const NAV_ACTIVE =
-    `bg-[rgba(26,107,74,0.12)] font-bold shadow-sm ring-1 ring-[rgba(26,107,74,0.22)] ${NAV_TEXT}`;
+    `bg-[#4ADE80] font-bold ${NAV_TEXT} dark:bg-[#1B5741]`;
 
   const moreItems = [
     { href: "/wallet", label: "Wallet", icon: Wallet },
@@ -240,7 +254,12 @@ export function DesktopSidebar({
                 <span className="relative">
                   <NavIcon
                     icon={item.icon}
-                    className="h-5 w-5 shrink-0 text-gray-600 dark:text-gray-300"
+                    strokeWidth={active ? 2.5 : 2}
+                    className={`h-5 w-5 shrink-0 ${
+                      active
+                        ? "text-brand dark:text-brand-light"
+                        : "text-gray-600 dark:text-gray-300"
+                    }`}
                   />
                   {showBadge && (
                     <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold leading-none text-white">
@@ -248,7 +267,13 @@ export function DesktopSidebar({
                     </span>
                   )}
                 </span>
-                <span className="hidden lg:block">{item.label}</span>
+                <span
+                    className={`hidden lg:block ${
+                      active ? "font-bold" : "font-semibold"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
               </Link>
             );
           })}

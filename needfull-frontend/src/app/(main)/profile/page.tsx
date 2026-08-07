@@ -223,7 +223,7 @@ export default function ProfilePage() {
   return (
     <div className="pb-8">
       {/* Header */}
-      <div className="glass-dark px-4 pb-8 pt-6 text-white">
+      <div className="bg-linear-to-b from-brand-dark via-brand to-brand px-4 pb-8 pt-6 text-white backdrop-blur-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="relative">
