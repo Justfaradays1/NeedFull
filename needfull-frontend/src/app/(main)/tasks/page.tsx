@@ -254,7 +254,15 @@ export default function MyTasksPage() {
       if (postedRes.success) setPosted(postedRes.data);
       if (acceptedRes.success) setAccepted(acceptedRes.data);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to load tasks");
+      const raw =
+        err instanceof Error ? err.message : "Failed to load tasks";
+      // WHAT: axios "Network Error" means the request never got a response —
+      //      a cold backend or flaky connection. Show a clear, calm message.
+      const message =
+        raw === "Network Error"
+          ? "Can't reach the server right now. Check your connection and try again."
+          : raw;
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -331,12 +339,12 @@ export default function MyTasksPage() {
       <div className="px-4 pb-8 pt-4">
         {/* Error */}
         {error && (
-          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-center">
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-5 text-center">
             <p className="text-sm font-medium text-red-600">{error}</p>
             <button
               type="button"
               onClick={fetchTasks}
-              className="tap-target mt-2 rounded-lg bg-brand px-4 py-2 text-xs font-bold text-on-brand"
+              className="tap-target mt-3 rounded-lg bg-brand px-5 py-2 text-xs font-bold text-on-brand transition-opacity hover:opacity-90"
             >
               Retry
             </button>

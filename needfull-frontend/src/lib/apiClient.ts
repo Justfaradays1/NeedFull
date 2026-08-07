@@ -25,6 +25,27 @@ let failedQueue: Array<{
   reject: (error: AxiosError) => void;
 }> = [];
 
+// WHAT: Retry transient failures (no response, timeouts, and flaky 5xx)
+// WHY: Render free-tier instances sleep when idle and DB connections can hiccup
+//      — the first request after a cold start can time out or return a 5xx,
+//      which surfaces as axios "Network Error" / console errors in the browser.
+//      A bounded retry with backoff rides through those blips. Only safe for
+//      idempotent calls; switch-role and simple reads all qualify.
+const NETWORK_RETRY_DELAYS = [800, 1600];
+const TRANSIENT_STATUS = new Set([500, 502, 503, 504]);
+
+function isTransientFailure(error: AxiosError, config: InternalAxiosRequestConfig): boolean {
+  const hasResponse = error.response !== undefined;
+  const isNoResponse = !hasResponse;
+  const isTimeout = error.code === "ECONNABORTED";
+  const isServerError = hasResponse && TRANSIENT_STATUS.has(error.response!.status);
+  if (!isNoResponse && !isTimeout && !isServerError) return false;
+  const retries = config as InternalAxiosRequestConfig & { _retryCount?: number };
+  return (retries._retryCount ?? 0) < NETWORK_RETRY_DELAYS.length;
+}
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 // WHAT: Helper to process queued requests after token refresh
 // WHY: Retry all failed requests with new token once refresh completes
 const processQueue = (
@@ -81,7 +102,18 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
+      _retryCount?: number;
     };
+
+    // WHAT: Retry transient network/timeout/5xx failures
+    // WHY: Cold-starting Render instances or flaky connections drop the first
+    //      request; bounce it a couple of times instead of failing the UI.
+    if (isTransientFailure(error, originalRequest)) {
+      originalRequest._retryCount = (originalRequest._retryCount ?? 0) + 1;
+      return sleep(NETWORK_RETRY_DELAYS[originalRequest._retryCount - 1]).then(
+        () => apiClient(originalRequest)
+      );
+    }
 
     // WHAT: Handle 401 (Unauthorized — token expired or invalid)
     if (error.response?.status === 401 && !originalRequest._retry) {

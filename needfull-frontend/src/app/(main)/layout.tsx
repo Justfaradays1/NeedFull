@@ -32,6 +32,7 @@ import { DesktopFloatingActions } from "@/components/layout/DesktopFloatingActio
 import { useNotifications } from "@/hooks/useNotifications";
 import { useChatUnread } from "@/hooks/useChatUnread";
 import { useSmartScroll } from "@/hooks/useSmartScroll";
+import toast from "react-hot-toast";
 import { POSTER_NAV, RUNNER_NAV } from "@/lib/navConfig";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -148,6 +149,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [switchingRole, setSwitchingRole] = useState<string | null>(null);
   const {
     notifications,
     groupedNotifications,
@@ -213,12 +215,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <button
                   key={role}
                   type="button"
+                  disabled={switchingRole !== null}
                   onClick={async () => {
-                    if (role === activeRole) return;
+                    if (role === activeRole || switchingRole) return;
+                    setSwitchingRole(role);
                     try {
                       const res = await import("@/lib/apiClient").then((mod) =>
                         mod.post<{
                           success: boolean;
+                          message?: string;
                           data: { activeRole: string };
                         }>("/users/me/switch-role", { role }),
                       );
@@ -226,18 +231,32 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         useAuthStore
                           .getState()
                           .setUser({ ...user, activeRole: res.data.activeRole });
+                        toast.success(
+                          `Switched to ${role.charAt(0).toUpperCase() + role.slice(1)}`,
+                        );
+                      } else {
+                        toast.error(res.message || "Failed to switch role");
                       }
-                    } catch {
-                      console.error("Failed to switch role");
+                    } catch (err: unknown) {
+                      const message =
+                        err instanceof Error && err.message === "Network Error"
+                          ? "Can't reach the server. Check your connection."
+                          : "Failed to switch role. Please try again.";
+                      toast.error(message);
+                      console.error("Failed to switch role", err);
+                    } finally {
+                      setSwitchingRole(null);
                     }
                   }}
                   className={`flex-1 rounded-[10px] px-3 py-2 text-center text-sm font-medium transition-all ${
                     role === activeRole
                       ? "bg-white text-brand shadow-sm dark:bg-amber-950/60 dark:text-amber-300"
-                      : "text-gray-600 hover:text-gray-900 dark:text-amber-400/70 dark:hover:text-amber-200"
+                      : "text-gray-600 hover:text-gray-900 dark:text-amber-400/70 dark:hover:text-amber-200 disabled:opacity-60"
                   }`}
                 >
-                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                  {switchingRole === role
+                    ? "…"
+                    : role.charAt(0).toUpperCase() + role.slice(1)}
                 </button>
               ))}
             </div>
