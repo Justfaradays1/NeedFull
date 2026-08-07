@@ -104,8 +104,10 @@ export function getTaskCapabilities(
     canApply: !isPoster && s === TaskStatus.PUBLISHED && !hasRunner,
     canWithdrawApplication: !isPoster && s === TaskStatus.PUBLISHED,
     canConfirmCompletion: isPoster && s === TaskStatus.COMPLETED && hasRunner,
-    canMarkAsDone: isRunner && active && !runnerDone,
-    canStartWork: isRunner && (s === TaskStatus.ACCEPTED || s === TaskStatus.RUNNER_EN_ROUTE),
+    canMarkAsDone: isRunner && s === TaskStatus.STARTED && !runnerDone,
+    canStartWork: isRunner && (
+      s === TaskStatus.MATCHED || s === TaskStatus.ACCEPTED || s === TaskStatus.RUNNER_EN_ROUTE
+    ),
     canChat: (isPoster || isRunner) && hasRunner,
     canRate: (isPoster || isRunner) && finished,
     canSeeExactLocation:
@@ -375,7 +377,7 @@ export async function getTask(
     SELECT
       t.id, t.poster_id, t.title, t.description, t.budget_kobo, t.deadline,
       t.is_urgent, t.status, t.location_label, t.runner_done_at,
-      t.work_mode, t.runner_phase,
+      t.work_mode, t.runner_phase, t.agreed_amount_kobo,
       ST_X(t.location::geometry) as lat, ST_Y(t.location::geometry) as lng,
       t.image_url, t.assigned_to as runner_id, t.created_at, t.updated_at,
       ${distanceSelect},
@@ -398,6 +400,18 @@ export async function getTask(
         'memberSince', u.created_at,
         'averageRating', (SELECT ROUND(AVG(r.rating)::numeric, 1) FROM reviews r WHERE r.reviewee_id = u.id)
       ) as poster,
+      CASE WHEN t.assigned_to IS NULL THEN NULL ELSE jsonb_build_object(
+        'id', ru.id,
+        'fullName', ru.full_name,
+        'avatarUrl', ru.avatar_url,
+        'profilePictureUrl', ru.avatar_url,
+        'trustScore', ru.trust_score,
+        'department', ru.department,
+        'level', ru.level,
+        'tasksCompleted', ru.tasks_completed,
+        'isVerifiedStudent', ru.is_verified_student,
+        'averageRating', (SELECT ROUND(AVG(r.rating)::numeric, 1) FROM reviews r WHERE r.reviewee_id = ru.id)
+      ) END as runner,
       jsonb_build_object(
         'id', c.id,
         'name', c.name,
@@ -405,6 +419,7 @@ export async function getTask(
       ) as category
     FROM tasks t
     JOIN users u ON t.poster_id = u.id
+    LEFT JOIN users ru ON ru.id = t.assigned_to
     JOIN categories c ON t.category_id = c.id
     WHERE t.id = $1
   `;
@@ -427,6 +442,9 @@ export async function getTask(
     title: row.title,
     description: row.description,
     budget: { kobo: row.budget_kobo, naira: row.budget_kobo / 100 },
+    agreedAmount: row.agreed_amount_kobo
+      ? { kobo: row.agreed_amount_kobo, naira: row.agreed_amount_kobo / 100 }
+      : null,
     deadline: row.deadline,
     isUrgent: row.is_urgent,
     status: row.status,
@@ -437,6 +455,7 @@ export async function getTask(
     lng: row.lng,
     imageUrl: row.image_url,
     runnerId: row.runner_id,
+    runner: row.runner || null,
     runnerDoneAt: row.runner_done_at,
     distance: row.distance,
     applicationCount: row.application_count,
@@ -662,6 +681,45 @@ export async function updateTask(
   };
 }
 
+// WHAT: Runner starts work — transitions canonical MATCHED / ACCEPTED / RUNNER_EN_ROUTE → STARTED
+// WHY: Gives the runner agency to signal they've begun; moves the task into the
+//      active phase and notifies the poster.
+export async function startWork(
+  taskId: string,
+  userId: string,
+): Promise<void> {
+  const task = await queryOne<TaskRow>(
+    `SELECT id, poster_id, assigned_to, status, runner_phase, runner_done_at, title
+     FROM tasks WHERE id = $1`,
+    [taskId],
+  );
+
+  if (!task) throw new Error("Task not found");
+  if (task.assigned_to !== userId) throw new Error("Only the assigned runner can start this task");
+  // WHAT: Guarded by state machine — ACCEPTED or RUNNER_EN_ROUTE → STARTED
+  assertTransitionFromStorage(
+    task.status,
+    TaskStatus.STARTED,
+    { runnerDoneAt: task.runner_done_at, runnerPhase: task.runner_phase },
+    "start work",
+  );
+
+  await db.query(
+    `UPDATE tasks
+     SET runner_phase = $1, updated_at = NOW() WHERE id = $2`,
+    [RunnerPhase.WORKING, taskId],
+  );
+
+  await notifyUser(task.poster_id, {
+    type: "task_started",
+    title: "Work Started",
+    body: `"${task.title}" has been started by the runner.`,
+    taskId,
+    conversationId: undefined,
+    actorId: userId,
+  });
+}
+
 // WHAT: Runner marks task as done — sets runner_done_at, notifies poster to confirm
 // WHY: Gives runner agency to signal completion; poster still controls escrow release
 export async function markAsDone(
@@ -669,7 +727,7 @@ export async function markAsDone(
   userId: string,
 ): Promise<void> {
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, assigned_to, status, title
+    `SELECT id, poster_id, assigned_to, status, runner_phase, runner_done_at, title
      FROM tasks WHERE id = $1`,
     [taskId],
   );
@@ -709,7 +767,8 @@ export async function cancelTask(
   userRole: string,
 ): Promise<{ status: string; message: string }> {
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, status, budget_kobo, assigned_to as runner_id, title
+    `SELECT id, poster_id, status, budget_kobo, assigned_to as runner_id, title,
+            runner_phase, runner_done_at
      FROM tasks WHERE id = $1`,
     [taskId],
   );
@@ -776,7 +835,8 @@ export async function confirmCompletion(
   userId: string,
 ): Promise<any> {
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, assigned_to as runner_id, budget_kobo, title, status
+    `SELECT id, poster_id, assigned_to as runner_id, budget_kobo, title, status,
+            runner_phase, runner_done_at
      FROM tasks WHERE id = $1`,
     [taskId],
   );

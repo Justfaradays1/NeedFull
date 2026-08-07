@@ -5,6 +5,7 @@
 import db, { queryOne, withTransaction } from "../config/db";
 import { lockEscrow, refundEscrow } from "./wallet.service";
 import { notifyUser, notifyMany } from "./notification.service";
+import { getOrCreateTaskConversation } from "./conversation.service";
 import {
   TaskStatus,
   canonicalStatus,
@@ -109,6 +110,21 @@ export async function apply(
       : null,
     createdAt: application.created_at,
   };
+}
+
+// WHAT: Open the task chat between poster and runner after hiring
+// WHY: The Task Chats model creates the conversation the moment a runner is
+//      selected — chats never exist in a vacuum, they exist because of a task.
+async function createTaskChatAfterHire(
+  posterId: string,
+  runnerId: string,
+  taskId: string,
+): Promise<void> {
+  try {
+    await getOrCreateTaskConversation(posterId, runnerId, taskId);
+  } catch (err) {
+    console.warn("[Chat] Failed to create task conversation after hire:", err);
+  }
 }
 
 // WHAT: Accept an application — poster chooses a runner, locks escrow, updates task
@@ -223,6 +239,9 @@ export async function acceptApplication(
     conversationId: undefined,
     actorId: posterId,
   });
+
+  // WHAT: Open the task chat (poster ↔ runner) now that a runner is hired
+  await createTaskChatAfterHire(posterId, runnerId, taskId);
 
   // WHAT: Notify rejected runners (non-blocking)
   const rejectedApps = await db.query<{ runner_id: string }>(
@@ -446,6 +465,9 @@ export async function acceptCounterOffer(
     conversationId: undefined,
     actorId: runnerId,
   });
+
+  // WHAT: Open the task chat (poster ↔ runner) now that the deal is sealed
+  await createTaskChatAfterHire(posterId, runnerId, taskId);
 
   // WHAT: Notify rejected runners
   const rejectedApps = await db.query<{ runner_id: string }>(

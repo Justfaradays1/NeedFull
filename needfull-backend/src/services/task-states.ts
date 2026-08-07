@@ -67,8 +67,8 @@ export const TASK_STATE_META: Record<TaskStatusValue, TaskStateMeta> = {
 export const ALLOWED_TRANSITIONS: Record<TaskStatusValue, TaskStatusValue[]> = {
   [TaskStatus.DRAFT]: [TaskStatus.PUBLISHED, TaskStatus.ARCHIVED],
   [TaskStatus.PUBLISHED]: [TaskStatus.MATCHED, TaskStatus.CANCELLED],
-  [TaskStatus.MATCHED]: [TaskStatus.ACCEPTED, TaskStatus.CANCELLED],
-  [TaskStatus.ACCEPTED]: [TaskStatus.RUNNER_EN_ROUTE, TaskStatus.CANCELLED],
+  [TaskStatus.MATCHED]: [TaskStatus.ACCEPTED, TaskStatus.STARTED, TaskStatus.CANCELLED],
+  [TaskStatus.ACCEPTED]: [TaskStatus.RUNNER_EN_ROUTE, TaskStatus.STARTED, TaskStatus.CANCELLED],
   [TaskStatus.RUNNER_EN_ROUTE]: [TaskStatus.STARTED, TaskStatus.CANCELLED],
   [TaskStatus.STARTED]: [TaskStatus.COMPLETED, TaskStatus.CANCELLED],
   [TaskStatus.COMPLETED]: [TaskStatus.PAYMENT_RELEASED],

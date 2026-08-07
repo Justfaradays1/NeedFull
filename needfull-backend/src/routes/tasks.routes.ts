@@ -58,6 +58,8 @@ router.post("/:taskId/invite", authenticate, requireRole("poster"), param("taskI
 
 router.post("/:taskId/done", authenticate, param("taskId").isUUID(), validate, tasks.markAsDoneHandler);
 
+router.post("/:taskId/start-work", authenticate, param("taskId").isUUID(), validate, tasks.startWorkHandler);
+
 router.post("/:taskId/complete", authenticate, param("taskId").isUUID(), validate, tasks.confirmCompletionHandler);
 
 export default router;

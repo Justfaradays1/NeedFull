@@ -3,7 +3,7 @@
 // FUTURE: Add pagination metadata helper
 
 import { Request, Response } from "express";
-import { listTasks, getTask, createTask, updateTask, cancelTask, confirmCompletion, markAsDone, getTaskCapabilities } from "../services/task.service";
+import { listTasks, getTask, createTask, updateTask, cancelTask, confirmCompletion, markAsDone, startWork, getTaskCapabilities } from "../services/task.service";
 import { notifyUser } from "../services/notification.service";
 
 export async function listTasksHandler(req: Request, res: Response): Promise<void> {
@@ -81,6 +81,17 @@ export async function markAsDoneHandler(req: Request, res: Response): Promise<vo
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Failed to mark task as done";
     console.error("[Tasks] markAsDoneHandler error:", error);
+    res.status(400).json({ success: false, message: msg });
+  }
+}
+
+export async function startWorkHandler(req: Request, res: Response): Promise<void> {
+  try {
+    await startWork(req.params.taskId, req.user!.id);
+    res.json({ success: true, message: "Work started." });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "Failed to start work";
+    console.error("[Tasks] startWorkHandler error:", error);
     res.status(400).json({ success: false, message: msg });
   }
 }
