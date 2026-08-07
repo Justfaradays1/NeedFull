@@ -20,7 +20,7 @@ import {
   Loader2,
   Search,
 } from "lucide-react";
-import { useIsAuthenticated, useAuthInit, useAuthUser } from "@/store";
+import { useIsAuthenticated, useAuthInit, useAuthUser, useUserRoles } from "@/store";
 import { get } from "@/lib/apiClient";
 import { formatCurrency } from "@/lib/format";
 import { Avatar } from "@/components/ui/avatar";
@@ -227,6 +227,7 @@ export default function MyTasksPage() {
   const router = useRouter();
   const isAuthenticated = useIsAuthenticated();
   const user = useAuthUser();
+  const userRoles = useUserRoles();
   useAuthInit();
 
   const [tab, setTab] = useState<TabType>("posted");
@@ -247,12 +248,19 @@ export default function MyTasksPage() {
     setLoading(true);
     setError(null);
     try {
+      // WHAT: Only runners can list their accepted (assigned) tasks — the
+      // backend 403s posters on /tasks/me/assigned. Fetching it for a poster
+      // used to reject the whole page, so gate it by role and treat a 403 as
+      // "no accepted tasks" instead of a page-wide failure.
+      const isRunner = (userRoles ?? []).includes("runner");
       const [postedRes, acceptedRes] = await Promise.all([
         get<{ success: boolean; data: TaskRow[] }>("/tasks/me/posted"),
-        get<{ success: boolean; data: TaskRow[] }>("/tasks/me/assigned"),
+        isRunner
+          ? get<{ success: boolean; data: TaskRow[] }>("/tasks/me/assigned")
+          : Promise.resolve({ success: true, data: [] as TaskRow[] }),
       ]);
       if (postedRes.success) setPosted(postedRes.data);
-      if (acceptedRes.success) setAccepted(acceptedRes.data);
+      if (acceptedRes?.success) setAccepted(acceptedRes.data);
     } catch (err: unknown) {
       const raw =
         err instanceof Error ? err.message : "Failed to load tasks";
@@ -266,7 +274,7 @@ export default function MyTasksPage() {
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, userRoles]);
 
   useEffect(() => {
     fetchTasks();
