@@ -5,6 +5,7 @@
 import { Request, Response } from "express";
 import db from "../config/db";
 import { v4 as uuidv4 } from "uuid";
+import { getOrCreateTaskConversation } from "../services/conversation.service";
 
 export async function listConversations(req: Request, res: Response): Promise<void> {
   try {
@@ -15,14 +16,20 @@ export async function listConversations(req: Request, res: Response): Promise<vo
         (SELECT content FROM messages WHERE conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message,
         c.last_message_at, c.created_at,
         jsonb_build_object('id', u.id, 'fullName', u.full_name, 'profilePictureUrl', u.profile_picture_url) as other_user,
-        (SELECT COUNT(*) FROM messages WHERE conversation_id = c.id AND sender_id != $1 AND is_read = false) as unread_count
+        (SELECT COUNT(*) FROM messages WHERE conversation_id = c.id AND sender_id != $1 AND is_read = false) as unread_count,
+        CASE WHEN c.task_id IS NULL THEN NULL
+             ELSE jsonb_build_object('id', t.id, 'title', t.title, 'status', t.status,
+                                     'workMode', t.work_mode, 'runnerPhase', t.runner_phase,
+                                     'runnerDoneAt', t.runner_done_at)
+        END as task
        FROM conversations c
        JOIN users u ON (CASE WHEN c.participant_a = $1 THEN c.participant_b ELSE c.participant_a END) = u.id
+       LEFT JOIN tasks t ON t.id = c.task_id
        WHERE $1 IN (c.participant_a, c.participant_b)
        ORDER BY c.last_message_at DESC NULLS LAST`,
       [userId],
     );
-    res.json({ success: true, data: result.rows.map((r: any) => ({ id: r.id, taskId: r.task_id, otherUser: r.other_user, lastMessage: r.last_message, lastMessageAt: r.last_message_at, unreadCount: parseInt(r.unread_count, 10), createdAt: r.created_at })) });
+    res.json({ success: true, data: result.rows.map((r: any) => ({ id: r.id, taskId: r.task_id, task: r.task, otherUser: r.other_user, lastMessage: r.last_message, lastMessageAt: r.last_message_at, unreadCount: parseInt(r.unread_count, 10), createdAt: r.created_at })) });
   } catch (error) {
     console.error("[Chat] listConversations error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch conversations" });
@@ -32,26 +39,16 @@ export async function listConversations(req: Request, res: Response): Promise<vo
 export async function getOrCreateConversation(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user!.id;
-    const { otherUserId } = req.body;
+    const { otherUserId, taskId } = req.body;
 
-    // WHAT: Check if conversation already exists (either direction)
-    const existing = await db.query<any>(
-      `SELECT id, task_id FROM conversations
-       WHERE (participant_a = $1 AND participant_b = $2) OR (participant_a = $2 AND participant_b = $1)
-       LIMIT 1`,
-      [userId, otherUserId],
-    );
-    if (existing.rows.length > 0) { res.json({ success: true, data: { id: existing.rows[0].id, taskId: existing.rows[0].task_id } }); return; }
+    if (!otherUserId) {
+      res.status(400).json({ success: false, message: "otherUserId is required" });
+      return;
+    }
 
-    // WHAT: Create new conversation with single row (participant_a/b)
-    const conversationId = uuidv4();
-    const now = new Date().toISOString();
-    await db.query(
-      "INSERT INTO conversations (id, participant_a, participant_b, created_at) VALUES ($1, $2, $3, $4)",
-      [conversationId, userId, otherUserId, now],
-    );
-
-    res.status(201).json({ success: true, data: { id: conversationId } });
+    const conversation = await getOrCreateTaskConversation(userId, otherUserId, taskId || null);
+    const { id, taskId: convTaskId, created } = conversation;
+    res.status(created ? 201 : 200).json({ success: true, data: { id, taskId: convTaskId } });
   } catch (error) {
     console.error("[Chat] getOrCreateConversation error:", error);
     res.status(500).json({ success: false, message: "Failed to create conversation" });

@@ -14,6 +14,7 @@ router.get("/conversations", chat.listConversations);
 
 router.post("/conversations",
   body("otherUserId").isUUID(),
+  body("taskId").optional({ values: "null" }).isUUID(),
   validate,
   chat.getOrCreateConversation,
 );
