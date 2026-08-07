@@ -17,6 +17,7 @@ import {
   Briefcase,
   Volume2,
   Globe,
+  Settings,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthInit, useAuthStore } from "@/store";
@@ -113,7 +114,8 @@ export default function SettingsPage() {
           >
             <ArrowLeft className="h-5 w-5 text-gray-500" />
           </button>
-          <h1 className="text-lg font-bold text-gray-900 sm:text-xl">
+          <h1 className="flex items-center gap-2 text-lg font-bold text-gray-900 sm:text-xl dark:text-white">
+            <Settings className="h-5 w-5" />
             Settings
           </h1>
         </div>
@@ -122,7 +124,7 @@ export default function SettingsPage() {
       <div className="px-4 py-4 space-y-6">
         {/* Account */}
         <section>
-          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
             Account
           </h2>
           <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
@@ -144,7 +146,7 @@ export default function SettingsPage() {
 
         {/* Linked Accounts */}
         <section>
-          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
             Linked Accounts
           </h2>
           <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
@@ -177,7 +179,7 @@ export default function SettingsPage() {
 
         {/* Notification Preferences */}
         <section>
-          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
             Notifications
           </h2>
           <div className="space-y-2">
@@ -206,7 +208,7 @@ export default function SettingsPage() {
 
         {/* Agent / Runner Settings */}
         <section>
-          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
             Agent / Runner
           </h2>
           <div className="space-y-2">
@@ -225,7 +227,7 @@ export default function SettingsPage() {
 
         {/* Privacy & Visibility */}
         <section>
-          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
             Privacy & Visibility
           </h2>
           <div className="space-y-2">
@@ -244,7 +246,7 @@ export default function SettingsPage() {
 
         {/* Wallet & Payments */}
         <section>
-          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
             Wallet & Payments
           </h2>
           <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
@@ -258,7 +260,7 @@ export default function SettingsPage() {
 
         {/* Help & Support */}
         <section>
-          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
             Support
           </h2>
           <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
@@ -272,7 +274,7 @@ export default function SettingsPage() {
 
         {/* Sign Out */}
         <section>
-          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
             Account
           </h2>
           <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
