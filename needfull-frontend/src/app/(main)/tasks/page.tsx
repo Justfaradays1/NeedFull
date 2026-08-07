@@ -19,6 +19,7 @@ import {
   AlertTriangle,
   Loader2,
   Search,
+  ChevronRight,
 } from "lucide-react";
 import { useIsAuthenticated, useAuthInit, useAuthUser, useUserRoles } from "@/store";
 import { get } from "@/lib/apiClient";
@@ -198,7 +199,7 @@ function AcceptedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
         <div className="mt-3 flex justify-end">
           <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-on-brand">
             <MessageCircle className="h-3.5 w-3.5" />
-            {isActive ? "Open Chat" : "Continue"}
+            {isActive ? "View Live Task" : "Continue"}
           </span>
         </div>
       )}
@@ -451,10 +452,10 @@ export default function MyTasksPage() {
                     key={task.id}
                     task={task}
                     onTap={() => {
-                      // WHAT: Active tasks open the live conversation; finished
-                      // tasks open the task record
+                      // WHAT: Active tasks open the live task page (progress +
+                      // chat); finished tasks open the task record
                       if (task.status === "in_progress") {
-                        router.push(`/chat/${task.id}`);
+                        router.push(`/tasks/${task.id}/active`);
                       } else {
                         router.push(`/feed/${task.id}`);
                       }
@@ -471,7 +472,15 @@ export default function MyTasksPage() {
           [...filteredPosted, ...sortedAccepted].filter(
             (t) => t.status === "completed",
           ).length > 0 && (
-            <div className="mt-6 rounded-xl border border-brand-light/50 bg-brand-light/20 p-4">
+            <button
+              onClick={() => {
+                const completed = [...filteredPosted, ...sortedAccepted].find(
+                  (t) => t.status === "completed",
+                );
+                if (completed) router.push(`/tasks/${completed.id}/rate`);
+              }}
+              className="mt-6 w-full rounded-xl border border-brand-light/50 bg-brand-light/20 p-4 text-left transition-colors hover:bg-brand-light/30"
+            >
               <div className="flex items-start gap-3">
                 <Star className="mt-0.5 h-5 w-5 shrink-0 text-gold" />
                 <div>
@@ -481,9 +490,12 @@ export default function MyTasksPage() {
                   <p className="mt-0.5 text-xs text-gray-600">
                     Your feedback helps build a trusted community.
                   </p>
+                  <span className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-brand">
+                    Start rating <ChevronRight className="h-3.5 w-3.5" />
+                  </span>
                 </div>
               </div>
-            </div>
+            </button>
           )}
       </div>
     </div>

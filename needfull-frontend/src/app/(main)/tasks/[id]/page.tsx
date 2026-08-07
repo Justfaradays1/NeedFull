@@ -18,10 +18,12 @@ import {
   MessageCircle,
   Users,
   Star,
+  PlayCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthInit, useIsAuthenticated, useAuthUser } from "@/store";
 import apiClient from "@/lib/apiClient";
+import { openTaskChat } from "@/lib/taskChat";
 import { CelebrationModal } from "@/components/ui/celebration-modal";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { useCelebration } from "@/hooks/useCelebration";
@@ -91,7 +93,6 @@ export default function MyTaskDetailPage() {
   const isRunner = user?.id === task?.runner?.id;
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
-  const [completeConfirmOpen, setCompleteConfirmOpen] = useState(false);
   const celebration = useCelebration();
 
   // WHAT: Nearby available runners shown to a poster on an open task
@@ -148,6 +149,17 @@ export default function MyTaskDetailPage() {
     fetchTask();
   }, [isAuthenticated, taskId]);
 
+  const handleChat = async () => {
+    const otherId = isPoster ? task?.runner?.id : task?.poster.id;
+    if (!otherId || !task) {
+      toast.error("Chat is available once a runner is hired");
+      return;
+    }
+    const convId = await openTaskChat(taskId, otherId);
+    if (convId) router.push(`/chat/${convId}`);
+    else toast.error("Couldn't open chat — try again");
+  };
+
   const handleCancel = async () => {
     setCancelConfirmOpen(false);
     setActionLoading("cancel");
@@ -172,23 +184,6 @@ export default function MyTaskDetailPage() {
       setTask(res.data?.data ?? null);
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Failed to mark as done");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleComplete = async () => {
-    setActionLoading("complete");
-    try {
-      await apiClient.post(`/tasks/${taskId}/complete`);
-      const res = await apiClient.get(`/tasks/${taskId}?lat=&lng=`);
-      setTask(res.data?.data ?? null);
-      celebration.showForAction("poster", "payment_released", {
-        primaryLabel: "Back to My Tasks",
-        primaryHref: "/tasks",
-      });
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to complete");
     } finally {
       setActionLoading(null);
     }
@@ -315,11 +310,21 @@ export default function MyTaskDetailPage() {
                 </div>
               </div>
 
-              {task.status === "in_progress" && (
-                <div className="mb-4 rounded-xl bg-amber-50 p-3 text-center text-sm font-semibold text-amber-800">
-                  Escrow locked — complete the task to release payment
-                </div>
-              )}
+{task.status === "in_progress" && (
+                  <div className="mb-4 rounded-xl bg-amber-50 p-3 text-center text-sm font-semibold text-amber-800">
+                    Escrow locked — view live progress &amp; instructions
+                  </div>
+                )}
+
+                {task.status === "in_progress" && (
+                  <button
+                    onClick={() => router.push(`/tasks/${taskId}/active`)}
+                    className="flex items-center justify-center gap-2 rounded-xl bg-gold py-3 text-sm font-bold text-white shadow-sm shadow-gold/20 transition-all active:scale-[0.97]"
+                  >
+                    <PlayCircle className="h-4 w-4" />
+                    View Live Task
+                  </button>
+                )}
 
               <div className="flex flex-col gap-2">
                 {task.capabilities?.canViewApplications && (
@@ -350,16 +355,21 @@ export default function MyTaskDetailPage() {
 
                 {task.capabilities?.canConfirmCompletion && (
                   <button
-                    onClick={() => setCompleteConfirmOpen(true)}
-                    disabled={actionLoading === "complete"}
+                    onClick={() => router.push(`/tasks/${taskId}/complete`)}
                     className="flex items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-on-brand disabled:opacity-50"
                   >
-                    {actionLoading === "complete" ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <CheckCircle className="h-4 w-4" />
-                    )}
-                    {task.runnerDoneAt ? "Confirm Complete & Release Payment" : "Mark as Complete"}
+                    <CheckCircle className="h-4 w-4" />
+                    Confirm Complete &amp; Release Payment
+                  </button>
+                )}
+
+                {task.capabilities?.canRate && (
+                  <button
+                    onClick={() => router.push(`/tasks/${taskId}/rate`)}
+                    className="flex items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-on-brand disabled:opacity-50"
+                  >
+                    <Star className="h-4 w-4" />
+                    Rate &amp; Review
                   </button>
                 )}
 
@@ -380,7 +390,7 @@ export default function MyTaskDetailPage() {
 
                 {task.capabilities?.canChat && (
                   <button
-                    onClick={() => router.push(`/chat/${taskId}`)}
+                    onClick={handleChat}
                     className="flex items-center justify-center gap-2 rounded-xl bg-gray-200 py-3 text-sm font-semibold text-gray-700"
                   >
                     <MessageCircle className="h-4 w-4" />
@@ -479,16 +489,6 @@ export default function MyTaskDetailPage() {
         confirmLabel="Cancel Task"
         variant="danger"
         loading={actionLoading === "cancel"}
-      />
-      <ConfirmationDialog
-        open={completeConfirmOpen}
-        onConfirm={handleComplete}
-        onCancel={() => setCompleteConfirmOpen(false)}
-        title="Mark task as complete?"
-        message="Payment will be released to the runner via escrow. This action cannot be undone."
-        confirmLabel="Confirm Complete"
-        variant="warning"
-        loading={actionLoading === "complete"}
       />
       <CelebrationModal
         open={celebration.open}

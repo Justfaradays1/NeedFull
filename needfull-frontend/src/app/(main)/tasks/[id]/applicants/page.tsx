@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { get, post } from "@/lib/apiClient";
+import { openTaskChat } from "@/lib/taskChat";
 import { useAuthInit, useIsAuthenticated } from "@/store";
 import { formatCurrency } from "@/lib/format";
 import { Avatar } from "@/components/ui/avatar";
@@ -133,12 +134,9 @@ export default function ApplicantsPage() {
 
   const openChat = async (runnerId: string) => {
     try {
-      const res = await post<{ success: boolean; data: { id: string } }>(
-        "/chat/conversations",
-        { otherUserId: runnerId },
-      );
-      if (res.success) router.push(`/chat/${res.data.id}`);
-      else router.push("/chat");
+      const convId = await openTaskChat(taskId, runnerId);
+      if (convId) router.push(`/chat/${convId}`);
+      else toast.error("Couldn't open chat — try again");
     } catch {
       toast.error("Couldn't open chat — try again");
     }
