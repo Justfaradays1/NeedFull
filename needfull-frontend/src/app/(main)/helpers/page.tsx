@@ -148,7 +148,7 @@ export default function HelpersPage() {
     "rounded-lg border border-card-border bg-surface px-2 py-1.5 text-[11px] font-semibold text-gray-700 focus:border-brand focus:outline-none";
 
   return (
-    <div className="min-h-screen page-shell pb-10">
+    <div>
       <div className="sticky top-0 z-30 glass border-b border-card-border px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-light">
@@ -165,7 +165,7 @@ export default function HelpersPage() {
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 pt-4">
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 pb-10 pt-5">
         {/* Search */}
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />

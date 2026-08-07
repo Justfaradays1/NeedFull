@@ -189,8 +189,8 @@ export default function FeedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-neutral-950">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-10 pt-4 sm:px-6 lg:px-8">
+    <div className="page-column">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 lg:gap-5">
         <WelcomeHeader firstName={firstName} />
         <WalletSummaryCard
           balanceKobo={balanceKobo}

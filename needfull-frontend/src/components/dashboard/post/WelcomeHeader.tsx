@@ -12,7 +12,7 @@ export function WelcomeHeader({ firstName }: WelcomeHeaderProps) {
   const greeting = useGreeting();
 
   return (
-    <h1 className="truncate text-lg font-black tracking-tight text-gray-900 sm:text-xl lg:text-2xl">
+    <h1 className="text-scale-section truncate text-gray-900 dark:text-white">
       {greeting.text}, {firstName}{" "}
       <span className="inline-block">{greeting.emoji}</span>
     </h1>

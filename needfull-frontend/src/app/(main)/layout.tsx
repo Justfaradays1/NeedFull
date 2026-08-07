@@ -8,8 +8,6 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
-  Bell,
-  Search,
   ChevronDown,
   Shield,
   User,
@@ -23,10 +21,10 @@ import {
 } from "@/store";
 import { Avatar } from "@/components/ui/avatar";
 import { Dropdown } from "@/components/ui/dropdown";
-import { BrandMark } from "@/components/ui/BrandMark";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import { NotificationDrawer } from "@/components/ui/NotificationDrawer";
+import { TopBar } from "@/components/layout/TopBar";
 import { DesktopSidebar, NavIcon } from "@/components/layout/DesktopSidebar";
 import { DesktopContextPanel } from "@/components/layout/DesktopContextPanel";
 import { DesktopFloatingActions } from "@/components/layout/DesktopFloatingActions";
@@ -283,181 +281,143 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className="flex flex-col md:flex-row page-shell"
+      className="page-shell md:flex md:flex-col"
       style={{ minHeight: "100dvh" }}
     >
-      {/* ─── Desktop / Tablet Sidebar ─── */}
-      <DesktopSidebar
-        user={user}
-        activeRole={activeRole}
-        pathname={pathname}
-        chatUnreadCount={chatUnreadCount}
+      {/* ─── Global Top Bar — spans all three columns ─── */}
+      <TopBar
+        onOpenPalette={() => setIsPaletteOpen(true)}
+        onOpenNotifications={() => setIsNotificationsOpen(true)}
+        unreadCount={unreadCount}
+        right={
+          <Dropdown items={avatarMenuItems} align="right">
+            <button
+              type="button"
+              className="tap-target inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm text-white transition hover:bg-white/20"
+              aria-label="Open profile menu"
+            >
+              <Avatar
+                src={user?.profilePictureUrl}
+                name={user?.fullName}
+                email={user?.email}
+                size="sm"
+              />
+              <span className="hidden truncate text-sm font-semibold md:inline-block">
+                {user?.fullName?.split(" ")[0] || "You"}
+              </span>
+              <ChevronDown className="h-4 w-4 shrink-0 text-white/60" />
+            </button>
+          </Dropdown>
+        }
       />
 
-      {/* ─── Main Content Area ─── */}
-      <div className="flex flex-col flex-1 min-w-0">
-        <AuthGuard>
-          <div
-            className={`glass-dark sticky top-0 z-30 transition-transform duration-300 ease-out ${
-              chromeHidden ? "-translate-y-full" : ""
-            }`}
-          >
-            <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-              <Link
-                href="/feed"
-                className="flex items-center gap-2 shrink-0"
-              >
-                <BrandMark wordmarkClass="text-white" />
-              </Link>
+      {/* ─── Workspace row: Left rail | Main | Right rail ─── */}
+      <div className="flex flex-1 md:overflow-hidden">
+        {/* ─── Left Sidebar (permanent rail) ─── */}
+        <DesktopSidebar
+          user={user}
+          activeRole={activeRole}
+          pathname={pathname}
+          chatUnreadCount={chatUnreadCount}
+        />
 
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsPaletteOpen(true)}
-                  className="hidden h-10 min-h-[44px] items-center gap-1.5 rounded-2xl border border-white/15 bg-white/10 px-3 text-white/80 transition hover:bg-white/20 md:inline-flex"
-                  aria-label="Search tasks"
-                >
-                  <Search className="h-4 w-4 shrink-0" />
-                  <span className="text-sm font-medium">Search</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsPaletteOpen(true)}
-                  className="inline-flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white/80 transition hover:bg-white/20 md:hidden max-[380px]:hidden"
-                  aria-label="Open search"
-                >
-                  <Search className="h-5 w-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsNotificationsOpen(true)}
-                  className="relative tap-target inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white/80 transition hover:bg-white/20"
-                  aria-label="Notifications"
-                >
-                  <Bell className="h-5 w-5" />
-                  {unreadCount > 0 ? (
-                    <span className="absolute -right-1 -top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-danger px-1.5 text-[10px] font-bold text-white">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  ) : null}
-                </button>
-                <Dropdown items={avatarMenuItems} align="right">
-                  <button
-                    type="button"
-                    className="tap-target inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm text-white transition hover:bg-white/20"
-                    aria-label="Open profile menu"
-                  >
-                    <Avatar
-                      src={user?.profilePictureUrl}
-                      name={user?.fullName}
-                      email={user?.email}
-                      size="sm"
-                    />
-                    <span className="hidden truncate text-sm font-semibold md:inline-block">
-                      {user?.fullName?.split(" ")[0] || "You"}
-                    </span>
-                    <ChevronDown className="h-4 w-4 shrink-0 text-white/60" />
-                  </button>
-                </Dropdown>
-              </div>
-            </div>
-          </div>
+        {/* ─── Main Content (independent scroll pane) ─── */}
+        <main className="workspace-scroll relative min-w-0 flex-1 md:h-[calc(100dvh-3.5rem)] md:overflow-y-auto">
+          <AuthGuard>
+            <CommandPalette
+              open={isPaletteOpen}
+              onClose={() => setIsPaletteOpen(false)}
+            />
+            <NotificationDrawer
+              open={isNotificationsOpen}
+              onClose={() => setIsNotificationsOpen(false)}
+              notifications={notifications}
+              groupedNotifications={groupedNotifications}
+              unreadCount={unreadCount}
+              loading={notificationsLoading}
+              markAllAsRead={markAllAsRead}
+            />
+            <div className="pb-nav md:pb-0">{children}</div>
+          </AuthGuard>
+        </main>
 
-          <CommandPalette
-            open={isPaletteOpen}
-            onClose={() => setIsPaletteOpen(false)}
-          />
-          <NotificationDrawer
-            open={isNotificationsOpen}
-            onClose={() => setIsNotificationsOpen(false)}
-            notifications={notifications}
-            groupedNotifications={groupedNotifications}
-            unreadCount={unreadCount}
-            loading={notificationsLoading}
-            markAllAsRead={markAllAsRead}
-          />
+        {/* ─── Right Context Panel (xl+) ─── */}
+        <DesktopContextPanel pathname={pathname} />
+      </div>
 
-          <div className="pb-nav md:pb-0">
-            {children}
-          </div>
-        </AuthGuard>
+      {/* ─── Mobile bottom nav ─── */}
+      <nav
+        className={`glass-white fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-lg rounded-3xl border border-slate-200/70 px-3 py-3 shadow-2xl shadow-slate-900/10 backdrop-blur-2xl transition-opacity duration-300 md:hidden ${
+          chromeHidden ? "opacity-75" : "opacity-100"
+        }`}
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <div className="flex items-center justify-between gap-2 px-1">
+          {(activeRole === "runner" ? RUNNER_NAV : POSTER_NAV)
+            .filter((n) => n.mobileTab)
+            .map((tab) => {
+            const { href, label, icon } = tab;
+            const isCta = tab.isCta;
+            const isActive =
+              pathname === href || pathname.startsWith(href + "/");
+            const isRunner = activeRole === "runner";
+            const activeColor = isRunner ? "text-gold" : "text-brand-text";
+            const activeBg = isRunner ? "bg-gold-light/70 shadow-sm shadow-gold/10" : "bg-brand-light/70 shadow-sm shadow-brand/10";
+            const activeText = isRunner ? "text-gold" : "text-brand-text";
+            const activeIconColor = isRunner ? "text-gold scale-110" : "text-brand-text scale-110";
 
-        <nav
-          className={`glass-white fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-lg rounded-3xl border border-slate-200/70 px-3 py-3 shadow-2xl shadow-slate-900/10 backdrop-blur-2xl transition-opacity duration-300 md:hidden ${
-            chromeHidden ? "opacity-75" : "opacity-100"
-          }`}
-          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-        >
-          <div className="flex items-center justify-between gap-2 px-1">
-            {(activeRole === "runner" ? RUNNER_NAV : POSTER_NAV)
-              .filter((n) => n.mobileTab)
-              .map((tab) => {
-              const { href, label, icon } = tab;
-              const isCta = tab.isCta;
-              const isActive =
-                pathname === href || pathname.startsWith(href + "/");
-              const isRunner = activeRole === "runner";
-              const activeColor = isRunner ? "text-gold" : "text-brand-text";
-              const activeBg = isRunner ? "bg-gold-light/70 shadow-sm shadow-gold/10" : "bg-brand-light/70 shadow-sm shadow-brand/10";
-              const activeText = isRunner ? "text-gold" : "text-brand-text";
-              const activeIconColor = isRunner ? "text-gold scale-110" : "text-brand-text scale-110";
-
-              if (isCta) {
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="glass-gold relative -mt-5 flex h-14 w-14 items-center justify-center rounded-3xl text-white shadow-xl transition-all duration-200 active:scale-95 hover:shadow-2xl"
-                    style={{ flex: "none" }}
-                    aria-label={label}
-                  >
-                    <NavIcon icon={icon} className="h-6 w-6" />
-                  </Link>
-                );
-              }
-
+            if (isCta) {
               return (
                 <Link
                   key={href}
                   href={href}
-                  className={`tap-target relative flex flex-1 flex-col items-center justify-center gap-1 rounded-3xl px-2 py-2 min-h-15 transition-all duration-200 ${
-                    isActive ? activeColor : "text-slate-600"
-                  }`}
+                  className="glass-gold relative -mt-5 flex h-14 w-14 items-center justify-center rounded-3xl text-white shadow-xl transition-all duration-200 active:scale-95 hover:shadow-2xl"
+                  style={{ flex: "none" }}
                   aria-label={label}
                 >
-                  <div
-                    className={`relative flex items-center justify-center rounded-2xl px-3 py-2 transition-all duration-200 ${
-                      isActive ? activeBg : "bg-transparent"
-                    }`}
-                  >
-                    <NavIcon
-                      icon={icon}
-                      className={`h-6 w-6 transition-all duration-200 ${isActive ? activeIconColor : "text-slate-500"}`}
-                    />
-                    {label === "Chat" && chatUnreadCount > 0 ? (
-                      <span className="absolute -right-1.5 -top-1 flex min-w-4 items-center justify-center rounded-full bg-danger px-1 py-px text-[9px] font-bold leading-none text-white">
-                        {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
-                      </span>
-                    ) : null}
-                  </div>
-                  <span
-                    className={`text-[11px] transition-all duration-200 ${
-                      isActive
-                        ? `font-semibold ${activeText}`
-                        : "font-semibold text-slate-600"
-                    }`}
-                  >
-                    {label}
-                  </span>
+                  <NavIcon icon={icon} className="h-6 w-6" />
                 </Link>
               );
-            })}
-          </div>
-        </nav>
-      </div>
+            }
 
-      {/* ─── Right Context Panel (xl+) ─── */}
-      <DesktopContextPanel pathname={pathname} />
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`tap-target relative flex flex-1 flex-col items-center justify-center gap-1 rounded-3xl px-2 py-2 transition-all duration-200 ${
+                  isActive ? activeColor : "text-slate-600"
+                }`}
+                aria-label={label}
+              >
+                <div
+                  className={`relative flex items-center justify-center rounded-2xl px-3 py-2 transition-all duration-200 ${
+                    isActive ? activeBg : "bg-transparent"
+                  }`}
+                >
+                  <NavIcon
+                    icon={icon}
+                    className={`h-6 w-6 transition-all duration-200 ${isActive ? activeIconColor : "text-slate-500"}`}
+                  />
+                  {label === "Chat" && chatUnreadCount > 0 ? (
+                    <span className="absolute -right-1.5 -top-1 flex min-w-4 items-center justify-center rounded-full bg-danger px-1 py-px text-[9px] font-bold leading-none text-white">
+                      {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
+                    </span>
+                  ) : null}
+                </div>
+                <span
+                  className={`text-[11px] transition-all duration-200 ${
+                    isActive
+                      ? `font-semibold ${activeText}`
+                      : "font-semibold text-slate-600"
+                  }`}
+                >
+                  {label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
 
       {/* ─── Floating Actions (tablet+) ─── */}
       <DesktopFloatingActions

@@ -31,7 +31,6 @@ import {
 import { useAuthStore } from "@/store";
 import { Avatar } from "@/components/ui/avatar";
 import { SmartMenu } from "@/components/ui/SmartMenu";
-import { BrandMark } from "@/components/ui/BrandMark";
 
 // WHAT: Lazy-load a lucide icon by name
 // WHY: WASM SWC can fail on lucide-react dynamic icon resolution; this avoids
@@ -211,26 +210,19 @@ export function DesktopSidebar({
 
   return (
     <aside
-      className="hidden md:flex md:shrink-0 md:sticky md:top-0 md:self-start md:border-r md:border-gray-200 md:bg-surface/95 md:backdrop-blur-xl md:z-40"
-      style={{ height: "100dvh" }}
+      className="hidden md:flex md:shrink-0 md:self-stretch md:border-r md:border-gray-200 md:bg-surface/95 md:backdrop-blur-xl md:z-40"
+      style={{ height: "calc(100dvh - 3.5rem)" }}
     >
       <div className="flex h-full w-full flex-col md:w-20 lg:w-[280px] xl:w-80">
-        {/* ─── Brand ─── */}
-        <Link
-          href="/feed"
-          aria-label="NeedFull home"
-          className="flex h-14 shrink-0 items-center px-3 md:justify-center lg:justify-start lg:px-5"
-        >
-          <span className="hidden md:block">
-            <BrandMark wordmarkClass="hidden lg:block text-gray-900 dark:text-white" />
-          </span>
-        </Link>
-
-        {/* ─── Main Navigation (never scrolls) ─── */}
-        {/* WHY: pt-4 pushes the first nav item onto the same horizontal line as
-           the greeting (center column) and the wallet card (right rail), which
-           both start 16px below their 56px top bands */}
-        <nav className="flex-1 space-y-1 overflow-visible px-2 pt-4 md:px-2 lg:px-4">
+        {/* ─── Scrollable zone: nav + promo — the rail scrolls on its own ─── */}
+        {/* WHY: matches the workspace model — the left rail keeps its own
+           internal scroll independent of the main column and right panel */}
+        <div className="sidebar-scroll min-h-0 flex-1">
+          {/* ─── Main Navigation ─── */}
+          {/* WHY: pt-6 keeps the first nav item on the same horizontal line as the
+             main column content and right rail cards — brand now lives in the
+             global TopBar, so the sidebar chrome starts at the workspace top */}
+          <nav className="space-y-1 px-2 pt-6 md:px-2 lg:px-4">
           {mainNav.map((item) => {
             const active = isActive(item.href);
             const showBadge = item.href === "/chat" && chatUnreadCount > 0;
@@ -392,11 +384,12 @@ export function DesktopSidebar({
             </div>
           )}
         </div>
+        </div>
 
         {/* ─── Profile (fixed bottom) ─── */}
         <div
           ref={profileRef}
-          className="relative border-t border-gray-100 p-2 dark:border-white/10 lg:p-3"
+          className="relative shrink-0 border-t border-gray-100 p-2 dark:border-white/10 lg:p-3"
         >
           <button
             type="button"
