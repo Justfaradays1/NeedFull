@@ -38,6 +38,9 @@ interface DashboardStats {
   openReports: number;
   platformEarningsKobo: number;
   platformEarningsNaira: number;
+  escrowLockedKobo: number;
+  escrowLockedNaira: number;
+  activeEscrowTasks: number;
 }
 
 const NAV_ITEMS = [
@@ -299,6 +302,19 @@ export default function AdminDashboardPage() {
             }
             icon={<DollarSign className="h-5 w-5 text-white" />}
             color="bg-gold-dark"
+          />
+          <StatCard
+            label="Escrow Locked"
+            value={
+              s?.escrowLockedNaira
+                ? `₦${s.escrowLockedNaira.toLocaleString()}`
+                : "₦0"
+            }
+            sub={`${s?.activeEscrowTasks ?? 0} active task${
+              (s?.activeEscrowTasks ?? 0) === 1 ? "" : "s"
+            }`}
+            icon={<WalletCards className="h-5 w-5 text-white" />}
+            color="bg-brand"
           />
           <StatCard
             label="Pending Items"

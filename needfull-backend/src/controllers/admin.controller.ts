@@ -47,6 +47,7 @@ export async function getDashboardStats(_req: Request, res: Response): Promise<v
       pendingVerifications,
       openReports,
       platformEarningsKobo,
+      escrowLockedKobo, activeEscrowTasks,
     ] = await Promise.all([
       safeCount('users'),
       safeCount('users', "created_at >= CURRENT_DATE"),
@@ -60,6 +61,9 @@ export async function getDashboardStats(_req: Request, res: Response): Promise<v
       safeCount('student_id_verifications', "status = 'pending'"),
       safeCount('reports', "status = 'open'"),
       safeSum('wallet_transactions', 'amount', "type = 'platform_fee'"),
+      // WHAT: Escrow is a SEPARATE column on wallets — sum what's held right now
+      safeSum('wallets', 'escrow'),
+      safeCount('tasks', "status IN ('open', 'in_progress') AND (budget_kobo > 0 OR agreed_amount_kobo > 0)"),
     ]);
 
     res.json({
@@ -70,6 +74,8 @@ export async function getDashboardStats(_req: Request, res: Response): Promise<v
         todayVolumeKobo, todayVolumeNaira: todayVolumeKobo / 100,
         pendingManualTransfers, pendingWithdrawals, pendingVerifications, openReports,
         platformEarningsKobo, platformEarningsNaira: platformEarningsKobo / 100,
+        escrowLockedKobo, escrowLockedNaira: escrowLockedKobo / 100,
+        activeEscrowTasks,
       },
     });
   } catch (error) {
@@ -457,15 +463,34 @@ export async function listPlatformTransactions(req: Request, res: Response): Pro
     const whereSQL = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
     const [rows, countRes] = await Promise.all([
       db.query<any>(
-        `SELECT wt.id, wt.user_id, wt.type, wt.amount AS amount_kobo, wt.balance_before, wt.balance_after, wt.description, wt.created_at,
+`SELECT wt.id, wt.type, wt.amount, wt.balance_before, wt.balance_after,
+                wt.reference, wt.task_id, wt.note, wt.created_at,
           jsonb_build_object('id', u.id, 'fullName', u.full_name, 'email', u.email) as "user"
-         FROM wallet_transactions wt JOIN users u ON wt.user_id = u.id
+         FROM wallet_transactions wt
+         JOIN wallets w ON w.id = wt.wallet_id
+         JOIN users u ON u.id = w.user_id
          ${whereSQL} ORDER BY wt.created_at DESC LIMIT $${idx} OFFSET $${idx + 1}`,
         [...params, perPage, offset],
       ),
       db.query<{ count: string }>(`SELECT COUNT(*) as count FROM wallet_transactions wt ${whereSQL}`, params),
     ]);
-    res.json({ success: true, data: rows.rows, pagination: { page, perPage, total: parseInt(countRes.rows[0]?.count || "0", 10) } });
+    res.json({
+      success: true,
+      data: rows.rows.map((r: any) => ({
+        id: r.id,
+        userId: r.user?.id,
+        type: r.type,
+        amount: { kobo: Number(r.amount) || 0, naira: (Number(r.amount) || 0) / 100 },
+        balanceBefore: { kobo: Number(r.balance_before) || 0, naira: (Number(r.balance_before) || 0) / 100 },
+        balanceAfter: { kobo: Number(r.balance_after) || 0, naira: (Number(r.balance_after) || 0) / 100 },
+        reference: r.reference,
+        taskId: r.task_id,
+        note: r.note,
+        user: r.user,
+        createdAt: r.created_at,
+      })),
+      pagination: { page, perPage, total: parseInt(countRes.rows[0]?.count || "0", 10) },
+    });
   } catch (error) {
     console.error("[Admin] listPlatformTransactions error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch transactions" });
