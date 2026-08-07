@@ -239,10 +239,19 @@ body {
         browser chain from scrolling the whole page when a pane hits its edge. */
 .workspace-scroll,
 .sidebar-scroll {
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
   scrollbar-width: thin;
   scrollbar-color: rgba(26, 107, 74, 0.28) transparent; /* brand green */
+}
+/* WHAT: Scroll behavior (independent panes) is DESKTOP-only — the shell's
+   desktop build makes each column an overflow container so only the pane
+   scrolls. On mobile the panes must stay plain blocks so the whole page
+   scrolls normally; forcing overflow/containment here breaks page scroll. */
+@media (min-width: 768px) {
+  .workspace-scroll,
+  .sidebar-scroll {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
 }
 .workspace-scroll::-webkit-scrollbar,
 .sidebar-scroll::-webkit-scrollbar {
