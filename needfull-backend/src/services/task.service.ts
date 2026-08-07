@@ -8,6 +8,14 @@ import { lockEscrow, releaseEscrow, refundEscrow } from "./wallet.service";
 import { notifyUser } from "./notification.service";
 import { onTrustEvent } from "./trust.service";
 import { notifyNearbyRunners } from "./matching.service";
+import {
+  TaskStatus,
+  canonicalStatus,
+  assertValidTransition,
+  assertTransitionFromStorage,
+  storageForStatus,
+  RunnerPhase,
+} from "./task-states";
 import { v4 as uuidv4 } from "uuid";
 import { MIN_TASK_BUDGET_KOBO } from "../config/constants";
 
@@ -30,6 +38,8 @@ interface TaskRow {
   assigned_to: string | null;
   runner_id: string | null;
   runner_done_at: string | null;
+  work_mode: string | null;
+  runner_phase: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -41,35 +51,65 @@ export interface TaskCapabilities {
   canEdit: boolean;
   canCancel: boolean;
   canViewApplications: boolean;
+  canHireApplicant: boolean;
   canApply: boolean;
+  canWithdrawApplication: boolean;
   canConfirmCompletion: boolean;
   canChat: boolean;
   canRate: boolean;
   canMarkAsDone: boolean;
+  canStartWork: boolean;
+  canSeeExactLocation: boolean;
 }
 
 // WHAT: Compute what the current user is allowed to do on a given task
 // WHY: Single source of truth for permission checks — used by both server-side
-//      services and returned to the frontend for UI rendering
+//      services and returned to the frontend for UI rendering. Uses the task
+//      state machine so permission rules track lifecycle phases.
+type TaskCapabilityArg = {
+  posterId: string;
+  assignedRunnerId: string | null;
+  status: string;
+  runnerDoneAt: string | null;
+  runnerPhase?: string | null;
+};
+
 export function getTaskCapabilities(
   userId: string,
-  task: { posterId: string; assignedRunnerId: string | null; status: string; runnerDoneAt: string | null },
+  task: TaskCapabilityArg,
 ): TaskCapabilities {
   const isPoster = task.posterId === userId;
   const isRunner = task.assignedRunnerId === userId;
-  const s = task.status;
+  const canonical = canonicalStatus(task.status, {
+    runnerDoneAt: task.runnerDoneAt,
+    runnerPhase: task.runnerPhase,
+  });
+  const s = canonical;
   const hasRunner = !!task.assignedRunnerId;
   const runnerDone = !!task.runnerDoneAt;
+  const active = s === TaskStatus.MATCHED
+    || s === TaskStatus.ACCEPTED
+    || s === TaskStatus.RUNNER_EN_ROUTE
+    || s === TaskStatus.STARTED
+    || (s === TaskStatus.COMPLETED);
+  const finished = s === TaskStatus.PAYMENT_RELEASED || s === TaskStatus.RATED;
 
   return {
-    canEdit: isPoster && s === "open",
-    canCancel: isPoster && (s === "open" || s === "in_progress"),
-    canViewApplications: isPoster && s === "open",
-    canApply: !isPoster && s === "open" && !hasRunner,
-    canConfirmCompletion: isPoster && s === "in_progress" && hasRunner,
-    canMarkAsDone: isRunner && s === "in_progress" && !runnerDone,
+    canEdit: isPoster && s === TaskStatus.PUBLISHED,
+    canCancel: isPoster && (
+      s === TaskStatus.PUBLISHED || active
+    ),
+    canViewApplications: isPoster && (s === TaskStatus.PUBLISHED || active),
+    canHireApplicant: isPoster && s === TaskStatus.PUBLISHED && hasRunner === false,
+    canApply: !isPoster && s === TaskStatus.PUBLISHED && !hasRunner,
+    canWithdrawApplication: !isPoster && s === TaskStatus.PUBLISHED,
+    canConfirmCompletion: isPoster && s === TaskStatus.COMPLETED && hasRunner,
+    canMarkAsDone: isRunner && active && !runnerDone,
+    canStartWork: isRunner && (s === TaskStatus.ACCEPTED || s === TaskStatus.RUNNER_EN_ROUTE),
     canChat: (isPoster || isRunner) && hasRunner,
-    canRate: (isPoster || isRunner) && s === "completed",
+    canRate: (isPoster || isRunner) && finished,
+    canSeeExactLocation:
+      isPoster || isRunner || s === TaskStatus.PAYMENT_RELEASED || s === TaskStatus.RATED,
   };
 }
 
@@ -101,6 +141,7 @@ export interface CreateTaskInput {
   budgetNaira: number;
   deadline?: string;
   isUrgent?: boolean;
+  workMode?: "on_site" | "remote";
   locationLabel?: string;
   lat?: number;
   lng?: number;
@@ -235,6 +276,7 @@ export async function listTasks(
     SELECT
       t.id, t.title, t.description, t.budget_kobo, t.deadline,
       t.is_urgent, t.status, t.location_label, t.runner_done_at,
+      t.work_mode, t.runner_phase,
       ST_X(t.location::geometry) as lat, ST_Y(t.location::geometry) as lng,
       t.image_url, t.assigned_to as runner_id, t.created_at, t.updated_at,
       ${distanceSelect},
@@ -270,6 +312,7 @@ export async function listTasks(
           assignedRunnerId: row.runner_id,
           status: row.status,
           runnerDoneAt: row.runner_done_at,
+          runnerPhase: row.runner_phase,
         })
       : undefined;
 
@@ -281,6 +324,8 @@ export async function listTasks(
       deadline: row.deadline,
       isUrgent: row.is_urgent,
       status: row.status,
+      workMode: row.work_mode || "on_site",
+      runnerPhase: row.runner_phase,
       locationLabel: row.location_label,
       lat: row.lat,
       lng: row.lng,
@@ -330,6 +375,7 @@ export async function getTask(
     SELECT
       t.id, t.poster_id, t.title, t.description, t.budget_kobo, t.deadline,
       t.is_urgent, t.status, t.location_label, t.runner_done_at,
+      t.work_mode, t.runner_phase,
       ST_X(t.location::geometry) as lat, ST_Y(t.location::geometry) as lng,
       t.image_url, t.assigned_to as runner_id, t.created_at, t.updated_at,
       ${distanceSelect},
@@ -371,6 +417,7 @@ export async function getTask(
         assignedRunnerId: row.runner_id,
         status: row.status,
         runnerDoneAt: row.runner_done_at,
+        runnerPhase: row.runner_phase,
       })
     : undefined;
 
@@ -383,6 +430,8 @@ export async function getTask(
     deadline: row.deadline,
     isUrgent: row.is_urgent,
     status: row.status,
+    workMode: row.work_mode || "on_site",
+    runnerPhase: row.runner_phase,
     locationLabel: row.location_label,
     lat: row.lat,
     lng: row.lng,
@@ -437,10 +486,10 @@ export async function createTask(
       `INSERT INTO tasks
        (id, poster_id, category_id, title, description, budget_kobo,
         deadline, is_urgent, location_label, location, image_url,
-        status, created_at, updated_at)
+        work_mode, status, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
         CASE WHEN $10::float8 IS NOT NULL AND $11::float8 IS NOT NULL THEN ST_SetSRID(ST_MakePoint($11::float, $10::float), 4326)::geography ELSE NULL END,
-        $12, 'open', $13, $13)
+        $12, $13, $14, $15, $15)
        RETURNING *`,
       [
         taskId,
@@ -455,6 +504,8 @@ export async function createTask(
         input.lat || null,
         input.lng || null,
         imageUrl,
+        input.workMode || "on_site",
+        storageForStatus(TaskStatus.PUBLISHED),
         now,
       ],
     );
@@ -625,11 +676,19 @@ export async function markAsDone(
 
   if (!task) throw new Error("Task not found");
   if (task.assigned_to !== userId) throw new Error("Only the assigned runner can mark this task as done");
-  if (task.status !== "in_progress") throw new Error(`Task status is "${task.status}". Only in_progress tasks can be marked as done.`);
+  // WHAT: Runner marking done moves the task to canonical COMPLETED
+  //      (storage stays in_progress + runner_done_at). Guarded by state machine.
+  assertTransitionFromStorage(
+    task.status,
+    TaskStatus.COMPLETED,
+    { runnerDoneAt: task.runner_done_at, runnerPhase: task.runner_phase },
+    "mark as done",
+  );
 
   await db.query(
-    `UPDATE tasks SET runner_done_at = NOW(), updated_at = NOW() WHERE id = $1`,
-    [taskId],
+    `UPDATE tasks
+     SET runner_done_at = NOW(), runner_phase = $1, updated_at = NOW() WHERE id = $2`,
+    [RunnerPhase.AWAITING_CONFIRMATION, taskId],
   );
 
   await notifyUser(task.poster_id, {
@@ -660,12 +719,12 @@ export async function cancelTask(
     throw new Error("Only the task poster or an admin can cancel this task");
   }
 
-  // WHAT: Only open or in_progress tasks can be cancelled
-  if (task.status !== "open" && task.status !== "in_progress") {
-    throw new Error(
-      `Task status is "${task.status}". Only open or in_progress tasks can be cancelled.`,
-    );
-  }
+  // WHAT: Only discovery/active phase tasks can be cancelled — guarded by state machine
+  const canonical = canonicalStatus(task.status, {
+    runnerDoneAt: task.runner_done_at,
+    runnerPhase: task.runner_phase,
+  });
+  assertValidTransition(canonical, TaskStatus.CANCELLED, "cancel task");
 
   await withTransaction(async (client) => {
     // WHAT: If in_progress, refund escrow to poster and notify runner
@@ -727,12 +786,15 @@ export async function confirmCompletion(
     throw new Error("Only the task poster can confirm completion");
   }
 
-  // WHAT: Must be in_progress
-  if (task.status !== "in_progress") {
-    throw new Error(
-      `Task status is "${task.status}". Task must be in_progress to confirm completion.`,
-    );
-  }
+  // WHAT: Poster confirming completion releases escrow → canonical PAYMENT_RELEASED
+  // WHY: Requires the runner to have marked done (runner_done_at) first, per the
+  //      Awaiting Confirmation → Completed → Payment Released lifecycle.
+  assertTransitionFromStorage(
+    task.status,
+    TaskStatus.PAYMENT_RELEASED,
+    { runnerDoneAt: task.runner_done_at, runnerPhase: task.runner_phase },
+    "confirm completion",
+  );
 
   if (!task.runner_id) {
     throw new Error("No runner assigned to this task");

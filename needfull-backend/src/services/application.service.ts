@@ -5,6 +5,12 @@
 import db, { queryOne, withTransaction } from "../config/db";
 import { lockEscrow, refundEscrow } from "./wallet.service";
 import { notifyUser, notifyMany } from "./notification.service";
+import {
+  TaskStatus,
+  canonicalStatus,
+  assertValidTransition,
+  RunnerPhase,
+} from "./task-states";
 import { v4 as uuidv4 } from "uuid";
 
 // WHAT: Application row shape from the database
@@ -29,6 +35,8 @@ interface TaskRow {
   budget_kobo: number;
   status: string;
   runner_id: string | null;
+  runner_done_at: string | null;
+  runner_phase: string | null;
 }
 
 // WHAT: Apply to a task — runner submits application with optional proposed amount
@@ -40,13 +48,16 @@ export async function apply(
     proposedAmountNaira?: number;
   },
 ): Promise<any> {
-  // WHAT: Validate task exists and is open
+  // WHAT: Validate task exists and is published (open)
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, title, budget_kobo, status, assigned_to as runner_id FROM tasks WHERE id = $1`,
+    `SELECT id, poster_id, title, budget_kobo, status, assigned_to as runner_id, runner_done_at, runner_phase FROM tasks WHERE id = $1`,
     [params.taskId],
   );
 
-  if (task.status !== "open") {
+  const canonical = task
+    ? canonicalStatus(task.status, { runnerDoneAt: task.runner_done_at, runnerPhase: task.runner_phase })
+    : TaskStatus.DRAFT;
+  if (canonical !== TaskStatus.PUBLISHED) {
     throw new Error(`Task is not accepting applications (status: ${task.status})`);
   }
   if (task.poster_id === userId) {
@@ -110,7 +121,8 @@ export async function acceptApplication(
     `SELECT
       a.id as app_id, a.task_id, a.runner_id, a.proposed_amount_kobo, a.counter_amount_kobo,
       a.agreed_amount_kobo, a.status as app_status,
-      t.poster_id, t.title, t.budget_kobo, t.status as task_status, t.assigned_to as task_runner_id
+      t.poster_id, t.title, t.budget_kobo, t.status as task_status, t.assigned_to as task_runner_id,
+      t.runner_done_at, t.runner_phase
      FROM task_applications a
      JOIN tasks t ON a.task_id = t.id
      WHERE a.id = $1`,
@@ -127,10 +139,12 @@ export async function acceptApplication(
     throw new Error(`Application status is "${appAndTask.app_status}". Cannot accept.`);
   }
 
-  // WHAT: Validate task is open
-  if (appAndTask.task_status !== "open") {
-    throw new Error(`Task status is "${appAndTask.task_status}". Cannot accept applications.`);
-  }
+  // WHAT: Validate task is published (open) — guard via state machine
+  const taskCanonical = canonicalStatus(appAndTask.task_status, {
+    runnerDoneAt: appAndTask.runner_done_at,
+    runnerPhase: appAndTask.runner_phase,
+  });
+  assertValidTransition(taskCanonical, TaskStatus.MATCHED, "accept application");
 
   // WHAT: Determine agreed amount
   // WHY: counter_amount overrides proposed, which overrides task budget
@@ -166,9 +180,11 @@ export async function acceptApplication(
     }
 
     // WHAT: Update task to in_progress with runner and agreed amount
+    // WHY: Poster hired a runner → task is now MATCHED (runner confirms later)
     await client.query(
       `UPDATE tasks
-       SET status = 'in_progress', assigned_to = $1, agreed_amount_kobo = $2, updated_at = NOW()
+       SET status = 'in_progress', assigned_to = $1, agreed_amount_kobo = $2,
+           runner_phase = '${RunnerPhase.MATCHED}', updated_at = NOW()
        WHERE id = $3`,
       [runnerId, agreedAmountKobo, taskId],
     );
@@ -337,7 +353,8 @@ export async function acceptCounterOffer(
   const app = await queryOne<any>(
     `SELECT
       a.id as app_id, a.task_id, a.runner_id, a.counter_amount_kobo, a.status as app_status,
-      t.poster_id, t.title, t.budget_kobo, t.status as task_status
+      t.poster_id, t.title, t.budget_kobo, t.status as task_status,
+      t.runner_done_at, t.runner_phase
      FROM task_applications a
      JOIN tasks t ON a.task_id = t.id
      WHERE a.id = $1`,
@@ -363,10 +380,14 @@ export async function acceptCounterOffer(
   const taskTitle = app.title;
   const posterId = app.poster_id;
 
-  // WHAT: Validate task is still open
-  if (app.task_status !== "open") {
-    throw new Error(`Task status is "${app.task_status}". Cannot accept.`);
-  }
+  // WHAT: Validate task is published (open) — guard via state machine
+  // WHY: Runner confirming the hire moves the task to canonical MATCHED
+  //      (granular runner_phase records that the runner accepted)
+  const taskCanonical = canonicalStatus(app.task_status, {
+    runnerDoneAt: app.runner_done_at,
+    runnerPhase: app.runner_phase,
+  });
+  assertValidTransition(taskCanonical, TaskStatus.MATCHED, "accept counter offer");
 
   await withTransaction(async (client) => {
     // WHAT: Adjust escrow to the counter-agreed amount (delta vs posted budget)
@@ -389,7 +410,8 @@ export async function acceptCounterOffer(
 
     await client.query(
       `UPDATE tasks
-       SET status = 'in_progress', assigned_to = $1, agreed_amount_kobo = $2, updated_at = NOW()
+       SET status = 'in_progress', assigned_to = $1, agreed_amount_kobo = $2,
+           runner_phase = '${RunnerPhase.ACCEPTED}', updated_at = NOW()
        WHERE id = $3`,
       [runnerId, agreedAmountKobo, taskId],
     );

@@ -61,12 +61,32 @@ export async function acceptCounterOfferHandler(req: Request, res: Response): Pr
   }
 }
 
-// WHAT: Get applications for a task (poster only)
+// WHAT: Get applications for a task (poster only — ownership enforced)
 export async function getForTask(req: Request, res: Response): Promise<void> {
   try {
+    const task = await db.query<{ poster_id: string }>(
+      `SELECT poster_id FROM tasks WHERE id = $1`,
+      [req.params.taskId],
+    );
+    if (task.rows.length === 0) {
+      res.status(404).json({ success: false, message: "Task not found" });
+      return;
+    }
+    if (task.rows[0].poster_id !== req.user!.id) {
+      res.status(403).json({ success: false, message: "Only the task poster can view applicants" });
+      return;
+    }
+
     const result = await db.query<any>(
       `SELECT a.id, a.task_id, a.runner_id, a.message, a.proposed_amount_kobo, a.counter_amount_kobo, a.agreed_amount_kobo, a.status, a.created_at,
-        jsonb_build_object('id', u.id, 'fullName', u.full_name, 'trustScore', u.trust_score, 'profilePictureUrl', u.profile_picture_url, 'department', u.department, 'level', u.level) as runner
+        jsonb_build_object(
+          'id', u.id, 'fullName', u.full_name, 'trustScore', u.trust_score,
+          'profilePictureUrl', u.profile_picture_url, 'avatarUrl', u.avatar_url,
+          'department', u.department, 'level', u.level, 'school', u.school,
+          'tasksCompleted', u.tasks_completed, 'isVerifiedStudent', u.is_verified_student,
+          'bio', u.bio, 'skills', u.skills, 'locationLabel', u.location_label,
+          'averageRating', (SELECT ROUND(AVG(r.rating)::numeric, 1) FROM reviews r WHERE r.reviewee_id = u.id)
+        ) as runner
        FROM task_applications a JOIN users u ON a.runner_id = u.id
        WHERE a.task_id = $1 ORDER BY a.created_at DESC`,
       [req.params.taskId],

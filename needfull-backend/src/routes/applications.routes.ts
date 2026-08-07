@@ -21,6 +21,13 @@ router.post("/",
 
 router.get("/me", applications.getMyApplications);
 
+// WHAT: Applicants for a specific task (poster-only; ownership enforced in controller)
+router.get("/task/:taskId",
+  param("taskId").isUUID(), validate,
+  requireRole("poster"),
+  applications.getForTask,
+);
+
 router.post("/:applicationId/accept",
   param("applicationId").isUUID(), validate,
   applications.acceptApplicationHandler,

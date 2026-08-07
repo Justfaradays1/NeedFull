@@ -105,3 +105,11 @@ ALTER TABLE wallets ADD COLUMN IF NOT EXISTS pending_balance INTEGER NOT NULL DE
 
 -- 9. Migration 012 — runner_done_at (Mark as Done flow)
 ALTER TABLE tasks ADD COLUMN IF NOT EXISTS runner_done_at TIMESTAMPTZ;
+
+-- 10. Migration 019 — task state machine columns
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS work_mode TEXT NOT NULL DEFAULT 'on_site'
+  CHECK (work_mode IN ('on_site', 'remote'));
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS runner_phase TEXT;
+CREATE INDEX IF NOT EXISTS idx_tasks_work_mode ON tasks (work_mode);
+CREATE INDEX IF NOT EXISTS idx_tasks_runner_phase ON tasks (runner_phase)
+  WHERE runner_phase IS NOT NULL;
