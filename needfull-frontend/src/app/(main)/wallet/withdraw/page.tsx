@@ -53,6 +53,12 @@ const NIGERIAN_BANKS = [
   { code: "070", name: "FCMB" },
 ];
 
+// WHAT: Paystack test bank — ONLY included in development builds
+// WHY: Paystack test keys block real-bank resolution (3/day live limit); lets devs verify auto-fill
+if (process.env.NODE_ENV !== "production") {
+  NIGERIAN_BANKS.push({ code: "001", name: "TEST BANK (Paystack 001)" });
+}
+
 // WHAT: Format date
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-NG", {

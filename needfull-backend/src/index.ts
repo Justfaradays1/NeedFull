@@ -16,6 +16,7 @@ import env from "./config/env";
 // WHY: Modular route organization
 import authRoutes from "./routes/authRoutes";
 import walletRoutes from "./routes/wallet.routes";
+import bankRoutes from "./routes/bank.routes";
 import webhookRoutes from "./routes/webhookRoutes";
 
 // WHAT: Initialize Express app
@@ -107,6 +108,7 @@ app.use("/api/auth", authRoutes);
 // WHAT: Mount wallet routes
 // WHY: Balance, transactions, funding methods
 app.use("/api/wallet", walletRoutes);
+app.use("/api/bank", bankRoutes);
 
 // WHAT: Mount chat routes
 // WHY: Conversations and messages API

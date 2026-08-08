@@ -7,7 +7,7 @@ import db, { withTransaction } from "../config/db";
 import { getWallet, creditWallet } from "../services/wallet.service";
 import { submitManualTransfer } from "../services/manualTransfer.service";
 import { getOrCreateVirtualAccount } from "../services/monnify.service";
-import { initializeTransaction, verifyTransaction } from "../services/paystack.service";
+import { initializeTransaction, verifyTransaction, resolveAccountNumber } from "../services/paystack.service";
 
 export async function getWalletHandler(req: Request, res: Response): Promise<void> {
   try {
@@ -142,6 +142,30 @@ export async function verifyCardPayment(req: Request, res: Response): Promise<vo
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Failed to verify payment";
     console.error("[Wallet] verifyCardPayment error:", error);
+    res.status(400).json({ success: false, message: msg });
+  }
+}
+
+// WHAT: Resolve bank account number → account holder name (Paystack)
+// WHY: Withdraw form auto-fills the account name before submission
+export async function resolveBankAccount(req: Request, res: Response): Promise<void> {
+  try {
+    const { accountNumber, bankCode } = req.query;
+    if (!accountNumber || !bankCode) {
+      res.status(400).json({ success: false, message: "accountNumber and bankCode are required" });
+      return;
+    }
+
+    const accountName = await resolveAccountNumber(String(accountNumber), String(bankCode));
+    if (!accountName) {
+      res.status(400).json({ success: false, message: "Could not verify account number. Check and try again." });
+      return;
+    }
+
+    res.json({ success: true, data: { accountName } });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "Failed to resolve account";
+    console.error("[Wallet] resolveBankAccount error:", error);
     res.status(400).json({ success: false, message: msg });
   }
 }
