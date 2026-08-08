@@ -458,7 +458,7 @@ export default function ProfilePage() {
       {/* Edit Profile Modal */}
       {editOpen && (
         <div className="glass-overlay fixed inset-0 z-50 flex items-end sm:items-center" onClick={() => setEditOpen(false)}>
-          <div className="glass-white w-full rounded-t-3xl px-4 pb-safe pb-8 pt-1 sm:max-w-md sm:mx-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-sheet w-full rounded-t-3xl px-4 pb-safe pb-8 pt-1 sm:max-w-md sm:mx-auto sm:rounded-2xl max-h-[92dvh] overflow-y-auto overscroll-contain" onClick={(e) => e.stopPropagation()}>
             <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-gray-300" />
             <div className="px-4">
             <div className="mb-4 flex items-center justify-between">

@@ -655,6 +655,32 @@ select {
   }
 }
 
+/* --- Opaque modal sheet surface (forms, dialogs) ---
+   WHY: glass surfaces are translucent by design (nav bars, FABs), but a form
+   modal must stay fully opaque — otherwise the page bleeds through inputs,
+   labels, and buttons. This is the shared, reusable surface for content
+   modals (Edit Profile, admin confirmations). The dimmed backdrop above
+   handles the visual separation. */
+.modal-sheet {
+  position: relative;
+  isolation: isolate;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  box-shadow:
+    0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .modal-sheet {
+  background: var(--color-card-bg);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 12px 40px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
 /* --- Card glass (for content cards in feed, etc.) --- */
 .glass-card {
   position: relative;
