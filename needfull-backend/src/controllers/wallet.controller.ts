@@ -156,13 +156,16 @@ export async function resolveBankAccount(req: Request, res: Response): Promise<v
       return;
     }
 
-    const accountName = await resolveAccountNumber(String(accountNumber), String(bankCode));
-    if (!accountName) {
-      res.status(400).json({ success: false, message: "Could not verify account number. Check and try again." });
+    const resolved = await resolveAccountNumber(String(accountNumber), String(bankCode));
+    if (!resolved.name) {
+      res.status(400).json({
+        success: false,
+        message: resolved.reason || "Could not verify account number. Check and try again.",
+      });
       return;
     }
 
-    res.json({ success: true, data: { accountName } });
+    res.json({ success: true, data: { accountName: resolved.name } });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Failed to resolve account";
     console.error("[Wallet] resolveBankAccount error:", error);

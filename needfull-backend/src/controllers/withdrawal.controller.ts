@@ -43,9 +43,10 @@ export async function requestWithdrawal(req: Request, res: Response): Promise<vo
 
     const { resolveAccountNumber, createTransferRecipient, initiateTransfer } = await import("../services/paystack.service");
 
-    // WHAT: Resolve account
-    const resolvedName = await resolveAccountNumber(accountNumber, bankCode);
-    if (!resolvedName) { res.status(400).json({ success: false, message: "Could not verify account number. Check and try again." }); return; }
+    // WHAT: Resolve account (cached; reason surfaced when resolution fails)
+    const resolved = await resolveAccountNumber(accountNumber, bankCode);
+    if (!resolved.name) { res.status(400).json({ success: false, message: resolved.reason || "Could not verify account number. Check and try again." }); return; }
+    const resolvedName = resolved.name;
 
     const withdrawalId = uuidv4();
 

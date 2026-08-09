@@ -5,11 +5,13 @@
 import axios, { AxiosError } from "axios";
 import { createHmac } from "crypto";
 import env from "../config/env";
+import db from "../config/db";
 
 // WHAT: Create Paystack API client with authentication
 // WHY: Reusable axios instance with pre-configured headers and base URL
 const paystackClient = axios.create({
   baseURL: "https://api.paystack.co",
+  timeout: 10000,
   headers: {
     Authorization: `Bearer ${env.PAYSTACK_SECRET_KEY}`,
     "Content-Type": "application/json",
@@ -232,20 +234,48 @@ export function verifyWebhookSignature(
 
 // WHAT: Resolve bank account number to get account holder name
 // WHY: Validate account before creating transfer recipient
+// NOTE: Cached in bank_account_cache — Paystack test mode limits real-bank
+//       resolution to 3/day, so each unique account is resolved once and reused.
 export async function resolveAccountNumber(
   accountNumber: string,
   bankCode: string,
-): Promise<string | null> {
+): Promise<{ name: string | null; reason?: string }> {
   try {
+    const cached = await db.query(
+      "SELECT account_name, failed_reason FROM bank_account_cache WHERE account_number = $1 AND bank_code = $2",
+      [accountNumber, bankCode],
+    );
+    if (cached.rows[0]?.account_name) {
+      return { name: cached.rows[0].account_name };
+    }
+
     const response = await paystackClient.get("/bank/resolve", {
       params: { account_number: accountNumber, bank_code: bankCode },
     });
-    return response.data?.data?.account_name || null;
+    const name = response.data?.data?.account_name || null;
+    if (name) {
+      await db.query(
+        `INSERT INTO bank_account_cache (account_number, bank_code, account_name, resolved_at)
+         VALUES ($1, $2, $3, NOW())
+         ON CONFLICT (account_number, bank_code)
+         DO UPDATE SET account_name = EXCLUDED.account_name, failed_reason = NULL, resolved_at = NOW()`,
+        [accountNumber, bankCode, name],
+      );
+    }
+    return { name };
   } catch (error) {
-    console.error(
-      "[Paystack] Account resolution error:",
-      error instanceof AxiosError ? error.response?.data?.message || error.message : "Unknown error",
+    const reason =
+      error instanceof AxiosError
+        ? error.response?.data?.message || error.message
+        : "Unknown error";
+    console.error("[Paystack] Account resolution error:", reason);
+    await db.query(
+      `INSERT INTO bank_account_cache (account_number, bank_code, failed_reason, resolved_at)
+       VALUES ($1, $2, $3, NOW())
+       ON CONFLICT (account_number, bank_code)
+       DO UPDATE SET failed_reason = EXCLUDED.failed_reason, resolved_at = NOW()`,
+      [accountNumber, bankCode, reason],
     );
-    return null;
+    return { name: null, reason };
   }
 }

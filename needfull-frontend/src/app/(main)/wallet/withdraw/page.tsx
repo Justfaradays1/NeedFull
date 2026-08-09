@@ -224,10 +224,11 @@ export default function WithdrawPage() {
           setAccountName(res.data.accountName);
           setErrors((prev) => ({ ...prev, accountName: "" }));
         }
-      } catch {
+      } catch (err: any) {
         setErrors((prev) => ({
           ...prev,
           accountNumber:
+            err?.response?.data?.message ||
             "Could not verify account. Please check and try again.",
         }));
       } finally {
