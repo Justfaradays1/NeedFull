@@ -42,7 +42,7 @@ export function WalletSummaryCard({
           {greeting.text}, {firstName} <span>{greeting.emoji}</span>
         </p>
 
-        <div className="mt-3.5 flex items-end justify-between gap-3">
+        <div className="mt-2 flex items-end justify-between gap-3">
           <div className="min-w-0">
             <span className="text-[11px] font-medium text-on-brand/60">
               Available Balance
