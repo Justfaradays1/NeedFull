@@ -5,19 +5,15 @@ import { useRouter } from "next/navigation";
 import { get } from "@/lib/apiClient";
 import { useAuthUser, useAuthStore, useActiveRole } from "@/store";
 import { useAuthInit } from "@/hooks/useAuthInit";
+import { useDashboardStore } from "@/store/dashboardStore";
 
-import { WelcomeHeader } from "@/components/dashboard/post/WelcomeHeader";
 import { WalletSummaryCard } from "@/components/dashboard/post/WalletSummaryCard";
-import { QuickStats } from "@/components/dashboard/post/QuickStats";
 import { QuickActions } from "@/components/dashboard/post/QuickActions";
-import { CategoryShortcuts } from "@/components/dashboard/post/CategoryShortcuts";
+import { BrowseCategories } from "@/components/dashboard/post/BrowseCategories";
+import { PostTaskCTA } from "@/components/dashboard/post/PostTaskCTA";
 import { ActiveTasksSection } from "@/components/dashboard/post/ActiveTasksSection";
-import { NearbyActivity } from "@/components/dashboard/post/NearbyActivity";
-import { AvailableHelpers } from "@/components/helpers/AvailableHelpers";
 import { RecentActivity } from "@/components/dashboard/post/RecentActivity";
-import { SmartInsights } from "@/components/dashboard/post/SmartInsights";
 import { DashboardSkeleton } from "@/components/dashboard/post/DashboardSkeleton";
-import { BecomeRunnerBanner } from "@/components/home/BecomeRunnerBanner";
 import RunnerDashboard from "@/components/runner/RunnerDashboard";
 
 /* ─── Types ─── */
@@ -43,14 +39,6 @@ interface WalletTransaction {
   createdAt: string;
 }
 
-interface Activity {
-  id: string;
-  type: string;
-  title: string;
-  description: string;
-  createdAt: string;
-}
-
 /* ─── Main Page ─── */
 
 export default function FeedPage() {
@@ -61,25 +49,20 @@ export default function FeedPage() {
 
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [tasksLoading, setTasksLoading] = useState(true);
-  const [postedCount, setPostedCount] = useState<number | null>(null);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [allTasks, setAllTasks] = useState<TaskItem[]>([]);
-  const [activities, setActivities] = useState<Activity[]>([]);
   const [pageReady, setPageReady] = useState(false);
+  const recentActivities = useDashboardStore((s) => s.recentActivities);
+  const setRecentActivities = useDashboardStore((s) => s.setRecentActivities);
 
   const balanceKobo = user?.wallet?.balanceKobo ?? 0;
   const escrowKobo = user?.wallet?.escrowKobo ?? 0;
-  const trustScore = user?.trustScore ?? 0;
   const activeRoleFromHook = useActiveRole();
   const activeRole = (activeRoleFromHook || user?.activeRole) === "runner" ? "runner" : "poster";
   const firstName = user?.fullName?.split(" ")[0] || "there";
-  const tasksPosted = (user as any)?.totalTasksPosted ?? postedCount ?? 0;
   const tasksCompleted = (user as any)?.totalTasksCompleted ?? 0;
-  const averageRating = (user as any)?.averageRating ?? 0;
-  const totalSpent = (user as any)?.totalSpentKobo ?? 0;
-  const successRate = tasksPosted > 0 ? Math.round((tasksCompleted / tasksPosted) * 100) : 0;
-  const activeTasks = tasks.filter((t) => t.status === "in_progress" || t.status === "awaiting_confirmation").length;
-  const hasEarnings = (user as any)?.hasEarnings ?? transactions.some((t) =>
+  const trustScore = user?.trustScore ?? 0;
+  const hasEarnings = transactions.some((t) =>
     ["escrow_release", "earnings"].includes(t.type)
   );
 
@@ -98,23 +81,20 @@ export default function FeedPage() {
       } catch { /* no saved location — fetch without distance */ }
       const [
         openTasksRes,
-        postedRes,
         txRes,
         myTasksRes,
       ] = await Promise.all([
         get<{ success: boolean; data: TaskItem[] }>(`/tasks?sortBy=newest&status=open&perPage=6${locationQuery}`).catch(() => null),
-        get<{ success: boolean; data: TaskItem[] }>("/tasks/me/posted").catch(() => null),
         get<{ success: boolean; data: WalletTransaction[] }>("/wallet/transactions?perPage=10").catch(() => null),
         get<{ success: boolean; data: TaskItem[] }>("/tasks/me?perPage=20").catch(() => null),
       ]);
 
       if (openTasksRes?.success) setTasks(openTasksRes.data);
       if (myTasksRes?.success) setAllTasks(myTasksRes.data);
-      if (postedRes?.success) setPostedCount(postedRes.data.length);
       if (txRes?.success) {
         setTransactions(txRes.data);
 
-        const derived: Activity[] = txRes.data.slice(0, 10).map((tx: any) => {
+        const derived: any[] = txRes.data.slice(0, 10).map((tx: any) => {
           const typeMap: Record<string, string> = {
             escrow_release: "task_completed",
             escrow_lock: "runner_hired",
@@ -153,7 +133,9 @@ export default function FeedPage() {
           });
         }
 
-        setActivities(derived.slice(0, 10));
+        // Sync to the shared store so the desktop right panel renders the same
+        // activity without a second fetch.
+        setRecentActivities(derived.slice(0, 10));
       }
     } catch {
       /* silent */
@@ -161,7 +143,7 @@ export default function FeedPage() {
       setTasksLoading(false);
       setPageReady(true);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, setRecentActivities]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -191,29 +173,20 @@ export default function FeedPage() {
   return (
     <div className="page-column">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 lg:gap-5">
-        <WelcomeHeader firstName={firstName} />
         <WalletSummaryCard
+          firstName={firstName}
           balanceKobo={balanceKobo}
           escrowKobo={escrowKobo}
           hasEarnings={hasEarnings}
         />
-        <AvailableHelpers />
         <QuickActions />
+        <BrowseCategories />
+        <PostTaskCTA />
         <ActiveTasksSection tasks={allTasks} loading={tasksLoading} />
-        <QuickStats
-          tasksPosted={tasksPosted}
-          tasksCompleted={tasksCompleted}
-          activeTasks={activeTasks}
-          averageRating={averageRating}
-          totalSpent={totalSpent}
-          successRate={successRate}
-          trustScore={trustScore}
-        />
-        <CategoryShortcuts />
-        <NearbyActivity />
-        <RecentActivity activities={activities} loading={tasksLoading} />
-        <SmartInsights />
-        <BecomeRunnerBanner />
+        {/* Recent activity: bottom of Home on mobile/tablet, right panel on desktop */}
+        <div className="xl:hidden">
+          <RecentActivity activities={recentActivities} loading={tasksLoading} />
+        </div>
       </div>
     </div>
   );

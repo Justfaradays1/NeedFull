@@ -1,6 +1,8 @@
 // WHAT: Right-hand context panel for the desktop shell (xl+ only)
 // WHY: Provides page-aware, complementary widgets without duplicating the
-//      center column's content; single registry keeps panel contents curated
+//      center column's content; single registry keeps panel contents curated.
+//      Home (/feed) shows Recent Activity here — NOT in the middle column —
+//      so the middle stays focused on the primary workflow.
 
 "use client";
 
@@ -8,26 +10,29 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowUpRight,
+  ChevronRight,
+  CheckCircle,
+  Clock,
+  DollarSign,
   Eye,
   EyeOff,
   LifeBuoy,
+  MessageCircle,
+  Plus,
+  Star,
+  UserPlus,
   Wallet as WalletIcon,
 } from "lucide-react";
 import { useAuthUser } from "@/store";
+import { useDashboardStore } from "@/store/dashboardStore";
 import { formatCurrency } from "@/lib/format";
 import { Callout } from "@/components/ui/callout";
 import { CategorySearch } from "@/components/dashboard/post/CategorySearch";
-import { NearbyActivity } from "@/components/dashboard/post/NearbyActivity";
-import { QuickActions } from "@/components/dashboard/post/QuickActions";
-import { SmartInsights } from "@/components/dashboard/post/SmartInsights";
 
-type WidgetKey = "wallet" | "categories" | "nearby" | "insights" | "quick" | "support" | "tip";
+type WidgetKey = "wallet" | "categories" | "recent" | "support" | "tip";
 
 const WIDGET_TITLES: Partial<Record<WidgetKey, string>> = {
   categories: "Browse Categories",
-  nearby: "Around Campus",
-  insights: "Smart Insights",
-  quick: "Quick Actions",
 };
 
 function PanelCard({
@@ -123,23 +128,90 @@ function SupportCard() {
   );
 }
 
+/* ─── Recent Activity (right-panel copy; data shared from the Home fetch) ─── */
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "now";
+  if (mins < 60) return `${mins}m`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h`;
+  const days = Math.floor(hrs / 24);
+  return days < 7 ? `${days}d` : new Date(dateStr).toLocaleDateString("en-NG", { month: "short", day: "numeric" });
+}
+
+const typeConfig: Record<string, { icon: typeof Clock; bg: string; color: string }> = {
+  task_completed: { icon: CheckCircle, bg: "bg-green-50", color: "#16A34A" },
+  task_posted: { icon: Plus, bg: "bg-blue-50", color: "#2563EB" },
+  escrow_release: { icon: DollarSign, bg: "bg-emerald-50", color: "#1A6B4A" },
+  wallet_funded: { icon: DollarSign, bg: "bg-emerald-50", color: "#1A6B4A" },
+  review_received: { icon: Star, bg: "bg-amber-50", color: "#EAA325" },
+  runner_hired: { icon: UserPlus, bg: "bg-purple-50", color: "#7C3AED" },
+  message_received: { icon: MessageCircle, bg: "bg-blue-50", color: "#2563EB" },
+};
+
+function RecentActivityPanel() {
+  const activities = useDashboardStore((s) => s.recentActivities);
+
+  return (
+    <PanelCard title="Recent Activity">
+      {activities.length === 0 ? (
+        <p className="text-xs text-gray-500">No recent activity yet</p>
+      ) : (
+        <div className="divide-y divide-card-border">
+          {activities.slice(0, 3).map((activity) => {
+            const cfg = typeConfig[activity.type] ?? { icon: Clock, bg: "bg-gray-50", color: "#6B7280" };
+            const Icon = cfg.icon;
+            return (
+              <div key={activity.id} className="flex items-center gap-2.5 py-2.5">
+                <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${cfg.bg}`}>
+                  <Icon className="h-3.5 w-3.5" style={{ color: cfg.color }} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-semibold text-gray-900 dark:text-white">
+                    {activity.title}
+                  </p>
+                  <p className="truncate text-[10px] text-gray-500">
+                    {activity.description}
+                  </p>
+                </div>
+                <span className="shrink-0 text-[10px] text-gray-400">
+                  {timeAgo(activity.createdAt)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      <Link
+        href="/wallet"
+        className="mt-2 flex items-center gap-0.5 text-[11px] font-bold text-brand-text"
+      >
+        View all <ChevronRight className="h-3 w-3" />
+      </Link>
+    </PanelCard>
+  );
+}
+
 // WHAT: Route-prefix → widget sets; first matching prefix wins
 // WHY: Keeps panel curated per page; unknown routes get a sensible default
 const REGISTRY: { match: string; widgets: WidgetKey[] }[] = [
-  { match: "/feed", widgets: ["wallet", "tip", "categories", "nearby", "insights"] },
-  { match: "/explore", widgets: ["categories", "nearby", "support"] },
-  { match: "/helpers", widgets: ["nearby", "categories", "support"] },
+  { match: "/feed", widgets: ["wallet", "recent", "tip"] },
+  { match: "/categories", widgets: ["support"] },
+  { match: "/explore", widgets: ["categories", "support"] },
+  { match: "/helpers", widgets: ["categories", "support"] },
   { match: "/tasks/create", widgets: [] },
-  { match: "/tasks/", widgets: ["wallet", "quick", "insights"] },
-  { match: "/tasks", widgets: ["wallet", "nearby", "insights"] },
+  { match: "/tasks/", widgets: ["wallet", "support"] },
+  { match: "/tasks", widgets: ["wallet", "support"] },
   { match: "/chat", widgets: ["wallet", "support"] },
-  { match: "/wallet", widgets: ["quick", "insights", "support"] },
-  { match: "/profile", widgets: ["wallet", "nearby"] },
+  { match: "/wallet", widgets: ["support"] },
+  { match: "/profile", widgets: ["wallet", "support"] },
   { match: "/notifications", widgets: ["support"] },
   { match: "/become-runner", widgets: ["support"] },
 ];
 
-const FALLBACK: WidgetKey[] = ["wallet", "nearby", "support"];
+const FALLBACK: WidgetKey[] = ["wallet", "support"];
 
 function resolveWidgets(pathname: string): WidgetKey[] {
   const hit = REGISTRY.find((r) => pathname.startsWith(r.match));
@@ -150,15 +222,12 @@ export function DesktopContextPanel({ pathname }: { pathname: string }) {
   const widgets = resolveWidgets(pathname);
   if (widgets.length === 0) return null;
 
-return (
+  return (
     <aside
       className="hidden xl:flex xl:w-80 xl:shrink-0 xl:sticky xl:top-14 xl:self-stretch xl:flex-col xl:border-l xl:border-gray-200 xl:bg-surface/60 xl:backdrop-blur-xl"
       style={{ height: "calc(100dvh - 3.5rem)" }}
       aria-label="Page context panel"
     >
-      {/* WHAT: Internal scroll is a fallback only — it only engages when panel
-         content exceeds the viewport, keeping a single browser scrollbar
-         in the common case */}
       <div className="sidebar-scroll flex-1 space-y-4 overflow-y-auto px-5 py-6">
         {widgets.map((key) => {
           switch (key) {
@@ -170,16 +239,8 @@ return (
                   <CategorySearch />
                 </PanelCard>
               );
-            case "nearby":
-              return <div key={key}><NearbyActivity /></div>;
-            case "insights":
-              return <div key={key}><SmartInsights /></div>;
-            case "quick":
-              return (
-                <PanelCard key={key} title={WIDGET_TITLES.quick}>
-                  <QuickActions />
-                </PanelCard>
-              );
+            case "recent":
+              return <RecentActivityPanel key={key} />;
             case "tip":
               return (
                 <Callout key={key} variant="tip">

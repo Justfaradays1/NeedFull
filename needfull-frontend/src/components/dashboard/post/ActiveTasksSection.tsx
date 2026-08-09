@@ -1,23 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import {
-  MessageCircle,
-  ChevronRight,
-  Clock,
-  User,
-  ClipboardCheck,
-  ExternalLink,
-} from "lucide-react";
-import { formatCurrency } from "@/lib/format";
+import { Plus, ChevronRight } from "lucide-react";
 
 interface ActiveTask {
   id: string;
   title: string;
   status: string;
-  runner?: { id: string; fullName: string } | null;
   budget: { kobo: number; naira: number };
-  deadline?: string | null;
   category?: { name: string; icon: string } | null;
 }
 
@@ -26,130 +16,86 @@ interface ActiveTasksSectionProps {
   loading: boolean;
 }
 
-function statusBadge(status: string) {
-  const cfg: Record<string, { label: string; color: string; bg: string }> = {
-    in_progress: { label: "In Progress", color: "#EAA325", bg: "bg-amber-50" },
-    awaiting_confirmation: { label: "Awaiting Confirmation", color: "#2563EB", bg: "bg-blue-50" },
-    completed: { label: "Completed", color: "#16A34A", bg: "bg-green-50" },
-    cancelled: { label: "Cancelled", color: "#EF4444", bg: "bg-red-50" },
+function statusLabel(status: string): string {
+  const map: Record<string, string> = {
+    open: "Waiting for runner",
+    matched: "Runner assigned",
+    accepted: "Runner assigned",
+    in_progress: "In progress",
+    awaiting_confirmation: "Awaiting confirmation",
+    completed: "Completed",
   };
-  const c = cfg[status] ?? { label: status, color: "#6B7280", bg: "bg-gray-50" };
-  return (
-    <span
-      className={`inline-flex items-center rounded-full ${c.bg} px-2 py-0.5 text-[10px] font-bold`}
-      style={{ color: c.color }}
-    >
-      {c.label}
-    </span>
-  );
+  return map[status] ?? status.replace(/_/g, " ");
 }
 
+// WHAT: State-aware, compact Active Tasks on Home. A single concise preview
+//       when something is live; a tiny inline empty state otherwise. The full
+//       task lifecycle lives in My Tasks (/tasks).
 export function ActiveTasksSection({ tasks, loading }: ActiveTasksSectionProps) {
+  const active = tasks.filter((t) =>
+    ["open", "matched", "accepted", "in_progress", "awaiting_confirmation"].includes(t.status),
+  );
+
   if (loading) {
     return (
-      <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
-        <div className="mb-3 h-5 w-28 animate-pulse rounded bg-gray-100" />
-        <div className="space-y-2">
-          {[1, 2].map((i) => (
-            <div key={i} className="h-20 animate-pulse rounded-lg bg-gray-50" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (tasks.length === 0) {
-    return (
-      <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
-        <h3 className="mb-3 text-sm font-bold text-gray-900 dark:text-white">
-          Active Tasks
-        </h3>
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-gray-200 px-4 py-3 dark:border-white/10">
-          <div className="flex min-w-0 items-center gap-3">
-            <ClipboardCheck className="h-6 w-6 shrink-0 text-gray-300" />
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-gray-900 dark:text-white">
-                No active tasks yet
-              </p>
-              <p className="truncate text-xs text-gray-500 dark:text-gray-400">
-                Post a task and a NeedRunner will pick it up
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/tasks/create"
-            className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-gold px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97]"
-          >
-            + Post Your First Task
-          </Link>
-        </div>
-      </div>
+      <section aria-label="Active tasks">
+        <div className="mb-2 h-5 w-28 animate-pulse rounded bg-gray-100" />
+        <div className="h-16 animate-pulse rounded-xl bg-gray-50" />
+      </section>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-card-border bg-surface p-4 shadow-sm">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-bold text-gray-900">
+    <section aria-label="Active tasks">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-base font-bold text-gray-900 dark:text-white">
           Active Tasks
-          <span className="ml-1.5 text-xs font-normal text-gray-500">
-            ({tasks.length})
-          </span>
-        </h3>
+        </h2>
         <Link
           href="/tasks"
-          className="flex items-center gap-0.5 text-[11px] font-bold text-brand-text"
+          className="flex shrink-0 items-center gap-0.5 text-[11px] font-bold text-brand-text"
         >
           View all <ChevronRight className="h-3 w-3" />
         </Link>
       </div>
 
-      <div className="space-y-2">
-        {tasks.slice(0, 5).map((task) => (
+      {active.length === 0 ? (
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-dashed border-gray-200 px-3.5 py-3 dark:border-white/10">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+            No active tasks yet
+          </p>
           <Link
-            key={task.id}
-            href={`/tasks/${task.id}`}
-            className="block rounded-lg border border-card-border p-3 transition-all hover:border-brand/20 hover:shadow-sm active:scale-[0.99]"
+            href="/tasks/create"
+            className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-gold px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97]"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  {task.category?.icon && (
-                    <span className="text-sm">{task.category.icon}</span>
-                  )}
-                  <p className="text-sm font-bold text-gray-900 truncate">
-                    {task.title}
-                  </p>
-                </div>
-                <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                  {statusBadge(task.status)}
-                  <span className="text-xs font-bold text-gray-900">
-                    {formatCurrency(task.budget.kobo)}
-                  </span>
-                </div>
-                <div className="mt-1 flex flex-wrap items-center gap-3 text-[11px] text-gray-500">
-                  {task.runner && (
-                    <span className="flex items-center gap-1">
-                      <User className="h-3 w-3" />
-                      {task.runner.fullName}
-                    </span>
-                  )}
-                  {task.deadline && (
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {new Date(task.deadline).toLocaleDateString("en-NG", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <ExternalLink className="h-4 w-4 shrink-0 text-gray-300" />
-            </div>
+            <Plus className="h-3.5 w-3.5" />
+            Post a Task
           </Link>
-        ))}
-      </div>
-    </div>
+        </div>
+      ) : (
+        <div className="card-list mt-3">
+          {active.slice(0, 2).map((task) => (
+            <Link
+              key={task.id}
+              href={`/tasks/${task.id}`}
+              className="flex items-center gap-3 rounded-xl border border-card-border bg-surface p-3 shadow-sm transition-all hover:border-brand/20 hover:shadow-md active:scale-[0.99]"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-light text-base">
+                {task.category?.icon || "📋"}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold text-gray-900 dark:text-white">
+                  {task.title}
+                </p>
+                <p className="truncate text-[11px] font-medium text-brand-text">
+                  {statusLabel(task.status)}
+                </p>
+              </div>
+              <ChevronRight className="h-4 w-4 shrink-0 text-gray-300" />
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
