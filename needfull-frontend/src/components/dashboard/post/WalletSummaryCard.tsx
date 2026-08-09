@@ -38,7 +38,7 @@ export function WalletSummaryCard({
 
       <div className="relative z-10">
         {/* Greeting — inside the card, calm and secondary to the balance */}
-        <p className="truncate text-[15px] font-semibold text-on-brand/90">
+        <p className="truncate text-[17px] font-bold text-on-brand/90 sm:text-lg md:text-[21px] lg:text-[23px]">
           {greeting.text}, {firstName} <span>{greeting.emoji}</span>
         </p>
 
