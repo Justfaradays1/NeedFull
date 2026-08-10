@@ -65,8 +65,8 @@ export function WalletSummaryCard({
           </Link>
         </div>
 
-        {/* Balance row — label + history right-aligned; balance dominant */}
-        <div className="mt-4 flex items-start justify-between gap-3">
+        {/* Balance row — amount left, history + fund wallet pushed right */}
+        <div className="mt-4 flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-on-brand/60">
               Available Balance
@@ -88,33 +88,35 @@ export function WalletSummaryCard({
               </button>
             </div>
           </div>
-          <Link
-            href="/wallet"
-            className="mt-0.5 inline-flex shrink-0 items-center gap-0.5 text-[11px] font-semibold text-on-brand/70 transition-colors hover:text-on-brand"
-          >
-            Transaction History
-            <ChevronRight className="h-3 w-3" />
-          </Link>
-        </div>
 
-        {/* Actions — Fund Wallet primary; Withdraw only when earnings exist */}
-        <div className="mt-3.5 flex flex-wrap items-center gap-2">
-          <Link
-            href="/wallet/fund"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-on-brand px-3.5 py-2 text-xs font-bold text-brand shadow-sm transition-all hover:brightness-95 active:scale-[0.97]"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Fund Wallet
-          </Link>
-          {hasEarnings ? (
+          {/* Right side — wallet links, aligned to the right edge */}
+          <div className="flex shrink-0 flex-col items-end gap-2">
             <Link
-              href="/wallet/withdraw"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-on-brand/15 px-3.5 py-2 text-xs font-bold text-on-brand transition-all hover:bg-on-brand/25 active:scale-[0.97]"
+              href="/wallet"
+              className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-on-brand/70 transition-colors hover:text-on-brand"
             >
-              <ArrowUpRight className="h-3.5 w-3.5" />
-              Withdraw
+              Transaction History
+              <ChevronRight className="h-3 w-3" />
             </Link>
-          ) : null}
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <Link
+                href="/wallet/fund"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-on-brand px-3.5 py-2 text-xs font-bold text-brand shadow-sm transition-all hover:brightness-95 active:scale-[0.97]"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Fund Wallet
+              </Link>
+              {hasEarnings ? (
+                <Link
+                  href="/wallet/withdraw"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-on-brand/15 px-3.5 py-2 text-xs font-bold text-on-brand transition-all hover:bg-on-brand/25 active:scale-[0.97]"
+                >
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                  Withdraw
+                </Link>
+              ) : null}
+            </div>
+          </div>
         </div>
 
         {/* Escrow — mobile only, part of the fund action row */}
