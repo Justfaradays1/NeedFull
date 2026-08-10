@@ -65,6 +65,9 @@ export default function FeedPage() {
   const hasEarnings = transactions.some((t) =>
     ["escrow_release", "earnings"].includes(t.type)
   );
+  const activeTasksCount = allTasks.filter((t) =>
+    ["open", "matched", "accepted", "in_progress", "awaiting_confirmation"].includes(t.status)
+  ).length;
 
   const fetchAll = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -177,6 +180,9 @@ export default function FeedPage() {
           firstName={firstName}
           balanceKobo={balanceKobo}
           escrowKobo={escrowKobo}
+          trustScore={trustScore}
+          activeTasksCount={activeTasksCount}
+          completedCount={tasksCompleted}
           hasEarnings={hasEarnings}
         />
         <QuickActions />
