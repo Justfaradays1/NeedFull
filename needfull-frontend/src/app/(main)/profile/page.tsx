@@ -3,13 +3,13 @@
 
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  User, Settings, LogOut, ChevronRight, Pencil, Star, Shield,
-  MapPin, Award, Clock, CheckCircle2, X, Upload, BadgeCheck,
-  Phone, Mail, GraduationCap, Volume2, Wifi, UserCheck,
+  Settings, LogOut, ChevronRight, Pencil, Star, Shield,
+  MapPin, Award, Clock, CheckCircle2, X, BadgeCheck,
+  Phone, Mail, GraduationCap, UserCheck,
 } from 'lucide-react';
 import { useAuthUser, useAuthStore } from '@/store';
 import apiClient, { get, patch } from '@/lib/apiClient';
@@ -101,12 +101,14 @@ export default function ProfilePage() {
   const avatarFileRef = useRef<HTMLInputElement>(null);
   const verificationFileRef = useRef<HTMLInputElement>(null);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     setFetchError(null);
     try {
       const [meRes, pubRes, postedRes] = await Promise.all([
         get<{ success: boolean; data: UserProfile }>('/users/me'),
-        get<{ success: boolean; data: { recentReviews?: ReviewItem[] } }>(`/users/${storeUser?.id}`).catch(() => ({ success: false, data: {} })),
+        get<{ success: boolean; data: { recentReviews?: ReviewItem[] } }>(`/users/${storeUser?.id}`).catch(
+          (): { success: boolean; data: { recentReviews?: ReviewItem[] } } => ({ success: false, data: {} }),
+        ),
         get<{ success: boolean; data: TaskRow[] }>('/tasks/me/posted').catch(() => ({ success: false, data: [] })),
       ]);
       if (meRes.success) {
@@ -122,20 +124,24 @@ export default function ProfilePage() {
       } else {
         setFetchError('Failed to load profile data');
       }
-      if ((pubRes as any).success && (pubRes as any).data?.recentReviews) {
-        setReviews((pubRes as any).data.recentReviews);
+      if (pubRes.success && pubRes.data?.recentReviews) {
+        setReviews(pubRes.data.recentReviews);
       }
       if (postedRes.success) {
         setActivity(postedRes.data.filter((t: TaskRow) => t.status === 'completed').slice(0, 10));
       }
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || 'Failed to load profile';
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } }; message?: string };
+      const msg = e?.response?.data?.message || e?.message || 'Failed to load profile';
       setFetchError(msg);
     }
     finally { setLoading(false); }
-  };
+  }, [storeUser]);
 
-  useEffect(() => { fetchProfile(); }, [storeUser?.id]);
+  useEffect(() => {
+    const t = setTimeout(fetchProfile, 0);
+    return () => clearTimeout(t);
+  }, [fetchProfile]);
 
   const avgRating = reviews.length > 0
     ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
@@ -151,7 +157,8 @@ export default function ProfilePage() {
         ? patch<{ success: boolean; data: { isAvailable: boolean } }>(endpoint)
         : patch<{ success: boolean; data: { isRunner: boolean } }>(endpoint, body));
       if (res.success) {
-        const newVal = (res as any).data[field === 'isAvailable' ? 'isAvailable' : 'isRunner'];
+        const data = res.data as { isAvailable?: boolean; isRunner?: boolean };
+        const newVal = data[field] ?? false;
         setProfile((p) => p ? { ...p, [field]: newVal } : null);
         if (field === 'isRunner' && newVal) {
           celebration.showForAction('runner', 'runner_approved');
@@ -162,7 +169,7 @@ export default function ProfilePage() {
 
   const handleEditSave = async () => {
     try {
-      const res = await patch<{ success: boolean; data: any }>('/users/me', editForm);
+      const res = await patch<{ success: boolean; data: Partial<UserProfile> }>('/users/me', editForm);
       if (res.success) {
         setProfile((p) => p ? { ...p, ...res.data } : null);
         setUser(storeUser ? { ...storeUser, fullName: editForm.fullName } : null);
@@ -181,6 +188,7 @@ export default function ProfilePage() {
       const res = await apiClient.post<{ success: boolean; data: { profilePictureUrl: string } }>('/users/me/avatar', fd);
       if (res.data.success) {
         setProfile((p) => p ? { ...p, profilePictureUrl: res.data.data.profilePictureUrl } : null);
+        setUser(storeUser ? { ...storeUser, profilePictureUrl: res.data.data.profilePictureUrl } : null);
         toast.success('Avatar updated');
       }
     } catch { toast.error('Upload failed'); }
@@ -230,6 +238,7 @@ export default function ProfilePage() {
             <div className="relative shrink-0">
               <button type="button" onClick={() => avatarFileRef.current?.click()} className="tap-target block">
                 {profile.profilePictureUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- avatar loaded from Cloudinary, no local optimization possible
                   <img src={profile.profilePictureUrl} alt="" className="h-[72px] w-[72px] rounded-full border-2 border-white/30 object-cover" />
                 ) : (
                   <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full border-2 border-white/30 bg-white/20 text-2xl font-bold">

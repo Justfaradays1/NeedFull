@@ -19,6 +19,7 @@ import {
   useUserRoles,
   useActiveRole,
 } from "@/store";
+import type { AuthUser } from "@/store/authStore";
 import { Avatar } from "@/components/ui/avatar";
 import { Dropdown } from "@/components/ui/dropdown";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -43,9 +44,12 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const recoveryAttempted = useRef(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("nf_access_token");
-    setHasToken(!!token);
-    setMounted(true);
+    const t = setTimeout(() => {
+      const token = localStorage.getItem("nf_access_token");
+      setHasToken(!!token);
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(t);
   }, []);
 
   // Redirect to login only when we're certain there's no token.
@@ -67,6 +71,10 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
     const recover = async () => {
       // 1) Try to restore user from zustand's persisted data in localStorage
+      //    as a FALLBACK — never prefer it over a fresh /auth/me response,
+      //    or profile changes (e.g. a new avatar) would stay hidden until
+      //    the cache expires.
+      let cached: AuthUser | null = null;
       try {
         const raw = localStorage.getItem("nf-auth");
         if (raw) {
@@ -74,10 +82,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
           // zustand 4.5 stores as { state: {...}, version: 0 }
           const stored = parsed?.state ?? parsed;
           if (stored?.isAuthenticated === true && stored?.user?.id) {
-            if (!cancelled) {
-              useAuthStore.getState().setUser(stored.user);
-              return;
-            }
+            cached = stored.user as AuthUser;
           }
         }
       } catch { /* corrupt data — fall through to API */ }
@@ -87,7 +92,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
         const token = localStorage.getItem("nf_access_token");
         if (!token) throw new Error("no token");
         const res = await fetch(
-          `https://needfull.onrender.com/api/auth/me`,
+          `${process.env.NEXT_PUBLIC_API_URL || "https://needfull.onrender.com/api"}/auth/me`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
         if (!res.ok) throw new Error("API rejected token");
@@ -111,12 +116,16 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
               ? { id: (json.wallet ?? raw.wallet).id, balanceKobo: (json.wallet ?? raw.wallet).balanceKobo ?? 0, escrowKobo: (json.wallet ?? raw.wallet).escrowKobo ?? 0, earningsKobo: (json.wallet ?? raw.wallet).earningsKobo ?? 0, pendingKobo: (json.wallet ?? raw.wallet).pendingKobo ?? 0 }
               : undefined,
           });
+          return;
         }
-      } catch {
-        if (!cancelled) {
-          useAuthStore.getState().logout();
-          router.replace("/login");
-        }
+      } catch { /* offline / server down — fall through to cache */ }
+
+      // 3) Offline fallback — restore the last known good cached user
+      if (!cancelled && cached) {
+        useAuthStore.getState().setUser(cached);
+      } else if (!cancelled && !cached) {
+        useAuthStore.getState().logout();
+        router.replace("/login");
       }
     };
 

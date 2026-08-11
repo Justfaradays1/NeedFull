@@ -153,7 +153,7 @@ export async function login(req: Request, res: Response): Promise<void> {
 
     // WHAT: Find user by email
     const userResult = await query(
-      "SELECT id, email, password_hash, role, roles, active_role FROM users WHERE email = $1",
+      "SELECT id, email, password_hash, role, roles, active_role, profile_picture_url, full_name FROM users WHERE email = $1",
       [email],
     );
 
@@ -199,9 +199,11 @@ export async function login(req: Request, res: Response): Promise<void> {
       user: {
         id: user.id,
         email: user.email,
+        fullName: user.full_name,
         role: user.role,
         roles: user.roles || ["poster"],
         activeRole: user.active_role || "poster",
+        profilePictureUrl: user.profile_picture_url,
       },
       tokens: {
         accessToken,
@@ -512,6 +514,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
       google_id: string | null;
       is_available: boolean;
       runner_busy: boolean;
+      profile_picture_url: string | null;
       wallet_id: string;
       balance: number;
       escrow: number;
@@ -521,6 +524,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
     }>(
       `SELECT 
         u.id, u.email, u.full_name, u.role, u.roles, u.active_role, u.email_verified_at, u.google_id, u.is_available, u.runner_busy,
+        u.profile_picture_url,
         w.id as wallet_id, w.balance, w.escrow, w.earnings,
         COALESCE((
           SELECT SUM(COALESCE(t.agreed_amount_kobo, t.budget_kobo))
@@ -544,6 +548,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
         activeRole: result.active_role || "poster",
         email_verified_at: result.email_verified_at,
         trustScore: result.trust_score,
+        profilePictureUrl: result.profile_picture_url,
         googleId: result.google_id,
         isAvailable: result.is_available,
         runnerBusy: result.runner_busy,

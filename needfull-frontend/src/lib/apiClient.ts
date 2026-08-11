@@ -87,6 +87,19 @@ apiClient.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+    // WHAT: Drop the forced JSON content-type for FormData bodies
+    // WHY: The instance default header is application/json, so axios
+    //      serializes FormData into an empty JSON object and the server
+    //      never receives the file (400 "No image file provided" → "Upload
+    //      failed" toast). Removing the header lets the browser set the
+    //      multipart boundary itself.
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      if (typeof config.headers.delete === 'function') {
+        config.headers.delete('Content-Type');
+      } else {
+        delete config.headers['Content-Type'];
+      }
+    }
     return config;
   },
   (error: AxiosError) => {
@@ -152,7 +165,7 @@ apiClient.interceptors.response.use(
         const response = await axios.post<{
           tokens: { accessToken: string; refreshToken: string };
         }>(
-          `https://needfull.onrender.com/api/auth/refresh`,
+          `${API_BASE_URL}/auth/refresh`,
           { refreshToken }
         );
 
