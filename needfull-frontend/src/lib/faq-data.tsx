@@ -9,7 +9,7 @@ export const FAQ_CATEGORIES = [
   "Posting Tasks",
   "Payments",
   "Trust & Safety",
-  "Student Helpers",
+  "Student Runners",
   "Businesses",
 ] as const;
 
@@ -97,7 +97,7 @@ export const ALL_FAQ: FaqItem[] = [
   },
   {
     category: "Trust & Safety",
-    title: "How are helpers verified?",
+    title: "How are runners verified?",
     content: (
       <div className="space-y-2">
         <p>Every user signs up with their student email. Beyond that, runners build their reputation through our trust score system — each completed task adds to their score, and each review contributes to their profile. You can always see a runner&apos;s full history before accepting their application.</p>
@@ -123,8 +123,8 @@ export const ALL_FAQ: FaqItem[] = [
     ),
   },
   {
-    category: "Student Helpers",
-    title: "How do I become a helper?",
+    category: "Student Runners",
+    title: "How do I become a runner?",
     content: (
       <div className="space-y-2">
         <p>Sign up and complete your profile with a bio, skills, and photo. Once your trust score reaches 30 (just a few completed tasks), you can enable runner mode and start applying to tasks. Browse the feed, find tasks that match your skills, and submit your application.</p>
@@ -132,7 +132,7 @@ export const ALL_FAQ: FaqItem[] = [
     ),
   },
   {
-    category: "Student Helpers",
+    category: "Student Runners",
     title: "Can I choose which tasks to accept?",
     content: (
       <div className="space-y-2">
@@ -141,7 +141,7 @@ export const ALL_FAQ: FaqItem[] = [
     ),
   },
   {
-    category: "Student Helpers",
+    category: "Student Runners",
     title: "How do I receive payments?",
     content: (
       <div className="space-y-2">

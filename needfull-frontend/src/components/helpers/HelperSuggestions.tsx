@@ -46,7 +46,7 @@ export function HelperSuggestions({ categoryId }: { categoryId: string }) {
     <div className="rounded-xl border border-brand/20 bg-brand-light/50 p-3">
       <p className="flex items-center gap-1.5 text-xs font-bold text-brand-text">
         <UsersRound className="h-3.5 w-3.5" />
-        Available helpers for this task
+        Available runners for this task
       </p>
       {loading ? (
         <p className="mt-2 text-[11px] text-gray-500">Checking who&apos;s available…</p>

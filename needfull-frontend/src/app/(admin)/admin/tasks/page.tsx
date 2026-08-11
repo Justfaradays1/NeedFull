@@ -10,6 +10,7 @@ import { ArrowLeft, ClipboardList, Loader2, XCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 import apiClient from "@/lib/apiClient";
+import { getCategoryDisplayName } from "@/lib/categoryConfig";
 
 interface TaskItem {
   id: string;
@@ -116,7 +117,7 @@ export default function AdminTasksPage() {
                 </div>
                 <div className="mb-2 text-xs text-gray-600">
                   <span className="font-medium">Budget:</span> ₦{t.budget.naira.toLocaleString()} &middot;
-                  <span className="font-medium"> Category:</span> {t.category.name}
+                  <span className="font-medium"> Category:</span> {getCategoryDisplayName(t.category.name)}
                 </div>
                 <p className="mb-3 text-xs text-gray-400">{new Date(t.createdAt).toLocaleDateString()}</p>
                 {(t.status === "open" || t.status === "in_progress") && (

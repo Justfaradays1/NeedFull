@@ -3,28 +3,18 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, X } from "lucide-react";
+import { searchCategoryConfigs, getCategoryColor } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 
-export const TASK_CATEGORIES = [
-  { name: "Laundry", icon: "🧺", color: "#E8F5E9" },
-  { name: "Delivery", icon: "🛵", color: "#E3F2FD" },
-  { name: "Printing", icon: "🖨", color: "#FFF3E0" },
-  { name: "Cleaning", icon: "🧹", color: "#F3E5F5" },
-  { name: "Food Runs", icon: "🍔", color: "#FFF8E1" },
-  { name: "Shopping", icon: "🛒", color: "#E0F2F1" },
-  { name: "Tech", icon: "💻", color: "#E8EAF6" },
-  { name: "Design", icon: "🎨", color: "#FBE9E7" },
-  { name: "Moving", icon: "📦", color: "#EFEBE9" },
-  { name: "Academics", icon: "📚", color: "#F1F8E9" },
-];
-
+// WHAT: Config-driven category search widget (used inside the desktop context
+//       panel and on the /categories page). Single source of truth is
+//       lib/categoryConfig.ts — display names, icons, descriptions, keywords.
+// WHY: Old hardcoded name/icon arrays drifted from the real taxonomy; one
+//       canonical config keeps every surface consistent.
 export function CategorySearch() {
   const [query, setQuery] = useState("");
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return TASK_CATEGORIES;
-    return TASK_CATEGORIES.filter((c) => c.name.toLowerCase().includes(q));
-  }, [query]);
+  const filtered = useMemo(() => searchCategoryConfigs(query), [query]);
 
   return (
     <div className="space-y-2.5">
@@ -58,18 +48,19 @@ export function CategorySearch() {
       ) : (
         <ul className="grid grid-cols-2 gap-2">
           {filtered.map((cat) => (
-            <li key={cat.name}>
+            <li key={cat.key}>
               <Link
-                href={`/tasks/create?category=${encodeURIComponent(cat.name)}`}
+                href={`/tasks/create?category=${encodeURIComponent(cat.displayName)}`}
+                title={cat.description}
                 className="flex items-center gap-2.5 rounded-xl border border-card-border bg-surface px-2.5 py-2.5 text-[13px] font-semibold text-gray-700 transition-all duration-150 hover:-translate-y-px hover:border-brand/30 hover:bg-brand-light/40 hover:shadow-sm active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 dark:text-white"
               >
                 <span
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm shadow-inner"
-                  style={{ background: cat.color }}
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-white"
+                  style={{ backgroundColor: getCategoryColor(cat.key) }}
                 >
-                  {cat.icon}
+                  <CategoryIcon name={cat.icon} className="h-3.5 w-3.5" />
                 </span>
-                <span className="truncate">{cat.name}</span>
+                <span className="truncate">{cat.displayName}</span>
               </Link>
             </li>
           ))}

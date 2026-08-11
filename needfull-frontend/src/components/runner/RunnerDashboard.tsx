@@ -25,6 +25,8 @@ import {
 import { useAuthUser, useAuthStore } from "@/store";
 import { get, patch } from "@/lib/apiClient";
 import { formatCurrency } from "@/lib/format";
+import { getCategoryDisplayName, getCategoryColor, getCategoryIcon } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { useGreeting } from "@/hooks/useGreeting";
 import { Avatar } from "@/components/ui/avatar";
 import { StartEarningModal } from "@/components/runner/StartEarningModal";
@@ -474,12 +476,16 @@ function AvailabilityCard() {
                 key={offer.id}
                 className="flex items-center gap-3 rounded-xl border border-card-border bg-gray-50 p-3"
               >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gold-light text-base">
-                  {offer.category?.icon || "✨"}
+                <span
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white shadow-sm"
+                  style={{ backgroundColor: getCategoryColor(offer.category?.name ?? "other") }}
+                >
+                  <CategoryIcon name={getCategoryIcon(offer.category?.name ?? "other")} className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-1 text-sm font-bold text-gray-900">
-                    Available for {offer.category?.name || "Help"}
+                    Available for{" "}
+                    {offer.category?.name ? getCategoryDisplayName(offer.category.name) : "Help"}
                     {offer.isOnlineToday && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-1.5 py-0.5 text-[9px] font-bold text-green-700">
                         <span className="h-1.5 w-1.5 rounded-full bg-green-500" />

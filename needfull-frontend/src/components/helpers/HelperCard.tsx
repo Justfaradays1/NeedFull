@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { get, post } from "@/lib/apiClient";
+import { getCategoryDisplayName, getCategoryColor, getCategoryIcon } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { Avatar } from "@/components/ui/avatar";
 import { HelperOffer, formatDistance } from "./types";
 
@@ -111,9 +113,14 @@ export function HelperCard({ offer, wide = false }: { offer: HelperOffer; wide?:
             )}
           </Link>
           <p className="mt-0.5 flex items-center gap-1 text-xs font-semibold text-brand-text">
-            <span>{offer.category?.icon}</span>
+            <CategoryIcon
+              name={getCategoryIcon(offer.category?.name ?? "other")}
+              className="h-3.5 w-3.5 shrink-0"
+              style={{ color: getCategoryColor(offer.category?.name ?? "other") }}
+            />
             <span className="truncate">
-              Available for {offer.category?.name || "Help"}
+              Available for{" "}
+              {offer.category?.name ? getCategoryDisplayName(offer.category.name) : "Help"}
             </span>
           </p>
         </div>
@@ -201,7 +208,13 @@ export function HelperCard({ offer, wide = false }: { offer: HelperOffer; wide?:
                   Invite {offer.runner?.fullName?.split(" ")[0]} to a task
                 </p>
                 <p className="truncate text-[10px] text-gray-500">
-                  {offer.category?.icon} Available for {offer.category?.name} —
+                  <CategoryIcon
+                    name={getCategoryIcon(offer.category?.name ?? "other")}
+                    className="mr-0.5 inline h-3 w-3"
+                    style={{ color: getCategoryColor(offer.category?.name ?? "other") }}
+                  />
+                  Available for{" "}
+                  {offer.category?.name ? getCategoryDisplayName(offer.category.name) : "Help"} —
                   they still apply and you still pick
                 </p>
               </div>

@@ -17,6 +17,8 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { get } from "@/lib/apiClient";
+import { getCategoryDisplayName, getCategoryColor, getCategoryIcon } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { useAuthUser, useAuthStore } from "@/store";
 import { type TaskItem } from "@/types/task";
 import TaskCard from "@/components/tasks/TaskCard";
@@ -256,12 +258,17 @@ export default function HustlePage() {
                 onClick={() => setCategory(c.id)}
                 className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
                   category === c.id
-                    ? "bg-brand text-white shadow-sm"
+                    ? "text-white shadow-sm"
                     : "border border-card-border bg-surface text-gray-600"
                 }`}
+                style={category === c.id ? { backgroundColor: getCategoryColor(c.name) } : undefined}
               >
-                {c.icon && <span className="text-sm leading-none">{c.icon}</span>}
-                {c.name}
+                <CategoryIcon
+                  name={getCategoryIcon(c.name)}
+                  className="h-3.5 w-3.5"
+                  style={{ color: category === c.id ? "#ffffff" : getCategoryColor(c.name) }}
+                />
+                {getCategoryDisplayName(c.name)}
               </button>
             ))}
           </div>

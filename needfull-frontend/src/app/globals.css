@@ -91,6 +91,24 @@
   --font-syne: "Syne", sans-serif;
   --font-plus-jakarta: "Plus Jakarta Sans", sans-serif;
 
+  /* ─── Category colours (single source for every category surface) ───
+     Keyed by stable category key (laundry, delivery, ...). Shared via
+     lib/categoryConfig.ts → getCategoryColor(). Single set for light+dark:
+     mid-tone hues that keep white text readable in both themes. */
+  --nf-cat-laundry: #1a6b4a;
+  --nf-cat-delivery: #ea580c;
+  --nf-cat-cleaning: #0284c7;
+  --nf-cat-printing: #7c3aed;
+  --nf-cat-food: #b45309;
+  --nf-cat-shopping: #0891b2;
+  --nf-cat-techsupport: #2563eb;
+  --nf-cat-design: #db2777;
+  --nf-cat-photography: #4f46e5;
+  --nf-cat-repairs: #57534e;
+  --nf-cat-moving: #9a3412;
+  --nf-cat-academic: #0d9488;
+  --nf-cat-other: #6b7280;
+
   /* Feedback / semantic colours */
   --color-success: #059669;
   --color-success-light: #ecfdf5;

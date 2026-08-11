@@ -18,6 +18,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { ToggleRow } from '@/components/ui/toggle';
 import { CelebrationModal } from '@/components/ui/celebration-modal';
 import { useCelebration } from '@/hooks/useCelebration';
+import { getCategoryDisplayName } from '@/lib/categoryConfig';
 import { ProfileSkeleton } from '@/components/ui/skeletons/ProfileSkeleton';
 
 type TabKey = 'overview' | 'reviews' | 'activity' | 'settings';
@@ -396,7 +397,7 @@ export default function ProfilePage() {
                   <div key={t.id} className="flex items-center justify-between rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold text-gray-900 truncate">{t.title}</p>
-                      <p className="text-[11px] text-gray-500">{t.category?.name || 'General'} · {new Date(t.createdAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}</p>
+                      <p className="text-[11px] text-gray-500">{t.category?.name ? getCategoryDisplayName(t.category.name) : 'General'} · {new Date(t.createdAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">Done</span>

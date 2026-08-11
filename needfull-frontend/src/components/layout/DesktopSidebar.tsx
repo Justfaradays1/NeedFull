@@ -62,11 +62,11 @@ export function NavIcon({
           Compass: mod.Compass,
           HelpCircle: mod.HelpCircle,
           House: mod.House,
+          LayoutGrid: mod.LayoutGrid,
           ListTodo: mod.ListTodo,
           MessageCircle: mod.MessageCircle,
           Settings: mod.Settings,
           User: mod.User,
-          UsersRound: mod.UsersRound,
           Wallet: mod.Wallet,
         };
         setIcon(() => Icons[icon]);
@@ -94,7 +94,7 @@ export function NavIcon({
 const POSTER_MAIN: { href: string; label: string; icon: string }[] = [
   { href: "/feed", label: "Home", icon: "House" },
   { href: "/explore", label: "Explore", icon: "Compass" },
-  { href: "/helpers", label: "Helpers", icon: "UsersRound" },
+  { href: "/categories", label: "Categories", icon: "LayoutGrid" },
   { href: "/tasks", label: "Browse Tasks", icon: "ListTodo" },
   { href: "/chat", label: "Messages", icon: "MessageCircle" },
   { href: "/profile", label: "Profile", icon: "User" },

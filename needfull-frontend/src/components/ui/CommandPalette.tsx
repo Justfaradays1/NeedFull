@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { searchCategoryConfigs } from "@/lib/categoryConfig";
 
 interface CommandItem {
   label: string;
@@ -17,8 +18,21 @@ const COMMAND_ITEMS: CommandItem[] = [
   { label: "Open messages", description: "Jump to chat conversations", href: "/chat" },
   { label: "Notifications", description: "See your latest updates", href: "/notifications" },
   { label: "Explore campus gigs", description: "Browse discovery and opportunities", href: "/explore" },
+  { label: "Find a NeedRunner", description: "Browse available runners near you", href: "/helpers" },
+  { label: "Browse categories", description: "See every kind of task you can post", href: "/categories" },
   { label: "Open settings", description: "Adjust preferences and account settings", href: "/settings" },
 ];
+
+// WHAT: Build category command entries from the canonical config
+// WHY: The palette doubles as category discovery — "moving", "furniture",
+//      "photocopy", "tutor" all resolve to their category before any typing
+function buildCategoryItems(query: string): CommandItem[] {
+  return searchCategoryConfigs(query).map((c) => ({
+    label: c.displayName,
+    description: c.description,
+    href: `/tasks/create?category=${encodeURIComponent(c.displayName)}`,
+  }));
+}
 
 interface CommandPaletteProps {
   open: boolean;
@@ -33,11 +47,17 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const filteredItems = useMemo(() => {
     const lower = query.toLowerCase().trim();
     if (!lower) return COMMAND_ITEMS;
-    return COMMAND_ITEMS.filter(
+    const commands = COMMAND_ITEMS.filter(
       (item) =>
         item.label.toLowerCase().includes(lower) ||
         item.description.toLowerCase().includes(lower),
     );
+    // Category discovery: matched categories supplement command results,
+    // deduped against the static list (which has a Browse categories entry)
+    const categories = buildCategoryItems(lower).filter(
+      (c) => !commands.some((cmd) => cmd.href === c.href),
+    );
+    return [...commands, ...categories];
   }, [query]);
 
   const handleSelect = useCallback(

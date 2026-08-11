@@ -20,6 +20,8 @@ import {
   Plus,
 } from "lucide-react";
 import { get } from "@/lib/apiClient";
+import { getCategoryDisplayName, getCategoryColor, getCategoryIcon } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { useAuthInit, useAuthUser } from "@/store";
 import { Avatar } from "@/components/ui/avatar";
 
@@ -293,12 +295,17 @@ export default function PublicProfilePage() {
             <div className="divide-y divide-card-border">
               {offers.map((offer) => (
                 <div key={offer.id} className="flex items-start gap-3 px-4 py-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gold-light text-base">
-                    {offer.category?.icon || "✨"}
-                  </span>
+                  <span
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white shadow-sm"
+                  style={{ backgroundColor: getCategoryColor(offer.category?.name ?? "other") }}
+                >
+                  <CategoryIcon name={getCategoryIcon(offer.category?.name ?? "other")} className="h-4 w-4" />
+                </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-bold text-gray-900">
-                      {offer.category?.name || "Help"}
+                      {offer.category?.name
+                      ? getCategoryDisplayName(offer.category.name)
+                      : "Help"}
                       {offer.isOnlineToday && (
                         <span className="ml-1.5 rounded-full bg-green-100 px-1.5 py-0.5 text-[9px] font-bold text-green-700">
                           ONLINE TODAY

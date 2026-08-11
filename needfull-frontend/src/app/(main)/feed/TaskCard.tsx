@@ -5,6 +5,8 @@
 'use client';
 
 import { formatCurrency } from '@/lib/format';
+import { getCategoryDisplayName, getCategoryColor, getCategoryIcon } from '@/lib/categoryConfig';
+import { CategoryIcon } from '@/components/ui/CategoryIcon';
 import {
   Flame,
   ShieldCheck,
@@ -109,8 +111,12 @@ export default function TaskCard({ task, onPress }: TaskCardProps) {
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {/* Category badge */}
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-brand-light px-2 py-0.5 text-[11px] font-semibold text-brand">
-            {task.category.icon} {task.category.name}
+          <span
+            className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold text-white"
+            style={{ backgroundColor: getCategoryColor(task.category.name) }}
+          >
+            <CategoryIcon name={getCategoryIcon(task.category.name)} className="h-3 w-3" strokeWidth={2.5} />
+            {getCategoryDisplayName(task.category.name)}
           </span>
 
           {/* Urgent / Emergency badge */}

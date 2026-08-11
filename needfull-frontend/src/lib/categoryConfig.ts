@@ -6,8 +6,15 @@ export type TaskMode = "onsite" | "collection_return" | "meetup" | "remote";
 export interface CategoryConfig {
   key: string;
   displayName: string;
+  /** Compact label for space-constrained surfaces (chips, filters) */
+  shortName: string;
+  /** Lucide icon NAME — render via <CategoryIcon name={...} /> */
   icon: string;
+  /** Category colour CSS variable (see globals.css --nf-cat-*) */
+  colorVar: string;
   description: string;
+  /** Search synonyms — typed queries that should surface this category */
+  keywords: string[];
   /** Budget config */
   budget: {
     min: number;
@@ -35,8 +42,11 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   laundry: {
     key: "laundry",
     displayName: "Laundry & Washing",
-    icon: "🧺",
-    description: "Wash, dry, iron, and fold clothes or other fabrics",
+    shortName: "Laundry",
+    icon: "Shirt",
+    colorVar: "var(--nf-cat-laundry)",
+    description: "Wash, dry, iron and care for clothes.",
+    keywords: ["laundry", "wash", "washing", "iron", "fold", "dry", "clothes"],
     budget: { min: 200, max: 5000, step: 100, suggestions: [500, 800, 1200], fairRange: { min: 500, max: 999 }, excellentRange: { min: 1000, max: 5000 } },
     needsDualLocation: true,
     allowedModes: ["onsite", "collection_return"],
@@ -47,9 +57,12 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   },
   delivery: {
     key: "delivery",
-    displayName: "Delivery & Errands",
-    icon: "🛵",
-    description: "Deliver items, run errands, pick up packages",
+    displayName: "Delivery & Pickup",
+    shortName: "Delivery",
+    icon: "Truck",
+    colorVar: "var(--nf-cat-delivery)",
+    description: "Deliver packages, documents and items.",
+    keywords: ["delivery", "deliver", "pickup", "package", "parcel", "document", "courier", "dispatch"],
     budget: { min: 300, max: 8000, step: 100, suggestions: [500, 1000, 2000], fairRange: { min: 800, max: 1499 }, excellentRange: { min: 1500, max: 8000 } },
     needsDualLocation: true,
     allowedModes: ["onsite", "collection_return"],
@@ -60,9 +73,12 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   },
   cleaning: {
     key: "cleaning",
-    displayName: "Cleaning",
-    icon: "🧹",
-    description: "Clean rooms, apartments, or shared spaces",
+    displayName: "Home Cleaning",
+    shortName: "Home Cleaning",
+    icon: "Home",
+    colorVar: "var(--nf-cat-cleaning)",
+    description: "Clean rooms, homes and other spaces.",
+    keywords: ["cleaning", "clean", "room", "house", "apartment", "tidy", "sweep", "mop"],
     budget: { min: 500, max: 15000, step: 100, suggestions: [1000, 2000, 3500], fairRange: { min: 1500, max: 2999 }, excellentRange: { min: 3000, max: 15000 } },
     needsDualLocation: false,
     allowedModes: ["onsite", "collection_return"],
@@ -73,9 +89,12 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   },
   printing: {
     key: "printing",
-    displayName: "Printing & Binding",
-    icon: "🖨",
-    description: "Print documents, spiral bind, photocopy",
+    displayName: "Printing & Documents",
+    shortName: "Printing",
+    icon: "Printer",
+    colorVar: "var(--nf-cat-printing)",
+    description: "Print, scan, photocopy and bind documents.",
+    keywords: ["printing", "print", "scan", "scanner", "photocopy", "bind", "binding", "copy", "document"],
     budget: { min: 100, max: 3000, step: 50, suggestions: [300, 700, 1500], fairRange: { min: 500, max: 999 }, excellentRange: { min: 1000, max: 3000 } },
     needsDualLocation: true,
     allowedModes: ["onsite", "collection_return"],
@@ -86,9 +105,12 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   },
   food: {
     key: "food",
-    displayName: "Food Runs",
-    icon: "🍔",
-    description: "Order or pick up food, groceries, snacks",
+    displayName: "Food & Grocery",
+    shortName: "Food & Grocery",
+    icon: "ShoppingBasket",
+    colorVar: "var(--nf-cat-food)",
+    description: "Get food and groceries delivered.",
+    keywords: ["food", "grocery", "groceries", "snacks", "meal", "buy food", "pick up"],
     budget: { min: 300, max: 5000, step: 100, suggestions: [500, 1000, 2000], fairRange: { min: 800, max: 1499 }, excellentRange: { min: 1500, max: 5000 } },
     needsDualLocation: true,
     allowedModes: ["onsite", "collection_return"],
@@ -99,9 +121,12 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   },
   shopping: {
     key: "shopping",
-    displayName: "Shopping",
-    icon: "🛒",
-    description: "Buy groceries, supplies, or other items",
+    displayName: "Shopping & Errands",
+    shortName: "Shopping",
+    icon: "ShoppingCart",
+    colorVar: "var(--nf-cat-shopping)",
+    description: "Get someone to shop or run errands.",
+    keywords: ["shopping", "buy", "purchase", "errand", "errands", "supplies", "supermarket", "toiletries"],
     budget: { min: 300, max: 10000, step: 100, suggestions: [800, 1500, 2500], fairRange: { min: 1000, max: 1999 }, excellentRange: { min: 2000, max: 10000 } },
     needsDualLocation: true,
     allowedModes: ["onsite", "collection_return"],
@@ -113,8 +138,11 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
     techsupport: {
     key: "techsupport",
     displayName: "Tech Support",
-    icon: "💻",
-    description: "Fix computers, phones, software issues",
+    shortName: "Tech Support",
+    icon: "Laptop",
+    colorVar: "var(--nf-cat-techsupport)",
+    description: "Get help with devices, software and technology.",
+    keywords: ["tech", "technology", "computer", "laptop", "phone", "software", "devices", "internet", "virus"],
     budget: { min: 500, max: 15000, step: 100, suggestions: [2000, 5000, 10000], fairRange: { min: 3000, max: 7999 }, excellentRange: { min: 8000, max: 15000 } },
     needsDualLocation: false,
     allowedModes: ["onsite", "remote"],
@@ -125,9 +153,12 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   },
   design: {
     key: "design",
-    displayName: "Graphic Design",
-    icon: "🎨",
-    description: "Design flyers, logos, banners, social media graphics",
+    displayName: "Design & Creative",
+    shortName: "Design",
+    icon: "Palette",
+    colorVar: "var(--nf-cat-design)",
+    description: "Logos, graphics, posters and creative work.",
+    keywords: ["design", "graphic", "flyer", "logo", "banner", "creative", "poster", "canva"],
     budget: { min: 500, max: 15000, step: 100, suggestions: [2000, 5000, 10000], fairRange: { min: 3000, max: 7999 }, excellentRange: { min: 8000, max: 15000 } },
     needsDualLocation: false,
     allowedModes: ["remote"],
@@ -139,8 +170,11 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   photography: {
     key: "photography",
     displayName: "Photography",
-    icon: "📷",
-    description: "Event photography, portraits, product photos",
+    shortName: "Photography",
+    icon: "Camera",
+    colorVar: "var(--nf-cat-photography)",
+    description: "Event photography, portraits, product photos.",
+    keywords: ["photography", "photo", "pictures", "event", "portrait", "camera", "shoot"],
     budget: { min: 500, max: 15000, step: 100, suggestions: [3000, 7000, 12000], fairRange: { min: 3000, max: 7999 }, excellentRange: { min: 8000, max: 15000 } },
     needsDualLocation: false,
     allowedModes: ["onsite", "remote"],
@@ -152,8 +186,11 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   repairs: {
     key: "repairs",
     displayName: "Repairs & Maintenance",
-    icon: "🛠",
-    description: "Fix appliances, furniture, plumbing, electrical",
+    shortName: "Repairs",
+    icon: "Wrench",
+    colorVar: "var(--nf-cat-repairs)",
+    description: "Fix appliances, furniture, plumbing, electrical.",
+    keywords: ["repair", "repairs", "maintenance", "fix", "appliance", "plumbing", "electrical", "handyman"],
     budget: { min: 500, max: 15000, step: 100, suggestions: [2000, 5000, 10000], fairRange: { min: 2000, max: 4999 }, excellentRange: { min: 5000, max: 15000 } },
     needsDualLocation: false,
     allowedModes: ["onsite", "collection_return"],
@@ -164,9 +201,12 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   },
   moving: {
     key: "moving",
-    displayName: "Moving Help",
-    icon: "📦",
-    description: "Help move luggage, furniture, or belongings",
+    displayName: "Furniture & Item Moving",
+    shortName: "Item Moving",
+    icon: "Package",
+    colorVar: "var(--nf-cat-moving)",
+    description: "Move belongings, furniture and other items.",
+    keywords: ["moving", "move", "relocation", "relocate", "luggage", "furniture", "boxes", "carry"],
     budget: { min: 500, max: 15000, step: 100, suggestions: [2000, 5000, 10000], fairRange: { min: 2000, max: 4999 }, excellentRange: { min: 5000, max: 15000 } },
     needsDualLocation: true,
     allowedModes: ["onsite", "collection_return"],
@@ -177,9 +217,12 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   },
   academic: {
     key: "academic",
-    displayName: "Academic Assistance",
-    icon: "📚",
-    description: "Research, writing, proofreading, tutoring",
+    displayName: "Tutoring & Academic",
+    shortName: "Tutoring",
+    icon: "GraduationCap",
+    colorVar: "var(--nf-cat-academic)",
+    description: "Tutoring, assignments and study assistance.",
+    keywords: ["academic", "assignment", "tutor", "tutoring", "research", "study", "proofread", "writing", "homework"],
     budget: { min: 500, max: 10000, step: 100, suggestions: [1000, 2500, 5000], fairRange: { min: 1500, max: 2999 }, excellentRange: { min: 3000, max: 10000 } },
     needsDualLocation: false,
     allowedModes: ["remote", "meetup"],
@@ -191,8 +234,11 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   other: {
     key: "other",
     displayName: "Other / Custom",
-    icon: "✨",
-    description: "Something else not listed above",
+    shortName: "Other",
+    icon: "Sparkles",
+    colorVar: "var(--nf-cat-other)",
+    description: "Something else? Create a task that doesn't fit a category.",
+    keywords: ["other", "custom", "misc", "anything", "everything", "general"],
     budget: { min: 200, max: 10000, step: 100, suggestions: [500, 1500, 3000], fairRange: { min: 1000, max: 2999 }, excellentRange: { min: 3000, max: 10000 } },
     needsDualLocation: false,
     allowedModes: ["onsite", "collection_return", "meetup", "remote"],
@@ -204,33 +250,52 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
 };
 
 // WHAT: Map API category names to config keys
-// WHY: DB category names may differ from our canonical keys
+// WHY: DB category names may differ from our canonical keys — include both
+//      legacy DB values and the current canonical names for forward compat
 const API_NAME_TO_KEY: Record<string, string> = {
   "Laundry": "laundry",
   "Laundry & Washing": "laundry",
   "Delivery": "delivery",
   "Delivery & Errands": "delivery",
+  "Delivery & Pickup": "delivery",
   "Cleaning": "cleaning",
+  "Home & Room Cleaning": "cleaning",
+  "Home Cleaning": "cleaning",
   "Printing": "printing",
   "Printing & Binding": "printing",
+  "Printing & Documents": "printing",
   "Food": "food",
   "Food Delivery": "food",
   "Food Runs": "food",
+  "Food & Grocery Run": "food",
+  "Food & Grocery": "food",
+  "Food & Grocery Runs": "food",
   "Shopping": "shopping",
+  "Shopping & Errands": "shopping",
   "Tech": "techsupport",
   "Tech Support": "techsupport",
+  "Tech Help": "techsupport",
+  "Tech Help & Support": "techsupport",
   "Design": "design",
   "Graphic Design": "design",
+  "Design & Creative": "design",
   "Photography": "photography",
   "Repairs": "repairs",
   "Repairs & Maintenance": "repairs",
   "Moving": "moving",
   "Moving Help": "moving",
+  "Item Moving": "moving",
+  "Item Moving & Relocation": "moving",
+  "Item & Furniture Moving": "moving",
+  "Furniture & Item Moving": "moving",
   "Assignment": "academic",
   "Assignment Help": "academic",
   "Academic": "academic",
   "Academic Assistance": "academic",
+  "Academic Help": "academic",
   "Tutoring": "academic",
+  "Tutoring & Academic": "academic",
+  "Academic Help & Tutoring": "academic",
   "Handyman": "repairs",
   "Event": "other",
   "Other": "other",
@@ -247,13 +312,41 @@ export function getCategoryDisplayName(dbName: string): string {
   return config.displayName;
 }
 
+export function getCategoryShortName(dbName: string): string {
+  const config = getCategoryConfig(dbName);
+  return config.shortName;
+}
+
 export function getCategoryIcon(dbName: string): string {
   const config = getCategoryConfig(dbName);
   return config.icon;
 }
 
+// WHAT: Category colour CSS variable for a category name/key
+// WHY: One colour per category, defined once in globals.css (--nf-cat-*),
+//      reused with inline styles so every surface stays in sync
+export function getCategoryColor(dbName: string): string {
+  const config = getCategoryConfig(dbName);
+  return config.colorVar;
+}
+
 export function getCategoryConfigs(): CategoryConfig[] {
   return Object.values(CATEGORY_CONFIGS);
+}
+
+// WHAT: Search categories by query text
+// WHY: Match against display name, short name, description, and keywords so
+//      "move", "furniture", "photocopy" or "iron clothes" all resolve correctly
+export function searchCategoryConfigs(query: string): CategoryConfig[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return getCategoryConfigs();
+  return getCategoryConfigs().filter(
+    (c) =>
+      c.displayName.toLowerCase().includes(q) ||
+      c.shortName.toLowerCase().includes(q) ||
+      c.description.toLowerCase().includes(q) ||
+      c.keywords.some((k) => k.toLowerCase().includes(q)),
+  );
 }
 
 // WHAT: Get recent categories from localStorage

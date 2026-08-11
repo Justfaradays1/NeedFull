@@ -3,12 +3,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { Search, Clock } from "lucide-react";
 import { CategoryCard } from "./CategoryCard";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import {
   getCategoryConfigs,
   getCategoryConfig,
   getRecentlyUsedCategories,
   addRecentlyUsedCategory,
-  type CategoryConfig,
 } from "@/lib/categoryConfig";
 
 interface CategorySelectionStepProps {
@@ -26,21 +26,42 @@ export function CategorySelectionStep({
   const [recentNames, setRecentNames] = useState<string[]>([]);
 
   useEffect(() => {
-    setRecentNames(getRecentlyUsedCategories());
+    const t = setTimeout(() => setRecentNames(getRecentlyUsedCategories()), 0);
+    return () => clearTimeout(t);
   }, []);
 
   // WHAT: Build full category data by merging API categories with our config
+  // WHY:  Collapse DB rows that resolve to the same canonical key (legacy rows
+  //       must never render as duplicate "Other / Custom" tiles) and order by
+  //       canonical config order so every surface shows the same 13 categories.
   const enrichedCategories = useMemo(() => {
-    return allCategories.map((cat) => {
+    const byKey = new Map<string, {
+      id: string;
+      key: string;
+      name: string;
+      displayName: string;
+      icon: string;
+      colorVar: string;
+      description: string;
+    }>();
+    for (const cat of allCategories) {
       const config = getCategoryConfig(cat.name);
-      return {
-        id: cat.id,
-        name: cat.name,
-        displayName: config.displayName,
-        icon: config.icon,
-        description: config.description,
-      };
-    });
+      if (!byKey.has(config.key)) {
+        byKey.set(config.key, {
+          id: cat.id,
+          key: config.key,
+          name: cat.name,
+          displayName: config.displayName,
+          icon: config.icon,
+          colorVar: config.colorVar,
+          description: config.description,
+        });
+      }
+    }
+    const order = new Map(getCategoryConfigs().map((c, i) => [c.key, i]));
+    return [...byKey.values()].sort(
+      (a, b) => (order.get(a.key) ?? 999) - (order.get(b.key) ?? 999),
+    );
   }, [allCategories]);
 
   // WHAT: Filter by search
@@ -115,7 +136,12 @@ export function CategorySelectionStep({
                     : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
                 }`}
               >
-                <span>{cat.icon}</span>
+                <span
+                  className="flex h-4 w-4 items-center justify-center rounded text-white"
+                  style={{ backgroundColor: cat.colorVar }}
+                >
+                  <CategoryIcon name={cat.icon} className="h-2.5 w-2.5" />
+                </span>
                 <span>{cat.displayName}</span>
               </button>
             ))}
@@ -130,6 +156,7 @@ export function CategorySelectionStep({
             <CategoryCard
               key={cat.id}
               icon={cat.icon}
+              colorVar={cat.colorVar}
               name={cat.displayName}
               description={cat.description}
               selected={selectedCategoryId === cat.id}

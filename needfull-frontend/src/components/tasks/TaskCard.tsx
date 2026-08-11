@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { type TaskItem, type WorkMode } from "@/types/task";
 import { formatCurrency, timeAgo, formatDistance } from "@/lib/format";
+import { getCategoryDisplayName, getCategoryColor, getCategoryIcon } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { Avatar } from "@/components/ui/avatar";
 
 interface TaskCardProps {
@@ -59,14 +61,22 @@ export default function TaskCard({ task, featured = false }: TaskCardProps) {
         <div className="min-w-0 flex-1">
           {/* Badges: category, work mode, urgent, new */}
           <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
-            {task.category?.icon && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-lg bg-brand-light text-xs">
-                {task.category.icon}
-              </span>
+            {task.category?.name && (
+              <>
+                <span
+                  className="flex h-5 w-5 items-center justify-center rounded-lg text-white"
+                  style={{ backgroundColor: getCategoryColor(task.category.name) }}
+                >
+                  <CategoryIcon name={getCategoryIcon(task.category.name)} className="h-3 w-3" strokeWidth={2.5} />
+                </span>
+                <span
+                  className="rounded-full px-2 py-0.5 text-[9px] font-semibold text-white"
+                  style={{ backgroundColor: getCategoryColor(task.category.name) }}
+                >
+                  {getCategoryDisplayName(task.category.name)}
+                </span>
+              </>
             )}
-            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-semibold text-amber-700">
-              {task.category?.name || "General"}
-            </span>
             <WorkModeBadge mode={task.workMode} locationLabel={task.locationLabel} />
             {task.isUrgent && (
               <span className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-bold text-red-700">

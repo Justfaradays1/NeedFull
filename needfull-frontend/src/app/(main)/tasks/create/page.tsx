@@ -25,6 +25,8 @@ import { TaskDetailsStep } from "@/components/tasks/create/TaskDetailsStep";
 import { CelebrationModal } from "@/components/ui/celebration-modal";
 import { useCelebration } from "@/hooks/useCelebration";
 import type { TaskMode } from "@/lib/categoryConfig";
+import { getCategoryConfig, getCategoryColor, getCategoryIcon, getCategoryDisplayName } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 
 interface Category {
   id: string;
@@ -83,12 +85,30 @@ export default function CreateTaskPage() {
     setCatLoading(true);
     get<Category[] | { success: boolean; data: Category[] }>("/categories")
       .then((res) => {
-        if (Array.isArray(res)) setCategories(res);
-        else if (res?.success && Array.isArray(res.data)) setCategories(res.data);
+        const list = Array.isArray(res) ? res : res?.success && Array.isArray(res.data) ? res.data : [];
+        setCategories(list);
+
+        // WHAT: Honor ?category=<name> deep-link (dashboard rail, categories page)
+        // WHY:  Display names from config may differ from DB slugs; resolve by
+        //       canonical display name, short name, or raw DB name.
+        const q = searchParams.get("category");
+        if (q && list.length) {
+          const target = q.trim().toLowerCase();
+          const match = list.find(
+            (c) =>
+              c.name.toLowerCase() === target ||
+              getCategoryConfig(c.name).displayName.toLowerCase() === target ||
+              getCategoryConfig(c.name).shortName.toLowerCase() === target,
+          );
+          if (match) {
+            setCategoryId(match.id);
+            setCategoryName(match.name);
+          }
+        }
       })
       .catch(() => {})
       .finally(() => setCatLoading(false));
-  }, [user]);
+  }, [user, searchParams]);
 
   const selectedCategory = categories.find((c) => c.id === categoryId);
   const budgetNum = budgetStepData?.budgetNaira ?? 0;
@@ -289,8 +309,12 @@ export default function CreateTaskPage() {
               <div className="space-y-4 rounded-2xl border border-card-border bg-surface p-4 shadow-card">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">Category</span>
-                  <span className="inline-flex items-center gap-1 rounded-md bg-brand-light px-2 py-0.5 text-xs font-semibold text-brand">
-                    {selectedCategory.icon} {selectedCategory.name}
+                  <span
+                    className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold text-white"
+                    style={{ backgroundColor: getCategoryColor(selectedCategory.name) }}
+                  >
+                    <CategoryIcon name={getCategoryIcon(selectedCategory.name)} className="h-3 w-3" strokeWidth={2.5} />
+                    {getCategoryDisplayName(selectedCategory.name)}
                   </span>
                 </div>
                 <hr className="border-gray-100" />

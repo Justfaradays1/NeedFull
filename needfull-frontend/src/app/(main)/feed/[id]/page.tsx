@@ -30,6 +30,8 @@ import toast from "react-hot-toast";
 import { useAuthInit, useIsAuthenticated, useAuthUser } from "@/store";
 import apiClient, { get } from "@/lib/apiClient";
 import { formatCurrency } from "@/lib/format";
+import { getCategoryDisplayName, getCategoryColor, getCategoryIcon } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { EscrowStatusCard } from "@/components/tasks/EscrowStatusCard";
 import { CelebrationModal } from "@/components/ui/celebration-modal";
 import { useCelebration } from "@/hooks/useCelebration";
@@ -362,8 +364,12 @@ export default function TaskDetailPage() {
                     URGENT
                   </span>
                 )}
-                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">
-                  {task.category.name}
+                <span
+                  className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-white"
+                  style={{ backgroundColor: getCategoryColor(task.category.name) }}
+                >
+                  <CategoryIcon name={getCategoryIcon(task.category.name)} className="h-3 w-3" strokeWidth={2.5} />
+                  {getCategoryDisplayName(task.category.name)}
                 </span>
               </div>
 

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { Plus, ChevronRight } from "lucide-react";
+import { getCategoryColor, getCategoryIcon } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 
 interface ActiveTask {
   id: string;
@@ -80,8 +82,11 @@ export function ActiveTasksSection({ tasks, loading }: ActiveTasksSectionProps) 
               href={`/tasks/${task.id}`}
               className="flex items-center gap-3 rounded-xl border border-card-border bg-surface p-3 shadow-sm transition-all hover:border-brand/20 hover:shadow-md active:scale-[0.99]"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-light text-base">
-                {task.category?.icon || "📋"}
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white"
+                style={{ backgroundColor: getCategoryColor(task.category?.name ?? "other") }}
+              >
+                <CategoryIcon name={getCategoryIcon(task.category?.name ?? "other")} className="h-4 w-4" />
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold text-gray-900 dark:text-white">

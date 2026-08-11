@@ -22,6 +22,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { patch } from "@/lib/apiClient";
+import { getCategoryDisplayName } from "@/lib/categoryConfig";
 import { useAuthUser } from "@/store";
 import toast from "react-hot-toast";
 
@@ -312,7 +313,7 @@ export function StartEarningModal({
                     }`}
                   >
                     {selected.includes(c.id) ? "✓ " : ""}
-                    {c.name}
+                    {getCategoryDisplayName(c.name)}
                   </button>
                 ))}
                 {categories.length === 0 && (

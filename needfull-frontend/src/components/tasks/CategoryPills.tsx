@@ -1,6 +1,7 @@
 "use client";
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { getCategoryDisplayName } from "@/lib/categoryConfig";
 
 interface CategoryPillsProps {
   categories: { id: string; name: string }[];
@@ -32,7 +33,7 @@ export function CategoryPills({ categories, selectedId, onSelect }: CategoryPill
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
-            {category.name}
+            {getCategoryDisplayName(category.name)}
           </button>
         ))}
       </div>

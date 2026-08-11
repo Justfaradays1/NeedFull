@@ -2,13 +2,17 @@
 
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { TASK_CATEGORIES } from "@/components/dashboard/post/CategorySearch";
+import { getCategoryConfigs } from "@/lib/categoryConfig";
+import { CategoryTile } from "@/components/ui/CategoryTile";
 
 // WHAT: Home "Browse Categories" — one horizontal rail on mobile (touch scroll,
 //       no wrap), a compact wrapped row on md+. "View all" opens /categories.
 // WHY:  Categories are discovery controls: the rail previews them, the
-//       dedicated page holds the complete experience.
+//       dedicated page holds the complete experience. Data + tile come from
+//       the single shared source (lib/categoryConfig.ts + CategoryTile).
 export function BrowseCategories() {
+  const categories = getCategoryConfigs().filter((c) => c.key !== "other");
+
   return (
     <section aria-label="Browse categories">
       <div className="flex items-center justify-between gap-2">
@@ -27,24 +31,14 @@ export function BrowseCategories() {
       </p>
 
       {/* Rail: mobile = single horizontal scroll line with partial peek on the
-          right; md+ = wrapped compact row (no huge grid). */}
+          right; md+ = wrapped compact row. Same tiles as /categories. */}
       <div className="scrollbar-hide -mr-4 mt-3 flex gap-2 overflow-x-auto pb-1 pr-4 md:-mr-0 md:flex-wrap md:overflow-visible md:pr-0">
-        {TASK_CATEGORIES.map((cat) => (
-          <Link
-            key={cat.name}
-            href={`/tasks/create?category=${encodeURIComponent(cat.name)}`}
-            className="flex w-[4.5rem] shrink-0 flex-col items-center gap-1.5 rounded-xl border border-card-border bg-surface px-1 py-2.5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-md active:scale-[0.97] md:w-20"
-          >
-            <span
-              className="flex h-9 w-9 items-center justify-center rounded-full text-lg"
-              style={{ background: cat.color }}
-            >
-              {cat.icon}
-            </span>
-            <span className="truncate text-[10px] font-semibold text-gray-700 dark:text-white">
-              {cat.name}
-            </span>
-          </Link>
+        {categories.map((cat) => (
+          <CategoryTile
+            key={cat.key}
+            category={cat}
+            className="w-40 shrink-0 md:w-auto md:flex-1 md:min-w-[9.5rem]"
+          />
         ))}
       </div>
     </section>

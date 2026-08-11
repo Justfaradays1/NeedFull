@@ -15,6 +15,8 @@ import {
   UsersRound,
 } from "lucide-react";
 import { get } from "@/lib/apiClient";
+import { getCategoryDisplayName, getCategoryColor, getCategoryIcon } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { useAuthStore } from "@/store";
 import { HelperCard } from "@/components/helpers/HelperCard";
 import { HelperOffer } from "@/components/helpers/types";
@@ -156,7 +158,7 @@ export default function HelpersPage() {
           </span>
           <div>
             <h1 className="font-display text-base font-bold text-gray-900">
-              Available Helpers
+              Available Runners
             </h1>
             <p className="text-[10px] text-gray-500">
               Runners offering services right now
@@ -172,7 +174,7 @@ export default function HelpersPage() {
             <input
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Search helpers, services, or notes…"
+            placeholder="Search runners, services, or notes…"
             className="w-full rounded-xl border border-card-border bg-surface py-2.5 pl-9 pr-3 text-sm placeholder:text-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
         </div>
@@ -195,12 +197,17 @@ export default function HelpersPage() {
               onClick={() => setCategoryId(categoryId === c.id ? "" : c.id)}
               className={`tap-target flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-bold transition-colors ${
                 categoryId === c.id
-                  ? "bg-brand text-on-brand"
+                  ? "text-on-brand"
                   : "border border-card-border bg-surface text-gray-600"
               }`}
+              style={categoryId === c.id ? { backgroundColor: getCategoryColor(c.name) } : undefined}
             >
-              <span>{c.icon}</span>
-              {c.name}
+              <CategoryIcon
+                name={getCategoryIcon(c.name)}
+                className="h-3 w-3"
+                style={{ color: categoryId === c.id ? "#ffffff" : getCategoryColor(c.name) }}
+              />
+              {getCategoryDisplayName(c.name)}
             </button>
           ))}
         </div>
@@ -290,7 +297,7 @@ export default function HelpersPage() {
         ) : error ? (
           <div className="py-12 text-center">
             <p className="text-sm font-bold text-gray-800">
-              Couldn&apos;t load helpers
+              Couldn&apos;t load runners
             </p>
             <button
               onClick={fetchOffers}
@@ -303,7 +310,7 @@ export default function HelpersPage() {
           <div className="py-14 text-center">
             <UsersRound className="mx-auto h-8 w-8 text-gray-300" />
             <p className="mt-3 text-sm font-bold text-gray-800">
-              No helpers match your filters
+              No runners match your filters
             </p>
             <p className="mx-auto mt-1 max-w-xs text-[11px] leading-relaxed text-gray-500">
               Try widening the distance or clearing a filter. Or post your task

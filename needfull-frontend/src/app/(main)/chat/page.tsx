@@ -14,6 +14,8 @@ import {
   SendHorizontal,
 } from "lucide-react";
 import { get } from "@/lib/apiClient";
+import { getCategoryConfigs, getCategoryDisplayName } from "@/lib/categoryConfig";
+import { CategoryTile } from "@/components/ui/CategoryTile";
 import { Avatar } from "@/components/ui/avatar";
 import { ChatListSkeleton } from "@/components/ui/skeletons/ChatListSkeleton";
 
@@ -93,17 +95,10 @@ function TaskSkeleton() {
   );
 }
 
-const CATEGORIES = [
-  { name: "Laundry & Washing", icon: "🧺", desc: "Wash, dry, iron, fold" },
-  { name: "Delivery & Errands", icon: "🛵", desc: "Deliver items, run errands" },
-  { name: "Cleaning", icon: "🧹", desc: "Clean rooms and spaces" },
-  { name: "Printing & Binding", icon: "🖨", desc: "Print, bind, photocopy" },
-  { name: "Shopping", icon: "🛒", desc: "Buy groceries, supplies" },
-  { name: "Food Runs", icon: "🍔", desc: "Food and snack delivery" },
-  { name: "Tech Support", icon: "💻", desc: "Fix computers, software" },
-  { name: "Graphic Design", icon: "🎨", desc: "Flyers, logos, banners" },
-  { name: "Academic Assistance", icon: "📚", desc: "Research, writing, tutoring" },
-];
+// WHAT: Popular categories for the chat empty state — canonical config
+// WHY: Single source of truth (lib/categoryConfig.ts); no drift from the
+//      dashboard or category page
+const CATEGORIES = getCategoryConfigs().filter((c) => c.key !== "other");
 
 function EmptyIllustration() {
   return (
@@ -344,7 +339,7 @@ export default function ChatPage() {
                           </span>
                         )}
                         <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[9px] font-medium text-gray-600">
-                          {task.category?.name || "General"}
+                          {task.category?.name ? getCategoryDisplayName(task.category.name) : "General"}
                         </span>
                       </div>
                       <p className="text-sm font-bold text-gray-900 line-clamp-2 leading-snug">
@@ -371,22 +366,8 @@ export default function ChatPage() {
                 Popular Categories
               </div>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                {CATEGORIES.map((cat, i) => (
-                  <Link
-                    key={i}
-                    href="/tasks"
-                    className="tap-target flex flex-col items-center gap-1.5 rounded-xl border border-card-border bg-surface px-3 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-md active:scale-[0.97]"
-                  >
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-light text-base">
-                      {cat.icon}
-                    </div>
-                    <span className="text-[11px] font-bold text-gray-900 text-center leading-tight">
-                      {cat.name}
-                    </span>
-                    <span className="text-[9px] text-gray-500 text-center leading-tight">
-                      {cat.desc}
-                    </span>
-                  </Link>
+                {CATEGORIES.map((cat) => (
+                  <CategoryTile key={cat.key} category={cat} />
                 ))}
               </div>
             </section>

@@ -10,6 +10,8 @@ import {
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store";
 import { get, post } from "@/lib/apiClient";
+import { getCategoryDisplayName, getCategoryColor, getCategoryIcon } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { useAuthInit } from "@/hooks/useAuthInit";
 import { ProgressSteps } from "@/components/ui/progress-steps";
 import PurchaseBudgetCard from "@/components/tasks/PurchaseBudgetCard";
@@ -210,7 +212,7 @@ export default function CreatePurchaseTaskPage() {
                 ) : (
                   <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
                     {categories.map((cat) => {
-                      const name = cat.name.charAt(0).toUpperCase() + cat.name.slice(1);
+                      const name = getCategoryDisplayName(cat.name);
                       return (
                         <button
                           key={cat.id}
@@ -222,7 +224,11 @@ export default function CreatePurchaseTaskPage() {
                               : "border-card-border bg-surface text-gray-600 hover:border-gray-400"
                           }`}
                         >
-                          <span className="text-base">{cat.icon}</span>
+                          <CategoryIcon
+                            name={getCategoryIcon(cat.name)}
+                            className="h-4 w-4"
+                            style={{ color: getCategoryColor(cat.name) }}
+                          />
                           <span>{name}</span>
                         </button>
                       );
@@ -399,8 +405,14 @@ export default function CreatePurchaseTaskPage() {
               <div className="space-y-4 rounded-2xl border border-card-border bg-surface p-4 shadow-card">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">Category</span>
-                  <span className="inline-flex items-center gap-1 rounded-md bg-brand-light px-2 py-0.5 text-xs font-semibold text-brand">
-                    {selectedCategory?.icon} {selectedCategory?.name}
+                  <span
+                    className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold text-white"
+                    style={{ backgroundColor: getCategoryColor(selectedCategory?.name ?? "other") }}
+                  >
+                    <CategoryIcon name={getCategoryIcon(selectedCategory?.name ?? "other")} className="h-3 w-3" strokeWidth={2.5} />
+                    {selectedCategory
+                      ? getCategoryDisplayName(selectedCategory.name)
+                      : "Select a category"}
                   </span>
                 </div>
                 <hr className="border-gray-100" />

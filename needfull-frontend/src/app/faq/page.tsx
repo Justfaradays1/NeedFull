@@ -5,7 +5,7 @@ import { FloatingSupportButton } from "@/components/ui/FloatingSupportButton";
 
 export const metadata: Metadata = {
   title: "Frequently Asked Questions — NeedFull Help Center",
-  description: "Find answers to common questions about NeedFull, posting tasks, payments, trust & safety, and becoming a student helper.",
+  description: "Find answers to common questions about NeedFull, posting tasks, payments, trust & safety, and becoming a student runner.",
 };
 
 export default function FaqPage() {

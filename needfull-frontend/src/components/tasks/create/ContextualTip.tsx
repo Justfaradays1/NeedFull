@@ -4,30 +4,34 @@
 //       chosen. Replaces the removed generic Home "Insights" wall with a
 //       relevant, in-context nudge.
 // WHY:  Insights are more useful where the user is acting, not parked on Home.
+// NOTE: Tips key on canonical category KEY (categoryConfig.ts), resolved from
+//       the API's DB name — so renamed labels never break the tip lookup.
 
 import { Lightbulb } from "lucide-react";
+import { getCategoryConfig } from "@/lib/categoryConfig";
 
 const TIPS: Record<string, string> = {
-  Printing:
+  printing:
     "Printing tasks posted before 5 PM usually receive faster responses.",
-  Laundry:
+  laundry:
     "Mention pickup and delivery in your description — it gets more applications.",
-  Delivery:
+  delivery:
     "Adding your hostel or hall name helps nearby runners say yes faster.",
-  Academics:
+  academic:
     "Include your course code and deadline — tutors respond to specifics.",
-  Tech:
+  techsupport:
     "List the exact device or software — it saves back-and-forth messages.",
-  Cleaning:
+  cleaning:
     "Runners prefer tasks with a rough time estimate. Keep it realistic.",
-  Shopping:
+  shopping:
     "Name the item and budget in the description to get accurate offers.",
-  "Food Runs":
+  food:
     "Runners pick food tasks fastest during lunch and dinner hours.",
 };
 
 export function ContextualTip({ categoryName }: { categoryName: string }) {
-  const tip = categoryName ? TIPS[categoryName] ?? null : null;
+  const config = categoryName ? getCategoryConfig(categoryName) : null;
+  const tip = config ? TIPS[config.key] ?? null : null;
   if (!tip) return null;
 
   return (

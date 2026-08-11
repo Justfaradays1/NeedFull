@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { get, post, patch } from "@/lib/apiClient";
+import { getCategoryDisplayName, getCategoryColor, getCategoryIcon } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { useAuthInit, useIsAuthenticated } from "@/store";
 
 interface Category {
@@ -231,12 +233,17 @@ export default function AvailabilityPage() {
                     onClick={() => setCategoryId(c.id)}
                     className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
                       categoryId === c.id
-                        ? "bg-brand text-white shadow-sm"
+                        ? "text-white shadow-sm"
                         : "border border-card-border bg-gray-50 text-gray-700"
                     }`}
+                    style={categoryId === c.id ? { backgroundColor: getCategoryColor(c.name) } : undefined}
                   >
-                    {c.icon && <span>{c.icon}</span>}
-                    {c.name}
+                    <CategoryIcon
+                      name={getCategoryIcon(c.name)}
+                      className="h-3.5 w-3.5"
+                      style={{ color: categoryId === c.id ? "#ffffff" : getCategoryColor(c.name) }}
+                    />
+                    {getCategoryDisplayName(c.name)}
                   </button>
                 ))}
               </div>
@@ -386,12 +393,17 @@ export default function AvailabilityPage() {
                   key={offer.id}
                   className="flex items-center gap-3 rounded-2xl border border-card-border bg-surface p-3.5 shadow-sm"
                 >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gold-light text-lg">
-                    {offer.category?.icon || "✨"}
+                  <span
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm"
+                    style={{ backgroundColor: getCategoryColor(offer.category?.name ?? "other") }}
+                  >
+                    <CategoryIcon name={getCategoryIcon(offer.category?.name ?? "other")} className="h-5 w-5" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-1.5 text-sm font-bold text-gray-900">
-                      {offer.category?.name || "Help"}
+                      {offer.category?.name
+                        ? getCategoryDisplayName(offer.category.name)
+                        : "Help"}
                       {offer.isOnlineToday && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-1.5 py-0.5 text-[9px] font-bold text-green-700">
                           <span className="h-1.5 w-1.5 rounded-full bg-green-500" />

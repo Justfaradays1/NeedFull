@@ -31,6 +31,8 @@ import toast from "react-hot-toast";
 import { useAuthInit, useIsAuthenticated, useAuthUser } from "@/store";
 import apiClient from "@/lib/apiClient";
 import { formatCurrency } from "@/lib/format";
+import { getCategoryDisplayName, getCategoryColor, getCategoryIcon } from "@/lib/categoryConfig";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { openTaskChat } from "@/lib/taskChat";
 import { TaskDetailSkeleton } from "@/components/ui/skeletons/TaskDetailSkeleton";
 import { Avatar } from "@/components/ui/avatar";
@@ -250,9 +252,13 @@ export default function TaskActivePage() {
                   URGENT
                 </span>
               )}
-              <span className="rounded-full bg-gray-200 px-3 py-1 text-xs text-gray-600">
-                {task.category.name}
-              </span>
+<span
+                  className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-white"
+                  style={{ backgroundColor: getCategoryColor(task.category.name) }}
+                >
+                  <CategoryIcon name={getCategoryIcon(task.category.name)} className="h-3 w-3" strokeWidth={2.5} />
+                  {getCategoryDisplayName(task.category.name)}
+                </span>
             </div>
 
             <h2 className="font-display text-lg font-bold text-gray-900">
