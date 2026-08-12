@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { Search, Clock } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Loader2, Search, Clock } from "lucide-react";
 import { CategoryCard } from "./CategoryCard";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import {
@@ -15,20 +15,19 @@ interface CategorySelectionStepProps {
   allCategories: { id: string; name: string; icon: string }[];
   selectedCategoryId: string;
   onSelect: (id: string, name: string) => void;
+  loading?: boolean;
 }
 
 export function CategorySelectionStep({
   allCategories,
   selectedCategoryId,
   onSelect,
+  loading = false,
 }: CategorySelectionStepProps) {
   const [search, setSearch] = useState("");
-  const [recentNames, setRecentNames] = useState<string[]>([]);
-
-  useEffect(() => {
-    const t = setTimeout(() => setRecentNames(getRecentlyUsedCategories()), 0);
-    return () => clearTimeout(t);
-  }, []);
+  const [recentNames, setRecentNames] = useState<string[]>(() =>
+    getRecentlyUsedCategories(),
+  );
 
   // WHAT: Build full category data by merging API categories with our config
   // WHY:  Collapse DB rows that resolve to the same canonical key (legacy rows
@@ -116,7 +115,7 @@ export function CategorySelectionStep({
       </div>
 
       {/* Recently Used */}
-      {recentItems.length > 0 && !search && (
+      {!loading && recentItems.length > 0 && !search && (
         <div>
           <div className="mb-3 flex items-center gap-2">
             <Clock className="h-4 w-4 text-gray-400" />
@@ -150,7 +149,11 @@ export function CategorySelectionStep({
       )}
 
       {/* Category Grid */}
-      {filtered.length > 0 ? (
+      {loading ? (
+        <div className="flex min-h-[400px] items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-white sm:min-h-[520px] lg:min-h-[560px]">
+          <Loader2 className="h-5 w-5 animate-spin text-brand" />
+        </div>
+      ) : filtered.length > 0 ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {filtered.map((cat) => (
             <CategoryCard

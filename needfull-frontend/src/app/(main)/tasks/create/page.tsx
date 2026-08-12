@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ChevronLeft,
@@ -81,8 +81,6 @@ export default function CreateTaskPage() {
 
   // Load categories
   useEffect(() => {
-    if (!user) return;
-    setCatLoading(true);
     get<Category[] | { success: boolean; data: Category[] }>("/categories")
       .then((res) => {
         const list = Array.isArray(res) ? res : res?.success && Array.isArray(res.data) ? res.data : [];
@@ -108,7 +106,27 @@ export default function CreateTaskPage() {
       })
       .catch(() => {})
       .finally(() => setCatLoading(false));
-  }, [user, searchParams]);
+  }, [searchParams]);
+
+  // WHAT: Reset the scroll position whenever the active step changes
+  // WHY:  All four steps render in the same page; without a reset, continuing
+  //       from the bottom of a long step leaves the next step's viewport
+  //       starting mid-page. Mobile scrolls the document; desktop scrolls the
+  //       <main> workspace pane — reset whichever container is the active
+  //       scroller (the other reset is a harmless no-op).
+  // NOTE: Runs before paint (useLayoutEffect) so the new step appears at its
+  //       top instantly — no flash of the stale scroll position.
+  const skipScrollReset = useRef(true);
+  useLayoutEffect(() => {
+    if (skipScrollReset.current) {
+      skipScrollReset.current = false;
+      return;
+    }
+    document
+      .querySelector<HTMLElement>("main.workspace-scroll")
+      ?.scrollTo({ top: 0, behavior: "instant" });
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [step]);
 
   const selectedCategory = categories.find((c) => c.id === categoryId);
   const budgetNum = budgetStepData?.budgetNaira ?? 0;
@@ -235,26 +253,24 @@ export default function CreateTaskPage() {
           {/* Step 1: Category Selection */}
           {step === 1 && (
             <div className="space-y-6">
-              {catLoading ? (
-                <div className="flex items-center gap-2 py-8 text-sm text-gray-500">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Loading categories...
-                </div>
-              ) : (
-                <CategorySelectionStep
-                  allCategories={categories}
-                  selectedCategoryId={categoryId}
-                  onSelect={(id) => {
-                    setCategoryId(id);
-                    const cat = categories.find((c) => c.id === id);
-                    if (cat) setCategoryName(cat.name);
-                  }}
-                />
-              )}
+              <CategorySelectionStep
+                allCategories={categories}
+                loading={catLoading}
+                selectedCategoryId={categoryId}
+                onSelect={(id) => {
+                  setCategoryId(id);
+                  const cat = categories.find((c) => c.id === id);
+                  if (cat) setCategoryName(cat.name);
+                }}
+              />
               {errors.categoryId && (
                 <p className="text-xs text-red-500">{errors.categoryId}</p>
               )}
-              <HelperSuggestions categoryId={categoryId} />
+              {categoryId ? (
+                <div className="min-h-[72px]">
+                  <HelperSuggestions categoryId={categoryId} />
+                </div>
+              ) : null}
               <ContextualTip categoryName={categoryName} />
               {/* Next button for Step 1 */}
               <div className="pt-2">
