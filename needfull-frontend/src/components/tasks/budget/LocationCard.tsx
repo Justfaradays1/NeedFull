@@ -29,13 +29,11 @@ export function LocationCard({
 }: LocationCardProps) {
   return (
     <div className="rounded-2xl border-2 border-border-default bg-surface-primary p-4 transition-all duration-200 focus-within:border-brand">
-      <div className="mb-2 flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <MapPin
-          className={`h-4 w-4 ${
-            value ? "text-brand-text" : "text-gray-400"
-          }`}
+          className="h-4 w-4 text-red-600"
         />
-        <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+        <span className="text-xs font-bold uppercase tracking-wider text-gray-900">
           {type === "task" ? "Task Location" : "Completion Location"}
         </span>
       </div>
