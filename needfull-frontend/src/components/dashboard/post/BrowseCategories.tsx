@@ -5,8 +5,8 @@ import { ChevronRight } from "lucide-react";
 import { getCategoryConfigs } from "@/lib/categoryConfig";
 import { CategoryTile } from "@/components/ui/CategoryTile";
 
-// WHAT: Home "Browse Categories" — one horizontal rail on mobile (touch scroll,
-//       no wrap), a compact wrapped row on md+. "View all" opens /categories.
+// WHAT: Home "Popular Categories" — one horizontal rail on mobile (touch scroll,
+//       no wrap), first 4 as a compact row on md+. "View all" opens /categories.
 // WHY:  Categories are discovery controls: the rail previews them, the
 //       dedicated page holds the complete experience. Data + tile come from
 //       the single shared source (lib/categoryConfig.ts + CategoryTile).
@@ -14,10 +14,10 @@ export function BrowseCategories() {
   const categories = getCategoryConfigs().filter((c) => c.key !== "other");
 
   return (
-    <section aria-label="Browse categories">
+    <section aria-label="Popular categories">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-base font-bold text-gray-900 dark:text-white">
-          Browse Categories
+          Popular Categories
         </h2>
         <Link
           href="/categories"
@@ -30,14 +30,16 @@ export function BrowseCategories() {
         Find the right kind of help for your task.
       </p>
 
-      {/* Rail: mobile = single horizontal scroll line with partial peek on the
-          right; md+ = wrapped compact row. Same tiles as /categories. */}
+      {/* Rail: single renderer — mobile = horizontal scroll line (scrollbar
+          hidden), md+ = only the first 4 tiles remain visible in one row. */}
       <div className="scrollbar-hide -mr-4 mt-3 flex gap-2 overflow-x-auto pb-1 pr-4 md:-mr-0 md:flex-wrap md:overflow-visible md:pr-0">
-        {categories.map((cat) => (
+        {categories.slice(0, 12).map((cat, i) => (
           <CategoryTile
             key={cat.key}
             category={cat}
-            className="w-40 shrink-0 md:w-auto md:flex-1 md:min-w-[9.5rem]"
+            className={`w-40 shrink-0 md:w-auto md:flex-1 md:min-w-[9.5rem] ${
+              i >= 4 ? "md:hidden" : ""
+            }`}
           />
         ))}
       </div>
