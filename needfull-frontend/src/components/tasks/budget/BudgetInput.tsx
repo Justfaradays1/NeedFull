@@ -22,7 +22,7 @@ export function BudgetInput({
   return (
     <div className="relative">
       <div className="flex items-center gap-0 rounded-2xl border-2 border-border-default bg-surface-primary px-5 py-4 transition-all duration-200 focus-within:border-brand focus-within:shadow-sm">
-        <span className="text-2xl font-bold text-gray-400">₦</span>
+        <span className="text-2xl font-bold text-brand">₦</span>
         <input
           type="text"
           inputMode="numeric"
