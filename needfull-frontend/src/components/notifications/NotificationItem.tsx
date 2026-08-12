@@ -112,7 +112,7 @@ export function NotificationItem({
 
   return (
     <div
-      className={`relative flex gap-3 p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer ${
+      className={`relative flex gap-3 p-4 border-b border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer ${
         !notification.is_read ? "bg-blue-50" : ""
       }`}
       onMouseDown={handleMouseDown}
@@ -180,7 +180,7 @@ export function NotificationItem({
           {!notification.is_read && (
             <button
               onClick={handleMarkReadClick}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 border-b border-gray-100"
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 border-b border-gray-100"
             >
               <Check className="w-4 h-4" />
               Mark as read

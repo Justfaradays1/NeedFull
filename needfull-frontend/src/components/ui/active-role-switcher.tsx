@@ -41,7 +41,7 @@ export function ActiveRoleSwitcher() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="tap-target flex items-center gap-2 rounded-xl border border-card-border bg-surface px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+        className="tap-target flex items-center gap-2 rounded-xl border border-card-border bg-surface px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-100"
       >
         <Icon className="h-4 w-4 text-brand-text" />
         <span>{meta.label}</span>

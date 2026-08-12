@@ -285,7 +285,7 @@ export default function ChatPage() {
                 </Link>
                 <Link
                   href="/tasks"
-                  className="tap-target inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-surface px-5 py-3 text-sm font-bold text-gray-600 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.97]"
+                  className="tap-target inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-surface px-5 py-3 text-sm font-bold text-gray-600 shadow-sm transition-all hover:bg-gray-100 active:scale-[0.97]"
                 >
                   <SendHorizontal className="h-4 w-4" />
                   My Tasks

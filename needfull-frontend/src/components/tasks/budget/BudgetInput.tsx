@@ -21,7 +21,7 @@ export function BudgetInput({
 
   return (
     <div className="relative">
-      <div className="flex items-center gap-0 rounded-2xl border-2 border-gray-200 bg-white px-5 py-4 transition-all duration-200 focus-within:border-brand focus-within:shadow-sm">
+      <div className="flex items-center gap-0 rounded-2xl border-2 border-border-default bg-surface-primary px-5 py-4 transition-all duration-200 focus-within:border-brand focus-within:shadow-sm">
         <span className="text-2xl font-bold text-gray-400">₦</span>
         <input
           type="text"
@@ -29,7 +29,7 @@ export function BudgetInput({
           value={value > 0 ? Math.round(value).toLocaleString("en-NG") : ""}
           onChange={handleChange}
           placeholder={placeholder}
-          className="w-full border-none bg-transparent px-2 text-2xl font-bold text-gray-900 outline-none placeholder:text-gray-300"
+          className="w-full border-none bg-transparent px-2 text-2xl font-bold text-gray-900 outline-none placeholder:text-gray-400"
         />
       </div>
     </div>

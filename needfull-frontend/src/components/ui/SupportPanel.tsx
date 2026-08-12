@@ -95,7 +95,7 @@ export function SupportPanel({ onClose }: SupportPanelProps) {
                   key={link.label}
                   href={link.href}
                   onClick={() => onClose()}
-                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-sm transition-colors hover:bg-gray-50"
+                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-sm transition-colors hover:bg-gray-100"
                 >
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
                     <Icon className="h-4 w-4" />
@@ -110,7 +110,7 @@ export function SupportPanel({ onClose }: SupportPanelProps) {
                 key={link.label}
                 href={link.href}
                 onClick={() => onClose()}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-sm transition-colors hover:bg-gray-50"
+                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-sm transition-colors hover:bg-gray-100"
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
                   <Icon className="h-4 w-4" />

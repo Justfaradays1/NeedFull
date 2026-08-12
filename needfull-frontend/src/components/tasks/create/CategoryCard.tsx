@@ -24,10 +24,10 @@ export function CategoryCard({
     <button
       type="button"
       onClick={onSelect}
-      className={`group relative flex flex-col items-center gap-2.5 rounded-2xl border-2 p-4 text-center transition-all duration-200 tap-target ${
+      className={`group relative flex flex-col items-center gap-2.5 rounded-2xl border-2 p-4 text-center transition-all duration-200 tap-target focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:border-brand ${
         selected
           ? "border-brand bg-brand/10 shadow-sm"
-          : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm hover:-translate-y-0.5"
+          : "border-border-default bg-surface-primary hover:border-border-strong hover:shadow-sm hover:-translate-y-0.5"
       }`}
     >
       {/* Checkmark overlay when selected */}
@@ -56,7 +56,7 @@ export function CategoryCard({
 
       {/* Description (desktop only) */}
       {description && (
-        <span className="hidden text-[11px] leading-tight text-gray-400 sm:line-clamp-2">
+        <span className="hidden text-[11px] leading-tight text-gray-500 sm:line-clamp-2">
           {description}
         </span>
       )}

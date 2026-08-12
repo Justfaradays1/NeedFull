@@ -18,7 +18,7 @@ function AccordionItem({ title, children, open, onToggle }: AccordionItemProps) 
       <button
         type="button"
         onClick={onToggle}
-        className="tap-target flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-gray-50/50 sm:px-6 sm:py-5"
+        className="tap-target flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-gray-100/50 sm:px-6 sm:py-5"
         aria-expanded={open}
       >
         <span className="font-display text-sm font-bold text-gray-900 sm:text-base">{title}</span>

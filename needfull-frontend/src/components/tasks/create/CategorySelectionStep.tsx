@@ -109,7 +109,7 @@ export function CategorySelectionStep({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search categories..."
-            className="w-full rounded-xl border-2 border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-brand"
+            className="w-full rounded-xl border-2 border-border-default bg-surface-primary py-2.5 pl-10 pr-4 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-brand"
           />
         </div>
       </div>
@@ -132,7 +132,7 @@ export function CategorySelectionStep({
                 className={`tap-target flex items-center gap-1.5 rounded-full border-2 px-4 py-2 text-sm font-semibold transition-all ${
                   selectedCategoryId === cat.id
                     ? "border-brand bg-brand/10 text-brand-text"
-                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                    : "border-border-default bg-surface-primary text-gray-600 hover:border-border-strong"
                 }`}
               >
                 <span
@@ -150,7 +150,7 @@ export function CategorySelectionStep({
 
       {/* Category Grid */}
       {loading ? (
-        <div className="flex min-h-[400px] items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-white sm:min-h-[520px] lg:min-h-[560px]">
+        <div className="flex min-h-[400px] items-center justify-center rounded-xl border-2 border-dashed border-border-default bg-surface-primary sm:min-h-[520px] lg:min-h-[560px]">
           <Loader2 className="h-5 w-5 animate-spin text-brand" />
         </div>
       ) : filtered.length > 0 ? (

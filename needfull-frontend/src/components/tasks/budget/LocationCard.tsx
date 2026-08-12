@@ -28,7 +28,7 @@ export function LocationCard({
   placeholder,
 }: LocationCardProps) {
   return (
-    <div className="rounded-2xl border-2 border-gray-200 bg-white p-4 transition-all duration-200 focus-within:border-brand">
+    <div className="rounded-2xl border-2 border-border-default bg-surface-primary p-4 transition-all duration-200 focus-within:border-brand">
       <div className="mb-2 flex items-center gap-2">
         <MapPin
           className={`h-4 w-4 ${
@@ -40,7 +40,7 @@ export function LocationCard({
         </span>
       </div>
 
-      <p className="mb-1 text-xs text-gray-400">
+      <p className="mb-1 text-xs text-gray-500">
         {type === "task"
           ? "Where should the NeedRunner begin this task?"
           : "Where should the completed task be delivered?"}
@@ -52,14 +52,14 @@ export function LocationCard({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder ?? `e.g. Block D Hostel, FUOYE`}
-          className="flex-1 rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-gray-300 focus:border-brand"
+          className="flex-1 rounded-xl border border-border-default px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-brand"
         />
         {onDetect && (
           <button
             type="button"
             onClick={onDetect}
             disabled={locating}
-            className="tap-target flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:border-brand hover:text-brand-text disabled:opacity-50"
+            className="tap-target flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-default text-gray-400 hover:border-brand hover:text-brand-text disabled:opacity-50"
           >
             {locating ? (
               <Loader2 className="h-4 w-4 animate-spin" />

@@ -52,7 +52,7 @@ export function TransactionRow({ type, amountKobo, note, createdAt }: Transactio
   const prefix = ["deposit", "transfer_in", "refund", "escrow_refund", "escrow_release"].includes(type) ? "+" : "-";
   
   return (
-    <div className="flex items-center justify-between p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+    <div className="flex items-center justify-between p-4 border-b border-gray-100 last:border-0 hover:bg-gray-100 transition-colors">
       <div className="flex items-center space-x-4">
         <div className="p-2 bg-gray-100 rounded-full">
           {getIcon()}

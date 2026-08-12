@@ -36,7 +36,7 @@ export function EscrowSummaryCard({ budgetNaira, feePercent, walletBalanceKobo }
           <span className="font-semibold text-brand-text">₦{budgetNaira.toLocaleString()}</span>
         </div>
 
-        <hr className="border-gray-100" />
+        <hr className="border-border-subtle" />
 
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-1">
@@ -56,7 +56,7 @@ export function EscrowSummaryCard({ budgetNaira, feePercent, walletBalanceKobo }
 
       {walletBalanceKobo !== undefined && (
         <>
-          <hr className="border-gray-100" />
+          <hr className="border-border-subtle" />
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600">Wallet balance</span>
             <span className="font-semibold text-gray-900">

@@ -35,7 +35,7 @@ export function ContextualTip({ categoryName }: { categoryName: string }) {
   if (!tip) return null;
 
   return (
-    <div className="flex items-start gap-2.5 rounded-xl border border-gold/30 bg-gold-light/40 px-3.5 py-3">
+    <div className="flex items-start gap-2.5 rounded-xl border border-gold/30 bg-gold-light/40 px-3.5 py-3 dark:bg-gold-light/10">
       <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
       <p className="text-xs leading-relaxed text-gray-700 dark:text-gray-200">
         <span className="font-bold text-gold-dark">Tip: </span>

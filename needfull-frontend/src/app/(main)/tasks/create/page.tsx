@@ -278,7 +278,7 @@ export default function CreateTaskPage() {
                   type="button"
                   onClick={nextStep}
                   disabled={!categoryId}
-                  className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-on-brand shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:opacity-50"
+                  className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-on-brand shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:bg-gray-200 disabled:text-gray-400"
                 >
                   Continue to Details
                 </button>
@@ -333,26 +333,26 @@ export default function CreateTaskPage() {
                     {getCategoryDisplayName(selectedCategory.name)}
                   </span>
                 </div>
-                <hr className="border-gray-100" />
+                <hr className="border-border-subtle" />
 
                 <div>
                   <span className="text-xs text-gray-500">Title</span>
                   <p className="mt-0.5 text-sm font-medium text-gray-900">{taskTitle}</p>
                 </div>
-                <hr className="border-gray-100" />
+                <hr className="border-border-subtle" />
 
                 <div>
                   <span className="text-xs text-gray-500">Description</span>
                   <p className="mt-0.5 text-sm leading-relaxed text-gray-700 line-clamp-4">{taskDescription}</p>
                 </div>
-                <hr className="border-gray-100" />
+                <hr className="border-border-subtle" />
 
                 <EscrowSummaryCard
                   budgetNaira={budgetNum}
                   feePercent={PLATFORM_FEE_PERCENT}
                   walletBalanceKobo={user?.wallet?.balanceKobo ?? 0}
                 />
-                <hr className="border-gray-100" />
+                <hr className="border-border-subtle" />
 
                 {(taskLocation || budgetLocLabel) && (
                   <>
@@ -368,7 +368,7 @@ export default function CreateTaskPage() {
 
                 {deadline && (
                   <>
-                    <hr className="border-gray-100" />
+                    <hr className="border-border-subtle" />
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-500">Deadline</span>
                       <span className="flex items-center gap-1 text-xs font-medium text-gray-700">
@@ -384,7 +384,7 @@ export default function CreateTaskPage() {
               </div>
 
               {/* Payment Summary — separate from the button */}
-              <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+              <div className="rounded-2xl border border-border-subtle bg-surface-primary p-5 shadow-sm">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
                   Payment Summary
                 </h3>
@@ -407,7 +407,7 @@ export default function CreateTaskPage() {
                     <span className="text-gray-500">Platform Fee (10%)</span>
                     <span className="font-semibold text-gray-700">—₦{Math.floor(budgetNum * 10 / 100).toLocaleString()}</span>
                   </div>
-                  <hr className="border-gray-100" />
+                  <hr className="border-border-subtle" />
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-gray-600">Amount to Pay</span>
                     <span className="font-bold text-brand-text">₦{(budgetNum + Math.floor(budgetNum * 10 / 100)).toLocaleString()}</span>
@@ -449,13 +449,13 @@ export default function CreateTaskPage() {
               )}
 
               {/* Sticky action buttons — clean, no amounts inside */}
-              <div className="sticky bottom-0 -mx-4 bg-gradient-to-t from-white via-white to-transparent px-4 pb-4 pt-6">
+              <div className="sticky bottom-0 -mx-4 bg-gradient-to-t from-surface-primary via-surface-primary to-transparent px-4 pb-4 pt-6">
                 {hasEnoughBalance ? (
                   <button
                     type="button"
                     onClick={handleSubmit}
                     disabled={submitting}
-                    className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-gold py-4 text-base font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:opacity-60"
+                    className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-gold py-4 text-base font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:bg-gray-200 disabled:text-gray-400"
                   >
                     {submitting ? (
                       <><Loader2 className="h-5 w-5 animate-spin" />Posting...</>
@@ -468,7 +468,7 @@ export default function CreateTaskPage() {
                     <button
                       type="button"
                       onClick={() => router.push("/wallet/fund")}
-                      className="tap-target flex w-full items-center justify-center gap-2 rounded-xl border-2 border-brand bg-white py-4 text-base font-bold text-brand shadow-sm transition-all hover:bg-brand/5 active:scale-[0.97]"
+                      className="tap-target flex w-full items-center justify-center gap-2 rounded-xl border-2 border-brand bg-surface-primary py-4 text-base font-bold text-brand shadow-sm transition-all hover:bg-brand/5 active:scale-[0.97]"
                     >
                       Fund Wallet
                     </button>

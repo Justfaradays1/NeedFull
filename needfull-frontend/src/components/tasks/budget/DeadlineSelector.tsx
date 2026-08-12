@@ -36,7 +36,7 @@ export function DeadlineSelector({ value, onChange }: DeadlineSelectorProps) {
               className={`tap-target flex flex-1 flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-center text-xs font-semibold transition-all duration-150 ${
                 isActive
                   ? "border-brand bg-brand/10 text-brand-text"
-                  : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
+                  : "border-border-default bg-surface-primary text-gray-600 hover:border-border-strong"
               }`}
             >
               <Icon className="h-5 w-5" />
@@ -54,7 +54,7 @@ export function DeadlineSelector({ value, onChange }: DeadlineSelectorProps) {
           onChange={(e) =>
             onChange({ option: "custom", customDate: e.target.value })
           }
-          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm outline-none transition-colors focus:border-brand"
+          className="w-full rounded-xl border-2 border-border-default bg-surface-primary px-4 py-3 text-sm text-gray-900 outline-none transition-colors focus:border-brand"
         />
       )}
     </div>

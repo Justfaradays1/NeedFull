@@ -95,7 +95,7 @@ export function Dropdown({
                       ? "text-error hover:bg-error-light"
                       : item.disabled
                         ? "cursor-not-allowed text-gray-400"
-                        : "text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-white/10"
+                        : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-white/10"
                   }`}
               >
                 {item.icon && (

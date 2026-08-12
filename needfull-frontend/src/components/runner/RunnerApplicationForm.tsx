@@ -301,7 +301,7 @@ export function RunnerApplicationForm() {
               type="button"
               onClick={() => goTo(currentStep - 1)}
               disabled={submitting}
-              className="tap-target inline-flex items-center gap-1.5 rounded-xl border-2 border-gray-200 px-5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 active:scale-[0.97] disabled:opacity-50 dark:border-gray-700 dark:text-amber-300 dark:hover:border-amber-600 dark:hover:bg-amber-950/30"
+              className="tap-target inline-flex items-center gap-1.5 rounded-xl border-2 border-gray-200 px-5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-100 active:scale-[0.97] disabled:opacity-50 dark:border-gray-700 dark:text-amber-300 dark:hover:border-amber-600 dark:hover:bg-amber-950/30"
             >
               <ChevronLeft className="h-4 w-4" />
               Back

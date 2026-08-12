@@ -320,7 +320,7 @@ export default function NotificationsPage() {
                               <button
                                 type="button"
                                 onClick={() => handleMarkRead(n.id)}
-                                className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                                className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100"
                               >
                                 <CheckCheck className="h-3.5 w-3.5 text-brand-text" />{" "}
                                 Mark as read
@@ -336,7 +336,7 @@ export default function NotificationsPage() {
                             <button
                               type="button"
                               onClick={() => setMenuId(null)}
-                              className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-500 hover:bg-gray-50"
+                              className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-500 hover:bg-gray-100"
                             >
                               <X className="h-3.5 w-3.5" /> Cancel
                             </button>

@@ -181,7 +181,7 @@ export function HelperCard({ offer, wide = false }: { offer: HelperOffer; wide?:
       <div className="mt-auto flex items-center gap-1.5 pt-3">
         <Link
           href={`/profile/${offer.runnerId}`}
-          className="tap-target flex-1 rounded-lg border border-card-border py-1.5 text-center text-[11px] font-bold text-gray-700 transition-colors hover:bg-gray-50"
+          className="tap-target flex-1 rounded-lg border border-card-border py-1.5 text-center text-[11px] font-bold text-gray-700 transition-colors hover:bg-gray-100"
         >
           View Profile
         </Link>
@@ -220,7 +220,7 @@ export function HelperCard({ offer, wide = false }: { offer: HelperOffer; wide?:
               </div>
               <button
                 onClick={() => setInviteOpen(false)}
-                className="tap-target ml-2 shrink-0 rounded-lg p-1.5 text-gray-400 hover:bg-gray-50"
+                className="tap-target ml-2 shrink-0 rounded-lg p-1.5 text-gray-400 hover:bg-gray-100"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
@@ -237,7 +237,7 @@ export function HelperCard({ offer, wide = false }: { offer: HelperOffer; wide?:
                     key={task.id}
                     onClick={() => sendInvite(task)}
                     disabled={sendingTo === task.id}
-                    className="tap-target flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gray-50 disabled:opacity-50"
+                    className="tap-target flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gray-100 disabled:opacity-50"
                   >
                     <span className="min-w-0 truncate text-xs font-semibold text-gray-800">
                       {task.title}

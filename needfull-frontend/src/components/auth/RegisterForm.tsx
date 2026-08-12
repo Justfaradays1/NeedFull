@@ -397,7 +397,7 @@ export function RegisterForm() {
               type="button"
               onClick={() => setCurrentStep('details')}
               disabled={isLoading}
-              className="tap-target flex-1 rounded-lg border-2 border-gray-300 px-4 py-3 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="tap-target flex-1 rounded-lg border-2 border-gray-300 px-4 py-3 font-semibold text-gray-700 hover:bg-gray-100 disabled:opacity-50"
             >
               <ChevronLeft className="inline h-4 w-4" /> Back
             </button>
@@ -508,7 +508,7 @@ export function RegisterForm() {
               type="button"
               onClick={() => setCurrentStep('verify')}
               disabled={isLoading}
-              className="tap-target flex-1 rounded-lg border-2 border-gray-300 px-4 py-3 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="tap-target flex-1 rounded-lg border-2 border-gray-300 px-4 py-3 font-semibold text-gray-700 hover:bg-gray-100 disabled:opacity-50"
             >
               <ChevronLeft className="inline h-4 w-4" /> Back
             </button>

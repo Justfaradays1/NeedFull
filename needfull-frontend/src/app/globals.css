@@ -38,13 +38,26 @@
   --color-gray-50: var(--clr-gray-50);
   --color-gray-100: var(--clr-gray-100);
   --color-gray-200: var(--clr-gray-200);
+  --color-gray-300: var(--clr-gray-300);
   --color-gray-400: var(--clr-gray-400);
   --color-gray-500: var(--clr-gray-500);
   --color-gray-600: var(--clr-gray-600);
   --color-gray-700: var(--clr-gray-700);
+  --color-gray-800: var(--clr-gray-800);
   --color-gray-900: var(--clr-gray-900);
   --color-surface: var(--clr-surface);
   --color-card-border: var(--clr-card-border);
+
+  /* Semantic surface + border tokens (structural UI colours)
+     WHY: Components describe what a colour MEANS (surface-primary,
+          border-default) instead of what it happens to be (bg-white). The
+          token layer gives every card/input/border an intentional light AND
+          dark appearance without per-component dark: overrides. */
+  --color-surface-primary: var(--clr-surface-primary);
+  --color-surface-secondary: var(--clr-surface-secondary);
+  --color-border-default: var(--clr-border-default);
+  --color-border-subtle: var(--clr-border-subtle);
+  --color-border-strong: var(--clr-border-strong);
 
   --shadow-card: 0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
   --shadow-lifted:
@@ -69,13 +82,20 @@
   --clr-gray-50: #f9fafb;
   --clr-gray-100: #f3f4f6;
   --clr-gray-200: #e5e7eb;
+  --clr-gray-300: #d1d5db;
   --clr-gray-400: #9ca3af;
   --clr-gray-500: #6b7280;
   --clr-gray-600: #4b5563;
   --clr-gray-700: #374151;
+  --clr-gray-800: #1f2937;
   --clr-gray-900: #111827;
   --clr-surface: #ffffff;
   --clr-card-border: #f3f4f6;
+  --clr-surface-primary: #ffffff;
+  --clr-surface-secondary: #f9fafb;
+  --clr-border-default: #e5e7eb;
+  --clr-border-subtle: #f3f4f6;
+  --clr-border-strong: #d1d5db;
   --color-info: #2563eb;
   --color-info-light: #eff6ff;
   --color-surface-muted: #f9fafb;
@@ -129,27 +149,34 @@
   --color-placeholder: #9ca3af;
   --color-border: #27272a;
   --color-muted: #a1a1aa;
-  --clr-surface: #18181b;
-  --clr-card-border: #27272a;
+  --clr-surface: #1c1c1f;
+  --clr-card-border: #3a3a40;
   --color-surface-2: #243828;
-  --clr-brand: #1a6b4a;
+  --clr-brand: #1f8a5c;
   --clr-brand-mid: #2d9e6b;
   --clr-brand-light: #e6f5ee;
   --clr-brand-dark: #0d4f35;
   --clr-brand-text: #34d399;
   --clr-on-brand: #ffffff;
   --clr-gray-50: #09090b;
-  --clr-gray-100: #18181b;
-  --clr-gray-200: #27272a;
+  --clr-gray-100: #1e1e22;
+  --clr-gray-200: #3a3a40;
+  --clr-gray-300: #4b4b52;
   --clr-gray-400: #a1a1aa;
-  --clr-gray-500: #6b7280;
+  --clr-gray-500: #8b8f98;
   --clr-gray-600: #d1d5db;
   --clr-gray-700: #e5e7eb;
+  --clr-gray-800: #e4e4e7;
   --clr-gray-900: #f5f5f4;
+  --clr-surface-primary: #1c1c1f;
+  --clr-surface-secondary: #141416;
+  --clr-border-default: #3a3a40;
+  --clr-border-subtle: #2a2a2e;
+  --clr-border-strong: #52525b;
   --color-info: #60a5fa;
   --color-info-light: #172554;
   --color-surface-muted: #09090b;
-  --color-nav-bg: rgba(24, 24, 27, 0.95);
+  --color-nav-bg: rgba(28, 28, 31, 0.95);
   --color-hero-bg-start: #0a0a0b;
   --color-hero-bg-mid: #0d4f35;
   --color-hero-text: #f5f5f4;

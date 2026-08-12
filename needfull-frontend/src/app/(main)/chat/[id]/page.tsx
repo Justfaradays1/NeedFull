@@ -354,7 +354,7 @@ export default function ChatThreadPage() {
                     setMenuOpen(false);
                     router.push(viewTaskHref);
                   }}
-                  className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                  className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100"
                 >
                   <Flag className="h-3.5 w-3.5" /> View Task
                 </button>

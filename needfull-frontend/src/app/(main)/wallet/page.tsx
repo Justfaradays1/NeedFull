@@ -452,7 +452,7 @@ export default function WalletPage() {
                     <button
                       type="button"
                       onClick={() => toggleExpand(tx.id)}
-                      className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-gray-50"
+                      className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-gray-100"
                     >
                       {/* Icon */}
                       <div

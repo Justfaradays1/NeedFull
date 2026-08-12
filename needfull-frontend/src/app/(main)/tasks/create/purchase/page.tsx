@@ -415,19 +415,19 @@ export default function CreatePurchaseTaskPage() {
                       : "Select a category"}
                   </span>
                 </div>
-                <hr className="border-gray-100" />
+                <hr className="border-border-subtle" />
 
                 <div>
                   <span className="text-xs text-gray-500">Title</span>
                   <p className="mt-0.5 text-sm font-medium text-gray-900">{title}</p>
                 </div>
-                <hr className="border-gray-100" />
+                <hr className="border-border-subtle" />
 
                 <div>
                   <span className="text-xs text-gray-500">Description</span>
                   <p className="mt-0.5 text-sm leading-relaxed text-gray-700 line-clamp-4">{description}</p>
                 </div>
-                <hr className="border-gray-100" />
+                <hr className="border-border-subtle" />
 
                 {storeName && (
                   <>
@@ -435,7 +435,7 @@ export default function CreatePurchaseTaskPage() {
                       <span className="text-xs text-gray-500">Store</span>
                       <span className="text-xs font-medium text-gray-700">{storeName}</span>
                     </div>
-                    <hr className="border-gray-100" />
+                    <hr className="border-border-subtle" />
                   </>
                 )}
 
@@ -445,7 +445,7 @@ export default function CreatePurchaseTaskPage() {
                   platformFeeNaira={platformFee}
                   maxAdditionalSpendingNaira={maxAdd}
                 />
-                <hr className="border-gray-100" />
+                <hr className="border-border-subtle" />
 
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">Location</span>
@@ -456,7 +456,7 @@ export default function CreatePurchaseTaskPage() {
 
                 {deadline && (
                   <>
-                    <hr className="border-gray-100" />
+                    <hr className="border-border-subtle" />
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-500">Deadline</span>
                       <span className="flex items-center gap-1 text-xs font-medium text-gray-700">
@@ -469,7 +469,7 @@ export default function CreatePurchaseTaskPage() {
 
                 {isUrgent && (
                   <>
-                    <hr className="border-gray-100" />
+                    <hr className="border-border-subtle" />
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-500">Priority</span>
                       <span className="inline-flex items-center gap-1 rounded-md bg-warning-light px-2 py-0.5 text-xs font-bold text-warning">

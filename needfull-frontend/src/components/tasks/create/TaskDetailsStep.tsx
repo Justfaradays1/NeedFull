@@ -37,10 +37,10 @@ function getDescriptionQuality(desc: string): {
   icon: string;
 } {
   const len = desc.trim().length;
-  if (len === 0) return { level: "empty", color: "text-gray-300", label: "Start typing a description", icon: "⚪" };
+  if (len === 0) return { level: "empty", color: "text-gray-400", label: "Start typing a description", icon: "⚪" };
   if (len < 30) return { level: "short", color: "text-red-500", label: "Too short — NeedRunners may not understand this task", icon: "🔴" };
-  if (len < 80) return { level: "medium", color: "text-amber-600", label: "Needs more detail — consider adding deadline or materials provided", icon: "🟡" };
-  return { level: "good", color: "text-green-600", label: "Excellent description — very likely to receive quality applicants", icon: "🟢" };
+  if (len < 80) return { level: "medium", color: "text-warning", label: "Needs more detail — consider adding deadline or materials provided", icon: "🟡" };
+  return { level: "good", color: "text-success", label: "Excellent description — very likely to receive quality applicants", icon: "🟢" };
 }
 
 export function TaskDetailsStep({
@@ -103,7 +103,7 @@ export function TaskDetailsStep({
             onChange={(e) => setTitle(e.target.value.slice(0, 60))}
             placeholder={config.titlePlaceholder}
             maxLength={60}
-            className="w-full rounded-2xl border-2 border-gray-200 bg-white px-5 py-4 text-base font-semibold outline-none transition-colors placeholder:text-gray-300 focus:border-brand"
+            className="w-full rounded-2xl border-2 border-border-default bg-surface-primary px-5 py-4 text-base font-semibold outline-none transition-colors placeholder:text-gray-400 focus:border-brand"
           />
         </div>
         <div className="mt-1.5 flex items-center justify-between">
@@ -126,7 +126,7 @@ export function TaskDetailsStep({
           placeholder={config.descriptionPlaceholder}
           rows={5}
           maxLength={500}
-          className="w-full resize-none rounded-2xl border-2 border-gray-200 bg-white px-5 py-4 text-sm leading-relaxed outline-none transition-colors placeholder:text-gray-300 focus:border-brand"
+          className="w-full resize-none rounded-2xl border-2 border-border-default bg-surface-primary px-5 py-4 text-sm leading-relaxed outline-none transition-colors placeholder:text-gray-400 focus:border-brand"
         />
 
         {/* Guidance (shown when empty or on focus) */}
@@ -168,7 +168,7 @@ export function TaskDetailsStep({
               key={chip}
               type="button"
               onClick={() => handleChipClick(chip)}
-              className="tap-target rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-600 transition-all hover:border-brand hover:text-brand hover:bg-brand/5"
+              className="tap-target rounded-full border border-border-default bg-surface-primary px-3.5 py-1.5 text-xs font-medium text-gray-600 transition-all hover:border-brand hover:text-brand hover:bg-brand/5"
             >
               {chip}
             </button>
@@ -194,12 +194,12 @@ export function TaskDetailsStep({
                   className={`tap-target flex flex-col items-center gap-1.5 rounded-2xl border-2 px-4 py-4 text-center transition-all ${
                     isActive
                       ? "border-brand bg-brand/10 text-brand-text"
-                      : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
+                      : "border-border-default bg-surface-primary text-gray-600 hover:border-border-strong"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
                   <span className="text-xs font-bold">{opt.label}</span>
-                  <span className="text-[10px] leading-tight text-gray-400">
+                  <span className="text-[10px] leading-tight text-gray-500">
                     {opt.description}
                   </span>
                 </button>
@@ -217,7 +217,7 @@ export function TaskDetailsStep({
               ? "Collection Location"
               : "Task Location"}
           </label>
-          <div className="flex items-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-4 py-3 transition-colors focus-within:border-brand">
+          <div className="flex items-center gap-2 rounded-2xl border-2 border-border-default bg-surface-primary px-4 py-3 transition-colors focus-within:border-brand">
             <MapPin className="h-4 w-4 shrink-0 text-gray-400" />
             <input
               type="text"
@@ -228,7 +228,7 @@ export function TaskDetailsStep({
                   ? "Where should the item be collected?"
                   : "Where should the NeedRunner go?"
               }
-              className="w-full border-none bg-transparent text-sm outline-none placeholder:text-gray-300"
+              className="w-full border-none bg-transparent text-sm outline-none placeholder:text-gray-400"
             />
           </div>
         </div>
@@ -239,14 +239,14 @@ export function TaskDetailsStep({
           <label className="block text-sm font-bold text-gray-900">
             Return Location
           </label>
-          <div className="flex items-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-4 py-3 transition-colors focus-within:border-brand">
+          <div className="flex items-center gap-2 rounded-2xl border-2 border-border-default bg-surface-primary px-4 py-3 transition-colors focus-within:border-brand">
             <MapPin className="h-4 w-4 shrink-0 text-gray-400" />
             <input
               type="text"
               value={completionLocation}
               onChange={(e) => setCompletionLocation(e.target.value)}
               placeholder="Where should the completed work be returned?"
-              className="w-full border-none bg-transparent text-sm outline-none placeholder:text-gray-300"
+              className="w-full border-none bg-transparent text-sm outline-none placeholder:text-gray-400"
             />
           </div>
         </div>
@@ -257,14 +257,14 @@ export function TaskDetailsStep({
           <label className="block text-sm font-bold text-gray-900">
             Meeting Location
           </label>
-          <div className="flex items-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-4 py-3 transition-colors focus-within:border-brand">
+          <div className="flex items-center gap-2 rounded-2xl border-2 border-border-default bg-surface-primary px-4 py-3 transition-colors focus-within:border-brand">
             <MapPin className="h-4 w-4 shrink-0 text-gray-400" />
             <input
               type="text"
               value={taskLocation}
               onChange={(e) => setTaskLocation(e.target.value)}
               placeholder="Where should you both meet?"
-              className="w-full border-none bg-transparent text-sm outline-none placeholder:text-gray-300"
+              className="w-full border-none bg-transparent text-sm outline-none placeholder:text-gray-400"
             />
           </div>
         </div>
@@ -275,26 +275,26 @@ export function TaskDetailsStep({
           <label className="block text-sm font-bold text-gray-900">
             Meeting Link or Platform
           </label>
-          <div className="flex items-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-4 py-3 transition-colors focus-within:border-brand">
+          <div className="flex items-center gap-2 rounded-2xl border-2 border-border-default bg-surface-primary px-4 py-3 transition-colors focus-within:border-brand">
             <Monitor className="h-4 w-4 shrink-0 text-gray-400" />
             <input
               type="text"
               value={meetingLink}
               onChange={(e) => setMeetingLink(e.target.value)}
               placeholder="e.g. Zoom link, WhatsApp, email, Google Meet"
-              className="w-full border-none bg-transparent text-sm outline-none placeholder:text-gray-300"
+              className="w-full border-none bg-transparent text-sm outline-none placeholder:text-gray-400"
             />
           </div>
         </div>
       )}
 
       {/* Continue Button */}
-      <div className="sticky bottom-0 -mx-4 bg-gradient-to-t from-white via-white to-transparent px-4 pb-4 pt-6">
+      <div className="sticky bottom-0 -mx-4 bg-gradient-to-t from-surface-primary via-surface-primary to-transparent px-4 pb-4 pt-6">
         <button
           type="button"
           onClick={handleContinue}
           disabled={!canContinue}
-          className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-on-brand shadow-sm transition-all duration-150 hover:brightness-105 active:scale-[0.97] disabled:opacity-50"
+          className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-on-brand shadow-sm transition-all duration-150 hover:brightness-105 active:scale-[0.97] disabled:bg-gray-200 disabled:text-gray-400"
         >
           Continue to Budget
         </button>

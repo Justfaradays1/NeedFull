@@ -232,7 +232,7 @@ export function StudentIDVerificationCard({
           {/* Camera Button */}
           <button
             onClick={() => cameraInputRef.current?.click()}
-            className="w-full flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
             disabled={isLoading}
           >
             <Camera className="w-4 h-4" />

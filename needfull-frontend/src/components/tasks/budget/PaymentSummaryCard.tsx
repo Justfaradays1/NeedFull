@@ -19,8 +19,8 @@ export function PaymentSummaryCard({
 
   if (budgetNaira <= 0) {
     return (
-      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-        <p className="text-center text-sm text-gray-400">
+      <div className="rounded-2xl border border-border-subtle bg-surface-primary p-5 shadow-sm">
+        <p className="text-center text-sm text-gray-500">
           Enter a budget to see payment summary
         </p>
       </div>
@@ -28,7 +28,7 @@ export function PaymentSummaryCard({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200">
+    <div className="rounded-2xl border border-border-subtle bg-surface-primary p-5 shadow-sm transition-all duration-200">
       <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-500">
         Payment Summary
       </h3>
@@ -41,14 +41,14 @@ export function PaymentSummaryCard({
           muted
         />
         <Row label="Escrow Amount" value={formatNaira(budgetNaira)} icon={<Lock className="h-3 w-3 text-brand-text" />} />
-        <div className="border-t border-gray-100 pt-2">
+        <div className="border-t border-border-subtle pt-2">
           <Row
             label="Total Payment"
             value={formatNaira(total)}
             bold
           />
         </div>
-        <div className="border-t border-gray-100 pt-2">
+        <div className="border-t border-border-subtle pt-2">
           <Row
             label="Wallet Balance"
             value={formatNaira(balanceNaira)}
@@ -61,8 +61,8 @@ export function PaymentSummaryCard({
       <div
         className={`mt-4 rounded-xl px-4 py-3 text-sm ${
           hasEnough
-            ? "bg-green-50 text-green-700"
-            : "bg-red-50 text-red-600"
+            ? "bg-success-light text-success"
+            : "bg-error-light text-error"
         }`}
       >
         <div className="flex items-start gap-2">
@@ -95,7 +95,7 @@ export function PaymentSummaryCard({
       <div className="mt-4 space-y-2">
         <div className="flex items-start gap-2">
           <Info className="mt-0.5 h-3 w-3 shrink-0 text-gray-400" />
-          <p className="text-[11px] leading-relaxed text-gray-400">
+          <p className="text-[11px] leading-relaxed text-gray-500">
             The platform fee helps cover secure payments, fraud protection,
             customer support, and platform maintenance.
           </p>
@@ -128,7 +128,7 @@ function Row({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <span className={`flex items-center gap-1 text-sm ${muted ? "text-gray-400" : "text-gray-600"}`}>
+      <span className={`flex items-center gap-1 text-sm ${muted ? "text-gray-500" : "text-gray-600"}`}>
         {icon}
         {label}
       </span>

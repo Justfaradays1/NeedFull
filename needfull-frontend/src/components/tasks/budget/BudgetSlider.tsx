@@ -40,7 +40,7 @@ export function BudgetSlider({ value, config, onChange }: BudgetSliderProps) {
           onChange={(e) => onChange(parseInt(e.target.value, 10))}
           className="h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 outline-none transition-all"
           style={{
-            background: `linear-gradient(to right, #1A6B4A ${pct}%, #e5e7eb ${pct}%)`,
+            background: `linear-gradient(to right, var(--clr-brand) ${pct}%, var(--clr-gray-200) ${pct}%)`,
           }}
         />
         <div className="mt-1 flex justify-between text-xs text-gray-400">

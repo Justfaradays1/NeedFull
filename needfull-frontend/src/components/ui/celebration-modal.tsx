@@ -136,7 +136,7 @@ export function CelebrationModal({ open, onClose, config }: CelebrationModalProp
             <button
               type="button"
               onClick={handleSecondary}
-              className="tap-target w-full rounded-xl border border-gray-300 bg-surface py-3.5 text-base font-semibold text-gray-600 hover:bg-gray-50"
+              className="tap-target w-full rounded-xl border border-gray-300 bg-surface py-3.5 text-base font-semibold text-gray-600 hover:bg-gray-100"
             >
               {config.secondaryLabel}
             </button>

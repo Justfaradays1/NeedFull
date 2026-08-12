@@ -147,7 +147,7 @@ function LoginForm() {
       {/* Google */}
       <a
         href="/api/auth/google"
-        className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-xl border px-5 py-3 text-sm font-semibold shadow-sm transition-all duration-150 hover:bg-gray-50 active:scale-[0.98]"
+        className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-xl border px-5 py-3 text-sm font-semibold shadow-sm transition-all duration-150 hover:bg-gray-100 active:scale-[0.98]"
         style={{ borderColor: "var(--color-card-border, #e5e7eb)", color: "var(--color-foreground, #171717)" }}
       >
         <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24">

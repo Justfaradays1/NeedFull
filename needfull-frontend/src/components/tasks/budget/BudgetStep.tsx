@@ -235,7 +235,7 @@ export function BudgetStep({
               className={`tap-target flex items-center gap-2 rounded-xl border-2 px-4 py-2.5 text-xs font-semibold transition-all ${
                 sameLocation
                   ? "border-brand bg-brand/10 text-brand-text"
-                  : "border-gray-200 text-gray-500 hover:border-gray-300"
+                  : "border-border-default text-gray-600 hover:border-border-strong"
               }`}
             >
               <CheckIcon checked={sameLocation} />
@@ -282,12 +282,12 @@ export function BudgetStep({
       />
 
       {/* 7. Continue Button */}
-      <div className="sticky bottom-0 -mx-4 bg-gradient-to-t from-white via-white to-transparent px-4 pb-4 pt-6">
+      <div className="sticky bottom-0 -mx-4 bg-gradient-to-t from-surface-primary via-surface-primary to-transparent px-4 pb-4 pt-6">
         <button
           type="button"
           onClick={handleContinue}
           disabled={!canContinue || isPosting}
-          className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-white shadow-sm transition-all duration-150 hover:brightness-105 active:scale-[0.97] disabled:opacity-50"
+          className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-on-brand shadow-sm transition-all duration-150 hover:brightness-105 active:scale-[0.97] disabled:bg-gray-200 disabled:text-gray-400"
         >
           {isPosting ? (
             <>
@@ -304,7 +304,7 @@ export function BudgetStep({
           <button
             type="button"
             onClick={() => router.push("/wallet/fund")}
-            className="tap-target mt-2 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-brand bg-white py-3 text-sm font-bold text-brand hover:bg-brand/5"
+            className="tap-target mt-2 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-brand bg-surface-primary py-3 text-sm font-bold text-brand hover:bg-brand/5"
           >
             Fund Wallet
           </button>

@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeedFull — Interactive Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1a6b4a;--gl:#e8f4ee;--gm:#2d8f64;--gd:#124d35;--g2:#0f4a32;
+  --a:#eaa325;--al:#fdf3dc;--ad:#b07a10;
+  --w:#fff;--bg:#f2f5f4;--s:#fff;--s2:#f2f5f4;
+  --b:#e2ebe6;--t:#0c1e16;--t2:#4a6459;--t3:#92b0a0;
+  --err:#dc2626;--ok:#16a34a;--warn:#d97706;
+  --fn:'Sora',sans-serif;
+  --r4:4px;--r8:8px;--r12:12px;--r16:16px;--r24:24px;--rf:999px;
+  --sh1:0 1px 4px rgba(0,0,0,.07);--sh2:0 4px 16px rgba(0,0,0,.1);--sh3:0 8px 32px rgba(0,0,0,.14);
+}
+body{font-family:var(--fn);background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px 0;overflow-x:hidden}
+/* ── SHELL ── */
+.shell{display:flex;gap:28px;align-items:flex-start;max-width:900px;width:100%}
+/* ── SIDEBAR ── */
+.sidebar{width:188px;flex-shrink:0;position:sticky;top:20px}
+.sb-logo{font-size:22px;font-weight:800;color:var(--a);margin-bottom:2px;letter-spacing:-0.5px}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px}
+.sb-group{margin-bottom:16px}
+.sb-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.25);margin-bottom:6px;padding-left:8px}
+.sb-btn{display:block;width:100%;text-align:left;padding:7px 12px;border:none;border-radius:var(--r8);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);font-family:var(--fn);font-size:11.5px;cursor:pointer;margin-bottom:3px;transition:all .15s;border:1px solid transparent}
+.sb-btn:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.85)}
+.sb-btn.on{background:rgba(26,107,74,.3);color:#5de8aa;border-color:rgba(26,107,74,.4)}
+/* ── PHONE ── */
+.phone-wrap{flex:0 0 375px}
+.phone{width:375px;height:812px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 0 0 9px #1e1e1e,0 0 0 11px #2e2e2e,0 28px 80px rgba(0,0,0,.7)}
+.island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:116px;height:32px;background:#000;border-radius:18px;z-index:9999;pointer-events:none}
+/* ── STATUS BAR ── */
+.sbar{height:52px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 26px 8px;position:absolute;top:0;left:0;right:0;z-index:500;pointer-events:none}
+.sbar-time{font-size:14px;font-weight:700;color:var(--t)}
+.sbar-icons{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t)}
+.sbar.inv .sbar-time,.sbar.inv .sbar-icons{color:#fff}
+/* ── SCREENS ── */
+.scr{position:absolute;top:0;left:0;width:375px;height:812px;display:none;flex-direction:column;background:var(--bg);overflow:hidden}
+.scr.on{display:flex}
+/* ── TOP BAR ── */
+.tbar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:var(--s);border-bottom:1px solid var(--b);flex-shrink:0;margin-top:52px}
+.tbar-title{font-size:16px;font-weight:700;color:var(--t)}
+.tbar-sub{font-size:11px;color:var(--t3);font-weight:400}
+.ib{width:40px;height:40px;border-radius:50%;border:none;background:var(--s2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t);font-size:19px;transition:background .15s;flex-shrink:0}
+.ib:active{background:var(--b)}
+.ib.trans{background:transparent}
+/* ── BOTTOM NAV ── */
+.bnav{height:76px;background:var(--s);border-top:1px solid var(--b);display:flex;align-items:flex-start;padding-top:6px;flex-shrink:0;position:relative}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;color:var(--t3);font-family:var(--fn);font-size:10px;font-weight:500;cursor:pointer;padding:4px 0;transition:color .15s}
+.ni.on{color:var(--g)}
+.ni-icon{font-size:22px;line-height:1}
+.ni-plus{width:52px;height:52px;border-radius:50%;background:var(--a);border:none;color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(234,163,37,.4);margin-top:-14px;flex-shrink:0;transition:transform .15s}
+.ni-plus:active{transform:scale(.93)}
+/* ── SCROLL ── */
+.scrl{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.scrl::-webkit-scrollbar{display:none}
+/* ── PADDING ── */
+.p16{padding:16px}.p20{padding:20px}.px16{padding-left:16px;padding-right:16px}.px20{padding-left:20px;padding-right:20px}.py12{padding-top:12px;padding-bottom:12px}.pt8{padding-top:8px}
+/* ── FLEX UTILS ── */
+.row{display:flex;align-items:center}.rowb{display:flex;align-items:center;justify-content:space-between}.col{display:flex;flex-direction:column}.g4{gap:4px}.g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
+/* ── MARGIN ── */
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}.mt24{margin-top:24px}.mt32{margin-top:32px}.mb4{margin-bottom:4px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+/* ── TYPE ── */
+.h1{font-size:28px;font-weight:800;color:var(--t);line-height:1.15}
+.h2{font-size:22px;font-weight:700;color:var(--t);line-height:1.2}
+.h3{font-size:17px;font-weight:700;color:var(--t)}
+.h4{font-size:14px;font-weight:600;color:var(--t)}
+.body{font-size:14px;color:var(--t2);line-height:1.55}
+.sm{font-size:12px;color:var(--t2)}
+.xs{font-size:11px;color:var(--t3)}
+.label{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
+.tc{text-align:center}
+/* ── BUTTONS ── */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border-radius:var(--rf);border:none;font-family:var(--fn);font-size:15px;font-weight:600;cursor:pointer;width:100%;transition:all .15s}
+.btn:active{transform:scale(.975)}
+.btn-g{background:var(--g);color:#fff}
+.btn-a{background:var(--a);color:#fff;box-shadow:0 4px 14px rgba(234,163,37,.3)}
+.btn-out{background:transparent;border:1.5px solid var(--g);color:var(--g)}
+.btn-ghost{background:var(--s2);color:var(--t)}
+.btn-sm{height:40px;font-size:13px}
+.btn-xs{height:32px;font-size:12px;padding:0 16px;width:auto}
+.btn-danger{background:#fee2e2;color:var(--err)}
+/* ── INPUTS ── */
+.igroup{margin-bottom:14px}
+.ilabel{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.ifield{width:100%;height:52px;border:1.5px solid var(--b);border-radius:var(--r12);padding:0 16px;font-family:var(--fn);font-size:15px;color:var(--t);background:var(--s);outline:none;transition:border-color .15s}
+.ifield:focus{border-color:var(--g)}
+.ifield.err{border-color:var(--err)}
+.itextarea{width:100%;border:1.5px solid var(--b);border-radius:var(--r12);padding:12px 16px;font-family:var(--fn);font-size:14px;color:var(--t);background:var(--s);outline:none;resize:none;transition:border-color .15s;line-height:1.5;min-height:100px}
+.itextarea:focus{border-color:var(--g)}
+.ifield-with-pre{display:flex;border:1.5px solid var(--b);border-radius:var(--r12);overflow:hidden;background:var(--s);transition:border-color .15s}
+.ifield-with-pre:focus-within{border-color:var(--g)}
+.ifield-pre{padding:0 14px;background:var(--s2);display:flex;align-items:center;font-size:14px;font-weight:600;color:var(--t2);border-right:1px solid var(--b);white-space:nowrap}
+.ifield-inner{flex:1;height:52px;border:none;padding:0 14px;font-family:var(--fn);font-size:15px;color:var(--t);background:transparent;outline:none}
+.ierror{font-size:12px;color:var(--err);margin-top:4px}
+.ihint{font-size:12px;color:var(--t3);margin-top:4px}
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:var(--rf);font-size:11px;font-weight:600}
+.badge-g{background:var(--gl);color:var(--g)}
+.badge-a{background:var(--al);color:var(--ad)}
+.badge-gray{background:#f0f0f0;color:#555}
+.badge-err{background:#fee2e2;color:var(--err)}
+.badge-ok{background:#dcfce7;color:var(--ok)}
+/* ── AVATAR ── */
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.av-sm{width:36px;height:36px;font-size:13px}
+.av-md{width:48px;height:48px;font-size:17px}
+.av-lg{width:64px;height:64px;font-size:22px}
+.av-xl{width:80px;height:80px;font-size:28px}
+.av-g{background:var(--gl);color:var(--g)}
+.av-a{background:var(--al);color:var(--ad)}
+.av-pu{background:#ede9fe;color:#7c3aed}
+.av-bl{background:#dbeafe;color:#2563eb}
+.av-ro{background:#fce7f3;color:#be185d}
+/* ── CARD ── */
+.card{background:var(--s);border-radius:var(--r16);padding:16px;box-shadow:var(--sh1)}
+/* ── TASK CARD ── */
+.tcard{background:var(--s);border-radius:var(--r16);padding:16px;margin-bottom:10px;box-shadow:var(--sh1);cursor:pointer;transition:transform .15s;border:1px solid transparent}
+.tcard:active{transform:scale(.98)}
+.tcard.urgent{border-color:rgba(234,163,37,.4)}
+.tc-title{font-size:15px;font-weight:600;color:var(--t)}
+.tc-meta{font-size:12px;color:var(--t3);margin-top:2px}
+.tc-budget{font-size:20px;font-weight:800;color:var(--g)}
+.tc-budget-sub{font-size:11px;color:var(--t3)}
+/* ── CHIPS ── */
+.chips{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding:10px 20px;flex-shrink:0}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:7px 14px;border-radius:var(--rf);border:1.5px solid var(--b);font-size:12.5px;font-weight:500;color:var(--t2);white-space:nowrap;cursor:pointer;background:var(--s);transition:all .15s;font-family:var(--fn)}
+.chip.on{background:var(--g);border-color:var(--g);color:#fff}
+/* ── STEPS ── */
+.steps{display:flex;align-items:center;padding:14px 20px;gap:0;flex-shrink:0}
+.step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.step-circle{width:28px;height:28px;border-radius:50%;background:var(--b);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--t3);transition:all .2s}
+.step-circle.on{background:var(--g);color:#fff}
+.step-circle.done{background:var(--gl);color:var(--g)}
+.step-label{font-size:10px;color:var(--t3);white-space:nowrap}
+.step-line{flex:1;height:2px;background:var(--b);margin:0 4px;flex-shrink:1;align-self:flex-start;margin-top:14px;transition:background .2s}
+.step-line.done{background:var(--g)}
+/* ── CATEGORY GRID ── */
+.catgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.catcard{background:var(--s);border-radius:var(--r16);padding:20px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;border:2px solid transparent;transition:all .15s}
+.catcard:active{transform:scale(.95)}
+.catcard.on{border-color:var(--g);background:var(--gl)}
+.cat-icon{font-size:30px}
+.cat-name{font-size:12.5px;font-weight:600;color:var(--t);text-align:center}
+/* ── WORKER CARD ── */
+.wcard{background:var(--s);border-radius:var(--r16);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:10px;cursor:pointer;box-shadow:var(--sh1);transition:transform .15s}
+.wcard:active{transform:scale(.98)}
+.wcard-name{font-size:14px;font-weight:600;color:var(--t)}
+.wcard-meta{font-size:12px;color:var(--t3);margin-top:2px}
+/* ── CHAT ── */
+.chat-area{display:flex;flex-direction:column;gap:2px;padding:12px 16px}
+.cb{max-width:74%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.45}
+.cb-in{background:var(--s);color:var(--t);border-radius:16px 16px 16px 4px;align-self:flex-start;box-shadow:var(--sh1)}
+.cb-out{background:var(--g);color:#fff;border-radius:16px 16px 4px 16px;align-self:flex-end}
+.ctime{font-size:10px;color:var(--t3);margin-bottom:8px;align-self:center}
+.chat-input-bar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--s);border-top:1px solid var(--b);flex-shrink:0}
+.chat-input{flex:1;height:44px;border:1.5px solid var(--b);border-radius:var(--rf);padding:0 16px;font-family:var(--fn);font-size:14px;color:var(--t);background:var(--s2);outline:none}
+.chat-send{width:44px;height:44px;border-radius:50%;background:var(--g);border:none;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+/* ── ESCROW ── */
+.escrow-box{background:var(--gl);border-radius:var(--r16);padding:16px;border:1.5px solid rgba(26,107,74,.2)}
+/* ── STARS ── */
+.star-row{display:flex;gap:8px;justify-content:center}
+.star-b{font-size:44px;cursor:pointer;opacity:.2;background:none;border:none;transition:all .15s;font-family:initial}
+.star-b.on{opacity:1;color:var(--a)}
+/* ── WALLET ── */
+.wallet-hero{background:linear-gradient(135deg,var(--gd) 0%,var(--g) 100%);border-radius:var(--r24);padding:24px;color:#fff;position:relative;overflow:hidden}
+.wallet-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;border:2px solid rgba(255,255,255,.08)}
+.wallet-hero::after{content:'';position:absolute;bottom:-60px;left:20px;width:200px;height:200px;border-radius:50%;border:1px solid rgba(255,255,255,.05)}
+/* ── TXN ── */
+.txn{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--b)}
+.txn-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.txn-cr{background:#dcfce7;color:var(--ok)}
+.txn-db{background:#fee2e2;color:var(--err)}
+.txn-pnd{background:#fef3c7;color:var(--warn)}
+/* ── DIVIDER ── */
+.dvd{height:1px;background:var(--b);margin:12px 0}
+.dvd-thick{height:8px;background:var(--s2);margin:0 -20px}
+/* ── TOGGLE ── */
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--b)}
+.tog{width:48px;height:28px;background:var(--b);border-radius:14px;position:relative;cursor:pointer;transition:background .2s}
+.tog.on{background:var(--g)}
+.tog-th{width:22px;height:22px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:left .2s;box-shadow:var(--sh1)}
+.tog.on .tog-th{left:23px}
+/* ── NOTIF ── */
+.ni-row{display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid var(--b);cursor:pointer}
+.ni-ic{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+/* ── STAT CARD ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat-card{background:var(--s);border-radius:var(--r12);padding:14px 8px;text-align:center;box-shadow:var(--sh1)}
+.stat-val{font-size:18px;font-weight:800;color:var(--t)}
+.stat-lbl{font-size:10px;color:var(--t3);margin-top:2px}
+/* ── PROFILE HEADER ── */
+.prof-head{background:linear-gradient(180deg,var(--gd) 0%,var(--g) 100%);padding:80px 20px 24px;color:#fff}
+/* ── SPLASH ── */
+.splash-bg{background:linear-gradient(180deg,var(--gd) 0%,var(--gm) 60%,var(--bg) 100%);flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:40px 28px 48px}
+/* ── EMPTY STATE ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center}
+.empty-icon{font-size:56px;margin-bottom:16px;opacity:.4}
+/* ── PROGRESS BAR ── */
+.prog-track{height:8px;background:var(--b);border-radius:var(--rf);overflow:hidden}
+.prog-fill{height:100%;border-radius:var(--rf);background:var(--g);transition:width .4s ease}
+/* ── SECTION HEADER ── */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sec-title{font-size:16px;font-weight:700;color:var(--t)}
+.sec-action{font-size:12.5px;color:var(--g);font-weight:600;cursor:pointer;border:none;background:none;font-family:var(--fn)}
+/* ── SEARCH BAR ── */
+.search-bar{display:flex;align-items:center;gap:10px;background:var(--s);border-radius:var(--rf);border:1.5px solid var(--b);padding:0 16px;height:48px;cursor:pointer}
+.search-bar input{flex:1;border:none;outline:none;font-family:var(--fn);font-size:14px;color:var(--t);background:transparent}
+.search-bar input::placeholder{color:var(--t3)}
+/* ── TASK STATUS TRACK ── */
+.status-steps{display:flex;flex-direction:column;gap:0}
+.ss-item{display:flex;gap:14px}
+.ss-line-col{display:flex;flex-direction:column;align-items:center}
+.ss-dot{width:14px;height:14px;border-radius:50%;background:var(--b);flex-shrink:0}
+.ss-dot.done{background:var(--g)}
+.ss-dot.curr{background:var(--a);box-shadow:0 0 0 4px rgba(234,163,37,.2)}
+.ss-vline{width:2px;flex:1;background:var(--b);min-height:32px}
+.ss-vline.done{background:var(--g)}
+.ss-content{padding-bottom:28px}
+.ss-label{font-size:14px;font-weight:600;color:var(--t)}
+.ss-sub{font-size:12px;color:var(--t3);margin-top:2px}
+/* ── ROLE CARD ── */
+.role-card{background:var(--s);border-radius:var(--r16);padding:20px;border:2px solid var(--b);cursor:pointer;transition:all .2s;flex:1}
+.role-card.on{border-color:var(--g);background:var(--gl)}
+.role-card-icon{width:52px;height:52px;border-radius:var(--r12);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px}
+.role-card.on .role-card-icon{background:var(--w)}
+/* ── AMOUNT DISPLAY ── */
+.amt-disp{background:var(--s);border-radius:var(--r16);padding:20px;text-align:center}
+.amt-cur{font-size:24px;font-weight:700;color:var(--t2);vertical-align:super;font-size:18px}
+.amt-num{font-size:48px;font-weight:800;color:var(--t)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sb-logo">NeedFull</div>
+  <div class="sb-sub">Interactive Prototype</div>
+
+  <div class="sb-group">
+    <div class="sb-label">🔐 Auth Flow</div>
+    <button class="sb-btn on" onclick="go('splash')">01 · Splash / Welcome</button>
+    <button class="sb-btn" onclick="go('phone-entry')">02 · Phone Entry</button>
+    <button class="sb-btn" onclick="go('otp')">03 · OTP Verify</button>
+    <button class="sb-btn" onclick="go('name-setup')">04 · Name & Photo</button>
+    <button class="sb-btn" onclick="go('role-select')">05 · Role Select</button>
+    <button class="sb-btn" onclick="go('school-setup')">06 · School Setup</button>
+  </div>
+
+  <div class="sb-group">
+    <div class="sb-label">🏠 Main Screens</div>
+    <button class="sb-btn" onclick="go('home')">07 · Home Feed</button>
+    <button class="sb-btn" onclick="go('explore')">08 · Explore</button>
+    <button class="sb-btn" onclick="go('notifications')">09 · Notifications</button>
+  </div>
+
+  <div class="sb-group">
+    <div class="sb-label">📝 Post Task</div>
+    <button class="sb-btn" onclick="go('post-cat')">10 · Category</button>
+    <button class="sb-btn" onclick="go('post-details')">11 · Task Details</button>
+    <button class="sb-btn" onclick="go('post-budget')">12 · Budget & Location</button>
+    <button class="sb-btn" onclick="go('post-success')">13 · Task Posted ✓</button>
+  </div>
+
+  <div class="sb-group">
+    <div class="sb-label">🔍 Browse & Apply</div>
+    <button class="sb-btn" onclick="go('task-feed')">14 · Task Feed (Agent)</button>
+    <button class="sb-btn" onclick="go('task-detail')">15 · Task Detail</button>
+    <button class="sb-btn" onclick="go('agent-profile')">16 · Agent Profile</button>
+    <button class="sb-btn" onclick="go('my-tasks')">17 · My Tasks (Seeker)</button>
+    <button class="sb-btn" onclick="go('applicants')">18 · Applicants</button>
+  </div>
+
+  <div class="sb-group">
+    <div class="sb-label">💬 Chat</div>
+    <button class="sb-btn" onclick="go('chat-list')">19 · Conversations</button>
+    <button class="sb-btn" onclick="go('chat-thread')">20 · Chat Thread</button>
+  </div>
+
+  <div class="sb-group">
+    <div class="sb-label">✅ Task Progress</div>
+    <button class="sb-btn" onclick="go('task-active')">21 · Task Active</button>
+    <button class="sb-btn" onclick="go('task-complete')">22 · Confirm Done</button>
+    <button class="sb-btn" onclick="go('rate-review')">23 · Rate & Review</button>
+  </div>
+
+  <div class="sb-group">
+    <div class="sb-label">💰 Wallet</div>
+    <button class="sb-btn" onclick="go('wallet')">24 · Wallet</button>
+    <button class="sb-btn" onclick="go('fund-wallet')">25 · Fund Wallet</button>
+    <button class="sb-btn" onclick="go('withdraw')">26 · Withdraw</button>
+  </div>
+
+  <div class="sb-group">
+    <div class="sb-label">👤 Account</div>
+    <button class="sb-btn" onclick="go('profile')">27 · My Profile</button>
+    <button class="sb-btn" onclick="go('settings')">28 · Settings</button>
+  </div>
+</aside>
+
+<!-- ── PHONE ── -->
+<div class="phone-wrap">
+<div class="phone">
+  <div class="island"></div>
+  <div class="sbar" id="mainSbar">
+    <span class="sbar-time">9:41</span>
+    <span class="sbar-icons">▲▲▲ WiFi ▌▌▌▌</span>
+  </div>
+
+<!-- ══════════════════════════════════════
+     01 SPLASH
+══════════════════════════════════════ -->
+<div class="scr on" id="splash">
+  <div class="splash-bg">
+    <!-- Logo -->
+    <div style="margin-bottom:auto;padding-top:80px">
+      <div style="width:72px;height:72px;border-radius:20px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:#fff;margin-bottom:20px;border:1px solid rgba(255,255,255,.2)">N</div>
+      <div style="font-size:36px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:6px">NeedFull</div>
+      <div style="font-size:15px;color:rgba(255,255,255,.65);line-height:1.5;max-width:220px">The trusted campus marketplace for tasks, errands &amp; local services.</div>
+    </div>
+    <!-- Illustration dots -->
+    <div style="display:flex;gap:10px;margin:32px 0;justify-content:center">
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--a)"></div>
+      <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.3)"></div>
+      <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.3)"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <button class="btn btn-a" onclick="go('phone-entry')">Get Started →</button>
+      <button class="btn btn-ghost" onclick="go('home')" style="color:rgba(255,255,255,.7);background:rgba(255,255,255,.1)">I already have an account</button>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,.3);text-align:center;margin-top:16px">By continuing you agree to our Terms &amp; Privacy Policy</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     02 PHONE ENTRY
+══════════════════════════════════════ -->
+<div class="scr" id="phone-entry">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">Sign up</span><div style="width:40px"></div></div>
+  <div class="scrl p20">
+    <div class="mt12">
+      <div class="h2 mb4">What's your<br>phone number?</div>
+      <div class="body mb24">We'll send a verification code. No spam, ever.</div>
+      <div class="igroup">
+        <div class="ilabel">Mobile Number</div>
+        <div class="ifield-with-pre">
+          <div class="ifield-pre">🇳🇬 +234</div>
+          <input class="ifield-inner" type="tel" placeholder="8012345678" id="phoneInput" oninput="checkPhone()">
+        </div>
+        <div class="ihint">Enter your number without the leading zero</div>
+      </div>
+      <!-- Hint box -->
+      <div style="background:var(--al);border-radius:var(--r12);padding:12px 14px;display:flex;gap:10px;align-items:flex-start;margin-bottom:24px">
+        <span style="font-size:18px">🔒</span>
+        <div class="sm" style="color:var(--ad)">Your number is only used to verify your identity. We never share it with anyone.</div>
+      </div>
+      <button class="btn btn-g" id="phoneBtn" onclick="go('otp')" style="opacity:.4;pointer-events:none">Send Code</button>
+    </div>
+    <!-- Alt login -->
+    <div style="text-align:center;margin-top:24px">
+      <div class="xs mb12" style="color:var(--t3)">— or continue with —</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost btn-sm" style="flex:1">🔵 Google</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1">🍎 Apple</button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--t3)">Already have an account? <span style="color:var(--g);font-weight:600;cursor:pointer" onclick="go('home')">Sign in</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     03 OTP
+══════════════════════════════════════ -->
+<div class="scr" id="otp">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">Verify</span><div style="width:40px"></div></div>
+  <div class="scrl p20">
+    <div class="mt24 tc">
+      <div style="font-size:48px;margin-bottom:16px">📱</div>
+      <div class="h2 mb8">Check your SMS</div>
+      <div class="body mb8">We sent a 6-digit code to</div>
+      <div style="font-size:15px;font-weight:700;color:var(--t);margin-bottom:32px">+234 8012345678</div>
+      <!-- OTP inputs -->
+      <div style="display:flex;gap:10px;justify-content:center;margin-bottom:24px">
+        <input style="width:46px;height:56px;border:2px solid var(--b);border-radius:12px;text-align:center;font-size:22px;font-weight:700;font-family:var(--fn);color:var(--t);outline:none;background:var(--s)" maxlength="1" oninput="otpNext(this,1)" id="o1">
+        <input style="width:46px;height:56px;border:2px solid var(--b);border-radius:12px;text-align:center;font-size:22px;font-weight:700;font-family:var(--fn);color:var(--t);outline:none;background:var(--s)" maxlength="1" oninput="otpNext(this,2)" id="o2">
+        <input style="width:46px;height:56px;border:2px solid var(--b);border-radius:12px;text-align:center;font-size:22px;font-weight:700;font-family:var(--fn);color:var(--t);outline:none;background:var(--s)" maxlength="1" oninput="otpNext(this,3)" id="o3">
+        <input style="width:46px;height:56px;border:2px solid var(--b);border-radius:12px;text-align:center;font-size:22px;font-weight:700;font-family:var(--fn);color:var(--t);outline:none;background:var(--s)" maxlength="1" oninput="otpNext(this,4)" id="o4">
+        <input style="width:46px;height:56px;border:2px solid var(--b);border-radius:12px;text-align:center;font-size:22px;font-weight:700;font-family:var(--fn);color:var(--t);outline:none;background:var(--s)" maxlength="1" oninput="otpNext(this,5)" id="o5">
+        <input style="width:46px;height:56px;border:2px solid var(--b);border-radius:12px;text-align:center;font-size:22px;font-weight:700;font-family:var(--fn);color:var(--t);outline:none;background:var(--s)" maxlength="1" oninput="otpNext(this,6)" id="o6">
+      </div>
+      <button class="btn btn-g mb20" onclick="go('name-setup')">Verify & Continue</button>
+      <div class="sm" style="color:var(--t3)">Didn't receive it? <span style="color:var(--g);font-weight:600;cursor:pointer">Resend in 0:45</span></div>
+      <div style="margin-top:10px"><span class="sm" style="color:var(--t3)">Wrong number? </span><span class="sm" style="color:var(--g);font-weight:600;cursor:pointer" onclick="back()">Change it</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     04 NAME SETUP
+══════════════════════════════════════ -->
+<div class="scr" id="name-setup">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">Your Profile</span><div style="width:40px"></div></div>
+  <!-- Step indicator -->
+  <div class="steps">
+    <div class="step"><div class="step-circle done">✓</div><div class="step-label">Phone</div></div>
+    <div class="step-line done"></div>
+    <div class="step"><div class="step-circle on">2</div><div class="step-label">Profile</div></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-circle">3</div><div class="step-label">Role</div></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-circle">4</div><div class="step-label">School</div></div>
+  </div>
+  <div class="scrl p20">
+    <!-- Avatar picker -->
+    <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:24px">
+      <div style="position:relative;cursor:pointer" onclick="void(0)">
+        <div class="av av-xl av-g" style="font-size:32px">AO</div>
+        <div style="position:absolute;bottom:0;right:0;width:28px;height:28px;background:var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid var(--bg)">📷</div>
+      </div>
+      <div class="sm mt8" style="color:var(--g);font-weight:600">Add photo</div>
+    </div>
+    <div class="igroup">
+      <div class="ilabel">First Name</div>
+      <input class="ifield" type="text" placeholder="e.g. Amaka" value="Amaka">
+    </div>
+    <div class="igroup">
+      <div class="ilabel">Last Name</div>
+      <input class="ifield" type="text" placeholder="e.g. Okafor" value="Okafor">
+    </div>
+    <div class="igroup">
+      <div class="ilabel">Gender (optional)</div>
+      <select class="ifield" style="cursor:pointer">
+        <option value="">Select gender</option>
+        <option value="f" selected>Female</option>
+        <option value="m">Male</option>
+        <option value="o">Prefer not to say</option>
+      </select>
+    </div>
+    <div class="mt8">
+      <button class="btn btn-g" onclick="go('role-select')">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     05 ROLE SELECT
+══════════════════════════════════════ -->
+<div class="scr" id="role-select">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">How will you use it?</span><div style="width:40px"></div></div>
+  <div class="steps">
+    <div class="step"><div class="step-circle done">✓</div><div class="step-label">Phone</div></div>
+    <div class="step-line done"></div>
+    <div class="step"><div class="step-circle done">✓</div><div class="step-label">Profile</div></div>
+    <div class="step-line done"></div>
+    <div class="step"><div class="step-circle on">3</div><div class="step-label">Role</div></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-circle">4</div><div class="step-label">School</div></div>
+  </div>
+  <div class="scrl p20">
+    <div class="body mb20" style="color:var(--t2)">You can always change this later in your settings.</div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <div class="role-card on" id="rc-seeker" onclick="selectRole('seeker')">
+        <div class="role-card-icon">🙋</div>
+        <div class="h4 mb4">Seeker</div>
+        <div class="sm" style="color:var(--t2)">I need help with tasks, errands, and services. I post tasks and hire Agents.</div>
+        <div style="margin-top:12px"><span class="badge badge-g">Most Common</span></div>
+      </div>
+      <div class="role-card" id="rc-agent" onclick="selectRole('agent')">
+        <div class="role-card-icon">💼</div>
+        <div class="h4 mb4">Agent</div>
+        <div class="sm" style="color:var(--t2)">I complete tasks and offer services. I browse nearby tasks and earn money.</div>
+        <div style="margin-top:12px"><span class="badge badge-a">Earn Daily</span></div>
+      </div>
+      <div class="role-card" id="rc-both" onclick="selectRole('both')">
+        <div class="role-card-icon">⚡</div>
+        <div class="h4 mb4">Both</div>
+        <div class="sm" style="color:var(--t2)">I sometimes need help AND sometimes offer services. Full access to everything.</div>
+      </div>
+    </div>
+    <button class="btn btn-g" onclick="go('school-setup')">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     06 SCHOOL SETUP
+══════════════════════════════════════ -->
+<div class="scr" id="school-setup">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">Your Campus</span><div style="width:40px"></div></div>
+  <div class="steps">
+    <div class="step"><div class="step-circle done">✓</div><div class="step-label">Phone</div></div>
+    <div class="step-line done"></div>
+    <div class="step"><div class="step-circle done">✓</div><div class="step-label">Profile</div></div>
+    <div class="step-line done"></div>
+    <div class="step"><div class="step-circle done">✓</div><div class="step-label">Role</div></div>
+    <div class="step-line done"></div>
+    <div class="step"><div class="step-circle on">4</div><div class="step-label">School</div></div>
+  </div>
+  <div class="scrl p20">
+    <div class="h2 mb4">Almost there 🎓</div>
+    <div class="body mb20">Your campus helps us show you the most relevant tasks and Agents nearby.</div>
+    <div class="igroup">
+      <div class="ilabel">University / Polytechnic</div>
+      <select class="ifield" style="cursor:pointer">
+        <option value="fuoye" selected>Federal Univ. of Oye-Ekiti (FUOYE)</option>
+        <option>University of Lagos (UNILAG)</option>
+        <option>Obafemi Awolowo University (OAU)</option>
+        <option>University of Ibadan (UI)</option>
+        <option>University of Nigeria (UNN)</option>
+        <option>ABU Zaria</option>
+        <option>LAUTECH</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="igroup">
+      <div class="ilabel">Faculty / Department</div>
+      <select class="ifield" style="cursor:pointer">
+        <option>Computing &amp; Information Sciences</option>
+        <option selected>Engineering</option>
+        <option>Medicine &amp; Surgery</option>
+        <option>Law</option>
+        <option>Social Sciences</option>
+        <option>Education</option>
+        <option>Management Sciences</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="igroup">
+      <div class="ilabel">Level</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+        <button style="height:40px;border-radius:var(--r8);border:1.5px solid var(--b);background:var(--s);font-family:var(--fn);font-size:13px;cursor:pointer;color:var(--t2)">100L</button>
+        <button style="height:40px;border-radius:var(--r8);border:1.5px solid var(--g);background:var(--gl);font-family:var(--fn);font-size:13px;cursor:pointer;color:var(--g);font-weight:600">200L</button>
+        <button style="height:40px;border-radius:var(--r8);border:1.5px solid var(--b);background:var(--s);font-family:var(--fn);font-size:13px;cursor:pointer;color:var(--t2)">300L</button>
+        <button style="height:40px;border-radius:var(--r8);border:1.5px solid var(--b);background:var(--s);font-family:var(--fn);font-size:13px;cursor:pointer;color:var(--t2)">400L</button>
+        <button style="height:40px;border-radius:var(--r8);border:1.5px solid var(--b);background:var(--s);font-family:var(--fn);font-size:13px;cursor:pointer;color:var(--t2)">500L+</button>
+      </div>
+    </div>
+    <div class="igroup mt4">
+      <div class="ilabel">Student ID (optional — for Verified badge)</div>
+      <div style="border:1.5px dashed var(--b);border-radius:var(--r12);padding:20px;text-align:center;cursor:pointer;background:var(--s2)" onclick="void(0)">
+        <div style="font-size:28px;margin-bottom:6px">📎</div>
+        <div class="sm font-600" style="color:var(--g)">Upload ID card</div>
+        <div class="xs mt4">JPG, PNG, or PDF • Max 5MB</div>
+      </div>
+    </div>
+    <button class="btn btn-g mt8" onclick="go('home')">🎉 Enter NeedFull</button>
+    <button class="btn btn-ghost btn-sm mt8" onclick="go('home')">Skip for now</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     07 HOME
+══════════════════════════════════════ -->
+<div class="scr" id="home">
+  <!-- Custom top area (no tbar, custom header) -->
+  <div style="background:var(--gd);padding:52px 20px 20px;flex-shrink:0">
+    <div class="rowb mb16">
+      <div>
+        <div style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:2px">Good morning 👋</div>
+        <div style="font-size:18px;font-weight:700;color:#fff">Amaka Okafor</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="ib" style="background:rgba(255,255,255,.12);color:#fff;position:relative" onclick="go('notifications')">🔔<div style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--a);border:1.5px solid var(--gd)"></div></button>
+        <div class="av av-sm av-g" style="cursor:pointer;font-size:11px;border:2px solid rgba(255,255,255,.3)" onclick="go('profile')">AO</div>
+      </div>
+    </div>
+    <!-- Wallet strip -->
+    <div style="background:rgba(255,255,255,.1);border-radius:var(--r12);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border:1px solid rgba(255,255,255,.08)" onclick="go('wallet')">
+      <div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6)">Wallet Balance</div>
+        <div style="font-size:20px;font-weight:800;color:#fff">₦12,500</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button style="background:rgba(255,255,255,.15);border:none;border-radius:var(--rf);padding:7px 14px;color:#fff;font-family:var(--fn);font-size:12px;font-weight:600;cursor:pointer" onclick="event.stopPropagation();go('fund-wallet')">+ Fund</button>
+        <button style="background:var(--a);border:none;border-radius:var(--rf);padding:7px 14px;color:#fff;font-family:var(--fn);font-size:12px;font-weight:600;cursor:pointer" onclick="event.stopPropagation();go('withdraw')">Withdraw</button>
+      </div>
+    </div>
+  </div>
+  <div class="scrl">
+    <!-- Search -->
+    <div class="px20" style="padding-top:16px;padding-bottom:8px">
+      <div class="search-bar" onclick="go('explore')">
+        <span style="font-size:18px;color:var(--t3)">🔍</span>
+        <input placeholder="Search tasks, services, Agents…" readonly>
+        <div style="width:1px;height:20px;background:var(--b)"></div>
+        <span style="font-size:16px">🎚</span>
+      </div>
+    </div>
+    <!-- Quick Actions -->
+    <div class="chips" style="padding-left:20px;padding-right:20px">
+      <button class="chip on">All</button>
+      <button class="chip">Nearby</button>
+      <button class="chip">Urgent</button>
+      <button class="chip">Today</button>
+      <button class="chip">My Tasks</button>
+    </div>
+    <div class="px20">
+      <!-- Categories -->
+      <div class="sec-hd mb12"><span class="sec-title">Categories</span><button class="sec-action" onclick="go('explore')">See all</button></div>
+      <div style="display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px">
+        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="go('post-cat')">
+          <div style="width:56px;height:56px;border-radius:16px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:26px">🧺</div>
+          <div class="xs tc" style="color:var(--t2);font-weight:500">Laundry</div>
+        </div>
+        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="go('post-cat')">
+          <div style="width:56px;height:56px;border-radius:16px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:26px">🛵</div>
+          <div class="xs tc" style="color:var(--t2);font-weight:500">Delivery</div>
+        </div>
+        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="go('post-cat')">
+          <div style="width:56px;height:56px;border-radius:16px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:26px">🖨</div>
+          <div class="xs tc" style="color:var(--t2);font-weight:500">Printing</div>
+        </div>
+        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="go('post-cat')">
+          <div style="width:56px;height:56px;border-radius:16px;background:#fce7f3;display:flex;align-items:center;justify-content:center;font-size:26px">🧹</div>
+          <div class="xs tc" style="color:var(--t2);font-weight:500">Cleaning</div>
+        </div>
+        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="go('post-cat')">
+          <div style="width:56px;height:56px;border-radius:16px;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:26px">🍔</div>
+          <div class="xs tc" style="color:var(--t2);font-weight:500">Food Run</div>
+        </div>
+        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="go('post-cat')">
+          <div style="width:56px;height:56px;border-radius:16px;background:#ecfdf5;display:flex;align-items:center;justify-content:center;font-size:26px">💻</div>
+          <div class="xs tc" style="color:var(--t2);font-weight:500">Tech Help</div>
+        </div>
+      </div>
+      <!-- Active Task Alert -->
+      <div style="background:var(--al);border-radius:var(--r12);padding:14px;display:flex;align-items:center;gap:12px;margin-top:16px;cursor:pointer;border:1px solid rgba(234,163,37,.3)" onclick="go('task-active')">
+        <div style="width:40px;height:40px;border-radius:12px;background:var(--a);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚡</div>
+        <div style="flex:1">
+          <div class="h4 mb2">Task in progress</div>
+          <div class="xs" style="color:var(--ad)">Laundry · Tunde is 10 min away</div>
+        </div>
+        <span style="color:var(--ad)">→</span>
+      </div>
+      <!-- Nearby Agents -->
+      <div class="sec-hd mt16 mb12"><span class="sec-title">Top Agents Near You</span><button class="sec-action" onclick="go('task-feed')">See all</button></div>
+      <div style="display:flex;gap:10px;overflow-x:auto;scrollbar-width:none">
+        <div class="wcard" style="flex-shrink:0;width:160px;flex-direction:column;align-items:flex-start;padding:14px;gap:8px" onclick="go('agent-profile')">
+          <div class="row g8"><div class="av av-sm av-g">TO</div><div><div style="font-size:13px;font-weight:600;color:var(--t)">Tunde O.</div><div class="xs" style="color:var(--a)">⭐ 4.9</div></div></div>
+          <div class="badge badge-g" style="font-size:10px">Laundry · Errands</div>
+          <div class="xs" style="color:var(--t3)">📍 180m away</div>
+        </div>
+        <div class="wcard" style="flex-shrink:0;width:160px;flex-direction:column;align-items:flex-start;padding:14px;gap:8px" onclick="go('agent-profile')">
+          <div class="row g8"><div class="av av-sm av-pu">CI</div><div><div style="font-size:13px;font-weight:600;color:var(--t)">Chioma I.</div><div class="xs" style="color:var(--a)">⭐ 4.8</div></div></div>
+          <div class="badge badge-a" style="font-size:10px">Printing · Design</div>
+          <div class="xs" style="color:var(--t3)">📍 320m away</div>
+        </div>
+        <div class="wcard" style="flex-shrink:0;width:160px;flex-direction:column;align-items:flex-start;padding:14px;gap:8px" onclick="go('agent-profile')">
+          <div class="row g8"><div class="av av-sm av-bl">EA</div><div><div style="font-size:13px;font-weight:600;color:var(--t)">Emeka A.</div><div class="xs" style="color:var(--a)">⭐ 4.7</div></div></div>
+          <div class="badge badge-gray" style="font-size:10px">Food · Delivery</div>
+          <div class="xs" style="color:var(--t3)">📍 500m away</div>
+        </div>
+      </div>
+      <!-- Recent Tasks -->
+      <div class="sec-hd mt16 mb12"><span class="sec-title">Recent Nearby Tasks</span><button class="sec-action" onclick="go('task-feed')">Browse all</button></div>
+      <div class="tcard" onclick="go('task-detail')">
+        <div class="rowb mb8">
+          <div><div class="tc-title">Wash 3 bags of clothes</div><div class="tc-meta">📍 Block D Hostel · 8 min ago</div></div>
+          <div style="text-align:right"><div class="tc-budget">₦800</div><div class="tc-budget-sub">Budget</div></div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="badge badge-a">⚡ Urgent</span>
+          <span class="badge badge-gray">🧺 Laundry</span>
+          <span class="badge badge-gray">📍 Onsite</span>
+        </div>
+        <div class="dvd" style="margin:10px 0"></div>
+        <div class="row g8"><div class="av av-sm av-a">FA</div><div><div style="font-size:12px;font-weight:600;color:var(--t)">Fatima A.</div><div class="xs">Seeker · 12 tasks posted</div></div><div style="margin-left:auto"><span class="badge badge-g">3 applied</span></div></div>
+      </div>
+      <!-- Stats -->
+      <div class="sec-title mb12 mt4">Your Activity</div>
+      <div class="stat-grid mb20">
+        <div class="stat-card"><div style="font-size:22px;margin-bottom:4px">📝</div><div class="stat-val">3</div><div class="stat-lbl">Posted</div></div>
+        <div class="stat-card"><div style="font-size:22px;margin-bottom:4px">✅</div><div class="stat-val">7</div><div class="stat-lbl">Done</div></div>
+        <div class="stat-card"><div style="font-size:22px;margin-bottom:4px">₦</div><div class="stat-val" style="font-size:14px">8,400</div><div class="stat-lbl">Earned</div></div>
+        <div class="stat-card"><div style="font-size:22px;margin-bottom:4px">💬</div><div class="stat-val">2</div><div class="stat-lbl">Chats</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="bnav">
+    <button class="ni on" onclick="go('home')"><span class="ni-icon">🏠</span>Home</button>
+    <button class="ni" onclick="go('explore')"><span class="ni-icon">🔍</span>Explore</button>
+    <button class="ni-plus" onclick="go('post-cat')">＋</button>
+    <button class="ni" onclick="go('chat-list')"><span class="ni-icon">💬</span>Chat</button>
+    <button class="ni" onclick="go('profile')"><span class="ni-icon">👤</span>Profile</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     08 EXPLORE
+══════════════════════════════════════ -->
+<div class="scr" id="explore">
+  <div class="tbar"><button class="ib trans" onclick="back()">←</button><span class="tbar-title">Explore</span><div style="width:40px"></div></div>
+  <div style="padding:10px 20px 4px;flex-shrink:0">
+    <div class="search-bar"><span style="font-size:18px;color:var(--t3)">🔍</span><input placeholder="Search tasks or services…" autofocus></div>
+  </div>
+  <div class="chips"><button class="chip on">All</button><button class="chip">Tasks</button><button class="chip">Services</button><button class="chip">Urgent</button><button class="chip">Under ₦500</button></div>
+  <div class="scrl px20">
+    <div class="sec-title mb12">Browse by Category</div>
+    <div class="catgrid">
+      <div class="catcard" onclick="go('task-feed')"><div class="cat-icon">🧺</div><div class="cat-name">Laundry &amp; Washing</div></div>
+      <div class="catcard" onclick="go('task-feed')"><div class="cat-icon">🛵</div><div class="cat-name">Delivery &amp; Errands</div></div>
+      <div class="catcard" onclick="go('task-feed')"><div class="cat-icon">🧹</div><div class="cat-name">Cleaning</div></div>
+      <div class="catcard" onclick="go('task-feed')"><div class="cat-icon">🖨</div><div class="cat-name">Printing &amp; Binding</div></div>
+      <div class="catcard" onclick="go('task-feed')"><div class="cat-icon">🍔</div><div class="cat-name">Food Runs</div></div>
+      <div class="catcard" onclick="go('task-feed')"><div class="cat-icon">💻</div><div class="cat-name">Tech Support</div></div>
+      <div class="catcard" onclick="go('task-feed')"><div class="cat-icon">🎨</div><div class="cat-name">Graphic Design</div></div>
+      <div class="catcard" onclick="go('task-feed')"><div class="cat-icon">📚</div><div class="cat-name">Tutoring</div></div>
+      <div class="catcard" onclick="go('task-feed')"><div class="cat-icon">✂️</div><div class="cat-name">Tailoring</div></div>
+      <div class="catcard" onclick="go('task-feed')"><div class="cat-icon">📸</div><div class="cat-name">Photography</div></div>
+      <div class="catcard" onclick="go('task-feed')"><div class="cat-icon">💪</div><div class="cat-name">Labour &amp; Lifting</div></div>
+      <div class="catcard" onclick="go('task-feed')"><div class="cat-icon">🔧</div><div class="cat-name">Repairs &amp; Fix</div></div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+  <div class="bnav">
+    <button class="ni" onclick="go('home')"><span class="ni-icon">🏠</span>Home</button>
+    <button class="ni on" onclick="go('explore')"><span class="ni-icon">🔍</span>Explore</button>
+    <button class="ni-plus" onclick="go('post-cat')">＋</button>
+    <button class="ni" onclick="go('chat-list')"><span class="ni-icon">💬</span>Chat</button>
+    <button class="ni" onclick="go('profile')"><span class="ni-icon">👤</span>Profile</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     09 NOTIFICATIONS
+══════════════════════════════════════ -->
+<div class="scr" id="notifications">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">Notifications</span><button class="ib trans" style="font-size:13px;font-weight:600;color:var(--g)">Clear</button></div>
+  <div class="scrl">
+    <div class="px20 pt8">
+      <div class="xs mb8" style="font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:1px">Today</div>
+    </div>
+    <div class="ni-row" onclick="go('task-active')"><div class="ni-ic" style="background:var(--al)">⚡</div><div style="flex:1"><div class="h4">Tunde accepted your task!</div><div class="sm mt4" style="color:var(--t2)">Your laundry task has been accepted. Tunde is on his way.</div><div class="xs mt4" style="color:var(--t3)">2 min ago</div></div><div style="width:8px;height:8px;border-radius:50%;background:var(--g);flex-shrink:0;margin-top:6px"></div></div>
+    <div class="ni-row" onclick="go('wallet')"><div class="ni-ic" style="background:var(--gl)">💰</div><div style="flex:1"><div class="h4">₦800 held in escrow</div><div class="sm mt4" style="color:var(--t2)">Payment is secured. It'll be released when the task is confirmed.</div><div class="xs mt4" style="color:var(--t3)">15 min ago</div></div></div>
+    <div class="ni-row" onclick="go('chat-thread')"><div class="ni-ic" style="background:#dbeafe">💬</div><div style="flex:1"><div class="h4">New message from Chioma</div><div class="sm mt4" style="color:var(--t2)">"I can do the printing by 3pm, is that okay?"</div><div class="xs mt4" style="color:var(--t3)">1 hr ago</div></div><div style="width:8px;height:8px;border-radius:50%;background:var(--g);flex-shrink:0;margin-top:6px"></div></div>
+    <div class="px20 pt8"><div class="xs mb8" style="font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:1px">Yesterday</div></div>
+    <div class="ni-row"><div class="ni-ic" style="background:#ede9fe">⭐</div><div style="flex:1"><div class="h4">Emeka left you a 5-star review</div><div class="sm mt4" style="color:var(--t2)">"Very fast and reliable. Will use again!"</div><div class="xs mt4" style="color:var(--t3)">Yesterday 6:40pm</div></div></div>
+    <div class="ni-row"><div class="ni-ic" style="background:#dcfce7">✅</div><div style="flex:1"><div class="h4">Task completed! ₦1,200 received</div><div class="sm mt4" style="color:var(--t2)">Printing &amp; Binding task is done. Funds released to your wallet.</div><div class="xs mt4" style="color:var(--t3)">Yesterday 4:20pm</div></div></div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     10 POST TASK — CATEGORY
+══════════════════════════════════════ -->
+<div class="scr" id="post-cat">
+  <div class="tbar"><button class="ib" onclick="back()">✕</button><span class="tbar-title">Post a Task</span><div style="width:40px"></div></div>
+  <div class="steps">
+    <div class="step"><div class="step-circle on">1</div><div class="step-label">Category</div></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-circle">2</div><div class="step-label">Details</div></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-circle">3</div><div class="step-label">Budget</div></div>
+  </div>
+  <div class="scrl p20">
+    <div class="h3 mb4">What do you need help with?</div>
+    <div class="body mb16">Choose a category to help us match you with the right Agents.</div>
+    <div class="catgrid">
+      <div class="catcard on" id="cat-laundry" onclick="selectCat('laundry')"><div class="cat-icon">🧺</div><div class="cat-name">Laundry &amp; Washing</div></div>
+      <div class="catcard" id="cat-delivery" onclick="selectCat('delivery')"><div class="cat-icon">🛵</div><div class="cat-name">Delivery &amp; Errands</div></div>
+      <div class="catcard" id="cat-cleaning" onclick="selectCat('cleaning')"><div class="cat-icon">🧹</div><div class="cat-name">Cleaning</div></div>
+      <div class="catcard" id="cat-printing" onclick="selectCat('printing')"><div class="cat-icon">🖨</div><div class="cat-name">Printing &amp; Binding</div></div>
+      <div class="catcard" id="cat-food" onclick="selectCat('food')"><div class="cat-icon">🍔</div><div class="cat-name">Food Runs</div></div>
+      <div class="catcard" id="cat-tech" onclick="selectCat('tech')"><div class="cat-icon">💻</div><div class="cat-name">Tech Support</div></div>
+      <div class="catcard" id="cat-design" onclick="selectCat('design')"><div class="cat-icon">🎨</div><div class="cat-name">Graphic Design</div></div>
+      <div class="catcard" id="cat-other" onclick="selectCat('other')"><div class="cat-icon">➕</div><div class="cat-name">Other / Custom</div></div>
+    </div>
+    <div class="mt20"><button class="btn btn-g" onclick="go('post-details')">Continue →</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     11 POST TASK — DETAILS
+══════════════════════════════════════ -->
+<div class="scr" id="post-details">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">Post a Task</span><div style="width:40px"></div></div>
+  <div class="steps">
+    <div class="step"><div class="step-circle done">✓</div><div class="step-label">Category</div></div>
+    <div class="step-line done"></div>
+    <div class="step"><div class="step-circle on">2</div><div class="step-label">Details</div></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-circle">3</div><div class="step-label">Budget</div></div>
+  </div>
+  <div class="scrl p20">
+    <div class="h3 mb4">Describe your task</div>
+    <div class="body mb16">Be specific — better descriptions attract better Agents faster.</div>
+    <div class="igroup">
+      <div class="ilabel">Task Title</div>
+      <input class="ifield" type="text" placeholder="e.g. Wash 3 bags of clothes" value="Wash 3 bags of clothes">
+      <div class="ihint">Short and clear. Max 60 characters.</div>
+    </div>
+    <div class="igroup">
+      <div class="ilabel">Description</div>
+      <textarea class="itextarea" rows="4" placeholder="Describe exactly what you need...">I need someone to wash and sun-dry about 3 bags of clothes. All materials (bucket, soap, water) are provided. Delivery back to my room when done please.</textarea>
+      <div class="ihint">Include important details like materials, special instructions, or access info.</div>
+    </div>
+    <!-- Quick suggestions -->
+    <div class="sm mb8" style="font-weight:600;color:var(--t)">Quick examples:</div>
+    <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px">
+      <span class="chip" style="cursor:pointer">Wash clothes by evening</span>
+      <span class="chip" style="cursor:pointer">Iron and fold as well</span>
+      <span class="chip" style="cursor:pointer">Materials provided</span>
+    </div>
+    <div class="igroup">
+      <div class="ilabel">Task Mode</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div style="border:2px solid var(--g);border-radius:var(--r12);padding:12px 8px;text-align:center;cursor:pointer;background:var(--gl)"><div style="font-size:20px">🏠</div><div style="font-size:11px;font-weight:600;color:var(--g);margin-top:4px">Onsite</div></div>
+        <div style="border:2px solid var(--b);border-radius:var(--r12);padding:12px 8px;text-align:center;cursor:pointer"><div style="font-size:20px">💻</div><div style="font-size:11px;font-weight:500;color:var(--t2);margin-top:4px">Remote</div></div>
+        <div style="border:2px solid var(--b);border-radius:var(--r12);padding:12px 8px;text-align:center;cursor:pointer"><div style="font-size:20px">🤝</div><div style="font-size:11px;font-weight:500;color:var(--t2);margin-top:4px">Flexible</div></div>
+      </div>
+    </div>
+    <button class="btn btn-g mt8" onclick="go('post-budget')">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     12 POST TASK — BUDGET
+══════════════════════════════════════ -->
+<div class="scr" id="post-budget">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">Post a Task</span><div style="width:40px"></div></div>
+  <div class="steps">
+    <div class="step"><div class="step-circle done">✓</div><div class="step-label">Category</div></div>
+    <div class="step-line done"></div>
+    <div class="step"><div class="step-circle done">✓</div><div class="step-label">Details</div></div>
+    <div class="step-line done"></div>
+    <div class="step"><div class="step-circle on">3</div><div class="step-label">Budget</div></div>
+  </div>
+  <div class="scrl p20">
+    <div class="h3 mb4">Set your budget &amp; deadline</div>
+    <div class="body mb20">Fair pricing attracts better Agents. Agents can also negotiate.</div>
+    <!-- Budget display -->
+    <div class="amt-disp mb16">
+      <div><span class="amt-cur">₦</span><span class="amt-num" id="budgetDisplay">800</span></div>
+      <div class="xs mt4" style="color:var(--t3)">Your budget</div>
+    </div>
+    <input type="range" min="200" max="10000" value="800" step="100" style="width:100%;accent-color:var(--g);margin-bottom:8px" oninput="document.getElementById('budgetDisplay').textContent=this.value;document.getElementById('budgetNum').value=this.value">
+    <div class="rowb mb20"><span class="xs" style="color:var(--t3)">₦200</span><span class="xs" style="color:var(--t3)">₦10,000</span></div>
+    <div class="igroup">
+      <div class="ilabel">Or enter exact amount</div>
+      <div class="ifield-with-pre"><div class="ifield-pre">₦</div><input class="ifield-inner" type="number" value="800" id="budgetNum"></div>
+    </div>
+    <!-- Suggested prices -->
+    <div class="sm mb8" style="font-weight:600;color:var(--t)">Suggested for Laundry:</div>
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <button style="flex:1;height:40px;border-radius:var(--r8);border:1.5px solid var(--b);background:var(--s);font-family:var(--fn);font-size:13px;cursor:pointer;color:var(--t2)">₦500</button>
+      <button style="flex:1;height:40px;border-radius:var(--r8);border:2px solid var(--g);background:var(--gl);font-family:var(--fn);font-size:13px;cursor:pointer;color:var(--g);font-weight:600">₦800</button>
+      <button style="flex:1;height:40px;border-radius:var(--r8);border:1.5px solid var(--b);background:var(--s);font-family:var(--fn);font-size:13px;cursor:pointer;color:var(--t2)">₦1,200</button>
+    </div>
+    <div class="igroup">
+      <div class="ilabel">Deadline</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="border:2px solid var(--g);border-radius:var(--r12);padding:12px;text-align:center;cursor:pointer;background:var(--gl)"><div style="font-size:20px">⚡</div><div style="font-size:12px;font-weight:600;color:var(--g);margin-top:4px">Today</div></div>
+        <div style="border:2px solid var(--b);border-radius:var(--r12);padding:12px;text-align:center;cursor:pointer"><div style="font-size:20px">📅</div><div style="font-size:12px;font-weight:500;color:var(--t2);margin-top:4px">Set time</div></div>
+      </div>
+    </div>
+    <div class="igroup">
+      <div class="ilabel">Location</div>
+      <div class="ifield-with-pre" style="cursor:pointer"><div class="ifield-pre">📍</div><input class="ifield-inner" type="text" value="Block D Hostel, FUOYE" placeholder="Tap to set location" readonly></div>
+    </div>
+    <!-- Wallet check -->
+    <div style="background:var(--gl);border-radius:var(--r12);padding:14px;margin-bottom:20px;border:1px solid rgba(26,107,74,.2)">
+      <div class="rowb mb4"><span class="sm font-600" style="color:var(--gd)">Payment summary</span></div>
+      <div class="rowb"><span class="sm" style="color:var(--t2)">Task budget</span><span class="sm font-600" style="color:var(--t)">₦800</span></div>
+      <div class="rowb mt4"><span class="sm" style="color:var(--t2)">Platform fee (10%)</span><span class="sm font-600" style="color:var(--t)">₦80</span></div>
+      <div class="dvd"></div>
+      <div class="rowb"><span class="sm font-600" style="color:var(--t)">Total held in escrow</span><span style="font-size:16px;font-weight:700;color:var(--g)">₦880</span></div>
+      <div class="xs mt4" style="color:var(--t3)">Wallet: ₦12,500 · Enough ✓</div>
+    </div>
+    <button class="btn btn-g" onclick="go('post-success')">🚀 Post Task</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     13 TASK POSTED
+══════════════════════════════════════ -->
+<div class="scr" id="post-success">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center">
+    <div style="width:90px;height:90px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:24px;box-shadow:0 0 0 12px rgba(26,107,74,.08)">🎉</div>
+    <div class="h2 mb8">Task Posted!</div>
+    <div class="body mb8" style="max-width:260px">Your task is now live and visible to Agents near <strong>Block D Hostel</strong>.</div>
+    <div style="background:var(--s);border-radius:var(--r16);padding:16px 20px;width:100%;margin:20px 0;box-shadow:var(--sh1)">
+      <div class="rowb mb8"><span class="sm" style="color:var(--t3)">Task</span><span class="h4">Wash 3 bags of clothes</span></div>
+      <div class="rowb mb8"><span class="sm" style="color:var(--t3)">Budget</span><span class="h4" style="color:var(--g)">₦800</span></div>
+      <div class="rowb"><span class="sm" style="color:var(--t3)">Status</span><span class="badge badge-a">🔍 Finding Agents</span></div>
+    </div>
+    <div class="body mb8" style="color:var(--t3)">Average response time: <strong style="color:var(--t)">4 minutes</strong></div>
+    <div style="width:100%;margin-bottom:24px">
+      <div class="rowb mb4"><span class="xs" style="color:var(--t3)">Agents notified</span><span class="xs font-600" style="color:var(--g)">12 nearby</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:30%;background:var(--a)"></div></div>
+    </div>
+    <button class="btn btn-g mb12" onclick="go('my-tasks')">View My Tasks</button>
+    <button class="btn btn-ghost btn-sm" onclick="go('home')">Back to Home</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     14 TASK FEED (Agent view)
+══════════════════════════════════════ -->
+<div class="scr" id="task-feed">
+  <div style="background:var(--gd);padding:52px 20px 16px;flex-shrink:0">
+    <div class="rowb">
+      <div><div class="xs" style="color:rgba(255,255,255,.5)">Agent Mode</div><div class="h3" style="color:#fff">Tasks Near You</div></div>
+      <div class="badge badge-g" style="cursor:pointer">📍 FUOYE Campus</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:14px;background:rgba(255,255,255,.1);border-radius:var(--rf);padding:10px 16px">
+      <span style="font-size:16px">🔍</span>
+      <input style="flex:1;border:none;background:transparent;font-family:var(--fn);font-size:14px;color:#fff;outline:none" placeholder="Search tasks…">
+    </div>
+  </div>
+  <div class="chips" style="background:var(--s);border-bottom:1px solid var(--b)">
+    <button class="chip on">All</button>
+    <button class="chip">🧺 Laundry</button>
+    <button class="chip">🛵 Delivery</button>
+    <button class="chip">🧹 Cleaning</button>
+    <button class="chip">💻 Tech</button>
+    <button class="chip">⚡ Urgent</button>
+  </div>
+  <div class="scrl px20" style="padding-top:14px">
+    <!-- Earnings banner -->
+    <div style="background:var(--al);border-radius:var(--r12);padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;border:1px solid rgba(234,163,37,.25)">
+      <span style="font-size:22px">💰</span>
+      <div><div class="sm font-600" style="color:var(--ad)">You've earned ₦8,400 this month</div><div class="xs" style="color:var(--ad);opacity:.7">7 tasks completed · Keep it up!</div></div>
+    </div>
+    <div class="tcard urgent" onclick="go('task-detail')">
+      <div class="rowb mb10">
+        <div><div class="tc-title">Wash 3 bags of clothes</div><div class="tc-meta">📍 Block D Hostel · 8 min ago · 180m away</div></div>
+        <div style="text-align:right"><div class="tc-budget">₦800</div><div class="tc-budget-sub">Budget</div></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><span class="badge badge-a">⚡ Urgent</span><span class="badge badge-gray">🧺 Laundry</span><span class="badge badge-gray">🏠 Onsite</span></div>
+      <div class="dvd" style="margin:8px 0"></div>
+      <div class="rowb"><div class="row g8"><div class="av av-sm av-a">FA</div><div><div style="font-size:12px;font-weight:600;color:var(--t)">Fatima A.</div><div class="xs">⭐ 4.6 · 12 posted</div></div></div><button class="btn btn-g btn-xs" onclick="event.stopPropagation();go('task-detail')">Apply Now</button></div>
+    </div>
+    <div class="tcard" onclick="go('task-detail')">
+      <div class="rowb mb10">
+        <div><div class="tc-title">Print &amp; bind 40-page project</div><div class="tc-meta">📍 Library Area · 22 min ago · 340m</div></div>
+        <div style="text-align:right"><div class="tc-budget">₦1,200</div><div class="tc-budget-sub">Budget</div></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><span class="badge badge-gray">🖨 Printing</span><span class="badge badge-gray">🏠 Onsite</span></div>
+      <div class="dvd" style="margin:8px 0"></div>
+      <div class="rowb"><div class="row g8"><div class="av av-sm av-bl">EK</div><div><div style="font-size:12px;font-weight:600;color:var(--t)">Emeka K.</div><div class="xs">⭐ 4.8 · 5 posted</div></div></div><button class="btn btn-g btn-xs" onclick="event.stopPropagation()">Apply</button></div>
+    </div>
+    <div class="tcard" onclick="go('task-detail')">
+      <div class="rowb mb10">
+        <div><div class="tc-title">Clean 2-room apartment</div><div class="tc-meta">📍 Off-campus · 1hr ago · 900m</div></div>
+        <div style="text-align:right"><div class="tc-budget">₦2,500</div><div class="tc-budget-sub">Budget</div></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><span class="badge badge-gray">🧹 Cleaning</span><span class="badge badge-gray">🏠 Onsite</span><span class="badge badge-g">High Pay</span></div>
+      <div class="dvd" style="margin:8px 0"></div>
+      <div class="rowb"><div class="row g8"><div class="av av-sm av-pu">NK</div><div><div style="font-size:12px;font-weight:600;color:var(--t)">Ngozi K.</div><div class="xs">⭐ 4.3 · 8 posted</div></div></div><button class="btn btn-g btn-xs" onclick="event.stopPropagation()">Apply</button></div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+  <div class="bnav">
+    <button class="ni" onclick="go('home')"><span class="ni-icon">🏠</span>Home</button>
+    <button class="ni on"><span class="ni-icon">🔍</span>Explore</button>
+    <button class="ni-plus" onclick="go('post-cat')">＋</button>
+    <button class="ni" onclick="go('chat-list')"><span class="ni-icon">💬</span>Chat</button>
+    <button class="ni" onclick="go('profile')"><span class="ni-icon">👤</span>Profile</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     15 TASK DETAIL (Agent view — apply)
+══════════════════════════════════════ -->
+<div class="scr" id="task-detail">
+  <div style="height:52px;flex-shrink:0"></div>
+  <div class="tbar"><button class="ib" onclick="back()">←</button><div><div class="tbar-title">Task Detail</div></div><button class="ib trans">⋯</button></div>
+  <div class="scrl">
+    <div class="p20">
+      <div class="row g8 mb12"><span class="badge badge-a">⚡ Urgent</span><span class="badge badge-gray">🧺 Laundry</span><span class="badge badge-gray">🏠 Onsite</span></div>
+      <div class="h2 mb4">Wash 3 bags of clothes</div>
+      <div class="row g8 mb16"><div class="av av-sm av-a">FA</div><div><div style="font-size:13px;font-weight:600;color:var(--t)">Fatima Adeyemi</div><div class="xs">⭐ 4.6 · 12 tasks posted · Verified ✓</div></div></div>
+      <!-- Budget + meta -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px">
+        <div class="card" style="text-align:center"><div style="font-size:18px;font-weight:800;color:var(--g)">₦800</div><div class="xs mt4">Budget</div></div>
+        <div class="card" style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--t)">Today</div><div class="xs mt4">Deadline</div></div>
+        <div class="card" style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--t)">3</div><div class="xs mt4">Applied</div></div>
+      </div>
+      <div class="dvd-thick"></div>
+      <div style="padding-top:16px">
+        <div class="h4 mb8">Description</div>
+        <div class="body" style="line-height:1.7">I need someone to wash and sun-dry about 3 bags of clothes. All materials (bucket, soap, water) are provided. Delivery back to my room when done please. Please be done before 6pm.</div>
+      </div>
+      <div class="dvd"></div>
+      <div class="h4 mb8">Location</div>
+      <div style="background:var(--s2);border-radius:var(--r12);padding:12px 16px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:22px">📍</span>
+        <div><div class="sm font-600" style="color:var(--t)">Block D Hostel, FUOYE</div><div class="xs mt2" style="color:var(--t3)">~180m from your location</div></div>
+      </div>
+      <div class="dvd"></div>
+      <div class="h4 mb8">Seeker Profile</div>
+      <div class="wcard" style="box-shadow:none;padding:0;background:transparent" onclick="void(0)">
+        <div class="av av-md av-a">FA</div>
+        <div style="flex:1"><div class="wcard-name">Fatima Adeyemi</div><div class="wcard-meta">⭐ 4.6 · 12 tasks posted · FUOYE, 200L</div></div>
+        <span class="badge badge-g">Verified</span>
+      </div>
+    </div>
+  </div>
+  <!-- Apply bar -->
+  <div style="padding:12px 20px 20px;background:var(--s);border-top:1px solid var(--b)">
+    <div class="rowb mb12">
+      <div><div class="sm" style="color:var(--t3)">Task budget</div><div style="font-size:22px;font-weight:800;color:var(--g)">₦800</div></div>
+      <div style="text-align:right"><div class="xs" style="color:var(--t3)">3 agents applied</div><div class="xs mt2" style="color:var(--t3)">Deadline: Today</div></div>
+    </div>
+    <button class="btn btn-g" onclick="go('chat-thread')">✋ Apply for this Task</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     16 AGENT PROFILE
+══════════════════════════════════════ -->
+<div class="scr" id="agent-profile">
+  <div style="height:52px;flex-shrink:0;background:var(--gd)"></div>
+  <div style="background:var(--gd);padding:8px 20px 20px;flex-shrink:0;position:relative">
+    <button class="ib" style="background:rgba(255,255,255,.15);color:#fff;position:absolute;top:8px;left:20px" onclick="back()">←</button>
+    <div style="display:flex;flex-direction:column;align-items:center;padding-top:8px">
+      <div class="av av-xl av-g" style="border:3px solid rgba(255,255,255,.3);margin-bottom:10px">TO</div>
+      <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:2px">Tunde Oladele</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.65)">FUOYE · Engineering 300L</div>
+      <div style="display:flex;gap:8px;margin-top:10px"><span class="badge" style="background:rgba(255,255,255,.15);color:#fff">✓ Verified Student</span><span class="badge" style="background:rgba(234,163,37,.3);color:var(--a)">⭐ 4.9 Rating</span></div>
+    </div>
+  </div>
+  <div class="scrl">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;padding:16px 20px">
+      <div class="stat-card"><div class="stat-val">47</div><div class="stat-lbl">Tasks Done</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--a)">4.9</div><div class="stat-lbl">Rating</div></div>
+      <div class="stat-card"><div class="stat-val">98%</div><div class="stat-lbl">Completion</div></div>
+      <div class="stat-card"><div class="stat-val" style="font-size:14px">~15m</div><div class="stat-lbl">Response</div></div>
+    </div>
+    <div class="dvd-thick"></div>
+    <div class="p20">
+      <div class="h4 mb8">Services Offered</div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px"><span class="badge badge-g">🧺 Laundry</span><span class="badge badge-g">🛵 Delivery</span><span class="badge badge-g">💪 Labour</span><span class="badge badge-g">🍔 Food runs</span></div>
+      <div class="h4 mb8">About</div>
+      <div class="body mb16">I'm a 300-level engineering student with 2 years of experience on NeedFull. I'm fast, reliable, and always on time. Available most days after 2pm and all weekends.</div>
+      <div class="h4 mb12">Recent Reviews</div>
+      <div class="card mb10"><div class="row g8 mb8"><div class="av av-sm av-pu">NK</div><div><div style="font-size:13px;font-weight:600;color:var(--t)">Ngozi K.</div><div style="color:var(--a);font-size:12px">⭐⭐⭐⭐⭐</div></div><div style="margin-left:auto;font-size:11px;color:var(--t3)">2 days ago</div></div><div class="body">"Very fast and reliable. He finished my laundry in 2 hours and brought everything back neatly folded!"</div></div>
+      <div class="card mb10"><div class="row g8 mb8"><div class="av av-sm av-bl">EK</div><div><div style="font-size:13px;font-weight:600;color:var(--t)">Emeka K.</div><div style="color:var(--a);font-size:12px">⭐⭐⭐⭐⭐</div></div><div style="margin-left:auto;font-size:11px;color:var(--t3)">5 days ago</div></div><div class="body">"Tunde is the real deal. Picked up my food order, no issues, very professional."</div></div>
+    </div>
+  </div>
+  <div style="padding:12px 20px 20px;background:var(--s);border-top:1px solid var(--b)">
+    <button class="btn btn-g" onclick="go('chat-thread')">💬 Message Tunde</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     17 MY TASKS (Seeker view)
+══════════════════════════════════════ -->
+<div class="scr" id="my-tasks">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">My Tasks</span><button class="ib trans" style="font-size:20px" onclick="go('post-cat')">＋</button></div>
+  <div class="chips" style="border-bottom:1px solid var(--b);background:var(--s)">
+    <button class="chip on">Active</button>
+    <button class="chip">Pending</button>
+    <button class="chip">Completed</button>
+    <button class="chip">Cancelled</button>
+  </div>
+  <div class="scrl px20" style="padding-top:14px">
+    <!-- Active task -->
+    <div class="tcard" style="border:2px solid var(--a)" onclick="go('task-active')">
+      <div class="rowb mb10"><div><div class="tc-title">Wash 3 bags of clothes</div><div class="tc-meta">Posted 20 min ago</div></div><span class="badge badge-a">⚡ In Progress</span></div>
+      <div class="dvd" style="margin:8px 0"></div>
+      <div class="row g8"><div class="av av-sm av-g">TO</div><div><div style="font-size:12px;font-weight:600;color:var(--t)">Tunde Oladele (Agent)</div><div class="xs">⭐ 4.9 · On his way</div></div><button class="btn btn-g btn-xs" onclick="event.stopPropagation();go('chat-thread')">Chat</button></div>
+    </div>
+    <!-- Pending task with applicants -->
+    <div class="tcard" onclick="go('applicants')">
+      <div class="rowb mb10"><div><div class="tc-title">Print &amp; bind 40-page project</div><div class="tc-meta">Posted 2hrs ago</div></div><span class="badge badge-gray">3 Applied</span></div>
+      <div class="dvd" style="margin:8px 0"></div>
+      <div class="rowb"><span class="xs" style="color:var(--t3)">Budget: ₦1,200 · Library Area</span><button class="btn btn-g btn-xs" onclick="event.stopPropagation();go('applicants')">View Applicants</button></div>
+    </div>
+    <!-- Completed -->
+    <div class="sec-title mt8 mb12">Completed (5)</div>
+    <div class="tcard" style="opacity:.75">
+      <div class="rowb mb6"><div class="tc-title">Food pickup from mama put</div><span class="badge badge-ok">✓ Done</span></div>
+      <div class="rowb mt6"><span class="xs" style="color:var(--t3)">Completed yesterday · ₦500</span><span style="color:var(--a);font-size:12px">⭐⭐⭐⭐⭐</span></div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+  <div class="bnav">
+    <button class="ni" onclick="go('home')"><span class="ni-icon">🏠</span>Home</button>
+    <button class="ni"><span class="ni-icon">🔍</span>Explore</button>
+    <button class="ni-plus" onclick="go('post-cat')">＋</button>
+    <button class="ni" onclick="go('chat-list')"><span class="ni-icon">💬</span>Chat</button>
+    <button class="ni on" onclick="go('profile')"><span class="ni-icon">👤</span>Profile</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     18 APPLICANTS
+══════════════════════════════════════ -->
+<div class="scr" id="applicants">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><div><div class="tbar-title">Applicants</div><div class="tbar-sub">Print &amp; bind project · ₦1,200</div></div><div style="width:40px"></div></div>
+  <div class="scrl px20" style="padding-top:14px">
+    <div class="body mb16">3 Agents have applied. Review their profiles and select the best fit.</div>
+    <div class="wcard" onclick="go('agent-profile')">
+      <div class="av av-md av-g">TO</div>
+      <div style="flex:1"><div class="wcard-name">Tunde Oladele</div><div class="wcard-meta">⭐ 4.9 · 47 done · 180m away · "Can do by 2pm today"</div></div>
+      <button class="btn btn-g btn-xs" onclick="event.stopPropagation();go('chat-thread')">Hire</button>
+    </div>
+    <div class="wcard" onclick="go('agent-profile')">
+      <div class="av av-md av-pu">CI</div>
+      <div style="flex:1"><div class="wcard-name">Chioma Ibeh</div><div class="wcard-meta">⭐ 4.8 · 31 done · 320m away · "My rate is ₦1,000"</div></div>
+      <button class="btn btn-out btn-xs" onclick="event.stopPropagation();go('chat-thread')">Chat</button>
+    </div>
+    <div class="wcard" onclick="go('agent-profile')">
+      <div class="av av-md av-ro">AA</div>
+      <div style="flex:1"><div class="wcard-name">Aisha Aliyu</div><div class="wcard-meta">⭐ 4.5 · 18 done · 650m away · Accepts ₦1,200</div></div>
+      <button class="btn btn-out btn-xs" onclick="event.stopPropagation();go('chat-thread')">Chat</button>
+    </div>
+    <!-- Hire confirmation -->
+    <div style="background:var(--gl);border-radius:var(--r16);padding:16px;margin-top:8px;border:1.5px solid rgba(26,107,74,.2)">
+      <div class="h4 mb4" style="color:var(--gd)">💡 Hiring tip</div>
+      <div class="sm" style="color:var(--t2)">You can chat with an Agent before hiring. Once you hire, ₦1,200 is held in escrow and only released when you confirm the task is done.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     19 CHAT LIST
+══════════════════════════════════════ -->
+<div class="scr" id="chat-list">
+  <div class="tbar"><button class="ib trans" onclick="back()">←</button><span class="tbar-title">Messages</span><div style="width:40px"></div></div>
+  <div style="padding:10px 20px 6px;flex-shrink:0">
+    <div class="search-bar"><span style="font-size:16px;color:var(--t3)">🔍</span><input placeholder="Search conversations…"></div>
+  </div>
+  <div class="scrl">
+    <div style="padding:8px 20px;display:flex;flex-direction:column;gap:0">
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--b);cursor:pointer;align-items:center" onclick="go('chat-thread')">
+        <div style="position:relative"><div class="av av-md av-g">TO</div><div style="position:absolute;bottom:0;right:0;width:12px;height:12px;border-radius:50%;background:var(--ok);border:2px solid var(--s)"></div></div>
+        <div style="flex:1"><div class="rowb"><span style="font-size:14px;font-weight:600;color:var(--t)">Tunde Oladele</span><span class="xs" style="color:var(--t3)">2m ago</span></div><div class="sm mt2" style="color:var(--t2)">I'm heading to your hostel now...</div><div class="xs mt2" style="color:var(--t3)">Laundry Task · Active 🟢</div></div>
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">2</div>
+      </div>
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--b);cursor:pointer;align-items:center" onclick="go('chat-thread')">
+        <div class="av av-md av-pu">CI</div>
+        <div style="flex:1"><div class="rowb"><span style="font-size:14px;font-weight:600;color:var(--t)">Chioma Ibeh</span><span class="xs" style="color:var(--t3)">1hr ago</span></div><div class="sm mt2" style="color:var(--t2)">I can do the printing by 3pm, is...</div><div class="xs mt2" style="color:var(--t3)">Printing Task · Pending 🟡</div></div>
+      </div>
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--b);cursor:pointer;align-items:center" onclick="go('chat-thread')">
+        <div class="av av-md av-a">FA</div>
+        <div style="flex:1"><div class="rowb"><span style="font-size:14px;font-weight:600;color:var(--t)">Fatima Adeyemi</span><span class="xs" style="color:var(--t3)">Yesterday</span></div><div class="sm mt2" style="color:var(--t3)">Thank you so much! 🙏</div><div class="xs mt2" style="color:var(--t3)">Laundry Task · Completed ✓</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="bnav">
+    <button class="ni" onclick="go('home')"><span class="ni-icon">🏠</span>Home</button>
+    <button class="ni"><span class="ni-icon">🔍</span>Explore</button>
+    <button class="ni-plus" onclick="go('post-cat')">＋</button>
+    <button class="ni on"><span class="ni-icon">💬</span>Chat</button>
+    <button class="ni" onclick="go('profile')"><span class="ni-icon">👤</span>Profile</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     20 CHAT THREAD
+══════════════════════════════════════ -->
+<div class="scr" id="chat-thread">
+  <div style="height:52px;flex-shrink:0"></div>
+  <div style="background:var(--s);border-bottom:1px solid var(--b);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+    <button class="ib" onclick="back()">←</button>
+    <div class="av av-sm av-g">TO</div>
+    <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--t)">Tunde Oladele</div><div class="xs" style="color:var(--ok)">● Online</div></div>
+    <button class="ib trans" onclick="go('task-active')">📋</button>
+  </div>
+  <!-- Task reference pin -->
+  <div style="background:var(--gl);padding:10px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(26,107,74,.15);flex-shrink:0;cursor:pointer" onclick="go('task-active')">
+    <span style="font-size:18px">📌</span>
+    <div style="flex:1"><div class="xs font-600" style="color:var(--gd)">Pinned Task: Wash 3 bags of clothes</div><div class="xs" style="color:var(--t3)">Budget ₦800 · Status: In Progress ⚡</div></div>
+    <span style="color:var(--g);font-size:13px">→</span>
+  </div>
+  <div class="scrl">
+    <div class="chat-area">
+      <div class="ctime">Today, 2:15pm</div>
+      <div class="cb cb-in">Hi! I just applied for your laundry task. I can pick up the clothes in 20 minutes if that works for you 🙂</div>
+      <div style="height:4px"></div>
+      <div class="cb cb-out">Hi Tunde! Yes please, that works perfectly. I'm in Block D room 212.</div>
+      <div style="height:4px"></div>
+      <div class="cb cb-in">Got it! I'll be there by 2:35pm. I'll bring my materials too just in case.</div>
+      <div style="height:4px"></div>
+      <div class="cb cb-out">Materials are provided but thank you! Please wash and sun dry. Can you iron too?</div>
+      <div style="height:4px"></div>
+      <div class="cb cb-in">I can iron for an extra ₦200. That'll make it ₦1,000 total. Is that okay?</div>
+      <div style="height:4px"></div>
+      <div class="cb cb-out">That's fine, deal! 👍</div>
+      <div style="height:4px"></div>
+      <div class="cb cb-in">Perfect! I'm heading to your hostel now 🚶</div>
+      <div class="ctime">2:31pm</div>
+    </div>
+  </div>
+  <div class="chat-input-bar">
+    <button class="ib trans" style="font-size:22px;color:var(--t3)">📎</button>
+    <input class="chat-input" placeholder="Type a message…">
+    <button class="chat-send">➤</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     21 TASK ACTIVE
+══════════════════════════════════════ -->
+<div class="scr" id="task-active">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><div><div class="tbar-title">Task Active</div><div class="tbar-sub" style="color:var(--a)">⚡ In Progress</div></div><button class="ib trans" onclick="go('chat-thread')">💬</button></div>
+  <div class="scrl p20">
+    <!-- Escrow box -->
+    <div class="escrow-box mb16">
+      <div class="rowb mb4"><span class="h4" style="color:var(--gd)">🔒 Funds in Escrow</span><span class="badge badge-g">Secured</span></div>
+      <div style="font-size:28px;font-weight:800;color:var(--g);margin:6px 0">₦800</div>
+      <div class="sm" style="color:var(--t2)">Payment is safely held. Released to Tunde only when you confirm the task is complete.</div>
+      <div class="dvd"></div>
+      <div class="rowb"><span class="xs" style="color:var(--t3)">Task ID: NF-20481</span><span class="xs" style="color:var(--t3)">Posted: Today</span></div>
+    </div>
+    <!-- Task info -->
+    <div class="card mb16">
+      <div class="h4 mb12">Wash 3 bags of clothes</div>
+      <div class="row g10 mb10"><div class="av av-sm av-g">TO</div><div><div style="font-size:13px;font-weight:600;color:var(--t)">Tunde Oladele</div><div class="xs">⭐ 4.9 · Agent</div></div><button class="btn btn-g btn-xs" style="margin-left:auto" onclick="go('chat-thread')">Chat</button></div>
+      <div style="background:var(--s2);border-radius:var(--r8);padding:10px;font-size:13px;color:var(--t3)">📍 Block D Hostel, FUOYE · ~180m</div>
+    </div>
+    <!-- Status tracker -->
+    <div class="h4 mb14">Task Progress</div>
+    <div class="status-steps">
+      <div class="ss-item"><div class="ss-line-col"><div class="ss-dot done"></div><div class="ss-vline done"></div></div><div class="ss-content"><div class="ss-label">Task Posted</div><div class="ss-sub">2:15pm · Budget ₦800 set</div></div></div>
+      <div class="ss-item"><div class="ss-line-col"><div class="ss-dot done"></div><div class="ss-vline done"></div></div><div class="ss-content"><div class="ss-label">Agent Hired</div><div class="ss-sub">2:32pm · Tunde accepted</div></div></div>
+      <div class="ss-item"><div class="ss-line-col"><div class="ss-dot curr"></div><div class="ss-vline"></div></div><div class="ss-content"><div class="ss-label" style="color:var(--a)">In Progress ⚡</div><div class="ss-sub">Tunde is working on it</div></div></div>
+      <div class="ss-item"><div class="ss-line-col"><div class="ss-dot"></div></div><div class="ss-content" style="padding-bottom:0"><div class="ss-label" style="color:var(--t3)">Awaiting Confirmation</div><div class="ss-sub">You'll confirm when done</div></div></div>
+    </div>
+  </div>
+  <!-- Action bar -->
+  <div style="padding:12px 20px 20px;background:var(--s);border-top:1px solid var(--b)">
+    <button class="btn btn-g mb10" onclick="go('task-complete')">✅ Mark as Completed</button>
+    <button class="btn btn-danger btn-sm">⚠️ Report an Issue</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     22 TASK COMPLETE
+══════════════════════════════════════ -->
+<div class="scr" id="task-complete">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">Confirm Completion</span><div style="width:40px"></div></div>
+  <div class="scrl p20">
+    <div style="text-align:center;margin:20px 0 28px">
+      <div style="font-size:56px;margin-bottom:12px">✅</div>
+      <div class="h2 mb8">Task done?</div>
+      <div class="body" style="max-width:260px;margin:0 auto">Confirming will release the escrow payment to Tunde immediately.</div>
+    </div>
+    <!-- Summary -->
+    <div class="card mb16">
+      <div class="h4 mb12">Payment Summary</div>
+      <div class="rowb mb8"><span class="sm" style="color:var(--t2)">Task</span><span class="sm font-600" style="color:var(--t)">Wash 3 bags of clothes</span></div>
+      <div class="rowb mb8"><span class="sm" style="color:var(--t2)">Agent</span><span class="sm font-600" style="color:var(--t)">Tunde Oladele</span></div>
+      <div class="rowb mb8"><span class="sm" style="color:var(--t2)">Base budget</span><span class="sm font-600" style="color:var(--t)">₦800</span></div>
+      <div class="dvd"></div>
+      <div class="rowb"><span class="sm font-600" style="color:var(--t)">Amount to be released</span><span style="font-size:20px;font-weight:800;color:var(--g)">₦800</span></div>
+    </div>
+    <div style="background:var(--al);border-radius:var(--r12);padding:14px;margin-bottom:20px;border:1px solid rgba(234,163,37,.25)">
+      <div class="sm font-600" style="color:var(--ad);margin-bottom:4px">⚠️ This cannot be undone</div>
+      <div class="sm" style="color:var(--ad)">Once you confirm, Tunde gets paid and the task is closed. Only confirm if you're satisfied with the work.</div>
+    </div>
+    <button class="btn btn-g mb10" onclick="go('rate-review')">✅ Yes, Release Payment</button>
+    <button class="btn btn-ghost btn-sm" onclick="back()">Not yet, go back</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     23 RATE & REVIEW
+══════════════════════════════════════ -->
+<div class="scr" id="rate-review">
+  <div style="flex:1;display:flex;flex-direction:column">
+    <div class="tbar"><div style="width:40px"></div><span class="tbar-title">Rate Tunde</span><div style="width:40px"></div></div>
+    <div class="scrl p20">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:56px;margin-bottom:8px">🎉</div>
+        <div class="h2 mb4">Payment Sent!</div>
+        <div class="body">₦800 has been released to Tunde.</div>
+      </div>
+      <div class="card mb20" style="text-align:center">
+        <div class="av av-lg av-g" style="margin:0 auto 10px">TO</div>
+        <div class="h3 mb2">Tunde Oladele</div>
+        <div class="xs" style="color:var(--t3)">How did he do?</div>
+        <div class="star-row mt16" id="starRow">
+          <button class="star-b" onclick="setStar(1)">★</button>
+          <button class="star-b" onclick="setStar(2)">★</button>
+          <button class="star-b" onclick="setStar(3)">★</button>
+          <button class="star-b on" onclick="setStar(4)">★</button>
+          <button class="star-b on" onclick="setStar(5)">★</button>
+        </div>
+        <div class="xs mt8" id="starLabel" style="color:var(--a);font-weight:600">Excellent!</div>
+      </div>
+      <div class="igroup">
+        <div class="ilabel">Write a review (optional)</div>
+        <textarea class="itextarea" placeholder="Tell others about your experience with Tunde…">Very fast and reliable! Done in under 3 hours and brought everything back neatly. Will definitely use again 🙏</textarea>
+      </div>
+      <!-- Tags -->
+      <div class="sm mb8 font-600" style="color:var(--t)">Quick tags:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px">
+        <span class="chip on">Fast ⚡</span>
+        <span class="chip on">Reliable ✓</span>
+        <span class="chip">Communicative 💬</span>
+        <span class="chip">Careful 🤲</span>
+        <span class="chip">Friendly 😊</span>
+      </div>
+      <button class="btn btn-g mb10" onclick="go('home')">Submit Review →</button>
+      <button class="btn btn-ghost btn-sm" onclick="go('home')">Skip for now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     24 WALLET
+══════════════════════════════════════ -->
+<div class="scr" id="wallet">
+  <div style="height:52px;flex-shrink:0;background:var(--gd)"></div>
+  <div style="background:var(--gd);padding:8px 20px 24px;flex-shrink:0">
+    <div class="rowb mb16"><button class="ib" style="background:rgba(255,255,255,.1);color:#fff" onclick="back()">←</button><span style="font-size:16px;font-weight:700;color:#fff">My Wallet</span><button class="ib" style="background:rgba(255,255,255,.1);color:#fff">⋯</button></div>
+    <div class="wallet-hero">
+      <div class="xs mb2" style="color:rgba(255,255,255,.6)">Available Balance</div>
+      <div style="font-size:38px;font-weight:800;color:#fff;margin-bottom:4px">₦12,500</div>
+      <div class="xs mb20" style="color:rgba(255,255,255,.5)">NeedFull Wallet · AO ✓</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;z-index:1">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2)" onclick="go('fund-wallet')">+ Fund Wallet</button>
+        <button class="btn btn-a btn-sm" onclick="go('withdraw')">Withdraw</button>
+      </div>
+    </div>
+  </div>
+  <div class="scrl">
+    <!-- Quick stats -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:16px 20px">
+      <div class="stat-card"><div class="stat-val" style="font-size:14px;color:var(--g)">₦8,400</div><div class="stat-lbl">Earned</div></div>
+      <div class="stat-card"><div class="stat-val" style="font-size:14px;color:var(--err)">₦3,200</div><div class="stat-lbl">Spent</div></div>
+      <div class="stat-card"><div class="stat-val" style="font-size:14px;color:var(--a)">₦800</div><div class="stat-lbl">In Escrow</div></div>
+    </div>
+    <div class="dvd-thick"></div>
+    <div class="p20">
+      <div class="sec-hd mb12"><span class="sec-title">Transactions</span><span class="sec-action">Filter</span></div>
+      <div class="txn"><div class="txn-icon txn-db">↑</div><div style="flex:1"><div class="sm font-600" style="color:var(--t)">Laundry Task — Tunde O.</div><div class="xs mt2" style="color:var(--t3)">Escrow · Today 2:35pm</div></div><span style="font-size:15px;font-weight:700;color:var(--err)">-₦800</span></div>
+      <div class="txn"><div class="txn-icon txn-cr">↓</div><div style="flex:1"><div class="sm font-600" style="color:var(--t)">Printing Task completed</div><div class="xs mt2" style="color:var(--t3)">Received · Yesterday 4:20pm</div></div><span style="font-size:15px;font-weight:700;color:var(--ok)">+₦1,200</span></div>
+      <div class="txn"><div class="txn-icon txn-cr">↓</div><div style="flex:1"><div class="sm font-600" style="color:var(--t)">Wallet funded via Paystack</div><div class="xs mt2" style="color:var(--t3)">Deposit · 2 days ago</div></div><span style="font-size:15px;font-weight:700;color:var(--ok)">+₦5,000</span></div>
+      <div class="txn"><div class="txn-icon txn-db">↑</div><div style="flex:1"><div class="sm font-600" style="color:var(--t)">Food run — Emeka A.</div><div class="xs mt2" style="color:var(--t3)">Payment · 3 days ago</div></div><span style="font-size:15px;font-weight:700;color:var(--err)">-₦500</span></div>
+      <div class="txn"><div class="txn-icon txn-cr">↓</div><div style="flex:1"><div class="sm font-600" style="color:var(--t)">Cleaning Task completed</div><div class="xs mt2" style="color:var(--t3)">Received · 4 days ago</div></div><span style="font-size:15px;font-weight:700;color:var(--ok)">+₦2,500</span></div>
+      <div class="txn"><div class="txn-icon" style="background:#f0f0f0;color:#888">↕</div><div style="flex:1"><div class="sm font-600" style="color:var(--t)">Withdrawal to GTB ****4521</div><div class="xs mt2" style="color:var(--t3)">Transferred · 6 days ago</div></div><span style="font-size:15px;font-weight:700;color:var(--t2)">-₦7,000</span></div>
+      <div style="height:20px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     25 FUND WALLET
+══════════════════════════════════════ -->
+<div class="scr" id="fund-wallet">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">Fund Wallet</span><div style="width:40px"></div></div>
+  <div class="scrl p20">
+    <div class="h3 mb4">How much to add?</div>
+    <div class="body mb20">Funds added instantly. Minimum ₦200.</div>
+    <div class="amt-disp mb16" style="text-align:center">
+      <div><span style="font-size:22px;font-weight:700;color:var(--t2);vertical-align:super;margin-right:4px">₦</span><span style="font-size:52px;font-weight:800;color:var(--t)" id="fundAmt">2,000</span></div>
+    </div>
+    <!-- Quick amounts -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px">
+      <button style="height:44px;border-radius:var(--r12);border:1.5px solid var(--b);background:var(--s);font-family:var(--fn);font-size:14px;cursor:pointer;color:var(--t2)" onclick="setFund('500')">₦500</button>
+      <button style="height:44px;border-radius:var(--r12);border:1.5px solid var(--b);background:var(--s);font-family:var(--fn);font-size:14px;cursor:pointer;color:var(--t2)" onclick="setFund('1,000')">₦1,000</button>
+      <button style="height:44px;border-radius:var(--r12);border:2px solid var(--g);background:var(--gl);font-family:var(--fn);font-size:14px;cursor:pointer;color:var(--g);font-weight:600" onclick="setFund('2,000')">₦2,000</button>
+      <button style="height:44px;border-radius:var(--r12);border:1.5px solid var(--b);background:var(--s);font-family:var(--fn);font-size:14px;cursor:pointer;color:var(--t2)" onclick="setFund('5,000')">₦5,000</button>
+      <button style="height:44px;border-radius:var(--r12);border:1.5px solid var(--b);background:var(--s);font-family:var(--fn);font-size:14px;cursor:pointer;color:var(--t2)" onclick="setFund('10,000')">₦10,000</button>
+      <button style="height:44px;border-radius:var(--r12);border:1.5px solid var(--b);background:var(--s);font-family:var(--fn);font-size:14px;cursor:pointer;color:var(--t2)">Custom</button>
+    </div>
+    <div class="h4 mb12">Payment Method</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+      <div style="border:2px solid var(--g);border-radius:var(--r12);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;background:var(--gl)"><span style="font-size:22px">💳</span><div style="flex:1"><div class="sm font-600" style="color:var(--t)">Debit/Credit Card</div><div class="xs" style="color:var(--t3)">Visa, Mastercard · via Paystack</div></div><div style="width:20px;height:20px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px">✓</div></div>
+      <div style="border:1.5px solid var(--b);border-radius:var(--r12);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer"><span style="font-size:22px">🏦</span><div><div class="sm font-600" style="color:var(--t)">Bank Transfer</div><div class="xs" style="color:var(--t3)">Free · Credited within 5 mins</div></div></div>
+      <div style="border:1.5px solid var(--b);border-radius:var(--r12);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer"><span style="font-size:22px">📱</span><div><div class="sm font-600" style="color:var(--t)">Opay / PalmPay / USSD</div><div class="xs" style="color:var(--t3)">Mobile money wallets</div></div></div>
+    </div>
+    <button class="btn btn-g" onclick="go('wallet')">Add ₦2,000 →</button>
+    <div class="xs tc mt12" style="color:var(--t3)">🔒 Secured by Paystack · PCI DSS compliant</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     26 WITHDRAW
+══════════════════════════════════════ -->
+<div class="scr" id="withdraw">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">Withdraw</span><div style="width:40px"></div></div>
+  <div class="scrl p20">
+    <div style="background:var(--gd);border-radius:var(--r16);padding:16px;margin-bottom:20px;text-align:center">
+      <div class="xs mb2" style="color:rgba(255,255,255,.5)">Available to withdraw</div>
+      <div style="font-size:32px;font-weight:800;color:#fff">₦12,500</div>
+    </div>
+    <div class="igroup">
+      <div class="ilabel">Amount to Withdraw</div>
+      <div class="ifield-with-pre"><div class="ifield-pre">₦</div><input class="ifield-inner" type="number" placeholder="0.00" value="5000"></div>
+      <div class="ihint">Min ₦500 · Max ₦50,000 per transaction</div>
+    </div>
+    <div class="h4 mb10">Send to</div>
+    <div style="border:2px solid var(--g);border-radius:var(--r12);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;background:var(--gl)">
+      <span style="font-size:22px">🏦</span>
+      <div style="flex:1"><div class="sm font-600" style="color:var(--t)">GTBank · ****4521</div><div class="xs" style="color:var(--t3)">Amaka Okafor · Saved account</div></div>
+      <div style="width:20px;height:20px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px">✓</div>
+    </div>
+    <button class="btn btn-ghost btn-sm mb20" style="font-size:13px">+ Add new bank account</button>
+    <div class="card mb20">
+      <div class="rowb mb8"><span class="sm" style="color:var(--t3)">Amount</span><span class="sm font-600" style="color:var(--t)">₦5,000</span></div>
+      <div class="rowb mb8"><span class="sm" style="color:var(--t3)">Transfer fee</span><span class="sm font-600" style="color:var(--t)">₦0 (Free)</span></div>
+      <div class="dvd"></div>
+      <div class="rowb"><span class="sm font-600" style="color:var(--t)">You receive</span><span style="font-size:18px;font-weight:800;color:var(--g)">₦5,000</span></div>
+      <div class="xs mt4" style="color:var(--t3)">Usually arrives within 15 minutes</div>
+    </div>
+    <button class="btn btn-g" onclick="go('wallet')">Withdraw ₦5,000</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     27 PROFILE
+══════════════════════════════════════ -->
+<div class="scr" id="profile">
+  <div style="height:52px;flex-shrink:0;background:var(--gd)"></div>
+  <div style="background:linear-gradient(180deg,var(--gd) 0%,var(--g) 100%);padding:8px 20px 24px;flex-shrink:0;text-align:center;position:relative">
+    <button class="ib" style="background:rgba(255,255,255,.1);color:#fff;position:absolute;top:8px;right:16px" onclick="go('settings')">⚙️</button>
+    <div style="position:relative;display:inline-block;margin-bottom:10px">
+      <div class="av av-xl av-g" style="margin:0 auto;border:3px solid rgba(255,255,255,.3)">AO</div>
+      <div style="position:absolute;bottom:0;right:0;width:28px;height:28px;background:var(--a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid var(--g);cursor:pointer">📷</div>
+    </div>
+    <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:2px">Amaka Okafor</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:8px">FUOYE · Engineering 200L</div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <span class="badge" style="background:rgba(255,255,255,.15);color:#fff">✓ Verified</span>
+      <span class="badge" style="background:rgba(234,163,37,.3);color:var(--a)">⭐ 4.8 Rating</span>
+      <span class="badge" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)">Both Roles</span>
+    </div>
+  </div>
+  <div class="scrl">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 20px">
+      <div class="stat-card"><div class="stat-val">10</div><div class="stat-lbl">Done</div></div>
+      <div class="stat-card"><div class="stat-val">3</div><div class="stat-lbl">Posted</div></div>
+      <div class="stat-card"><div class="stat-val" style="font-size:14px;color:var(--g)">₦8.4k</div><div class="stat-lbl">Earned</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--a)">4.8</div><div class="stat-lbl">Rating</div></div>
+    </div>
+    <div class="dvd-thick"></div>
+    <div class="p20">
+      <div class="h4 mb8">My Services</div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px"><span class="badge badge-g">🧺 Laundry</span><span class="badge badge-g">🛵 Delivery</span><span class="badge badge-g">🧹 Cleaning</span><button class="chip btn-xs" style="font-size:12px">+ Add service</button></div>
+      <!-- Settings list -->
+      <div class="h4 mb12">Account</div>
+      <div style="background:var(--s);border-radius:var(--r16);overflow:hidden;box-shadow:var(--sh1)">
+        <div class="tog-row" style="padding:14px 16px;cursor:pointer" onclick="go('settings')"><div class="row g10"><span style="font-size:18px">⚙️</span><span class="sm font-600" style="color:var(--t)">Settings</span></div><span style="color:var(--t3)">→</span></div>
+        <div class="tog-row" style="padding:14px 16px;cursor:pointer"><div class="row g10"><span style="font-size:18px">🔔</span><span class="sm font-600" style="color:var(--t)">Notification preferences</span></div><span style="color:var(--t3)">→</span></div>
+        <div class="tog-row" style="padding:14px 16px;cursor:pointer"><div class="row g10"><span style="font-size:18px">🔒</span><span class="sm font-600" style="color:var(--t)">Privacy &amp; Security</span></div><span style="color:var(--t3)">→</span></div>
+        <div class="tog-row" style="padding:14px 16px;cursor:pointer" onclick="go('wallet')"><div class="row g10"><span style="font-size:18px">💰</span><span class="sm font-600" style="color:var(--t)">Wallet &amp; Payments</span></div><span style="color:var(--t3)">→</span></div>
+        <div class="tog-row" style="padding:14px 16px;cursor:pointer;border-bottom:none"><div class="row g10"><span style="font-size:18px">❓</span><span class="sm font-600" style="color:var(--t)">Help &amp; Support</span></div><span style="color:var(--t3)">→</span></div>
+      </div>
+      <button class="btn btn-danger mt16 btn-sm">Sign Out</button>
+    </div>
+  </div>
+  <div class="bnav">
+    <button class="ni" onclick="go('home')"><span class="ni-icon">🏠</span>Home</button>
+    <button class="ni" onclick="go('explore')"><span class="ni-icon">🔍</span>Explore</button>
+    <button class="ni-plus" onclick="go('post-cat')">＋</button>
+    <button class="ni" onclick="go('chat-list')"><span class="ni-icon">💬</span>Chat</button>
+    <button class="ni on"><span class="ni-icon">👤</span>Profile</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     28 SETTINGS
+══════════════════════════════════════ -->
+<div class="scr" id="settings">
+  <div class="tbar"><button class="ib" onclick="back()">←</button><span class="tbar-title">Settings</span><div style="width:40px"></div></div>
+  <div class="scrl p20">
+    <!-- Account -->
+    <div class="sm font-600 mb8" style="color:var(--t3);text-transform:uppercase;letter-spacing:1px">Account</div>
+    <div class="card mb16">
+      <div class="tog-row" style="padding:4px 0"><div><div class="sm font-600" style="color:var(--t)">Amaka Okafor</div><div class="xs" style="color:var(--t3)">+234 801 234 5678</div></div><span class="badge badge-g">Edit</span></div>
+    </div>
+    <!-- Notifications -->
+    <div class="sm font-600 mb8" style="color:var(--t3);text-transform:uppercase;letter-spacing:1px">Notifications</div>
+    <div class="card mb16">
+      <div class="tog-row" style="padding:12px 0"><div class="sm font-600" style="color:var(--t)">Task alerts</div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-th"></div></div></div>
+      <div class="tog-row" style="padding:12px 0"><div class="sm font-600" style="color:var(--t)">Chat messages</div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-th"></div></div></div>
+      <div class="tog-row" style="padding:12px 0"><div class="sm font-600" style="color:var(--t)">Payment updates</div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-th"></div></div></div>
+      <div class="tog-row" style="padding:12px 0;border-bottom:none"><div class="sm font-600" style="color:var(--t)">Promotions &amp; tips</div><div class="tog" onclick="this.classList.toggle('on')"><div class="tog-th"></div></div></div>
+    </div>
+    <!-- Agent mode -->
+    <div class="sm font-600 mb8" style="color:var(--t3);text-transform:uppercase;letter-spacing:1px">Agent Settings</div>
+    <div class="card mb16">
+      <div class="tog-row" style="padding:12px 0"><div><div class="sm font-600" style="color:var(--t)">Available for tasks</div><div class="xs" style="color:var(--t3)">Show you in nearby Agent list</div></div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-th"></div></div></div>
+      <div class="tog-row" style="padding:12px 0;border-bottom:none"><div><div class="sm font-600" style="color:var(--t)">Urgent task alerts</div><div class="xs" style="color:var(--t3)">Ping for high-paying tasks first</div></div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-th"></div></div></div>
+    </div>
+    <!-- Privacy -->
+    <div class="sm font-600 mb8" style="color:var(--t3);text-transform:uppercase;letter-spacing:1px">Privacy</div>
+    <div class="card mb16">
+      <div class="tog-row" style="padding:12px 0"><div><div class="sm font-600" style="color:var(--t)">Show real name publicly</div><div class="xs" style="color:var(--t3)">Others see your full name</div></div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-th"></div></div></div>
+      <div class="tog-row" style="padding:12px 0;border-bottom:none"><div><div class="sm font-600" style="color:var(--t)">Location sharing</div><div class="xs" style="color:var(--t3)">Allow distance-based matching</div></div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-th"></div></div></div>
+    </div>
+    <button class="btn btn-danger btn-sm">Sign Out</button>
+    <div class="xs tc mt12" style="color:var(--t3)">NeedFull v1.0.0 · FUOYE Campus Edition</div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+</div><!-- /phone -->
+</div><!-- /phone-wrap -->
+</div><!-- /shell -->
+
+<script>
+/* ── NAV STATE ── */
+const history = ['splash'];
+
+function go(id) {
+  const curr = history[history.length - 1];
+  const currEl = document.getElementById(curr);
+  const nextEl = document.getElementById(id);
+  if (!nextEl || curr === id) return;
+  if (currEl) currEl.classList.remove('on');
+  nextEl.classList.add('on');
+  history.push(id);
+  updateSidebar(id);
+  // scroll screen to top
+  const scrl = nextEl.querySelector('.scrl');
+  if (scrl) scrl.scrollTop = 0;
+}
+
+function back() {
+  if (history.length <= 1) return;
+  const curr = history.pop();
+  const currEl = document.getElementById(curr);
+  const prev = history[history.length - 1];
+  const prevEl = document.getElementById(prev);
+  if (currEl) currEl.classList.remove('on');
+  if (prevEl) prevEl.classList.add('on');
+  updateSidebar(prev);
+}
+
+function updateSidebar(activeId) {
+  document.querySelectorAll('.sb-btn').forEach(b => {
+    const onclick = b.getAttribute('onclick') || '';
+    const match = onclick.match(/go\('([^']+)'\)/);
+    if (match) b.classList.toggle('on', match[1] === activeId);
+  });
+}
+
+/* ── PHONE INPUT ── */
+function checkPhone() {
+  const v = document.getElementById('phoneInput').value;
+  const btn = document.getElementById('phoneBtn');
+  const ready = v.replace(/\s/g,'').length >= 10;
+  btn.style.opacity = ready ? '1' : '.4';
+  btn.style.pointerEvents = ready ? 'auto' : 'none';
+}
+
+/* ── OTP ── */
+function otpNext(el, num) {
+  if (el.value.length === 1 && num < 6) {
+    document.getElementById('o'+(num+1)).focus();
+  }
+  el.style.borderColor = el.value ? 'var(--g)' : 'var(--b)';
+  el.style.background = el.value ? 'var(--gl)' : 'var(--s)';
+}
+
+/* ── ROLE SELECT ── */
+function selectRole(role) {
+  ['seeker','agent','both'].forEach(r => {
+    document.getElementById('rc-'+r).classList.toggle('on', r === role);
+  });
+}
+
+/* ── CATEGORY SELECT ── */
+function selectCat(cat) {
+  document.querySelectorAll('.catcard[id^="cat-"]').forEach(c => c.classList.remove('on'));
+  const el = document.getElementById('cat-'+cat);
+  if (el) el.classList.add('on');
+}
+
+/* ── STAR RATING ── */
+const starLabels = ['','Terrible 😞','Poor 😕','Okay 😐','Good 😊','Excellent! 🌟'];
+function setStar(n) {
+  document.querySelectorAll('.star-b').forEach((s,i) => s.classList.toggle('on', i < n));
+  const lbl = document.getElementById('starLabel');
+  if (lbl) { lbl.textContent = starLabels[n]; }
+}
+
+/* ── FUND AMOUNTS ── */
+function setFund(v) {
+  const el = document.getElementById('fundAmt');
+  if (el) el.textContent = v;
+}
+
+/* ── CHIP TOGGLE ── */
+document.querySelectorAll('.chip').forEach(c => {
+  c.addEventListener('click', function() {
+    const row = this.closest('.chips');
+    if (row) {
+      row.querySelectorAll('.chip').forEach(x => x.classList.remove('on'));
+    }
+    this.classList.toggle('on');
+  });
+});
+</script>
+</body>
+</html>
