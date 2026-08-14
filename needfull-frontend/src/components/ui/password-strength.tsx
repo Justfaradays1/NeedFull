@@ -20,7 +20,7 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
   return (
     <div className="mt-2 space-y-1.5" role="status" aria-label={`Password strength: ${label}`}>
       <div className="flex items-center justify-between">
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200">
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-secondary">
           <div
             className={`h-full rounded-full transition-all duration-300 ${barColor}`}
             style={{ width: barWidth }}
@@ -39,7 +39,7 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
         </ul>
       )}
       {strength === 'very-strong' && (
-        <p className="flex items-center gap-1 text-[11px] text-green-600">
+        <p className="flex items-center gap-1 text-[11px] text-success-text">
           <span aria-hidden="true">✓</span> Password is very strong
         </p>
       )}

@@ -122,7 +122,7 @@ export default function TaskRatePage() {
   if (denied) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center page-shell px-4 text-center">
-        <AlertCircle className="mb-2 h-10 w-10 text-gray-300" />
+        <AlertCircle className="mb-2 h-10 w-10 text-foreground-muted" />
         <h2 className="text-lg font-semibold text-gray-900">
           Nothing to rate yet
         </h2>
@@ -142,7 +142,7 @@ export default function TaskRatePage() {
   if (alreadyRated) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center page-shell px-4 text-center">
-        <CheckCircle2 className="mb-2 h-10 w-10 text-green-500" />
+        <CheckCircle2 className="mb-2 h-10 w-10 text-success-text" />
         <h2 className="text-lg font-semibold text-gray-900">
           You&apos;ve already rated this task
         </h2>
@@ -252,7 +252,7 @@ export default function TaskRatePage() {
                   className={`h-9 w-9 ${
                     (hoverRating || rating) >= n
                       ? "fill-gold text-gold"
-                      : "fill-transparent text-gray-300"
+                      : "fill-transparent text-foreground-muted"
                   }`}
                 />
               </button>
@@ -274,7 +274,7 @@ export default function TaskRatePage() {
             placeholder={`Tell others about your experience with ${peerName}…`}
             rows={3}
             maxLength={500}
-            className="w-full rounded-xl border border-gray-300 p-3 text-sm focus:border-brand focus:outline-none"
+            className="w-full rounded-xl border border-border-default p-3 text-sm focus:border-brand focus:outline-none"
           />
         </div>
 
@@ -290,7 +290,7 @@ export default function TaskRatePage() {
                 className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                   tags.includes(t.label)
                     ? "border-gold bg-gold-light text-gold-dark"
-                    : "border-gray-300 bg-surface text-gray-600"
+                    : "border-border-default bg-surface text-gray-600"
                 }`}
               >
                 {t.emoji} {t.label}
@@ -315,7 +315,7 @@ export default function TaskRatePage() {
           <button
             onClick={() => router.push("/tasks")}
             disabled={submitting}
-            className="w-full rounded-xl border border-gray-300 py-3 text-sm font-semibold text-gray-600 active:scale-[0.97] disabled:opacity-50"
+            className="w-full rounded-xl border border-border-default py-3 text-sm font-semibold text-gray-600 active:scale-[0.97] disabled:opacity-50"
           >
             Skip for now
           </button>

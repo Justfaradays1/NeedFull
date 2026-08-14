@@ -116,22 +116,22 @@ function LoginForm() {
 
       {/* Alerts */}
       {sessionExpired && (
-        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="mb-4 rounded-xl border border-warning-border bg-warning-bg px-4 py-3 text-sm text-warning-text">
           Your session expired. Please log in again to continue.
         </div>
       )}
       {googleError && (
-        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-4 rounded-xl border border-error-border bg-error-bg px-4 py-3 text-sm text-error-text">
           {googleError}
         </div>
       )}
       {linkedEmail && (
-        <div className="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+        <div className="mb-4 rounded-xl border border-success-border bg-success-bg px-4 py-3 text-sm text-success-text">
           Google account linked! Sign in with your email or Google.
         </div>
       )}
       {verified && (
-        <div className="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+        <div className="mb-4 rounded-xl border border-success-border bg-success-bg px-4 py-3 text-sm text-success-text">
           Email verified successfully. You can now sign in.
         </div>
       )}
@@ -147,7 +147,7 @@ function LoginForm() {
       {/* Google */}
       <a
         href="/api/auth/google"
-        className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-xl border px-5 py-3 text-sm font-semibold shadow-sm transition-all duration-150 hover:bg-gray-100 active:scale-[0.98]"
+        className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-xl border px-5 py-3 text-sm font-semibold shadow-sm transition-all duration-150 hover:bg-surface-secondary active:scale-[0.98]"
         style={{ borderColor: "var(--color-card-border, #e5e7eb)", color: "var(--color-foreground, #171717)" }}
       >
         <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24">
@@ -210,7 +210,7 @@ function LoginForm() {
           />
         </div>
         {localError && (
-          <p className="text-sm text-red-600">{localError}</p>
+          <p className="text-sm text-error-text">{localError}</p>
         )}
         <button
           type="submit"

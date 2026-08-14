@@ -22,6 +22,7 @@ import {
   RefreshCw,
   Loader2,
   CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { get, post } from "@/lib/apiClient";
@@ -63,6 +64,10 @@ interface TaskSummary {
   title: string;
   status: string;
   budget: { kobo: number; naira: number };
+  agreedAmount: { kobo: number; naira: number } | null;
+  escrowAmount: { kobo: number; naira: number };
+  additionalFundingRequired: { kobo: number; naira: number };
+  acceptedProposal?: { id: string } | null;
   applicationCount: number;
   capabilities?: { canViewApplications: boolean };
 }
@@ -80,6 +85,8 @@ export default function ApplicantsPage() {
   const [error, setError] = useState(false);
   const [denied, setDenied] = useState(false);
   const [hiringId, setHiringId] = useState<string | null>(null);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [funding, setFunding] = useState(false);
 
   const fetchApplicants = useCallback(async () => {
     try {
@@ -142,6 +149,55 @@ export default function ApplicantsPage() {
     }
   };
 
+  const reject = async (applicationId: string, runnerName: string) => {
+    if (!window.confirm(`Reject ${runnerName}'s application? They'll be notified.`)) return;
+    if (rejectingId) return;
+    setRejectingId(applicationId);
+    try {
+      const res = await post<{ success: boolean; message: string }>(
+        `/applications/${applicationId}/reject`,
+      );
+      if (res.success) {
+        toast.success("Application rejected");
+        await fetchApplicants();
+      } else {
+        toast.error(res.message || "Couldn't reject this application");
+      }
+    } catch (err: any) {
+      toast.error(
+        err?.response?.data?.message || "Couldn't reject this application — try again",
+      );
+    } finally {
+      setRejectingId(null);
+    }
+  };
+
+  // WHAT: Poster funds the remaining agreed amount inline (IDEMPOTENT endpoint)
+  // WHY: Hiring at a counter-offer amount leaves the task awaiting_funding —
+  //      this button completes the hire: escrow tops up, task goes live
+  const fund = async () => {
+    const proposalId = task?.acceptedProposal?.id;
+    if (!proposalId || funding) return;
+    setFunding(true);
+    try {
+      const res = await post<{ success: boolean; message: string }>(
+        `/proposals/${proposalId}/fund`,
+      );
+      if (res.success) {
+        toast.success("Payment secured — the task is now active!");
+        await fetchApplicants();
+      } else {
+        toast.error(res.message || "Funding failed — try again");
+      }
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Funding failed — try again";
+      toast.error(msg);
+      if (/balance|wallet/i.test(msg)) router.push("/wallet/fund");
+    } finally {
+      setFunding(false);
+    }
+  };
+
   if (!isAuthenticated) return null;
 
   if (loading) {
@@ -169,7 +225,7 @@ export default function ApplicantsPage() {
     return (
       <PageShell taskId={taskId}>
         <div className="flex flex-col items-center py-16 text-center">
-          <AlertCircle className="h-10 w-10 text-gray-300" />
+          <AlertCircle className="h-10 w-10 text-foreground-muted" />
           <h2 className="mt-3 text-base font-bold text-gray-900">
             Couldn&apos;t load applicants
           </h2>
@@ -190,7 +246,7 @@ export default function ApplicantsPage() {
     return (
       <PageShell taskId={taskId}>
         <div className="flex flex-col items-center py-16 text-center">
-          <ShieldCheck className="h-10 w-10 text-gray-300" />
+          <ShieldCheck className="h-10 w-10 text-foreground-muted" />
           <h2 className="mt-3 text-base font-bold text-gray-900">
             Only the task poster can see applicants
           </h2>
@@ -225,24 +281,66 @@ export default function ApplicantsPage() {
         </div>
       </div>
 
+      {/* Funding step — hired at a negotiated amount above escrow */}
+      {task?.status === "awaiting_funding" && task.acceptedProposal && hired && (
+        <div className="mb-4 rounded-2xl border border-gold/30 bg-gold-light/50 p-4">
+          <p className="flex items-center gap-1.5 text-sm font-bold text-gold-dark">
+            <ShieldCheck className="h-4 w-4" />
+            Additional funding required
+          </p>
+          <p className="mt-1.5 text-xs leading-relaxed text-gray-600">
+            You agreed to pay{" "}
+            <span className="font-bold text-gray-900">
+              {formatCurrency(task.agreedAmount?.kobo ?? task.budget.kobo)}
+            </span>
+            . {formatCurrency(task.escrowAmount.kobo)} is already secured in
+            escrow — fund the remaining{" "}
+            <span className="font-black text-gold-dark">
+              {formatCurrency(task.additionalFundingRequired.kobo)}
+            </span>{" "}
+            and {hired.runner.fullName.split(" ")[0]} can start immediately.
+          </p>
+          <button
+            type="button"
+            onClick={fund}
+            disabled={funding}
+            className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-gold px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-gold/25 transition-all active:scale-[0.98] disabled:opacity-60"
+          >
+            {funding ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ShieldCheck className="h-4 w-4" />
+            )}
+            {funding
+              ? "Securing payment..."
+              : `Fund ${formatCurrency(task.additionalFundingRequired.kobo)}`}
+          </button>
+          <p className="mt-2 text-[10px] text-gray-500">
+            Funded from your wallet balance — top up first if needed.
+          </p>
+        </div>
+      )}
+
       {/* Hired banner */}
       {hired && (
-        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50 p-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-600 text-white">
+        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-success-border bg-success-bg p-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-success text-white">
             <UserCheck className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-green-900">
+            <p className="text-sm font-bold text-success-text">
               {hired.runner.fullName} has been hired
             </p>
-            <p className="text-[11px] text-green-700">
-              Escrow is locked. Other applicants were notified.
+            <p className="text-[11px] text-success-text">
+              {task?.status === "awaiting_funding"
+                ? "Fund the remaining amount above to activate the task."
+                : "Escrow is locked. Other applicants were notified."}
             </p>
           </div>
           <button
             type="button"
             onClick={() => router.push("/tasks")}
-            className="shrink-0 rounded-lg bg-green-600 px-3 py-2 text-[11px] font-bold text-white transition-all active:scale-[0.97]"
+            className="shrink-0 rounded-lg bg-success px-3 py-2 text-[11px] font-bold text-white transition-all active:scale-[0.97]"
           >
             My Tasks
           </button>
@@ -250,8 +348,8 @@ export default function ApplicantsPage() {
       )}
 
       {applicants.length === 0 && !hired ? (
-        <div className="rounded-2xl border border-dashed border-gray-200 px-4 py-12 text-center">
-          <Users className="mx-auto h-9 w-9 text-gray-300" />
+        <div className="rounded-2xl border border-dashed border-border-default px-4 py-12 text-center">
+          <Users className="mx-auto h-9 w-9 text-foreground-muted" />
           <h2 className="mt-3 text-sm font-bold text-gray-900">
             No one has applied yet
           </h2>
@@ -270,7 +368,7 @@ export default function ApplicantsPage() {
               <div
                 key={app.id}
                 className={`rounded-2xl border bg-surface p-4 shadow-sm ${
-                  isHired ? "border-green-300 ring-1 ring-green-200" : "border-card-border"
+                  isHired ? "border-success-border ring-1 ring-success-border" : "border-card-border"
                 }`}
               >
                 {/* Runner identity */}
@@ -289,10 +387,10 @@ export default function ApplicantsPage() {
                         {app.runner.fullName}
                       </Link>
                       {app.runner.isVerifiedStudent && (
-                        <BadgeCheck className="h-4 w-4 shrink-0 text-blue-500" />
+                        <BadgeCheck className="h-4 w-4 shrink-0 text-info-text" />
                       )}
                       {isHired && (
-                        <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[9px] font-bold text-green-700">
+                        <span className="shrink-0 rounded-full bg-success-bg px-2 py-0.5 text-[9px] font-bold text-success-text">
                           HIRED
                         </span>
                       )}
@@ -316,12 +414,12 @@ export default function ApplicantsPage() {
                         Trust {app.runner.trustScore ?? "—"}
                       </span>
                       <span className="inline-flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3 text-gray-400" />
+                        <CheckCircle2 className="h-3 w-3 text-foreground-muted" />
                         {app.runner.tasksCompleted ?? 0} tasks done
                       </span>
                       {app.runner.locationLabel && (
                         <span className="inline-flex items-center gap-1">
-                          <MapPin className="h-3 w-3 text-gray-400" />
+                          <MapPin className="h-3 w-3 text-foreground-muted" />
                           {app.runner.locationLabel}
                         </span>
                       )}
@@ -332,7 +430,7 @@ export default function ApplicantsPage() {
                     <p className="font-display text-base font-black text-gold">
                       {amount ? formatCurrency(amount.kobo) : "Budget"}
                     </p>
-                    <p className="text-[10px] capitalize text-gray-400">{app.status}</p>
+                    <p className="text-[10px] capitalize text-foreground-muted">{app.status}</p>
                   </div>
                 </div>
 
@@ -357,7 +455,7 @@ export default function ApplicantsPage() {
 
                 {/* Application message */}
                 {app.message && (
-                  <div className="mt-3 rounded-xl bg-gray-50 p-3">
+                  <div className="mt-3 rounded-xl bg-surface-secondary p-3">
                     <p className="text-[11px] leading-relaxed text-gray-600">
                       “{app.message}”
                     </p>
@@ -369,7 +467,7 @@ export default function ApplicantsPage() {
                   <div className="mt-3 flex items-center gap-2">
                     <button
                       type="button"
-                      disabled={!!hiringId}
+                      disabled={!!hiringId || !!rejectingId}
                       onClick={() => hire(app.id, app.runner.fullName)}
                       className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gold px-3 py-2.5 text-xs font-bold text-white shadow-sm shadow-gold/20 transition-all active:scale-[0.97] disabled:opacity-60"
                     >
@@ -382,24 +480,56 @@ export default function ApplicantsPage() {
                     </button>
                     <button
                       type="button"
+                      disabled={!!hiringId || !!rejectingId}
+                      onClick={() => reject(app.id, app.runner.fullName)}
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-error-border px-3 py-2.5 text-xs font-bold text-error-text transition-all active:scale-[0.97] disabled:opacity-60"
+                    >
+                      {rejectingId === app.id ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <XCircle className="h-3.5 w-3.5" />
+                      )}
+                      {rejectingId === app.id ? "Rejecting…" : "Reject"}
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => openChat(app.runnerId)}
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-card-border px-3 py-2.5 text-xs font-bold text-gray-700 transition-all active:scale-[0.97]"
+                      aria-label={`Chat with ${app.runner.fullName}`}
+                      className="flex items-center justify-center rounded-xl border border-card-border px-3 py-2.5 text-gray-700 transition-all active:scale-[0.97]"
                     >
                       <MessageCircle className="h-3.5 w-3.5" />
-                      Chat
                     </button>
                   </div>
                 ) : isHired ? (
-                  <button
-                    type="button"
-                    onClick={() => openChat(app.runnerId)}
-                    className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-green-600 px-3 py-2.5 text-xs font-bold text-white transition-all active:scale-[0.97]"
-                  >
-                    <MessageCircle className="h-3.5 w-3.5" />
-                    Chat with hired runner
-                  </button>
+                  <div className="mt-3 space-y-2">
+                    {task?.status === "awaiting_funding" && (
+                      <button
+                        type="button"
+                        onClick={fund}
+                        disabled={funding}
+                        className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-gold px-3 py-2.5 text-xs font-bold text-white shadow-sm shadow-gold/20 transition-all active:scale-[0.97] disabled:opacity-60"
+                      >
+                        {funding ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <ShieldCheck className="h-3.5 w-3.5" />
+                        )}
+                        {funding
+                          ? "Securing payment…"
+                          : `Fund remaining ${formatCurrency(task?.additionalFundingRequired?.kobo ?? 0)}`}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => openChat(app.runnerId)}
+                      className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-success px-3 py-2.5 text-xs font-bold text-white transition-all active:scale-[0.97]"
+                    >
+                      <MessageCircle className="h-3.5 w-3.5" />
+                      Chat with hired runner
+                    </button>
+                  </div>
                 ) : (
-                  <p className="mt-3 text-center text-[11px] font-medium text-gray-400">
+                  <p className="mt-3 text-center text-[11px] font-medium text-foreground-muted">
                     Not selected — this application is closed
                   </p>
                 )}

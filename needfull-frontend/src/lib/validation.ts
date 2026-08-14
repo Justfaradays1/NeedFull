@@ -52,21 +52,21 @@ export function getPasswordStrengthLabel(strength: PasswordStrength): string {
 
 export function getPasswordStrengthColor(strength: PasswordStrength): string {
   switch (strength) {
-    case 'weak': return 'bg-red-500';
-    case 'fair': return 'bg-amber-500';
-    case 'strong': return 'bg-green-500';
+    case 'weak': return 'bg-error';
+    case 'fair': return 'bg-warning';
+    case 'strong': return 'bg-success';
     case 'very-strong': return 'bg-brand';
-    default: return 'bg-gray-200';
+    default: return 'bg-surface-secondary';
   }
 }
 
 export function getPasswordStrengthTextColor(strength: PasswordStrength): string {
   switch (strength) {
-    case 'weak': return 'text-red-600';
-    case 'fair': return 'text-amber-600';
-    case 'strong': return 'text-green-600';
+    case 'weak': return 'text-error-text';
+    case 'fair': return 'text-warning-text';
+    case 'strong': return 'text-success-text';
     case 'very-strong': return 'text-brand-text';
-    default: return 'text-gray-400';
+    default: return 'text-foreground-muted';
   }
 }
 

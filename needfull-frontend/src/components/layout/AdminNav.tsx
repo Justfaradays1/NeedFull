@@ -100,7 +100,7 @@ export function AdminNav() {
         >
           <div className="mx-auto max-w-lg overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-2xl">
             <div className="flex items-center justify-between px-4 pb-2 pt-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-foreground-muted">
                 More Sections
               </span>
               <button
@@ -108,7 +108,7 @@ export function AdminNav() {
                 onClick={() => setShowMore(false)}
                 className="tap-target flex h-7 w-7 items-center justify-center rounded-lg hover:bg-gray-700"
               >
-                <AdminTabIcon icon="X" className="h-4 w-4 text-gray-400" />
+                <AdminTabIcon icon="X" className="h-4 w-4 text-foreground-muted" />
               </button>
             </div>
             <div className="grid grid-cols-2 gap-1 px-2 pb-3">
@@ -123,8 +123,8 @@ export function AdminNav() {
                     onClick={() => setShowMore(false)}
                     className={`tap-target flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                       isActive
-                        ? "bg-purple-600/20 text-purple-300"
-                        : "text-gray-300 hover:bg-gray-700/60"
+                        ? "bg-processing/20 text-info-text"
+                        : "text-foreground-muted hover:bg-gray-700/60"
                     }`}
                   >
                     <AdminTabIcon icon={item.icon} className="h-4 w-4" />
@@ -164,24 +164,24 @@ export function AdminNav() {
                   type="button"
                   onClick={() => setShowMore((v) => !v)}
                   className={`tap-target relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 min-h-12 transition-all duration-200 ${
-                    isActive || showMore ? "text-purple-400" : "text-gray-500"
+                    isActive || showMore ? "text-info-text" : "text-gray-500"
                   }`}
                   aria-label="More"
                 >
                   <div
                     className={`relative flex items-center justify-center rounded-xl px-3 py-1.5 transition-all duration-200 ${
-                      isActive || showMore ? "bg-purple-500/15" : ""
+                      isActive || showMore ? "bg-processing/15" : ""
                     }`}
                   >
                     <AdminTabIcon
                       icon={tab.icon}
-                      className={`h-5 w-5 transition-all duration-200 ${isActive || showMore ? "text-purple-400 scale-110" : ""}`}
+                      className={`h-5 w-5 transition-all duration-200 ${isActive || showMore ? "text-info-text scale-110" : ""}`}
                     />
                   </div>
                   <span
                     className={`text-[10px] transition-all duration-200 ${
                       isActive || showMore
-                        ? "font-bold text-purple-400"
+                        ? "font-bold text-info-text"
                         : "font-medium text-gray-500"
                     }`}
                   >
@@ -196,24 +196,24 @@ export function AdminNav() {
                 key={tab.href}
                 href={tab.href}
                 className={`tap-target relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 min-h-12 transition-all duration-200 ${
-                  isActive ? "text-purple-400" : "text-gray-500"
+                  isActive ? "text-info-text" : "text-gray-500"
                 }`}
                 aria-label={tab.label}
               >
                 <div
                   className={`relative flex items-center justify-center rounded-xl px-3 py-1.5 transition-all duration-200 ${
-                    isActive ? "bg-purple-500/15" : ""
+                    isActive ? "bg-processing/15" : ""
                   }`}
                 >
                   <AdminTabIcon
                     icon={tab.icon}
-                    className={`h-5 w-5 transition-all duration-200 ${isActive ? "text-purple-400 scale-110" : ""}`}
+                    className={`h-5 w-5 transition-all duration-200 ${isActive ? "text-info-text scale-110" : ""}`}
                   />
                 </div>
                 <span
                   className={`text-[10px] transition-all duration-200 ${
                     isActive
-                      ? "font-bold text-purple-400"
+                      ? "font-bold text-info-text"
                       : "font-medium text-gray-500"
                   }`}
                 >

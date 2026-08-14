@@ -15,8 +15,8 @@ export default function MainError({
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-        <svg className="h-6 w-6 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-error-bg">
+        <svg className="h-6 w-6 text-error-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="12" cy="12" r="10" />
           <path d="M12 8v4M12 16h.01" />
         </svg>

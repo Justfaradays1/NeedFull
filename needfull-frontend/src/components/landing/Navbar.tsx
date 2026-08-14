@@ -7,7 +7,7 @@ import NavbarScript from "./NavbarScript";
 const NAV_LINKS = [
   { href: "/about", label: "About" },
   { href: "#how-it-works", label: "How it works" },
-  { href: "#features", label: "For students" },
+  { href: "#features", label: "For earners" },
   { href: "#safety", label: "Safety" },
 ];
 

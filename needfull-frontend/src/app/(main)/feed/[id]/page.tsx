@@ -1,6 +1,10 @@
-// WHAT: Task detail page — summary cards, payment breakdown, seeker profile, application, escrow status
-// WHY: Runners decide on a task here — quick facts at the top, trust signals about the
-//      poster, a transparent payment breakdown, then the apply flow and escrow reassurance.
+// WHAT: Task detail page (public / runner view) — one coherent flow:
+//       back → badges → title → stats → description → location → due →
+//       payment → poster → apply. All surfaces use semantic tokens so the
+//       page is intentional in BOTH light and dark mode.
+// WHY:  Runners decide on a task here — quick facts at the top, trust signals
+//       about the poster, a transparent payment breakdown, then the apply
+//       flow and escrow reassurance.
 // FUTURE: Add image gallery, add review prompt after completion, add dispute button
 
 "use client";
@@ -13,7 +17,6 @@ import {
   Clock,
   AlertCircle,
   DollarSign,
-  User,
   Send,
   Loader2,
   BadgeCheck,
@@ -23,7 +26,6 @@ import {
   Briefcase,
   Users,
   ChevronRight,
-  Wifi,
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -32,6 +34,11 @@ import apiClient, { get } from "@/lib/apiClient";
 import { formatCurrency } from "@/lib/format";
 import { getCategoryDisplayName, getCategoryColor, getCategoryIcon } from "@/lib/categoryConfig";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
+import { TaskStatusBadge } from "@/components/ui/task-status-badge";
+import { WorkModeBadge } from "@/components/tasks/WorkModeBadge";
+import { LocationRow } from "@/components/ui/location-row";
+import { StatCard } from "@/components/ui/stat-card";
+import { PaymentBreakdown } from "@/components/tasks/PaymentBreakdown";
 import { EscrowStatusCard } from "@/components/tasks/EscrowStatusCard";
 import { CelebrationModal } from "@/components/ui/celebration-modal";
 import { useCelebration } from "@/hooks/useCelebration";
@@ -50,11 +57,22 @@ interface TaskCapabilities {
 
 interface TaskDetail {
   id: string;
+  posterId: string;
   title: string;
   description: string;
   budget: { kobo: number; naira: number };
+  agreedAmount: { kobo: number; naira: number } | null;
+  escrowAmount: { kobo: number; naira: number };
+  additionalFundingRequired: { kobo: number; naira: number };
+  acceptedProposal?: {
+    id: string;
+    proposedAmount: { kobo: number; naira: number };
+    difference: { kobo: number; naira: number };
+    status: string;
+  } | null;
   status: string;
   isUrgent: boolean;
+  runnerDoneAt?: string | null;
   workMode?: "on_site" | "remote" | null;
   locationLabel: string | null;
   deadline: string | null;
@@ -85,6 +103,12 @@ interface TaskDetail {
     id: string;
     status: string;
     proposedAmount: { kobo: number; naira: number } | null;
+    proposal?: {
+      id: string;
+      proposedAmount: { kobo: number; naira: number };
+      difference: { kobo: number; naira: number };
+      status: string;
+    } | null;
   } | null;
   capabilities?: TaskCapabilities;
 }
@@ -97,39 +121,6 @@ interface RelatedTask {
   createdAt: string;
   distance: number | null;
 }
-
-const STATUS_BADGES: Record<
-  string,
-  { bg: string; text: string; label: string }
-> = {
-  open: { bg: "bg-green-100", text: "text-green-800", label: "Open" },
-  in_progress: {
-    bg: "bg-amber-100",
-    text: "text-amber-800",
-    label: "In Progress",
-  },
-  completed: { bg: "bg-blue-100", text: "text-blue-800", label: "Completed" },
-  cancelled: { bg: "bg-gray-100", text: "text-gray-600", label: "Cancelled" },
-};
-
-function WorkModeBadge({ mode }: { mode?: "on_site" | "remote" | null }) {
-  if (mode === "remote") {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-700">
-        <Wifi className="h-3 w-3" />
-        Remote
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-brand-light/70 px-3 py-1 text-xs font-bold text-brand-text">
-      <MapPin className="h-3 w-3" />
-      On-site
-    </span>
-  );
-}
-
-const PLATFORM_FEE_RATE = 0.1;
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -166,6 +157,7 @@ export default function TaskDetailPage() {
   const [proposedAmount, setProposedAmount] = useState("");
   const [applying, setApplying] = useState(false);
   const [related, setRelated] = useState<RelatedTask[]>([]);
+  const [funding, setFunding] = useState(false);
   const applyRef = useRef<HTMLDivElement>(null);
   const celebration = useCelebration();
 
@@ -264,6 +256,26 @@ export default function TaskDetailPage() {
     handleApply();
   };
 
+  // WHAT: Poster funds the remaining agreed amount (IDEMPOTENT endpoint)
+  // WHY: Moves the task forever out of awaiting_funding — fund() credits escrow
+  //      and flips status to in_progress in one atomic transaction
+  const handleFundAccepted = async () => {
+    if (!task?.acceptedProposal) return;
+    setFunding(true);
+    try {
+      await apiClient.post(`/proposals/${task.acceptedProposal.id}/fund`);
+      toast.success("Payment secured — the task is now active!");
+      const data = await fetchTask();
+      setTask(data);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Funding failed";
+      toast.error(msg);
+      if (/balance|wallet/i.test(msg)) router.push("/wallet/fund");
+    } finally {
+      setFunding(false);
+    }
+  };
+
   if (!isAuthenticated) return null;
 
   if (loading) {
@@ -272,9 +284,9 @@ export default function TaskDetailPage() {
 
   if (!task) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 text-center">
-        <AlertCircle className="mb-3 h-12 w-12 text-gray-300" />
-        <h2 className="text-lg font-semibold text-gray-900">Task not found</h2>
+      <div className="page-shell flex min-h-screen flex-col items-center justify-center px-4 text-center">
+        <AlertCircle className="mb-3 h-12 w-12 text-foreground-muted" />
+        <h2 className="text-lg font-semibold text-foreground">Task not found</h2>
         <button
           onClick={() => router.push("/hustle")}
           className="mt-4 rounded-xl bg-brand px-6 py-2.5 text-sm font-semibold text-on-brand"
@@ -286,10 +298,11 @@ export default function TaskDetailPage() {
   }
 
   const canApply = task.capabilities?.canApply && !task.myApplication;
-  const badge = STATUS_BADGES[task.status] || STATUS_BADGES.open;
   const distanceLabel = formatDistance(task.distance);
-  const runnerReceivesKobo = Math.round(task.budget.kobo * (1 - PLATFORM_FEE_RATE));
-  const platformFeeKobo = task.budget.kobo - runnerReceivesKobo;
+  const isPoster = task.posterId === user?.id;
+  // WHAT: All payout math uses the AGREED amount once a negotiation exists —
+  //       the original budget is only the starting point for open tasks
+  const payKobo = task.agreedAmount ? task.agreedAmount.kobo : task.budget.kobo;
   const posterAvatar = task.poster.profilePictureUrl || task.poster.avatarUrl || null;
   const rating = task.poster.averageRating ?? null;
   const memberSince = task.poster.memberSince
@@ -298,268 +311,338 @@ export default function TaskDetailPage() {
         year: "numeric",
       })
     : null;
-
-  const summaryCards: { label: string; value: string; icon: React.ReactNode }[] = [
-    {
-      label: "Budget",
-      value: formatCurrency(task.budget.kobo),
-      icon: <DollarSign className="h-3.5 w-3.5 text-gold" />,
-    },
-    {
-      label: "Due",
-      value: task.deadline
-        ? new Date(task.deadline).toLocaleDateString("en-NG", { day: "numeric", month: "short" })
-        : "Flexible",
-      icon: <Clock className="h-3.5 w-3.5 text-gold" />,
-    },
-    {
-      label: "Applicants",
-      value: `${task.applicationCount}`,
-      icon: <Users className="h-3.5 w-3.5 text-gold" />,
-    },
-    {
-      label: "Posted",
-      value: timeAgo(task.createdAt),
-      icon: <Calendar className="h-3.5 w-3.5 text-gold" />,
-    },
-  ];
+  const dueLabel = task.deadline
+    ? new Date(task.deadline).toLocaleDateString("en-NG", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : null;
 
   return (
     <>
-      <div className="min-h-screen page-shell pb-28 md:pb-8">
-        <div className="glass-dark px-4 py-3">
-          <div className="flex items-center gap-3">
+      <div className="page-shell min-h-screen pb-28 md:pb-8">
+        {/* Header — clean surface, readable in both themes (no green wash) */}
+        <header className="sticky top-0 z-30 border-b border-border-default bg-surface-primary/95 backdrop-blur-xl">
+          <div className="mx-auto flex w-full max-w-2xl items-center gap-2 px-4 py-2.5">
             <button
               onClick={() => router.back()}
-              className="tap-target rounded-lg p-2 hover:bg-white/20"
+              aria-label="Go back"
+              className="tap-target shrink-0 rounded-lg text-foreground-secondary hover:bg-surface-secondary"
             >
-              <ArrowLeft className="h-5 w-5 text-white" />
+              <ArrowLeft className="h-5 w-5" strokeWidth={2.5} />
             </button>
-            <h1 className="text-lg font-bold text-white truncate">
+            <span className="nf-section-label truncate">Task Details</span>
+          </div>
+        </header>
+
+        <main className="mx-auto w-full max-w-2xl px-4 pb-6 pt-4">
+          {/* ─── Hero: badges → title → meta ─── */}
+          <section className="rounded-2xl border border-border-default bg-surface-primary p-4 shadow-card sm:p-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <TaskStatusBadge
+                status={task.status}
+                runnerDoneAt={task.runnerDoneAt}
+                urgent={task.isUrgent}
+              />
+              <WorkModeBadge mode={task.workMode} />
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1 text-[11px] font-extrabold leading-none text-white"
+                style={{ backgroundColor: getCategoryColor(task.category.name) }}
+              >
+                <CategoryIcon
+                  name={getCategoryIcon(task.category.name)}
+                  className="h-3.5 w-3.5"
+                  strokeWidth={2.5}
+                />
+                {getCategoryDisplayName(task.category.name)}
+              </span>
+            </div>
+
+            <h1 className="mt-3 font-display text-xl font-extrabold leading-snug text-foreground sm:text-2xl">
               {task.title}
             </h1>
-          </div>
-        </div>
 
-        <div className="px-4 py-4">
-          <div className="overflow-hidden rounded-2xl bg-surface shadow-sm">
-            {task.imageUrl && (
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-foreground-muted">
+              {distanceLabel && (
+                <span className="inline-flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5 text-location" strokeWidth={2.5} />
+                  {distanceLabel}
+                </span>
+              )}
+              <span className="inline-flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5 text-foreground-muted" />
+                Posted {timeAgo(task.createdAt)}
+              </span>
+            </div>
+          </section>
+
+          {/* ─── Stats: supporting, not dominant ─── */}
+          {!task.imageUrl && (
+            <section className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <StatCard
+                label="Budget"
+                value={formatCurrency(task.budget.kobo)}
+                icon={<DollarSign className="h-3.5 w-3.5 text-gold" strokeWidth={2.5} />}
+              />
+              <StatCard
+                label="Due"
+                value={
+                  task.deadline
+                    ? new Date(task.deadline).toLocaleDateString("en-NG", {
+                        day: "numeric",
+                        month: "short",
+                      })
+                    : "Flexible"
+                }
+                icon={<Clock className="h-3.5 w-3.5 text-gold" strokeWidth={2.5} />}
+              />
+              <StatCard
+                label="Applicants"
+                value={`${task.applicationCount}`}
+                icon={<Users className="h-3.5 w-3.5 text-processing" strokeWidth={2.5} />}
+              />
+              <StatCard
+                label="Posted"
+                value={timeAgo(task.createdAt)}
+                icon={<Calendar className="h-3.5 w-3.5 text-processing" strokeWidth={2.5} />}
+              />
+            </section>
+          )}
+
+          {task.imageUrl && (
+            <div className="mt-3">
               <img
                 src={task.imageUrl}
                 alt={task.title}
-                className="w-full object-cover max-h-56"
+                className="max-h-60 w-full rounded-2xl border border-border-default object-cover"
               />
-            )}
-
-            <div className="p-4">
-              <div className="mb-3 flex flex-wrap items-center gap-2">
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-bold ${badge.bg} ${badge.text}`}
-                >
-                  {badge.label}
-                </span>
-                <WorkModeBadge mode={task.workMode} />
-                {task.isUrgent && (
-                  <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">
-                    URGENT
-                  </span>
-                )}
-                <span
-                  className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-white"
-                  style={{ backgroundColor: getCategoryColor(task.category.name) }}
-                >
-                  <CategoryIcon name={getCategoryIcon(task.category.name)} className="h-3 w-3" strokeWidth={2.5} />
-                  {getCategoryDisplayName(task.category.name)}
-                </span>
-              </div>
-
-              {/* Quick summary cards */}
-              <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {summaryCards.map((c) => (
-                  <div
-                    key={c.label}
-                    className="rounded-xl border border-card-border bg-gray-50 p-2.5"
-                  >
-                    <div className="flex items-center gap-1 text-gold">{c.icon}</div>
-                    <p className="mt-1 text-sm font-black text-gray-900">{c.value}</p>
-                    <p className="text-[10px] font-medium text-gray-500">{c.label}</p>
-                  </div>
-                ))}
-              </div>
-
-              <p className="mb-4 text-sm leading-relaxed text-gray-700 whitespace-pre-line">
-                {task.description}
-              </p>
-
-              <div className="mb-4 space-y-2 text-sm text-gray-600">
-                {task.locationLabel && (
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-gray-400" />
-                    <span>
-                      {task.locationLabel}
-                      {distanceLabel ? ` (${distanceLabel})` : ""}
-                    </span>
-                  </div>
-                )}
-                {task.deadline && (
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-gray-400" />
-                    <span>
-                      Due {new Date(task.deadline).toLocaleDateString("en-NG", {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Payment breakdown — escrow transparency */}
-              <div className="mb-4 rounded-xl border border-gold/25 bg-gold-light/40 p-3.5">
-                <p className="mb-2 flex items-center gap-1.5 text-xs font-bold text-gold-dark">
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  Payment Breakdown
-                </p>
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-500">Task budget</span>
-                    <span className="font-semibold text-gray-900">
-                      {formatCurrency(task.budget.kobo)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-500">Platform fee (10%)</span>
-                    <span className="text-gray-500">
-                      − {formatCurrency(platformFeeKobo)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-gold/20 pt-1.5">
-                    <span className="font-bold text-gray-900">You receive</span>
-                    <span className="font-black text-gold-dark">
-                      {formatCurrency(runnerReceivesKobo)}
-                    </span>
-                  </div>
-                </div>
-                <p className="mt-2.5 flex items-start gap-1.5 text-[10px] leading-relaxed text-gray-500">
-                  <ShieldCheck className="mt-0.5 h-3 w-3 shrink-0 text-brand-text" />
-                  Your payment is held safely in escrow by NeedFull until the task is
-                  completed and confirmed — you never chase the poster for money.
-                </p>
-              </div>
-
-              {/* Seeker profile — trust signals */}
-              <Link
-                href={`/profile/${task.poster.id}`}
-                className="mb-4 block rounded-xl border border-card-border bg-surface p-3.5 transition-all hover:border-brand/30 hover:shadow-sm active:scale-[0.99]"
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar
-                    src={posterAvatar}
-                    name={task.poster.fullName}
-                    size="lg"
-                    border
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="flex items-center gap-1 text-sm font-bold text-gray-900">
-                      <span className="truncate">{task.poster.fullName}</span>
-                      {task.poster.isVerifiedStudent && (
-                        <BadgeCheck className="h-4 w-4 shrink-0 text-blue-500" />
-                      )}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {task.poster.school || "Campus student"}
-                      {task.poster.school && " · "}
-                      {memberSince ? `Member since ${memberSince}` : ""}
-                    </p>
-                    <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-600">
-                      {rating !== null && (
-                        <span className="inline-flex items-center gap-0.5 font-semibold">
-                          <Star className="h-3 w-3 fill-gold text-gold" />
-                          {rating}
-                        </span>
-                      )}
-                      <span className="inline-flex items-center gap-1">
-                        <BadgeCheck className="h-3 w-3 text-brand-text" />
-                        Trust {task.poster.trustScore}
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <Briefcase className="h-3 w-3 text-gray-400" />
-                        {task.poster.tasksPosted ?? 0} posted
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <CheckIcon />
-                        {task.poster.tasksCompleted ?? 0} done
-                      </span>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-gray-300" />
-                </div>
-              </Link>
-
-              {task.runner && (
-                <div className="mb-4 flex items-center gap-3 rounded-xl bg-amber-50 p-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber/10 text-sm font-bold text-amber">
-                    {task.runner.fullName.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">
-                      {task.runner.fullName}
-                    </p>
-                    <p className="text-xs text-amber-700">Runner assigned</p>
-                  </div>
-                </div>
-              )}
-
-              {task.status === "in_progress" && (
-                <div className="mb-4">
-                  <EscrowStatusCard
-                    budgetNaira={task.budget.naira}
-                    posterName={task.poster.fullName}
-                    runnerName={task.runner?.fullName}
-                    status={task.status}
-                  />
-                </div>
-              )}
-
-              {task.myApplication && (
-                <div
-                  className={`rounded-xl p-3 text-center text-sm font-semibold ${task.myApplication.status === "pending" || task.myApplication.status === "negotiating" ? "bg-amber-50 text-amber-800" : task.myApplication.status === "accepted" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
-                >
-                  Your application: {task.myApplication.status}
-                  {task.myApplication.proposedAmount &&
-                    ` (₦${task.myApplication.proposedAmount.naira.toLocaleString()})`}
-                </div>
-              )}
+              <section className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <StatCard
+                  label="Budget"
+                  value={formatCurrency(task.budget.kobo)}
+                  icon={<DollarSign className="h-3.5 w-3.5 text-gold" strokeWidth={2.5} />}
+                />
+                <StatCard
+                  label="Due"
+                  value={
+                    task.deadline
+                      ? new Date(task.deadline).toLocaleDateString("en-NG", {
+                          day: "numeric",
+                          month: "short",
+                        })
+                      : "Flexible"
+                  }
+                  icon={<Clock className="h-3.5 w-3.5 text-gold" strokeWidth={2.5} />}
+                />
+                <StatCard
+                  label="Applicants"
+                  value={`${task.applicationCount}`}
+                  icon={<Users className="h-3.5 w-3.5 text-processing" strokeWidth={2.5} />}
+                />
+                <StatCard
+                  label="Posted"
+                  value={timeAgo(task.createdAt)}
+                  icon={<Calendar className="h-3.5 w-3.5 text-processing" strokeWidth={2.5} />}
+                />
+              </section>
             </div>
-          </div>
+          )}
 
-          {/* Apply form */}
-          <div ref={applyRef} className="scroll-mt-20">
+          {/* ─── Description — primary content, never disabled-looking ─── */}
+          <section className="mt-5">
+            <p className="nf-section-label">Description</p>
+            <p className="mt-1.5 whitespace-pre-line text-[15px] leading-relaxed text-foreground">
+              {task.description}
+            </p>
+          </section>
+
+          {/* ─── Location + due — canonical accents ─── */}
+          {task.locationLabel && (
+            <section className="mt-4 rounded-2xl border border-border-default bg-surface-primary p-4">
+              <LocationRow
+                label="Task location"
+                location={task.locationLabel}
+                distance={distanceLabel}
+              />
+              {dueLabel && (
+                <div className="mt-3 flex items-start gap-2 border-t border-border-subtle pt-3">
+                  <Clock className="mt-0.5 h-4 w-4 shrink-0 text-gold" strokeWidth={2.5} />
+                  <div>
+                    <p className="nf-section-label">Due</p>
+                    <p className="mt-1 text-sm font-semibold text-foreground-secondary">
+                      {dueLabel}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* ─── Payment breakdown — warm semantic surface ─── */}
+          <section className="mt-3">
+            <PaymentBreakdown
+              budgetKobo={task.budget.kobo}
+              agreedKobo={payKobo !== task.budget.kobo ? payKobo : null}
+              escrowKobo={task.escrowAmount.kobo}
+            />
+          </section>
+
+          {/* ─── Poster card — trust signals ─── */}
+          <section className="mt-3">
+            <Link
+              href={`/profile/${task.poster.id}`}
+              className="card-surface block p-4 transition-all hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-lifted active:scale-[0.99]"
+            >
+              <div className="flex items-center gap-3">
+                <Avatar
+                  src={posterAvatar}
+                  name={task.poster.fullName}
+                  size="lg"
+                  border
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="flex items-center gap-1 text-sm font-bold text-foreground">
+                    <span className="truncate">{task.poster.fullName}</span>
+                    {task.poster.isVerifiedStudent && (
+                      <BadgeCheck className="h-4 w-4 shrink-0 text-info-text" />
+                    )}
+                  </p>
+                  <p className="mt-0.5 truncate text-xs text-foreground-muted">
+                    {task.poster.school || "Campus student"}
+                    {task.poster.school && " · "}
+                    {memberSince ? `Member since ${memberSince}` : ""}
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium text-foreground-secondary">
+                    {rating !== null && (
+                      <span className="inline-flex items-center gap-0.5 font-semibold">
+                        <Star className="h-3 w-3 fill-gold text-gold" />
+                        {rating}
+                      </span>
+                    )}
+                    <span className="inline-flex items-center gap-1">
+                      <ShieldCheck className="h-3 w-3 text-brand-text" />
+                      Trust {task.poster.trustScore}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <Briefcase className="h-3 w-3 text-foreground-muted" />
+                      {task.poster.tasksPosted ?? 0} posted
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <span className="flex h-3 w-3 items-center justify-center rounded-full bg-success-bg text-[8px] font-black text-success-text">
+                        ✓
+                      </span>
+                      {task.poster.tasksCompleted ?? 0} done
+                    </span>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 shrink-0 text-foreground-muted" />
+              </div>
+            </Link>
+          </section>
+
+          {/* ─── Runner assigned ─── */}
+          {task.runner && (
+            <section className="mt-3 flex items-center gap-3 rounded-2xl border border-warning-border bg-warning-bg p-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-warning text-sm font-bold text-white">
+                {task.runner.fullName.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-warning-text">
+                  {task.runner.fullName}
+                </p>
+                <p className="text-xs font-medium text-warning-text/80">
+                  Runner assigned
+                </p>
+              </div>
+            </section>
+          )}
+
+          {task.status === "in_progress" && (
+            <section className="mt-3">
+              <EscrowStatusCard
+                budgetNaira={task.budget.naira}
+                posterName={task.poster.fullName}
+                runnerName={task.runner?.fullName}
+                status={task.status}
+              />
+            </section>
+          )}
+
+          {/* ─── Poster: agreed to negotiate — fund the remaining amount ─── */}
+          {isPoster && task.status === "awaiting_funding" && task.acceptedProposal && (
+            <section className="mt-3 rounded-2xl border border-payment-border bg-payment-bg p-4">
+              <p className="flex items-center gap-1.5 text-sm font-extrabold text-payment-text-strong">
+                <ShieldCheck className="h-4 w-4" strokeWidth={2.5} />
+                Additional funding required
+              </p>
+              <p className="mt-1.5 text-xs leading-relaxed text-foreground-secondary">
+                You agreed to pay{" "}
+                <span className="font-bold text-foreground">
+                  {formatCurrency(payKobo)}
+                </span>
+                . {formatCurrency(task.escrowAmount.kobo)} is already secured
+                in escrow — fund the remaining{" "}
+                <span className="font-black text-payment-text-strong">
+                  {formatCurrency(task.additionalFundingRequired.kobo)}
+                </span>{" "}
+                and {task.runner?.fullName?.split(" ")[0] || "the runner"} can
+                start immediately.
+              </p>
+              <button
+                type="button"
+                onClick={handleFundAccepted}
+                disabled={funding}
+                className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-gold px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-gold/25 active:scale-[0.98] disabled:opacity-60"
+              >
+                {funding ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ShieldCheck className="h-4 w-4" />
+                )}
+                {funding
+                  ? "Securing payment..."
+                  : `Fund ${formatCurrency(task.additionalFundingRequired.kobo)}`}
+              </button>
+              <p className="mt-2 text-[11px] text-foreground-muted">
+                Funded from your wallet balance — top up first if needed.
+              </p>
+            </section>
+          )}
+
+          {/* ─── Runner: application / proposal status ─── */}
+          {task.myApplication && (
+            <section className="mt-3">
+              <ApplicationStatusCard task={task} />
+            </section>
+          )}
+
+          {/* ─── Apply form ─── */}
+          <div ref={applyRef} className="mt-4 scroll-mt-24">
             {canApply && (
-              <div className="mt-4 overflow-hidden rounded-2xl bg-surface p-4 shadow-sm border border-card-border">
-                <h3 className="mb-1 font-semibold text-gray-900">
+              <div className="card-surface p-4">
+                <h3 className="font-display text-base font-bold text-foreground">
                   Apply for this task
                 </h3>
-                <p className="mb-3 text-[11px] text-gray-500">
-                  Tell the poster why you&apos;re the best fit. Your bid is protected by
-                  escrow either way.
+                <p className="mb-3 mt-0.5 text-xs text-foreground-muted">
+                  Tell the poster why you&apos;re the best fit. Your bid is
+                  protected by escrow either way.
                 </p>
                 <textarea
                   value={applyMessage}
                   onChange={(e) => setApplyMessage(e.target.value)}
                   placeholder="Tell the poster why you're the best fit..."
-                  className="mb-3 w-full rounded-xl border border-gray-300 p-3 text-sm focus:border-brand focus:outline-none"
+                  className="mb-3 w-full rounded-xl border border-border-default bg-surface-primary p-3 text-sm text-foreground placeholder:text-foreground-muted focus:border-brand focus:outline-none"
                   rows={3}
                   maxLength={500}
                 />
                 <div className="mb-1">
-                  <label className="text-xs font-medium text-gray-600">
+                  <label className="text-xs font-semibold text-foreground-secondary">
                     Proposed amount (optional)
                   </label>
-                  <div className="relative mt-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">
+                  <div className="relative mt-1.5">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-foreground-muted">
                       ₦
                     </span>
                     <input
@@ -567,11 +650,11 @@ export default function TaskDetailPage() {
                       value={proposedAmount}
                       onChange={(e) => setProposedAmount(e.target.value)}
                       placeholder={task.budget.naira.toLocaleString()}
-                      className="w-full rounded-xl border border-gray-300 py-2.5 pl-8 pr-3 text-sm focus:border-brand focus:outline-none"
+                      className="w-full rounded-xl border border-border-default bg-surface-primary py-2.5 pl-8 pr-3 text-sm text-foreground placeholder:text-foreground-muted focus:border-brand focus:outline-none"
                       min={50}
                     />
                   </div>
-                  <p className="mt-1 text-[10px] text-gray-500">
+                  <p className="mt-1 text-[11px] text-foreground-muted">
                     Leave empty to accept the listed budget
                   </p>
                 </div>
@@ -583,23 +666,23 @@ export default function TaskDetailPage() {
             !canApply &&
             !task.capabilities?.canApply &&
             !task.myApplication && (
-              <div className="mt-4 rounded-xl bg-gray-100 p-4 text-center text-sm text-gray-500">
+              <div className="mt-4 rounded-2xl bg-surface-secondary p-4 text-center text-sm font-medium text-foreground-muted">
                 Sign in to apply for this task
               </div>
             )}
 
-          {/* Related tasks */}
+          {/* ─── Related tasks ─── */}
           {related.length > 0 && (
-            <div className="mt-6">
+            <section className="mt-6">
               <div className="mb-3 flex items-center justify-between">
-                <h2 className="font-display text-base font-bold text-gray-900">
+                <h2 className="font-display text-base font-bold text-foreground">
                   Similar tasks
                 </h2>
                 <Link
                   href="/hustle"
-                  className="flex items-center gap-0.5 text-[11px] font-bold text-gold"
+                  className="flex items-center gap-0.5 text-xs font-bold text-gold-dark"
                 >
-                  View all <ChevronRight className="h-3 w-3" />
+                  View all <ChevronRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
               <div className="space-y-2">
@@ -607,11 +690,13 @@ export default function TaskDetailPage() {
                   <Link
                     key={t.id}
                     href={`/feed/${t.id}`}
-                    className="tap-target flex items-center justify-between gap-3 rounded-xl border border-card-border bg-surface p-3.5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
+                    className="card-surface flex items-center justify-between gap-3 p-3.5 transition-all hover:-translate-y-0.5 hover:shadow-lifted active:scale-[0.98]"
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-gray-900">{t.title}</p>
-                      <p className="mt-0.5 text-[11px] text-gray-500">
+                      <p className="truncate text-sm font-bold text-foreground">
+                        {t.title}
+                      </p>
+                      <p className="mt-0.5 text-xs text-foreground-muted">
                         {t.isUrgent ? "Urgent · " : ""}
                         {formatDistance(t.distance) || "Campus task"} · {timeAgo(t.createdAt)}
                       </p>
@@ -622,21 +707,21 @@ export default function TaskDetailPage() {
                   </Link>
                 ))}
               </div>
-            </div>
+            </section>
           )}
-        </div>
+        </main>
       </div>
 
       {/* Sticky Apply CTA — the single submission point, all screens */}
       {canApply && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200/70 bg-white/95 px-4 pb-4 pt-3 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:inset-x-auto md:bottom-6 md:right-6 md:w-80 md:rounded-2xl md:border md:p-4 md:shadow-xl">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border-default bg-surface-primary/95 px-4 pb-4 pt-3 shadow-[0_-8px_30px_rgb(0_0_0/0.12)] backdrop-blur-xl md:inset-x-auto md:bottom-6 md:right-6 md:w-80 md:rounded-2xl md:border md:p-4 md:shadow-lifted">
           <div className="mx-auto flex max-w-lg items-center justify-between gap-3 md:block">
             <div className="min-w-0">
-              <p className="flex items-center gap-1 text-[10px] font-bold text-green-700">
-                <ShieldCheck className="h-3 w-3" />
+              <p className="flex items-center gap-1 text-[10px] font-bold text-success-text">
+                <ShieldCheck className="h-3 w-3" strokeWidth={2.5} />
                 Escrow-protected
               </p>
-              <p className="text-[10px] text-gray-500">
+              <p className="text-[10px] text-foreground-muted">
                 Funds held safely until the task is done
               </p>
             </div>
@@ -666,10 +751,112 @@ export default function TaskDetailPage() {
   );
 }
 
-function CheckIcon() {
+// WHAT: Runner-side status card — "Your application" with the negotiated bid,
+//       and the hired state (including the waiting-for-funding interim)
+// WHY: The runner needs to know exactly where they stand: bid sent, proposal
+//      accepted, or hired-but-waiting for the poster to secure the difference
+function ApplicationStatusCard({ task }: { task: TaskDetail }) {
+  const app = task.myApplication!;
+  const proposal = app.proposal;
+  const paidKobo = proposal
+    ? proposal.proposedAmount.kobo
+    : app.proposedAmount?.kobo;
+
+  if (app.status === "accepted") {
+    const waitingFunding = task.status === "awaiting_funding";
+    return (
+      <div
+        className={`rounded-2xl border p-4 text-sm ${
+          waitingFunding
+            ? "border-warning-border bg-warning-bg"
+            : "border-success-border bg-success-bg"
+        }`}
+      >
+        <p
+          className={`flex items-center gap-1.5 font-bold ${
+            waitingFunding ? "text-warning-text" : "text-success-text"
+          }`}
+        >
+          <BadgeCheck className="h-4 w-4" strokeWidth={2.5} />
+          You&apos;re hired for {formatCurrency(payKoboOf(task))}
+        </p>
+        {waitingFunding ? (
+          <p className="mt-1 text-xs leading-relaxed text-warning-text">
+            The poster is securing the remaining{" "}
+            <span className="font-black">
+              {formatCurrency(task.additionalFundingRequired.kobo)}
+            </span>{" "}
+            — the task goes live automatically once funded.
+          </p>
+        ) : (
+          <p className="mt-1 text-xs text-success-text">
+            The full amount is secured in escrow. Start the task when ready.
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  if (app.status === "rejected") {
+    return (
+      <div className="rounded-2xl border border-error-border bg-error-bg p-3.5 text-sm font-semibold text-error-text">
+        Your application was not selected this time.
+      </div>
+    );
+  }
+
+  const expired = proposal?.status === "expired";
   return (
-    <span className="flex h-3 w-3 items-center justify-center rounded-full bg-green-100 text-[8px] font-black text-green-700">
-      ✓
-    </span>
+    <div className="rounded-2xl border border-border-default bg-surface-primary p-4 text-sm">
+      <div
+        className={`rounded-xl border p-3 ${
+          expired
+            ? "border-border-default bg-surface-secondary"
+            : "border-warning-border bg-warning-bg"
+        }`}
+      >
+        <p
+          className={`font-bold ${
+            expired ? "text-foreground-muted" : "text-warning-text"
+          }`}
+        >
+          {expired
+            ? "Your budget proposal expired"
+            : proposal
+              ? "Budget proposal sent"
+              : "Application sent"}
+        </p>
+        {paidKobo && (
+          <div className="mt-1.5 space-y-1 text-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-foreground-muted">Your bid</span>
+              <span className="font-bold text-foreground">
+                {formatCurrency(paidKobo)}
+              </span>
+            </div>
+            {proposal && (
+              <div className="flex items-center justify-between">
+                <span className="text-foreground-muted">
+                  {proposal.difference.kobo > 0 ? "Above budget" : "Below budget"}
+                </span>
+                <span className="font-bold text-foreground-secondary">
+                  {proposal.difference.kobo > 0 ? "+" : "−"}
+                  {formatCurrency(Math.abs(proposal.difference.kobo))}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+        <p className="mt-1.5 text-[11px] text-foreground-muted">
+          {expired
+            ? "The poster didn't respond in time. You can send a new proposal."
+            : "Waiting for the poster to respond. You'll be notified."}
+        </p>
+      </div>
+    </div>
   );
+}
+
+function payKoboOf(task: TaskDetail): number {
+  return task.agreedAmount ? task.agreedAmount.kobo : task.budget.kobo;
 }

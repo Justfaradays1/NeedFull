@@ -175,7 +175,7 @@ export default function HelpersPage() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search runners, services, or notes…"
-            className="w-full rounded-xl border border-card-border bg-surface py-2.5 pl-9 pr-3 text-sm placeholder:text-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="w-full rounded-full border border-card-border bg-surface py-2.5 pl-9 pr-3 text-sm placeholder:text-gray-400 search-pill"
           />
         </div>
 

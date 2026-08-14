@@ -27,21 +27,38 @@ interface NotificationItemProps {
 const getNotificationIcon = (type: Notification["type"]) => {
   switch (type) {
     case "task_assigned":
-      return { icon: CheckCircle2, color: "bg-blue-100 text-blue-600" };
+      return { icon: CheckCircle2, color: "bg-info-bg text-info-text" };
     case "task_completed":
-      return { icon: CheckCircle2, color: "bg-green-100 text-green-600" };
+      return { icon: CheckCircle2, color: "bg-success-bg text-success-text" };
     case "message":
-      return { icon: MessageCircle, color: "bg-purple-100 text-purple-600" };
+      return { icon: MessageCircle, color: "bg-info-bg text-info-text" };
     case "review_received":
-      return { icon: Star, color: "bg-amber-100 text-amber-600" };
+      return { icon: Star, color: "bg-warning-bg text-warning-text" };
     case "wallet_transaction":
-      return { icon: Wallet, color: "bg-green-100 text-green-600" };
+      return { icon: Wallet, color: "bg-success-bg text-success-text" };
     case "report_filed":
-      return { icon: AlertCircle, color: "bg-red-100 text-red-600" };
+      return { icon: AlertCircle, color: "bg-error-bg text-error-text" };
     case "verification_status":
-      return { icon: Check, color: "bg-indigo-100 text-indigo-600" };
+      return { icon: Check, color: "bg-info-bg text-info-text" };
+    case "application_accepted":
+    case "task_assigned":
+    case "proposal_accepted":
+    case "budget_proposal_accepted":
+      return { icon: CheckCircle2, color: "bg-success-bg text-success-text" };
+    case "funding_required":
+      return { icon: AlertCircle, color: "bg-warning-bg text-warning-text" };
+    case "budget_proposal_sent":
+    case "application.counter_offer":
+    case "counter_offer":
+      return { icon: MessageCircle, color: "bg-warning-bg text-warning-text" };
+    case "budget_proposal_rejected":
+    case "budget_proposal_expired":
+    case "proposal_expired":
+      return { icon: AlertCircle, color: "bg-error-bg text-error-text" };
+    case "funding_success":
+      return { icon: Wallet, color: "bg-brand-light text-brand-text" };
     default:
-      return { icon: MessageCircle, color: "bg-gray-100 text-gray-600" };
+      return { icon: MessageCircle, color: "bg-surface-secondary text-foreground-secondary" };
   }
 };
 
@@ -112,8 +129,8 @@ export function NotificationItem({
 
   return (
     <div
-      className={`relative flex gap-3 p-4 border-b border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer ${
-        !notification.is_read ? "bg-blue-50" : ""
+      className={`relative flex gap-3 p-4 border-b border-border-default hover:bg-surface-secondary transition-colors cursor-pointer ${
+        !notification.is_read ? "bg-info-bg" : ""
       }`}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
@@ -126,7 +143,7 @@ export function NotificationItem({
     >
       {/* Unread Indicator Dot */}
       {!notification.is_read && (
-        <div className="absolute top-4 left-0 w-1 h-1 bg-blue-600 rounded-full"></div>
+        <div className="absolute top-4 left-0 w-1 h-1 bg-processing rounded-full"></div>
       )}
 
       {/* Icon */}
@@ -167,7 +184,7 @@ export function NotificationItem({
             e.stopPropagation();
             setShowMenu(!showMenu);
           }}
-          className="p-1 hover:bg-gray-200 rounded-lg transition-colors"
+          className="p-1 hover:bg-surface-secondary rounded-lg transition-colors"
           aria-label="More options"
         >
           <MoreVertical className="w-4 h-4 text-gray-500" />
@@ -180,7 +197,7 @@ export function NotificationItem({
           {!notification.is_read && (
             <button
               onClick={handleMarkReadClick}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 border-b border-gray-100"
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-surface-secondary flex items-center gap-2 border-b border-border-subtle"
             >
               <Check className="w-4 h-4" />
               Mark as read
@@ -188,7 +205,7 @@ export function NotificationItem({
           )}
           <button
             onClick={handleDeleteClick}
-            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+            className="w-full text-left px-4 py-2 text-sm text-error-text hover:bg-error-bg flex items-center gap-2"
           >
             <Trash2 className="w-4 h-4" />
             Delete

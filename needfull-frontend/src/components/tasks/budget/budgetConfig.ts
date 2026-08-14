@@ -32,20 +32,20 @@ export function getPricingGuidance(
   if (amount >= config.excellentRange.min) {
     return {
       level: "excellent",
-      color: "text-green-600",
+      color: "text-success-text",
       label: "Excellent Offer — your budget is likely to attract many NeedRunners quickly.",
     };
   }
   if (amount >= config.fairRange.min) {
     return {
       level: "fair",
-      color: "text-amber-600",
+      color: "text-warning-text",
       label: "Fair Offer — your budget is reasonable but may receive fewer applicants.",
     };
   }
   return {
     level: "low",
-    color: "text-red-500",
+    color: "text-error-text",
     label: "Low Offer — consider increasing your budget to attract more qualified NeedRunners.",
   };
 }

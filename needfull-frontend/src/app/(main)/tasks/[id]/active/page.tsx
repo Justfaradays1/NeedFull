@@ -244,11 +244,11 @@ export default function TaskActivePage() {
         <div className="mb-4 overflow-hidden rounded-2xl border border-card-border bg-surface shadow-sm">
           <div className="p-4">
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
+              <span className="rounded-full bg-warning-bg px-3 py-1 text-xs font-bold text-warning-text">
                 {isAwaiting ? "Awaiting Confirmation" : "In Progress"}
               </span>
               {task.isUrgent && (
-                <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">
+                <span className="rounded-full bg-error-bg px-3 py-1 text-xs font-bold text-error-text">
                   URGENT
                 </span>
               )}
@@ -268,13 +268,13 @@ export default function TaskActivePage() {
             <div className="mt-2 space-y-1.5 text-xs text-gray-600">
               {task.locationLabel && (
                 <p className="flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5 text-gray-400" />
+                  <MapPin className="h-3.5 w-3.5 text-foreground-muted" />
                   {task.locationLabel}
                 </p>
               )}
               {task.deadline && (
                 <p className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-gray-400" />
+                  <Clock className="h-3.5 w-3.5 text-foreground-muted" />
                   Due {new Date(task.deadline).toLocaleDateString("en-NG", {
                     weekday: "short",
                     day: "numeric",
@@ -283,7 +283,7 @@ export default function TaskActivePage() {
                 </p>
               )}
               <p className="flex items-center gap-1.5">
-                <Calendar className="h-3.5 w-3.5 text-gray-400" />
+                <Calendar className="h-3.5 w-3.5 text-foreground-muted" />
                 Posted {new Date(task.createdAt).toLocaleDateString("en-NG", {
                   day: "numeric",
                   month: "short",
@@ -292,7 +292,7 @@ export default function TaskActivePage() {
             </div>
 
             {/* Hired agent (poster view) / Poster (runner view) */}
-            <div className="mt-4 flex items-center gap-3 rounded-xl bg-gray-100 p-3">
+            <div className="mt-4 flex items-center gap-3 rounded-xl bg-surface-secondary p-3">
               <Avatar
                 src={peer?.profilePictureUrl || peer?.avatarUrl || null}
                 name={peer?.fullName}
@@ -300,13 +300,13 @@ export default function TaskActivePage() {
                 border
               />
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-foreground-muted">
                   {peerLabel}
                 </p>
                 <p className="flex items-center gap-1 truncate text-sm font-bold text-gray-900">
                   <span className="truncate">{peer?.fullName}</span>
                   {peer?.isVerifiedStudent && (
-                    <BadgeCheck className="h-4 w-4 shrink-0 text-blue-500" />
+                    <BadgeCheck className="h-4 w-4 shrink-0 text-info-text" />
                   )}
                 </p>
                 <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-500">
@@ -358,7 +358,7 @@ export default function TaskActivePage() {
       </div>
 
       {/* Sticky action bar */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200/70 bg-white/95 px-4 pb-4 pt-3 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:inset-x-auto md:bottom-6 md:right-6 md:w-80 md:rounded-2xl md:border md:p-4 md:shadow-xl">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200/70 bg-surface/95 px-4 pb-4 pt-3 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:inset-x-auto md:bottom-6 md:right-6 md:w-80 md:rounded-2xl md:border md:p-4 md:shadow-xl">
         <div className="mx-auto flex max-w-lg flex-col gap-2">
           {task.capabilities?.canStartWork && (
             <button
@@ -379,7 +379,7 @@ export default function TaskActivePage() {
             <button
               onClick={handleMarkDone}
               disabled={action === "done"}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-3 text-sm font-bold text-white active:scale-[0.97] disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-success py-3 text-sm font-bold text-white active:scale-[0.97] disabled:opacity-60"
             >
               {action === "done" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -413,7 +413,7 @@ export default function TaskActivePage() {
           {task.capabilities?.canCancel && (
             <button
               onClick={() => router.push(`/tasks/${taskId}`)}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 py-3 text-sm font-semibold text-red-600"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-error-border py-3 text-sm font-semibold text-error-text"
             >
               Manage Task
             </button>

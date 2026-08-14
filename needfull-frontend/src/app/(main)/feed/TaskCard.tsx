@@ -73,9 +73,9 @@ export default function TaskCard({ task, onPress }: TaskCardProps) {
   // WHAT: Determine left border accent
   let borderAccent = '';
   if (task.isEmergency) {
-    borderAccent = 'border-l-red-500';
+    borderAccent = 'border-l-error-border';
   } else if (task.isUrgent) {
-    borderAccent = 'border-l-amber-500';
+    borderAccent = 'border-l-warning-border';
   } else {
     borderAccent = 'border-l-transparent';
   }
@@ -121,13 +121,13 @@ export default function TaskCard({ task, onPress }: TaskCardProps) {
 
           {/* Urgent / Emergency badge */}
           {task.isEmergency && (
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-red-100 px-2 py-0.5 text-[11px] font-bold text-red-600">
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-error-bg px-2 py-0.5 text-[11px] font-bold text-error-text">
               <AlertCircle className="h-3 w-3" />
               EMERGENCY
             </span>
           )}
           {task.isUrgent && !task.isEmergency && (
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-warning-bg px-2 py-0.5 text-[11px] font-semibold text-warning-text">
               <Flame className="h-3 w-3" />
               URGENT
             </span>
@@ -164,7 +164,7 @@ export default function TaskCard({ task, onPress }: TaskCardProps) {
       </div>
 
       {/* Divider */}
-      <div className="mb-3 border-t border-gray-100" />
+      <div className="mb-3 border-t border-border-subtle" />
 
       {/* Bottom row: poster avatar + name + rating + verified, application count */}
       <div className="flex items-center justify-between">
@@ -193,8 +193,8 @@ export default function TaskCard({ task, onPress }: TaskCardProps) {
         </div>
 
         {/* Application count */}
-        <div className="flex shrink-0 items-center gap-1 rounded-md bg-gray-50 px-2 py-1">
-          <Users className="h-3 w-3 text-gray-400" />
+        <div className="flex shrink-0 items-center gap-1 rounded-md bg-surface-secondary px-2 py-1">
+          <Users className="h-3 w-3 text-foreground-muted" />
           <span className="text-xs font-medium text-gray-500">
             {task.applicationCount ?? 0}
           </span>

@@ -55,9 +55,43 @@
           dark appearance without per-component dark: overrides. */
   --color-surface-primary: var(--clr-surface-primary);
   --color-surface-secondary: var(--clr-surface-secondary);
+  --color-surface-elevated: var(--clr-surface-elevated);
   --color-border-default: var(--clr-border-default);
   --color-border-subtle: var(--clr-border-subtle);
   --color-border-strong: var(--clr-border-strong);
+
+  /* Foreground hierarchy tokens
+     WHY: Text describes its ROLE (primary / secondary / muted) — secondary
+          must stay readable in dark mode (never < 60% brightness grays). */
+  --color-foreground-secondary: var(--clr-foreground-secondary);
+  --color-foreground-muted: var(--clr-foreground-muted);
+
+  /* Canonical location accent — one red pin treatment everywhere */
+  --color-location: var(--clr-location);
+  --color-location-bg: var(--clr-location-bg);
+
+  /* Payment / warm finance surface (escrow breakdown, pricing) */
+  --color-payment-bg: var(--clr-payment-bg);
+  --color-payment-bg-strong: var(--clr-payment-bg-strong);
+  --color-payment-border: var(--clr-payment-border);
+  --color-payment-text: var(--clr-payment-text);
+  --color-payment-text-strong: var(--clr-payment-text-strong);
+
+  /* Semantic feedback pairs — bg / border / text so badges and callouts
+     stay intentional in BOTH themes (raw Tailwind pastels like bg-green-50
+     are static light values and wash out in dark mode). */
+  --color-success-bg: var(--clr-success-bg);
+  --color-success-border: var(--clr-success-border);
+  --color-success-text: var(--clr-success-text);
+  --color-warning-bg: var(--clr-warning-bg);
+  --color-warning-border: var(--clr-warning-border);
+  --color-warning-text: var(--clr-warning-text);
+  --color-error-bg: var(--clr-error-bg);
+  --color-error-border: var(--clr-error-border);
+  --color-error-text: var(--clr-error-text);
+  --color-info-bg: var(--clr-info-bg);
+  --color-info-border: var(--clr-info-border);
+  --color-info-text: var(--clr-info-text);
 
   --shadow-card: 0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
   --shadow-lifted:
@@ -93,9 +127,40 @@
   --clr-card-border: #f3f4f6;
   --clr-surface-primary: #ffffff;
   --clr-surface-secondary: #f9fafb;
+  --clr-surface-elevated: #ffffff;
   --clr-border-default: #e5e7eb;
   --clr-border-subtle: #f3f4f6;
   --clr-border-strong: #d1d5db;
+
+  /* Foreground hierarchy — secondary stays dark-enough, muted stays readable */
+  --clr-foreground-secondary: #3f3f46;
+  --clr-foreground-muted: #6b7280;
+
+  /* Canonical location accent — red pin */
+  --clr-location: #dc2626;
+  --clr-location-bg: #fee2e2;
+
+  /* Payment / finance surface — warm tint, never gray mud */
+  --clr-payment-bg: #fff8ec;
+  --clr-payment-bg-strong: #fff1d6;
+  --clr-payment-border: #f0d49a;
+  --clr-payment-text: #92610c;
+  --clr-payment-text-strong: #7c4a03;
+
+  /* Semantic feedback pairs (light) */
+  --clr-success-bg: #ecfdf5;
+  --clr-success-border: #a7f3d0;
+  --clr-success-text: #047857;
+  --clr-warning-bg: #fffbeb;
+  --clr-warning-border: #fde68a;
+  --clr-warning-text: #92400e;
+  --clr-error-bg: #fef2f2;
+  --clr-error-border: #fecaca;
+  --clr-error-text: #b91c1c;
+  --clr-info-bg: #eff6ff;
+  --clr-info-border: #bfdbfe;
+  --clr-info-text: #1d4ed8;
+
   --color-info: #2563eb;
   --color-info-light: #eff6ff;
   --color-surface-muted: #f9fafb;
@@ -170,9 +235,43 @@
   --clr-gray-900: #f5f5f4;
   --clr-surface-primary: #1c1c1f;
   --clr-surface-secondary: #141416;
+  --clr-surface-elevated: #26262a;
   --clr-border-default: #3a3a40;
   --clr-border-subtle: #2a2a2e;
   --clr-border-strong: #52525b;
+  --color-gold: #eaa325;
+  --color-gold-light: #2d2412;
+  --color-gold-dark: #fbbf24;
+
+  /* Foreground hierarchy — secondary/muted stay clearly readable on dark */
+  --clr-foreground-secondary: #d4d4d8;
+  --clr-foreground-muted: #a1a1aa;
+
+  /* Canonical location accent — vivid red, never grayed out */
+  --clr-location: #f87171;
+  --clr-location-bg: rgba(248, 113, 113, 0.14);
+
+  /* Payment / finance surface — dark warm brown, intentional */
+  --clr-payment-bg: #241d0f;
+  --clr-payment-bg-strong: #2d2412;
+  --clr-payment-border: rgba(234, 163, 37, 0.35);
+  --clr-payment-text: #f0c674;
+  --clr-payment-text-strong: #fbbf24;
+
+  /* Semantic feedback pairs (dark) — tinted dark surfaces, bright text */
+  --clr-success-bg: #0d2a1f;
+  --clr-success-border: rgba(52, 211, 153, 0.35);
+  --clr-success-text: #6ee7b7;
+  --clr-warning-bg: #2a2110;
+  --clr-warning-border: rgba(251, 191, 36, 0.35);
+  --clr-warning-text: #fcd34d;
+  --clr-error-bg: #2c1414;
+  --clr-error-border: rgba(248, 113, 113, 0.35);
+  --clr-error-text: #fca5a5;
+  --clr-info-bg: #14233f;
+  --clr-info-border: rgba(96, 165, 250, 0.35);
+  --clr-info-text: #93c5fd;
+
   --color-info: #60a5fa;
   --color-info-light: #172554;
   --color-surface-muted: #09090b;
@@ -225,9 +324,29 @@
 }
 [data-theme="dark"],
 .dark {
-  --stat-card-bg:     rgba(255,255,255,0.05);
-  --stat-card-border: rgba(255,255,255,0.08);
-  --text-muted:       rgba(255,255,255,0.45);
+  --stat-card-bg:     var(--clr-surface-elevated);
+  --stat-card-border: var(--clr-border-default);
+  --text-muted:       var(--clr-foreground-muted);
+}
+
+/* WHAT: Shared card surface — semantic elevation for content cards
+   WHY: Every card uses the same "page → surface → border" stack so cards
+        stay visible above the page background in BOTH themes. */
+.card-surface {
+  background: var(--clr-surface-primary);
+  border: 1px solid var(--clr-border-default);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-card);
+}
+
+/* WHAT: Micro section heading with consistent secondary prominence
+   WHY: "DESCRIPTION" / "LOCATION" labels use one typographic treatment */
+.nf-section-label {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clr-foreground-muted);
 }
 
 /* Profile dropdown — dark mode override */
@@ -687,6 +806,25 @@ select {
   }
 }
 
+/* --- Search pill focus ring (role-themed) ---
+   WHAT: One focus treatment shared by every search bar: brand green while
+         acting as a poster, gold accent while acting as a runner.
+   WHY:  Matches NeedFull's poster/runner theming; `data-role` is mirrored
+         onto <html> by the main app layout. Radius stays rounded-full in
+         the components (same as the topbar search pill). */
+.search-pill:focus,
+.search-pill:focus-visible,
+.search-pill:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(26, 107, 74, 0.45);
+}
+
+html[data-role="runner"] .search-pill:focus,
+html[data-role="runner"] .search-pill:focus-visible,
+html[data-role="runner"] .search-pill:focus-within {
+  box-shadow: 0 0 0 2px rgba(234, 163, 37, 0.5);
+}
+
 /* --- Modal/sheet overlay backdrop --- */
 .glass-overlay {
   background: rgba(0, 0, 0, 0.36);
@@ -1022,11 +1160,7 @@ select {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgb(100 116 139);
-}
-[data-theme="dark"] .section-label,
-.dark .section-label {
-  color: rgb(148 163 184);
+  color: var(--clr-foreground-muted);
 }
 
 /* ── Page column — consistent rhythm across the three workspace columns ── */

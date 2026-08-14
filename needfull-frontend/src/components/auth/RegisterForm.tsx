@@ -158,7 +158,7 @@ export function RegisterForm() {
           <span>Step {['details', 'verify', 'profile'].indexOf(currentStep) + 1} of 3</span>
           <span>{progressPercentage}%</span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-gray-200">
+        <div className="h-2 overflow-hidden rounded-full bg-surface-secondary">
           <div
             className="h-full bg-brand transition-all duration-300"
             style={{ width: `${progressPercentage}%` }}
@@ -189,7 +189,7 @@ export function RegisterForm() {
               placeholder="John Doe"
               disabled={isLoading}
               autoComplete="off"
-              className={`tap-target w-full rounded-lg border bg-white px-4 py-3 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
+              className={`tap-target w-full rounded-lg border bg-surface px-4 py-3 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary ${
                 detailsErrors.fullName ? 'border-danger focus:border-danger' : 'border-gray-300 focus:border-brand'
               }`}
               {...detailsForm.register('fullName', {
@@ -220,7 +220,7 @@ export function RegisterForm() {
               placeholder="you@example.com"
               disabled={isLoading}
               autoComplete="off"
-              className={`tap-target w-full rounded-lg border bg-white px-4 py-3 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
+              className={`tap-target w-full rounded-lg border bg-surface px-4 py-3 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary ${
                 detailsErrors.email ? 'border-danger focus:border-danger' : 'border-gray-300 focus:border-brand'
               }`}
               {...detailsForm.register('email')}
@@ -232,7 +232,7 @@ export function RegisterForm() {
               </p>
             )}
             {detailsForm.getValues('email') && !detailsErrors.email && (
-              <p className="flex items-center gap-1 text-sm text-green-600">
+              <p className="flex items-center gap-1 text-sm text-success-text">
                 <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 Email looks good
               </p>
@@ -250,7 +250,7 @@ export function RegisterForm() {
               placeholder="+234 801 234 5678"
               disabled={isLoading}
               autoComplete="off"
-              className={`tap-target w-full rounded-lg border bg-white px-4 py-3 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
+              className={`tap-target w-full rounded-lg border bg-surface px-4 py-3 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary ${
                 detailsErrors.phone ? 'border-danger focus:border-danger' : 'border-gray-300 focus:border-brand'
               }`}
               {...detailsForm.register('phone')}
@@ -278,7 +278,7 @@ export function RegisterForm() {
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck="false"
-                className={`tap-target w-full rounded-lg border bg-white px-4 py-3 pr-12 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
+                className={`tap-target w-full rounded-lg border bg-surface px-4 py-3 pr-12 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary ${
                   detailsErrors.password ? 'border-danger focus:border-danger' : 'border-gray-300 focus:border-brand'
                 }`}
                 {...detailsForm.register('password', {
@@ -294,7 +294,7 @@ export function RegisterForm() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={isLoading}
-                className="tap-target absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:text-gray-300"
+                className="tap-target absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:text-foreground-muted"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -327,7 +327,7 @@ export function RegisterForm() {
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck="false"
-                className={`tap-target w-full rounded-lg border bg-white px-4 py-3 pr-12 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
+                className={`tap-target w-full rounded-lg border bg-surface px-4 py-3 pr-12 text-base placeholder-gray-500 focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary ${
                   detailsErrors.confirmPassword ? 'border-danger focus:border-danger' : 'border-gray-300 focus:border-brand'
                 }`}
                 {...detailsForm.register('confirmPassword')}
@@ -336,7 +336,7 @@ export function RegisterForm() {
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 disabled={isLoading}
-                className="tap-target absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:text-gray-300"
+                className="tap-target absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:text-foreground-muted"
                 aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
               >
                 {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -349,7 +349,7 @@ export function RegisterForm() {
               </p>
             )}
             {passwordValue && !detailsErrors.password && !detailsErrors.confirmPassword && (
-              <p className="flex items-center gap-1 text-sm text-green-600">
+              <p className="flex items-center gap-1 text-sm text-success-text">
                 <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 Passwords match
               </p>
@@ -397,7 +397,7 @@ export function RegisterForm() {
               type="button"
               onClick={() => setCurrentStep('details')}
               disabled={isLoading}
-              className="tap-target flex-1 rounded-lg border-2 border-gray-300 px-4 py-3 font-semibold text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+              className="tap-target flex-1 rounded-lg border-2 border-border-default px-4 py-3 font-semibold text-gray-700 hover:bg-surface-secondary disabled:opacity-50"
             >
               <ChevronLeft className="inline h-4 w-4" /> Back
             </button>
@@ -427,7 +427,7 @@ export function RegisterForm() {
               type="text"
               placeholder="Federal University Oye-Ekiti"
               disabled={isLoading}
-              className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50"
+              className="tap-target w-full rounded-lg border border-border-default bg-surface px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary"
               {...profileForm.register('school')}
             />
             {profileForm.formState.errors.school && (
@@ -447,7 +447,7 @@ export function RegisterForm() {
               type="text"
               placeholder="Computer Science"
               disabled={isLoading}
-              className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50"
+              className="tap-target w-full rounded-lg border border-border-default bg-surface px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary"
               {...profileForm.register('department')}
             />
             {profileForm.formState.errors.department && (
@@ -465,7 +465,7 @@ export function RegisterForm() {
             <select
               id="level"
               disabled={isLoading}
-              className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50"
+              className="tap-target w-full rounded-lg border border-border-default bg-surface px-4 py-3 text-base focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary"
               {...profileForm.register('level')}
             >
               <option value="">Select your level</option>
@@ -492,7 +492,7 @@ export function RegisterForm() {
               type="text"
               placeholder="e.g., Hostel A, Off-campus"
               disabled={isLoading}
-              className="tap-target w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50"
+              className="tap-target w-full rounded-lg border border-border-default bg-surface px-4 py-3 text-base placeholder-gray-500 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary"
               {...profileForm.register('hostel')}
             />
             {profileForm.formState.errors.hostel && (
@@ -508,7 +508,7 @@ export function RegisterForm() {
               type="button"
               onClick={() => setCurrentStep('verify')}
               disabled={isLoading}
-              className="tap-target flex-1 rounded-lg border-2 border-gray-300 px-4 py-3 font-semibold text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+              className="tap-target flex-1 rounded-lg border-2 border-border-default px-4 py-3 font-semibold text-gray-700 hover:bg-surface-secondary disabled:opacity-50"
             >
               <ChevronLeft className="inline h-4 w-4" /> Back
             </button>

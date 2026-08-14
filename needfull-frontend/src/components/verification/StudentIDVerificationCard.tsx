@@ -94,24 +94,24 @@ export function StudentIDVerificationCard({
   const getStatusBadgeColor = (s: VerificationStatus) => {
     switch (s) {
       case "approved":
-        return "bg-green-50 text-green-700";
+        return "bg-success-bg text-success-text";
       case "pending":
-        return "bg-amber-50 text-amber-700";
+        return "bg-warning-bg text-warning-text";
       case "rejected":
-        return "bg-red-50 text-red-700";
+        return "bg-error-bg text-error-text";
       default:
-        return "bg-gray-50 text-gray-700";
+        return "bg-surface-secondary text-foreground-secondary";
     }
   };
 
   const getStatusIcon = (s: VerificationStatus) => {
     switch (s) {
       case "approved":
-        return <CheckCircle2 className="w-4 h-4 text-green-700" />;
+        return <CheckCircle2 className="w-4 h-4 text-success-text" />;
       case "rejected":
-        return <AlertCircle className="w-4 h-4 text-red-700" />;
+        return <AlertCircle className="w-4 h-4 text-error-text" />;
       case "pending":
-        return <Loader className="w-4 h-4 text-amber-700 animate-spin" />;
+        return <Loader className="w-4 h-4 text-warning-text animate-spin" />;
       default:
         return null;
     }
@@ -122,8 +122,8 @@ export function StudentIDVerificationCard({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="bg-purple-100 p-3 rounded-lg">
-            <FileText className="w-5 h-5 text-purple-700" />
+          <div className="bg-info-bg p-3 rounded-lg">
+            <FileText className="w-5 h-5 text-info-text" />
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">
@@ -133,9 +133,9 @@ export function StudentIDVerificationCard({
           </div>
         </div>
         {status === "approved" && (
-          <div className="flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full">
-            <CheckCircle2 className="w-4 h-4 text-green-700" />
-            <span className="text-sm font-medium text-green-700">Verified</span>
+          <div className="flex items-center gap-2 bg-success-bg px-3 py-1 rounded-full">
+            <CheckCircle2 className="w-4 h-4 text-success-text" />
+            <span className="text-sm font-medium text-success-text">Verified</span>
           </div>
         )}
       </div>
@@ -193,7 +193,7 @@ export function StudentIDVerificationCard({
         <div className="space-y-3">
           {/* File Input Area */}
           <div
-            className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors"
+            className="border-2 border-dashed border-border-default rounded-lg p-6 text-center cursor-pointer hover:border-processing hover:bg-info-bg transition-colors"
             onClick={() => fileInputRef.current?.click()}
             role="button"
             tabIndex={0}
@@ -232,7 +232,7 @@ export function StudentIDVerificationCard({
           {/* Camera Button */}
           <button
             onClick={() => cameraInputRef.current?.click()}
-            className="w-full flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 border border-border-default hover:bg-surface-secondary text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
             disabled={isLoading}
           >
             <Camera className="w-4 h-4" />
@@ -262,7 +262,7 @@ export function StudentIDVerificationCard({
                 setMatricInput(e.target.value.toUpperCase());
                 setError(null);
               }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-2 border border-border-default rounded-lg focus:ring-2 focus:ring-processing focus:border-transparent outline-none"
               disabled={isLoading}
             />
           </div>
@@ -271,7 +271,7 @@ export function StudentIDVerificationCard({
           <button
             onClick={handleSubmit}
             disabled={isLoading || !file}
-            className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 bg-processing hover:brightness-105 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>
@@ -287,8 +287,8 @@ export function StudentIDVerificationCard({
           </button>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p className="text-sm text-red-700">{error}</p>
+            <div className="bg-error-bg border border-error-border rounded-lg p-3">
+              <p className="text-sm text-error-text">{error}</p>
             </div>
           )}
         </div>

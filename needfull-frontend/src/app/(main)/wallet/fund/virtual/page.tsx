@@ -256,7 +256,7 @@ export default function VirtualFundPage() {
               </div>
 
               {/* Account number with copy */}
-              <div className="mt-2 flex items-center gap-3 rounded-lg bg-gray-50 px-4 py-3">
+              <div className="mt-2 flex items-center gap-3 rounded-lg bg-surface-secondary px-4 py-3">
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-medium text-gray-500">
                     Account Number
@@ -268,10 +268,10 @@ export default function VirtualFundPage() {
                 <button
                   type="button"
                   onClick={copyAccountNumber}
-                  className="tap-target flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface shadow-sm transition-colors hover:bg-gray-100"
+                  className="tap-target flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface shadow-sm transition-colors hover:bg-surface-secondary"
                 >
                   {copied ? (
-                    <Check className="h-5 w-5 text-green-600" />
+                    <Check className="h-5 w-5 text-success-text" />
                   ) : (
                     <Copy className="h-5 w-5 text-gray-600" />
                   )}
@@ -279,7 +279,7 @@ export default function VirtualFundPage() {
               </div>
 
               {/* Account name */}
-              <div className="mt-2 rounded-lg bg-gray-50 px-4 py-3">
+              <div className="mt-2 rounded-lg bg-surface-secondary px-4 py-3">
                 <p className="text-xs font-medium text-gray-500">
                   Account Name
                 </p>
@@ -293,15 +293,15 @@ export default function VirtualFundPage() {
                 <p className="text-sm text-gray-700">
                   Transfer any amount to this number from any bank.
                 </p>
-                <p className="flex items-center gap-1.5 text-sm font-medium text-green-700">
+                <p className="flex items-center gap-1.5 text-sm font-medium text-success-text">
                   <Check className="h-4 w-4" />
                   Credited automatically within 5 minutes
                 </p>
               </div>
 
               {/* Fee note */}
-              <div className="mt-4 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
-                <p className="text-xs font-medium text-amber-700">
+              <div className="mt-4 rounded-lg bg-warning-bg border border-warning-border px-4 py-3">
+                <p className="text-xs font-medium text-warning-text">
                   ~₦30 flat fee charged by your bank for transfers
                 </p>
               </div>
@@ -371,7 +371,7 @@ export default function VirtualFundPage() {
                   <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                 </div>
               ) : transactions.length === 0 ? (
-                <div className="mt-4 rounded-lg bg-gray-50 py-8 text-center">
+                <div className="mt-4 rounded-lg bg-surface-secondary py-8 text-center">
                   <Wallet className="mx-auto h-8 w-8 text-gray-300" />
                   <p className="mt-2 text-sm text-gray-500">
                     No virtual deposits yet
@@ -401,7 +401,7 @@ export default function VirtualFundPage() {
                         )}
                       </div>
                       <div className="text-right shrink-0 ml-3">
-                        <p className="text-sm font-bold text-green-600">
+                        <p className="text-sm font-bold text-success-text">
                           +{formatCurrency(tx.amount.kobo)}
                         </p>
                         {tx.balanceAfter && (

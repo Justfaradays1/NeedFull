@@ -20,8 +20,8 @@ export function ErrorState({
 }: ErrorStateProps) {
   return (
     <div role="alert" className={cn('flex flex-col items-center py-16 text-center', className)}>
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-        <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-error-bg">
+        <AlertCircle className="h-8 w-8 text-error-text" aria-hidden="true" />
       </div>
       <p className="mt-4 font-display text-lg font-bold text-gray-900">{title}</p>
       <p className="mt-1 max-w-xs text-sm text-gray-500">{message}</p>

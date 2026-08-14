@@ -16,7 +16,7 @@ const variantStyles = {
   primary: 'bg-brand text-on-brand shadow-card hover:bg-brand-mid active:scale-[0.97]',
   gold:    'bg-gold text-white shadow-card hover:brightness-105 active:scale-[0.97]',
   outline: 'bg-transparent text-brand-text border-[1.5px] border-brand hover:bg-brand-light hover:text-brand active:scale-[0.97]',
-  ghost:   'bg-transparent text-gray-600 hover:bg-gray-100 active:scale-[0.97]',
+  ghost:   'bg-transparent text-foreground-secondary hover:bg-surface-secondary active:scale-[0.97]',
   danger:  'bg-danger text-white shadow-card hover:brightness-105 active:scale-[0.97]',
 };
 
@@ -47,7 +47,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           'transition-all duration-150 ease-out',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40',
           'disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100',
-          showSuccess && !loading && '!bg-green-500 !text-white !shadow-none !pointer-events-none',
+          showSuccess && !loading && '!bg-success !text-white !shadow-none !pointer-events-none',
           variantStyles[variant],
           sizeStyles[size],
           className

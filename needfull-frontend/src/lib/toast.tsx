@@ -14,7 +14,7 @@ export function showToast(message: string, type: 'success' | 'error' | 'loading'
   toast.custom(
     (t) => (
       <div
-        className={`pointer-events-auto flex items-start gap-3 rounded-2xl bg-white px-4 py-3 shadow-lifted border border-gray-100 transition-all duration-300 ${
+        className={`pointer-events-auto flex items-start gap-3 rounded-2xl bg-surface px-4 py-3 shadow-lifted border border-border-default transition-all duration-300 ${
           t.visible ? 'animate-in fade-in slide-in-from-top-2' : 'animate-out fade-out'
         }`}
         style={{
@@ -24,11 +24,11 @@ export function showToast(message: string, type: 'success' | 'error' | 'loading'
         }}
       >
         <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-          type === 'success' ? 'bg-green-100 text-green-600' :
-          type === 'error' ? 'bg-red-100 text-red-600' :
-          type === 'warning' ? 'bg-amber-100 text-amber-600' :
-          type === 'loading' ? 'bg-blue-100 text-blue-600' :
-          'bg-blue-100 text-blue-600'
+          type === 'success' ? 'bg-success-bg text-success-text' :
+          type === 'error' ? 'bg-error-bg text-error-text' :
+          type === 'warning' ? 'bg-warning-bg text-warning-text' :
+          type === 'loading' ? 'bg-info-bg text-info-text' :
+          'bg-info-bg text-info-text'
         }`}>
           {type === 'loading' ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -44,7 +44,7 @@ export function showToast(message: string, type: 'success' | 'error' | 'loading'
         <button
           type="button"
           onClick={() => toast.dismiss(t.id)}
-          className="tap-target mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          className="tap-target mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-foreground-muted hover:bg-surface-secondary hover:text-foreground-secondary"
           aria-label="Dismiss"
         >
           <svg viewBox="0 0 16 16" fill="none" className="h-3 w-3">

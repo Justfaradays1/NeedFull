@@ -107,7 +107,7 @@ export function FooterSection() {
               className="mt-3 text-sm leading-relaxed"
               style={{ color: "var(--color-muted)" }}
             >
-              Campus economy for Nigerian students.
+              The trusted local marketplace for Nigeria.
             </p>
           </div>
           <div>
@@ -115,7 +115,7 @@ export function FooterSection() {
               className="mb-3 text-sm font-bold"
               style={{ color: "var(--color-foreground)" }}
             >
-              For students
+              For everyone
             </h4>
             <ul
               className="space-y-2 text-sm"
@@ -250,8 +250,8 @@ export function FooterSection() {
             color: "var(--color-muted)",
           }}
         >
-          &copy; 2026 NeedFull. All rights reserved. Currently live at Federal
-          University Oye-Ekiti (FUOYE). Expanding to more campuses in 2026.
+          &copy; 2026 NeedFull. All rights reserved. Live in selected
+          communities across Nigeria. Expanding in 2026.
         </div>
       </div>
     </footer>

@@ -68,10 +68,10 @@ export default function AdminReportsPage() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-secondary">
       <header className="sticky top-0 z-10 bg-surface px-4 py-3 shadow-sm border-b border-card-border">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-gray-100">
+          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-surface-secondary">
             <ArrowLeft className="h-5 w-5 text-gray-700" />
           </button>
           <h1 className="text-lg font-bold text-gray-900">Reports</h1>
@@ -80,7 +80,7 @@ export default function AdminReportsPage() {
 
       <div className="flex gap-2 px-4 py-3">
         {(["open", "all"] as const).map((f) => (
-          <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${filter === f ? "bg-brand text-white" : "bg-gray-200 text-gray-600"}`}>
+          <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${filter === f ? "bg-brand text-white" : "bg-surface-secondary text-gray-600"}`}>
             {f === "open" ? "Open" : "All"}
           </button>
         ))}
@@ -90,7 +90,7 @@ export default function AdminReportsPage() {
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-brand-text" /></div>
         ) : reports.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-12 text-foreground-muted">
             <Flag className="mb-2 h-12 w-12" />
             <p className="text-sm">No reports found</p>
           </div>
@@ -100,7 +100,7 @@ export default function AdminReportsPage() {
               <div key={r.id} className="rounded-xl bg-surface p-4 shadow-sm border border-card-border">
                 <div className="mb-2 flex items-start justify-between">
                   <p className="font-semibold text-gray-900">Report #{r.id.slice(0, 8)}</p>
-                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${r.status === "open" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"}`}>{r.status}</span>
+                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${r.status === "open" ? "bg-error-bg text-error-text" : "bg-success-bg text-success-text"}`}>{r.status}</span>
                 </div>
                 <p className="mb-2 text-sm text-gray-700">{r.reason}</p>
                 <div className="mb-2 text-xs text-gray-500">
@@ -108,13 +108,13 @@ export default function AdminReportsPage() {
                   {r.reportedUser && <p>Against: {r.reportedUser.fullName}</p>}
                   {r.reportedTask && <p>Task: {r.reportedTask.title}</p>}
                 </div>
-                <p className="mb-3 text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</p>
+                <p className="mb-3 text-xs text-foreground-muted">{new Date(r.createdAt).toLocaleDateString()}</p>
                 {r.status === "open" && (
                   <div className="space-y-2">
-                    <textarea value={resolution} onChange={(e) => setResolution(e.target.value)} placeholder="Resolution notes..." className="w-full rounded-xl border border-gray-300 p-3 text-sm focus:border-brand focus:outline-none" rows={2} />
+                    <textarea value={resolution} onChange={(e) => setResolution(e.target.value)} placeholder="Resolution notes..." className="w-full rounded-xl border border-border-default p-3 text-sm focus:border-brand focus:outline-none" rows={2} />
                     <div className="flex gap-2">
-                      <button onClick={() => setAction("action_taken")} className={`rounded-lg px-3 py-2 text-xs font-semibold ${action === "action_taken" ? "bg-brand text-white" : "bg-gray-100 text-gray-600"}`}>Action Taken</button>
-                      <button onClick={() => setAction("dismiss")} className={`rounded-lg px-3 py-2 text-xs font-semibold ${action === "dismiss" ? "bg-gray-600 text-white" : "bg-gray-100 text-gray-600"}`}>Dismiss</button>
+                      <button onClick={() => setAction("action_taken")} className={`rounded-lg px-3 py-2 text-xs font-semibold ${action === "action_taken" ? "bg-brand text-white" : "bg-surface-secondary text-gray-600"}`}>Action Taken</button>
+                      <button onClick={() => setAction("dismiss")} className={`rounded-lg px-3 py-2 text-xs font-semibold ${action === "dismiss" ? "bg-gray-600 text-white" : "bg-surface-secondary text-gray-600"}`}>Dismiss</button>
                     </div>
                     <button onClick={() => handleResolve(r.id)} disabled={!resolution.trim() || processingId === r.id} className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-brand py-2.5 text-sm font-semibold text-white disabled:opacity-50">
                       {processingId === r.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}

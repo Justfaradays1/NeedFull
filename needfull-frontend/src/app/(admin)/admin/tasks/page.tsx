@@ -73,10 +73,10 @@ export default function AdminTasksPage() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-secondary">
       <header className="sticky top-0 z-10 bg-surface px-4 py-3 shadow-sm border-b border-card-border">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-gray-100">
+          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-surface-secondary">
             <ArrowLeft className="h-5 w-5 text-gray-700" />
           </button>
           <h1 className="text-lg font-bold text-gray-900">All Tasks</h1>
@@ -85,7 +85,7 @@ export default function AdminTasksPage() {
 
       <div className="flex gap-2 overflow-x-auto px-4 py-3">
         {filters.map((f) => (
-          <button key={f} onClick={() => { setStatusFilter(f); setPage(1); }} className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${statusFilter === f ? "bg-brand text-white" : "bg-gray-200 text-gray-600"}`}>
+          <button key={f} onClick={() => { setStatusFilter(f); setPage(1); }} className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${statusFilter === f ? "bg-brand text-white" : "bg-surface-secondary text-gray-600"}`}>
             {f === "in_progress" ? "In Progress" : f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
@@ -95,7 +95,7 @@ export default function AdminTasksPage() {
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-brand-text" /></div>
         ) : tasks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-12 text-foreground-muted">
             <ClipboardList className="mb-2 h-12 w-12" />
             <p className="text-sm">No tasks found</p>
           </div>
@@ -109,8 +109,8 @@ export default function AdminTasksPage() {
                     <p className="text-xs text-gray-500">by {t.poster?.fullName ?? "Unknown"}</p>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    {t.isUrgent && <span className="rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-700">URGENT</span>}
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${t.status === "open" ? "bg-green-100 text-green-800" : t.status === "in_progress" ? "bg-amber-100 text-amber-800" : t.status === "completed" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-600"}`}>
+                    {t.isUrgent && <span className="rounded bg-error-bg px-1.5 py-0.5 text-[10px] font-bold text-error-text">URGENT</span>}
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${t.status === "open" ? "bg-success-bg text-success-text" : t.status === "in_progress" ? "bg-warning-bg text-warning-text" : t.status === "completed" ? "bg-info-bg text-info-text" : "bg-surface-secondary text-gray-600"}`}>
                       {t.status.replace("_", " ")}
                     </span>
                   </div>
@@ -119,9 +119,9 @@ export default function AdminTasksPage() {
                   <span className="font-medium">Budget:</span> ₦{t.budget.naira.toLocaleString()} &middot;
                   <span className="font-medium"> Category:</span> {getCategoryDisplayName(t.category.name)}
                 </div>
-                <p className="mb-3 text-xs text-gray-400">{new Date(t.createdAt).toLocaleDateString()}</p>
+                <p className="mb-3 text-xs text-foreground-muted">{new Date(t.createdAt).toLocaleDateString()}</p>
                 {(t.status === "open" || t.status === "in_progress") && (
-                  <button onClick={() => handleCancel(t.id)} disabled={cancellingId === t.id} className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-red-300 py-2.5 text-sm font-semibold text-red-600 disabled:opacity-50">
+                  <button onClick={() => handleCancel(t.id)} disabled={cancellingId === t.id} className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-error-border py-2.5 text-sm font-semibold text-error-text disabled:opacity-50">
                     {cancellingId === t.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4" />}
                     Cancel Task
                   </button>
@@ -129,9 +129,9 @@ export default function AdminTasksPage() {
               </div>
             ))}
             <div className="flex items-center justify-between pt-2">
-              <button disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} className="rounded-lg bg-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 disabled:opacity-30">Previous</button>
+              <button disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} className="rounded-lg bg-surface-secondary px-4 py-2 text-xs font-semibold text-gray-700 disabled:opacity-30">Previous</button>
               <span className="text-xs text-gray-500">Page {page}</span>
-              <button disabled={!hasMore} onClick={() => setPage((p) => p + 1)} className="rounded-lg bg-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 disabled:opacity-30">Next</button>
+              <button disabled={!hasMore} onClick={() => setPage((p) => p + 1)} className="rounded-lg bg-surface-secondary px-4 py-2 text-xs font-semibold text-gray-700 disabled:opacity-30">Next</button>
             </div>
           </div>
         )}

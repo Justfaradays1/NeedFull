@@ -146,7 +146,7 @@ export default function PublicProfilePage() {
 
   if (notFound || !profile) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-surface-secondary px-4 text-center">
         <h2 className="text-lg font-semibold text-gray-900">Profile not found</h2>
         <p className="mt-1 text-sm text-gray-500">This user may have been removed.</p>
         <button
@@ -203,8 +203,8 @@ export default function PublicProfilePage() {
               className="border-4 border-surface"
             />
             {profile.isAvailable && (
-              <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-[11px] font-bold text-green-700">
-                <span className="h-2 w-2 rounded-full bg-green-500" />
+              <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-success-bg px-3 py-1 text-[11px] font-bold text-success-text">
+                <span className="h-2 w-2 rounded-full bg-success" />
                 {profile.isRunner ? "Available" : "Online"}
               </span>
             )}
@@ -213,7 +213,7 @@ export default function PublicProfilePage() {
             <p className="flex items-center gap-1.5 font-display text-lg font-bold text-gray-900">
               {profile.fullName}
               {profile.isVerifiedStudent && (
-                <BadgeCheck className="h-5 w-5 shrink-0 text-blue-500" />
+                <BadgeCheck className="h-5 w-5 shrink-0 text-info-text" />
               )}
             </p>
             {profile.school && (
@@ -243,7 +243,7 @@ export default function PublicProfilePage() {
                 {trustChips.map((chip) => (
                   <span
                     key={chip.label}
-                    className="inline-flex items-center gap-1 rounded-full border border-card-border bg-gray-50 px-2.5 py-1 text-[10px] font-bold text-gray-700"
+                    className="inline-flex items-center gap-1 rounded-full border border-card-border bg-surface-secondary px-2.5 py-1 text-[10px] font-bold text-gray-700"
                   >
                     {chip.icon}
                     {chip.label}
@@ -259,7 +259,7 @@ export default function PublicProfilePage() {
           <div className="rounded-xl border border-card-border bg-surface p-3 text-center shadow-sm">
             <p className="text-lg font-black text-brand-text">
               {profile.trustScore}
-              <span className="text-xs font-medium text-gray-400">/100</span>
+              <span className="text-xs font-medium text-foreground-muted">/100</span>
             </p>
             <p className="mt-0.5 text-[10px] font-medium text-gray-500">Trust Score</p>
           </div>
@@ -271,7 +271,7 @@ export default function PublicProfilePage() {
             <p className="mt-0.5 text-[10px] font-medium text-gray-500">Rating</p>
           </div>
           <div className="rounded-xl border border-card-border bg-surface p-3 text-center shadow-sm">
-            <div className="flex items-center justify-center gap-1 text-lg font-black text-emerald-600">
+            <div className="flex items-center justify-center gap-1 text-lg font-black text-success-text">
               <Briefcase className="h-4 w-4" />
               {profile.tasksCompleted}
             </div>
@@ -287,8 +287,8 @@ export default function PublicProfilePage() {
               <h2 className="font-display text-sm font-bold text-gray-900">
                 Currently Offering
               </h2>
-              <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+              <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-success-bg px-2 py-0.5 text-[10px] font-bold text-success-text">
+                <span className="h-1.5 w-1.5 rounded-full bg-success" />
                 {profile.isAvailable ? "AVAILABLE" : "BUSY"}
               </span>
             </div>
@@ -307,7 +307,7 @@ export default function PublicProfilePage() {
                       ? getCategoryDisplayName(offer.category.name)
                       : "Help"}
                       {offer.isOnlineToday && (
-                        <span className="ml-1.5 rounded-full bg-green-100 px-1.5 py-0.5 text-[9px] font-bold text-green-700">
+                        <span className="ml-1.5 rounded-full bg-success-bg px-1.5 py-0.5 text-[9px] font-bold text-success-text">
                           ONLINE TODAY
                         </span>
                       )}
@@ -360,7 +360,7 @@ export default function PublicProfilePage() {
               <Award className="h-4 w-4 text-gold" />
               Recent Reviews
             </h2>
-            <span className="text-[11px] font-medium text-gray-400">
+            <span className="text-[11px] font-medium text-foreground-muted">
               {profile.recentReviews ? profile.recentReviews.length : 0}
             </span>
           </div>
@@ -375,7 +375,7 @@ export default function PublicProfilePage() {
                         {rev.reviewer.fullName}
                       </p>
                     </div>
-                    <span className="text-[10px] text-gray-400">
+                    <span className="text-[10px] text-foreground-muted">
                       {timeAgo(rev.createdAt)}
                     </span>
                   </div>

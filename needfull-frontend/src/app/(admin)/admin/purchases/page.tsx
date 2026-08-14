@@ -52,19 +52,19 @@ const STATUS_FILTERS = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  pending_payment: "bg-gray-100 text-gray-600",
-  funded: "bg-blue-100 text-blue-800",
-  accepted: "bg-indigo-100 text-indigo-800",
-  at_store: "bg-purple-100 text-purple-800",
-  shopping: "bg-purple-100 text-purple-800",
-  receipt_uploaded: "bg-teal-100 text-teal-800",
-  needs_budget_approval: "bg-amber-100 text-amber-800",
-  heading_to_delivery: "bg-orange-100 text-orange-800",
-  delivered: "bg-cyan-100 text-cyan-800",
-  completed: "bg-green-100 text-green-800",
-  disputed: "bg-red-100 text-red-800",
-  refunded: "bg-gray-100 text-gray-600",
-  cancelled: "bg-gray-100 text-gray-500",
+  pending_payment: "bg-surface-secondary text-gray-600",
+  funded: "bg-info-bg text-info-text",
+  accepted: "bg-info-bg text-info-text",
+  at_store: "bg-processing-bg text-processing-text",
+  shopping: "bg-processing-bg text-processing-text",
+  receipt_uploaded: "bg-info-bg text-info-text",
+  needs_budget_approval: "bg-warning-bg text-warning-text",
+  heading_to_delivery: "bg-warning-bg text-warning-text",
+  delivered: "bg-info-bg text-info-text",
+  completed: "bg-success-bg text-success-text",
+  disputed: "bg-error-bg text-error-text",
+  refunded: "bg-surface-secondary text-gray-600",
+  cancelled: "bg-surface-secondary text-gray-500",
 };
 
 export default function AdminPurchasesPage() {
@@ -117,34 +117,34 @@ export default function AdminPurchasesPage() {
             bg="bg-brand-light/30"
           />
           <StatCard
-            icon={<CheckCircle2 className="h-4 w-4 text-green-600" />}
+            icon={<CheckCircle2 className="h-4 w-4 text-success-text" />}
             label="Completed"
             value={String(stats.completedPurchases)}
-            bg="bg-green-50"
+            bg="bg-success-bg"
           />
           <StatCard
-            icon={<Clock className="h-4 w-4 text-orange-600" />}
+            icon={<Clock className="h-4 w-4 text-warning-text" />}
             label="Pending Delivery"
             value={String(stats.pendingDeliveries)}
-            bg="bg-orange-50"
+            bg="bg-warning-bg"
           />
           <StatCard
-            icon={<AlertTriangle className="h-4 w-4 text-red-600" />}
+            icon={<AlertTriangle className="h-4 w-4 text-error-text" />}
             label="Disputes"
             value={String(stats.openDisputes)}
-            bg="bg-red-50"
+            bg="bg-error-bg"
           />
           <StatCard
-            icon={<DollarSign className="h-4 w-4 text-amber-600" />}
+            icon={<DollarSign className="h-4 w-4 text-warning-text" />}
             label="Budget Approvals"
             value={String(stats.pendingBudgetApprovals)}
-            bg="bg-amber-50"
+            bg="bg-warning-bg"
           />
           <StatCard
-            icon={<ShoppingBag className="h-4 w-4 text-blue-600" />}
+            icon={<ShoppingBag className="h-4 w-4 text-info-text" />}
             label="Today's Activity"
             value={String(stats.todayTransactions)}
-            bg="bg-blue-50"
+            bg="bg-info-bg"
           />
         </div>
       )}
@@ -158,7 +158,7 @@ export default function AdminPurchasesPage() {
             className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
               statusFilter === f.value
                 ? "bg-brand text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-surface-secondary text-gray-600 hover:bg-surface-elevated"
             }`}
           >
             {f.label}
@@ -173,7 +173,7 @@ export default function AdminPurchasesPage() {
         </div>
       ) : tasks.length === 0 ? (
         <div className="rounded-2xl bg-surface p-8 text-center border border-card-border">
-          <ShoppingBag className="mx-auto mb-2 h-8 w-8 text-gray-300" />
+          <ShoppingBag className="mx-auto mb-2 h-8 w-8 text-foreground-muted" />
           <p className="text-sm text-gray-500">No purchase tasks found</p>
         </div>
       ) : (
@@ -196,7 +196,7 @@ export default function AdminPurchasesPage() {
                 </div>
                 <span
                   className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                    STATUS_COLORS[task.status] || "bg-gray-100 text-gray-600"
+                    STATUS_COLORS[task.status] || "bg-surface-secondary text-gray-600"
                   }`}
                 >
                   {task.status.replace(/_/g, " ")}

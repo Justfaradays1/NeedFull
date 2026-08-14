@@ -66,7 +66,7 @@ function FundingCard({
             </span>
           )}
           {highlight && (
-            <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-bold text-green-700">
+            <span className="inline-flex items-center rounded-full bg-success-bg px-2.5 py-0.5 text-[11px] font-bold text-success-text">
               {highlight}
             </span>
           )}
@@ -83,7 +83,7 @@ function FundingCard({
         {/* Fee disclaimer */}
         {fee && (
           <p
-            className={`text-xs font-medium ${feeWarning ? "text-amber-600" : "text-gray-500"}`}
+            className={`text-xs font-medium ${feeWarning ? "text-warning-text" : "text-foreground-muted"}`}
           >
             {fee}
           </p>
@@ -191,7 +191,7 @@ export default function WalletFundPage() {
       </div>
 
       {/* WHAT: Info footer */}
-      <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <div className="border-t border-border-default px-4 py-5 sm:px-6">
         {user?.activeRole === "runner" && (
           <div className="mb-3 rounded-xl border border-gold/30 bg-gold-light/60 px-4 py-3">
             <p className="text-xs font-medium text-gray-700">

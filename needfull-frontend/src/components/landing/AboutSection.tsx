@@ -17,15 +17,15 @@ export function AboutSection() {
               className="font-display text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold leading-[1.12] tracking-tight"
               style={{ color: "var(--color-foreground)" }}
             >
-              Campus commerce, reimagined for African{" "}
+              Local commerce, reimagined for African{" "}
               <span style={{ color: "var(--color-brand)" }}>trust</span>.
             </h2>
             <div className="mt-6 space-y-4 text-[15px] leading-relaxed sm:text-base">
               <p style={{ color: "var(--color-muted)" }}>
-                Every day across Nigerian campuses, thousands of students need
-                help&mdash;laundry done, notes shared, groceries delivered,
-                assignments proofread. And just as many students are ready to
-                work. The problem? No one trusts a stranger with their money.
+                Every day, people need help with everyday tasks&mdash;laundry
+                done, notes shared, groceries delivered, documents proofread.
+                And right beside them are people ready to work. The problem? No
+                one trusts a stranger with their money.
               </p>
               <p style={{ color: "var(--color-muted)" }}>
                 NeedFull solves that. We are the trusted middleman that holds
@@ -33,11 +33,10 @@ export function AboutSection() {
                 satisfaction. Money only moves when both sides are happy.
               </p>
               <p style={{ color: "var(--color-muted)" }}>
-                Launched at Federal University Oye-Ekiti (FUOYE), we are
-                building a campus economy that lets every student earn real
-                money, build a reputation, and access services they need&mdash;no
-                bank account required, no complicated setup, just you and your
-                campus community.
+                Built for communities across Nigeria, we are building a local
+                economy that lets everyone earn real money, build a reputation,
+                and access the services they need&mdash;no bank account required,
+                no complicated setup, just you and the people around you.
               </p>
             </div>
           </div>
@@ -59,9 +58,9 @@ export function AboutSection() {
                 className="mt-3 text-sm leading-relaxed"
                 style={{ color: "var(--color-muted)" }}
               >
-                &ldquo;A student needs help with a campus task right now. Another
-                student wants to earn money. Neither trusts the other enough to
-                hand over cash.&rdquo;
+                &ldquo;Someone needs help with a task right now. Someone else
+                wants to earn money. Neither trusts the other enough to hand
+                over cash.&rdquo;
               </p>
               <div
                 className="mt-5 flex items-center gap-4 rounded-xl p-4"
@@ -103,12 +102,12 @@ export function AboutSection() {
                 className="mt-3 text-sm leading-relaxed"
                 style={{ color: "var(--color-muted)" }}
               >
-                Today FUOYE. Tomorrow every university campus in Nigeria.
+                Today one community. Tomorrow every community in Nigeria.
                 We&rsquo;re building the infrastructure for a generation of
-                students who earn, learn, and thrive&mdash;on their own terms.
+                people who earn, learn, and thrive&mdash;on their own terms.
               </p>
               <div className="mt-5 flex flex-wrap gap-3">
-                {["FUOYE", "Nigeria", "Africa"].map((phase) => (
+                {["One community", "Nigeria", "Africa"].map((phase) => (
                   <span
                     key={phase}
                     className="rounded-full px-3.5 py-1.5 text-xs font-semibold"

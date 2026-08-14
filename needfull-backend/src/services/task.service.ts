@@ -40,6 +40,8 @@ interface TaskRow {
   runner_done_at: string | null;
   work_mode: string | null;
   runner_phase: string | null;
+  agreed_amount_kobo: number | null;
+  escrow_amount_kobo: number;
   created_at: string;
   updated_at: string;
 }
@@ -377,7 +379,7 @@ export async function getTask(
     SELECT
       t.id, t.poster_id, t.title, t.description, t.budget_kobo, t.deadline,
       t.is_urgent, t.status, t.location_label, t.runner_done_at,
-      t.work_mode, t.runner_phase, t.agreed_amount_kobo,
+      t.work_mode, t.runner_phase, t.agreed_amount_kobo, t.escrow_amount_kobo,
       ST_X(t.location::geometry) as lat, ST_Y(t.location::geometry) as lng,
       t.image_url, t.assigned_to as runner_id, t.created_at, t.updated_at,
       ${distanceSelect},
@@ -445,6 +447,17 @@ export async function getTask(
     agreedAmount: row.agreed_amount_kobo
       ? { kobo: row.agreed_amount_kobo, naira: row.agreed_amount_kobo / 100 }
       : null,
+    // WHAT: Server-calculated escrow + funding summary — the UI never derives
+    //       these numbers itself (original budget, agreed amount, escrow and
+    //       the additional amount required must always agree)
+    escrowAmount: {
+      kobo: row.escrow_amount_kobo,
+      naira: row.escrow_amount_kobo / 100,
+    },
+    additionalFundingRequired: {
+      kobo: Math.max(0, (row.agreed_amount_kobo ?? row.escrow_amount_kobo) - row.escrow_amount_kobo),
+      naira: Math.max(0, (row.agreed_amount_kobo ?? row.escrow_amount_kobo) - row.escrow_amount_kobo) / 100,
+    },
     deadline: row.deadline,
     isUrgent: row.is_urgent,
     status: row.status,
@@ -464,6 +477,75 @@ export async function getTask(
     capabilities,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    ...(currentUserId ? { myApplication: await getMyApplicationOnTask(taskId, currentUserId) } : {}),
+    acceptedProposal: await getAcceptedProposal(taskId),
+  };
+}
+
+// WHAT: Load the latest budget proposal attached to the task's accepted
+//       application — the amount the poster agreed to and must (fully) fund
+// WHY: The poster's funding banner needs the accepted proposal id + amounts
+async function getAcceptedProposal(taskId: string): Promise<any> {
+  const result = await db.query<any>(
+    `SELECT p.id, p.proposed_amount_kobo, p.difference_kobo, p.status, p.accepted_year
+     FROM task_budget_proposals p
+     JOIN task_applications a ON a.id = p.application_id
+     WHERE a.task_id = $1 AND a.status = 'accepted'
+     ORDER BY p.created_at DESC
+     LIMIT 1`,
+    [taskId],
+  );
+  const p = result.rows[0];
+  if (!p) return null;
+  return {
+    id: p.id,
+    proposedAmount: { kobo: p.proposed_amount_kobo, naira: p.proposed_amount_kobo / 100 },
+    difference: { kobo: p.difference_kobo, naira: p.difference_kobo / 100 },
+    status: p.status,
+    acceptedYear: p.accepted_year,
+  };
+}
+
+// WHAT: Load the calling user's application (with its latest proposal) on a task
+// WHY: The task detail UI shows "Your application" status and the negotiated
+//      amount from this single source instead of merging data client-side
+async function getMyApplicationOnTask(taskId: string, runnerId: string): Promise<any> {
+  const result = await db.query<any>(
+    `SELECT a.id, a.status, a.proposed_amount_kobo, a.is_counter_offer,
+            p.id AS proposal_id, p.proposed_amount_kobo AS proposal_amount_kobo,
+            p.difference_kobo, p.status AS proposal_status
+     FROM task_applications a
+     LEFT JOIN task_budget_proposals p ON p.application_id = a.id
+     WHERE a.task_id = $1 AND a.runner_id = $2
+     ORDER BY p.created_at DESC NULLS LAST
+     LIMIT 1`,
+    [taskId, runnerId],
+  );
+  const app = result.rows[0];
+  if (!app) return null;
+  return {
+    id: app.id,
+    status: app.status,
+    isCounterOffer: app.is_counter_offer,
+    proposedAmount: app.proposed_amount_kobo
+      ? { kobo: app.proposed_amount_kobo, naira: app.proposed_amount_kobo / 100 }
+      : null,
+    ...(app.proposal_id
+      ? {
+          proposal: {
+            id: app.proposal_id,
+            proposedAmount: {
+              kobo: app.proposal_amount_kobo,
+              naira: app.proposal_amount_kobo / 100,
+            },
+            difference: {
+              kobo: app.difference_kobo,
+              naira: app.difference_kobo / 100,
+            },
+            status: app.proposal_status,
+          },
+        }
+      : {}),
   };
 }
 
@@ -594,7 +676,7 @@ export async function updateTask(
 ): Promise<any> {
   // WHAT: Verify task exists, belongs to user, and is open
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, status FROM tasks WHERE id = $1`,
+    `SELECT id, poster_id, status, budget_kobo, escrow_amount_kobo FROM tasks WHERE id = $1`,
     [taskId],
   );
 
@@ -610,6 +692,10 @@ export async function updateTask(
   const params: any[] = [];
   let paramIndex = 1;
   const now = new Date().toISOString();
+  // WHAT: Escrow adjustment needed when the posted budget changes
+  // WHY: The published budget is locked in escrow at creation — changing it
+  //      without re-locking would silently drift wallet escrow from the task
+  let budgetDeltaKobo: number | null = null;
 
   if (fields.title !== undefined) {
     setClauses.push(`title = $${paramIndex++}`);
@@ -626,8 +712,11 @@ export async function updateTask(
         `Minimum task budget is ₦${(MIN_TASK_BUDGET_KOBO / 100).toFixed(0)}`,
       );
     }
-    setClauses.push(`budget_kobo = $${paramIndex++}`);
-    params.push(budgetKobo);
+    budgetDeltaKobo = budgetKobo - task.budget_kobo;
+    if (budgetDeltaKobo !== 0) {
+      setClauses.push(`budget_kobo = $${paramIndex++}`);
+      params.push(budgetKobo);
+    }
   }
   if (fields.deadline !== undefined) {
     setClauses.push(`deadline = $${paramIndex++}`);
@@ -664,7 +753,29 @@ export async function updateTask(
   params.push(taskId);
 
   const sql = `UPDATE tasks SET ${setClauses.join(", ")} WHERE id = $${paramIndex} RETURNING *`;
-  const result = await queryOne<TaskRow>(sql, params);
+
+  // WHAT: Budget changes adjust escrow atomically with the row update
+  // WHY: Lock the extra (balance check inside) or refund the difference —
+  //      never silently (that was the drift bug)
+  const result = budgetDeltaKobo
+    ? await withTransaction(async (client) => {
+        if (budgetDeltaKobo! > 0) {
+          await lockEscrow(client, userId, budgetDeltaKobo, taskId, {
+            note: `Task budget increased to ₦${((task.budget_kobo + budgetDeltaKobo) / 100).toLocaleString()}`,
+          });
+        } else {
+          await refundEscrow(client, userId, -budgetDeltaKobo!, taskId, {
+            note: `Task budget reduced to ₦${((task.budget_kobo + budgetDeltaKobo!) / 100).toLocaleString()}`,
+          });
+        }
+        const r = await client.query<TaskRow>(sql, params);
+        return r.rows[0];
+      })
+    : await queryOne<TaskRow>(sql, params);
+
+  console.info(
+    `[Task] updateTask task=${taskId} by=${userId} budgetDelta=${budgetDeltaKobo ?? 0}`,
+  );
 
   return {
     id: result.id,
@@ -767,7 +878,7 @@ export async function cancelTask(
   userRole: string,
 ): Promise<{ status: string; message: string }> {
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, status, budget_kobo, assigned_to as runner_id, title,
+    `SELECT id, poster_id, status, budget_kobo, escrow_amount_kobo, assigned_to as runner_id, title,
             runner_phase, runner_done_at
      FROM tasks WHERE id = $1`,
     [taskId],
@@ -786,9 +897,27 @@ export async function cancelTask(
   assertValidTransition(canonical, TaskStatus.CANCELLED, "cancel task");
 
   await withTransaction(async (client) => {
-    // WHAT: If in_progress, refund escrow to poster and notify runner
-    if (task.status === "in_progress" && task.runner_id) {
-      await refundEscrow(client, task.poster_id, task.budget_kobo, taskId);
+    // WHAT: Lock the task row — serializes duplicate cancellation requests
+    const locked = await client.query<any>(
+      `SELECT id, status, escrow_amount_kobo, assigned_to as runner_id
+       FROM tasks WHERE id = $1 FOR UPDATE`,
+      [taskId],
+    );
+    const taskLocked = locked.rows[0];
+    if (!taskLocked) throw new Error("Task not found");
+    const lockedCanonical = canonicalStatus(taskLocked.status, {
+      runnerDoneAt: task.runner_done_at,
+      runnerPhase: task.runner_phase,
+    });
+    assertValidTransition(lockedCanonical, TaskStatus.CANCELLED, "cancel task");
+
+    // WHAT: Refund whatever is currently escrowed for this task — the FULL
+    //       amount (original + any additional funding), never just the budget
+    if (taskLocked.escrow_amount_kobo > 0) {
+      await refundEscrow(client, task.poster_id, taskLocked.escrow_amount_kobo, taskId, {
+        idempotencyKey: `cancel_${taskId}`,
+        note: `Escrow refunded for cancelled task ${taskId}`,
+      });
     }
 
     await client.query(
@@ -798,14 +927,18 @@ export async function cancelTask(
 
     // WHAT: Free the runner if one was assigned — cancelled task, no more busy
     // WHY: An in_progress cancellation releases the runner slot for matching
-    if (task.runner_id) {
+    if (taskLocked.runner_id) {
       await client.query(
         `UPDATE users SET runner_busy = false, updated_at = NOW()
          WHERE id = $1 AND runner_busy = true`,
-        [task.runner_id],
+        [taskLocked.runner_id],
       );
     }
   });
+
+  console.info(
+    `[Task] cancelTask task=${taskId} by=${userId} role=${userRole} refunded=${task.escrow_amount_kobo}`,
+  );
 
   // WHAT: Notify runner if assigned
   if (task.status === "in_progress" && task.runner_id) {
@@ -829,14 +962,17 @@ export async function cancelTask(
 }
 
 // WHAT: Confirm task completion — poster confirms, escrow released, both sides prompted for review
-// WHY: Final step in task lifecycle — triggers payment and reputation update
+// WHY: Final step in task lifecycle — triggers payment and reputation update.
+//      Releases the AGREED amount (never the original budget when they differ),
+//      refunds any excess escrow (lower-proposal settlement), and is guarded
+//      by a task row lock so duplicate confirmations can never double-release.
 export async function confirmCompletion(
   taskId: string,
   userId: string,
 ): Promise<any> {
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, assigned_to as runner_id, budget_kobo, title, status,
-            runner_phase, runner_done_at
+    `SELECT id, poster_id, assigned_to as runner_id, budget_kobo, escrow_amount_kobo,
+            agreed_amount_kobo, title, status, runner_phase, runner_done_at
      FROM tasks WHERE id = $1`,
     [taskId],
   );
@@ -860,16 +996,49 @@ export async function confirmCompletion(
     throw new Error("No runner assigned to this task");
   }
 
+  // WHAT: Settlement amount — the agreed amount when negotiated, else escrow
+  const releaseAmountKobo = task.agreed_amount_kobo ?? task.escrow_amount_kobo;
+  const excessKobo = Math.max(0, task.escrow_amount_kobo - releaseAmountKobo);
+
   // WHAT: Atomic completion — release escrow, update status, update stats
   await withTransaction(async (client) => {
+    // WHAT: Lock the task row — serializes duplicate confirmations
+    const locked = await client.query<any>(
+      `SELECT id, status, runner_done_at, assigned_to as runner_id,
+              agreed_amount_kobo, escrow_amount_kobo
+       FROM tasks WHERE id = $1 FOR UPDATE`,
+      [taskId],
+    );
+    const taskLocked = locked.rows[0];
+    if (!taskLocked) throw new Error("Task not found");
+    // WHAT: Re-validate inside the lock — a concurrent confirmation fails here
+    if (taskLocked.status !== "in_progress" || !taskLocked.runner_done_at) {
+      throw new Error("Task is not awaiting confirmation");
+    }
+
+    const releaseKobo = taskLocked.agreed_amount_kobo ?? taskLocked.escrow_amount_kobo;
+    const excess = Math.max(0, taskLocked.escrow_amount_kobo - releaseKobo);
+
     // WHAT: Release escrow to runner (platform fee deducted internally)
+    //       Idempotency key → a retried request can never pay twice
     await releaseEscrow(
       client,
       task.poster_id,
-      task.runner_id!,
-      task.budget_kobo,
+      taskLocked.runner_id,
+      releaseKobo,
       taskId,
+      undefined,
+      { idempotencyKey: `settle_${taskId}` },
     );
+
+    // WHAT: Refund EXCESS escrow (agreed < originally secured) back to the
+    //       poster at settlement — it is never paid to the runner
+    if (excess > 0) {
+      await refundEscrow(client, task.poster_id, excess, taskId, {
+        idempotencyKey: `settle_excess_${taskId}`,
+        note: `Excess escrow refunded after settlement (agreed ₦${(releaseKobo / 100).toLocaleString()}, secured ₦${(taskLocked.escrow_amount_kobo / 100).toLocaleString()})`,
+      });
+    }
 
     // WHAT: Update task status
     await client.query(
@@ -881,7 +1050,7 @@ export async function confirmCompletion(
     await client.query(
       `UPDATE users SET runner_busy = false, updated_at = NOW()
        WHERE id = $1 AND runner_busy = true`,
-      [task.runner_id],
+      [taskLocked.runner_id],
     );
 
     // WHAT: Increment poster's tasks_completed
@@ -893,9 +1062,13 @@ export async function confirmCompletion(
     // WHAT: Increment runner's tasks_completed
     await client.query(
       `UPDATE users SET tasks_completed = tasks_completed + 1, updated_at = NOW() WHERE id = $1`,
-      [task.runner_id],
+      [taskLocked.runner_id],
     );
   });
+
+  console.info(
+    `[Task] confirmCompletion task=${taskId} poster=${task.poster_id} runner=${task.runner_id} release=${releaseAmountKobo} excess=${excessKobo}`,
+  );
 
   // WHAT: Prompt both sides for review (non-blocking)
   const promptReview = async (targetId: string, role: string) => {

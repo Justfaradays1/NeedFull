@@ -14,7 +14,7 @@ const router = Router();
 
 router.get("/", optionalAuth,
   query("categoryId").optional().isUUID(),
-  query("status").optional().isIn(["open", "in_progress", "completed", "cancelled"]),
+  query("status").optional().isIn(["open", "in_progress", "completed", "cancelled", "awaiting_funding"]),
   query("isUrgent").optional().isBoolean().toBoolean(),
   query("search").optional().isString().trim(),
   query("sortBy").optional().isIn(["newest", "nearest", "budget_high", "budget_low", "urgent_first"]),

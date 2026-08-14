@@ -37,8 +37,8 @@ function getDescriptionQuality(desc: string): {
   icon: string;
 } {
   const len = desc.trim().length;
-  if (len === 0) return { level: "empty", color: "text-gray-400", label: "Start typing a description", icon: "⚪" };
-  if (len < 30) return { level: "short", color: "text-red-500", label: "Too short — NeedRunners may not understand this task", icon: "🔴" };
+  if (len === 0) return { level: "empty", color: "text-foreground-muted", label: "Start typing a description", icon: "⚪" };
+  if (len < 30) return { level: "short", color: "text-error-text", label: "Too short — NeedRunners may not understand this task", icon: "🔴" };
   if (len < 80) return { level: "medium", color: "text-warning", label: "Needs more detail — consider adding deadline or materials provided", icon: "🟡" };
   return { level: "good", color: "text-success", label: "Excellent description — very likely to receive quality applicants", icon: "🟢" };
 }
@@ -294,7 +294,7 @@ export function TaskDetailsStep({
           type="button"
           onClick={handleContinue}
           disabled={!canContinue}
-          className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-on-brand shadow-sm transition-all duration-150 hover:brightness-105 active:scale-[0.97] disabled:bg-gray-200 disabled:text-gray-400"
+          className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-on-brand shadow-sm transition-all duration-150 hover:brightness-105 active:scale-[0.97] disabled:bg-surface-secondary disabled:text-foreground-muted"
         >
           Continue to Budget
         </button>

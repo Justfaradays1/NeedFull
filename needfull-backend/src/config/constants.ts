@@ -19,6 +19,11 @@ export const MIN_TASK_BUDGET_KOBO = 5000; // ₦50 minimum
 export const MIN_DEPOSIT_KOBO = 10000; // ₦100 minimum
 export const MIN_WITHDRAWAL_KOBO = 10000; // ₦100 minimum
 
+// WHAT: Budget proposals expire if the poster has not responded in time
+// WHY: A runner's ask must not hang forever; expiry leaves the task untouched
+//      at its original budget (PENDING → EXPIRED, enforced by cron)
+export const PROPOSAL_EXPIRY_HOURS = 24;
+
 // WHAT: Trust score range and defaults
 // WHY: Gamification mechanism to encourage quality work and platform participation
 export const TRUST_SCORE_MIN = 0;

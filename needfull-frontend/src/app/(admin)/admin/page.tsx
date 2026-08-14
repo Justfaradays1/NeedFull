@@ -138,9 +138,9 @@ function AlertBadge({
 }) {
   if (count === 0) return null;
   const colors: Record<string, string> = {
-    red: "border-red-200 bg-red-50 text-red-700 hover:bg-red-100",
-    amber: "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100",
-    blue: "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100",
+    red: "border-error-border bg-error-bg text-error-text",
+    amber: "border-warning-border bg-warning-bg text-warning-text",
+    blue: "border-info-border bg-info-bg text-info-text",
   };
   return (
     <Link
@@ -241,7 +241,7 @@ export default function AdminDashboardPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-        <AlertTriangle className="mx-auto h-8 w-8 text-amber-500" />
+        <AlertTriangle className="mx-auto h-8 w-8 text-warning-text" />
         <p className="mt-2 font-bold text-gray-900">Failed to load dashboard</p>
         <p className="mt-1 text-sm text-gray-500">
           Could not fetch admin stats. The backend may be unavailable.
@@ -269,9 +269,9 @@ export default function AdminDashboardPage() {
       (s?.pendingManualTransfers ?? 0) > 0 &&
       count === s?.pendingManualTransfers
     )
-      return "bg-red-100 text-red-600";
-    if (count >= 5) return "bg-red-100 text-red-600";
-    if (count >= 1) return "bg-amber-100 text-amber-600";
+      return "bg-error-bg text-error-text";
+    if (count >= 5) return "bg-error-bg text-error-text";
+    if (count >= 1) return "bg-warning-bg text-warning-text";
     return undefined;
   };
 
@@ -373,9 +373,9 @@ export default function AdminDashboardPage() {
                 count !== undefined && count > 0
                   ? countKey === "pendingManualTransfers" ||
                     countKey === "openReports"
-                    ? "bg-red-100 text-red-600"
+                    ? "bg-error-bg text-error-text"
                     : countKey === "pendingWithdrawals"
-                      ? "bg-amber-100 text-amber-600"
+                      ? "bg-warning-bg text-warning-text"
                       : "bg-brand-light text-brand"
                   : undefined;
               return (

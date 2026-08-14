@@ -12,6 +12,7 @@
 export const TaskStatus = {
   DRAFT: "draft",
   PUBLISHED: "published",
+  AWAITING_FUNDING: "awaiting_funding",
   MATCHED: "matched",
   ACCEPTED: "accepted",
   RUNNER_EN_ROUTE: "runner_en_route",
@@ -26,7 +27,13 @@ export const TaskStatus = {
 export type TaskStatusValue = (typeof TaskStatus)[keyof typeof TaskStatus];
 
 // WHAT: Storage values the tasks.status column actually holds (legacy vocabulary)
-export const STORAGE_STATUSES = ["open", "in_progress", "completed", "cancelled"] as const;
+export const STORAGE_STATUSES = [
+  "open",
+  "awaiting_funding",
+  "in_progress",
+  "completed",
+  "cancelled",
+] as const;
 export type StorageStatus = (typeof STORAGE_STATUSES)[number];
 
 // WHAT: Runner progress phases stored in tasks.runner_phase (null until hired)
@@ -51,6 +58,7 @@ export interface TaskStateMeta {
 export const TASK_STATE_META: Record<TaskStatusValue, TaskStateMeta> = {
   [TaskStatus.DRAFT]: { label: "Draft", phase: "discovery", storage: "open" },
   [TaskStatus.PUBLISHED]: { label: "Published", phase: "discovery", storage: "open" },
+  [TaskStatus.AWAITING_FUNDING]: { label: "Awaiting Funding", phase: "hiring", storage: "awaiting_funding" },
   [TaskStatus.MATCHED]: { label: "Matched", phase: "hiring", storage: "in_progress" },
   [TaskStatus.ACCEPTED]: { label: "Runner Accepted", phase: "hiring", storage: "in_progress" },
   [TaskStatus.RUNNER_EN_ROUTE]: { label: "Runner En Route", phase: "active", storage: "in_progress" },
@@ -66,7 +74,8 @@ export const TASK_STATE_META: Record<TaskStatusValue, TaskStateMeta> = {
 //       never skip stages (e.g. open → completed directly is rejected).
 export const ALLOWED_TRANSITIONS: Record<TaskStatusValue, TaskStatusValue[]> = {
   [TaskStatus.DRAFT]: [TaskStatus.PUBLISHED, TaskStatus.ARCHIVED],
-  [TaskStatus.PUBLISHED]: [TaskStatus.MATCHED, TaskStatus.CANCELLED],
+  [TaskStatus.PUBLISHED]: [TaskStatus.MATCHED, TaskStatus.AWAITING_FUNDING, TaskStatus.CANCELLED],
+  [TaskStatus.AWAITING_FUNDING]: [TaskStatus.MATCHED, TaskStatus.CANCELLED],
   [TaskStatus.MATCHED]: [TaskStatus.ACCEPTED, TaskStatus.STARTED, TaskStatus.CANCELLED],
   [TaskStatus.ACCEPTED]: [TaskStatus.RUNNER_EN_ROUTE, TaskStatus.STARTED, TaskStatus.CANCELLED],
   [TaskStatus.RUNNER_EN_ROUTE]: [TaskStatus.STARTED, TaskStatus.CANCELLED],
@@ -88,6 +97,8 @@ export function canonicalStatus(
   switch (status) {
     case "open":
       return TaskStatus.PUBLISHED;
+    case "awaiting_funding":
+      return TaskStatus.AWAITING_FUNDING;
     case "in_progress":
       if (flags?.runnerDoneAt) return TaskStatus.COMPLETED;
       switch (flags?.runnerPhase) {

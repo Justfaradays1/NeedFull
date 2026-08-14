@@ -110,7 +110,7 @@ export default function TaskCompletePage() {
   if (denied) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center page-shell px-4 text-center">
-        <AlertTriangle className="mb-2 h-10 w-10 text-amber-400" />
+        <AlertTriangle className="mb-2 h-10 w-10 text-warning-text" />
         <h2 className="text-lg font-semibold text-gray-900">
           Nothing to confirm right now
         </h2>
@@ -146,7 +146,7 @@ export default function TaskCompletePage() {
 
       <div className="px-4 py-6">
         <div className="text-center">
-          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-4xl">
+          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-success-bg text-4xl">
             ✅
           </div>
           <h2 className="font-display text-xl font-bold text-gray-900">
@@ -161,7 +161,7 @@ export default function TaskCompletePage() {
         {/* Payment summary */}
         <div className="mt-6 overflow-hidden rounded-2xl border border-card-border bg-surface shadow-sm">
           <div className="p-4">
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground-muted">
               Payment Summary
             </h3>
             <div className="space-y-2.5 text-sm">
@@ -196,12 +196,12 @@ export default function TaskCompletePage() {
         </div>
 
         {/* Warning */}
-        <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4">
-          <p className="flex items-center gap-1.5 text-sm font-bold text-red-700">
+        <div className="mt-4 rounded-2xl border border-error-border bg-error-bg p-4">
+          <p className="flex items-center gap-1.5 text-sm font-bold text-error-text">
             <AlertTriangle className="h-4 w-4" />
             This cannot be undone
           </p>
-          <p className="mt-1 text-xs leading-relaxed text-red-600">
+          <p className="mt-1 text-xs leading-relaxed text-error-text">
             Once you confirm, {task.runner?.fullName?.split(" ")[0]} gets paid and
             the task is closed. Only confirm if you&apos;re satisfied with the work.
           </p>
@@ -223,13 +223,13 @@ export default function TaskCompletePage() {
           <button
             onClick={() => router.back()}
             disabled={confirming}
-            className="w-full rounded-xl border border-gray-300 py-3 text-sm font-semibold text-gray-600 active:scale-[0.97] disabled:opacity-50"
+            className="w-full rounded-xl border border-border-default py-3 text-sm font-semibold text-gray-600 active:scale-[0.97] disabled:opacity-50"
           >
             Not yet, go back
           </button>
         </div>
 
-        <p className="mt-4 flex items-center justify-center gap-1 text-center text-[11px] text-gray-400">
+        <p className="mt-4 flex items-center justify-center gap-1 text-center text-[11px] text-foreground-muted">
           <Lock className="h-3 w-3" />
           Payment is held safely by NeedFull until you confirm.
         </p>

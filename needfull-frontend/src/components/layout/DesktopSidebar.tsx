@@ -130,11 +130,11 @@ function MenuLink({
       <div
         role="menuitem"
         aria-disabled="true"
-        className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-semibold text-gray-400"
+        className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-semibold text-foreground-muted"
       >
-        <Icon className="h-5 w-5 shrink-0 text-gray-400" />
+        <Icon className="h-5 w-5 shrink-0 text-foreground-muted" />
         <span>{label}</span>
-        <span className="ml-auto text-[10px] font-bold uppercase tracking-wider text-gray-400">
+        <span className="ml-auto text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
           Soon
         </span>
       </div>
@@ -147,8 +147,8 @@ function MenuLink({
       onClick={onNavigate}
       className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-semibold transition-colors duration-150 active:scale-[0.99] ${
         danger
-          ? "text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-          : "text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10"
+          ? "text-error-text hover:bg-error-bg dark:text-red-400 dark:hover:bg-red-500/10"
+          : "text-gray-800 hover:bg-surface-secondary dark:text-white dark:hover:bg-white/10"
       }`}
     >
       <Icon className="h-5 w-5 shrink-0 text-gray-600 dark:text-gray-300" />
@@ -205,7 +205,7 @@ export function DesktopSidebar({
   const NAV_BASE =
     "flex h-11 items-center gap-3.5 rounded-xl text-[17px] transition-all duration-200 md:justify-center lg:justify-start lg:px-4 active:scale-[0.98]";
   const NAV_TEXT = "text-black dark:text-white";
-  const NAV_INACTIVE = `${NAV_TEXT} font-semibold hover:bg-gray-100 dark:hover:bg-white/10`;
+  const NAV_INACTIVE = `${NAV_TEXT} font-semibold hover:bg-surface-secondary dark:hover:bg-white/10`;
   const NAV_ACTIVE =
     `bg-[#2D9E6B] font-bold text-white/95 dark:bg-[#1B5741] dark:text-white/90`;
 
@@ -224,7 +224,7 @@ export function DesktopSidebar({
 
   return (
     <aside
-      className="hidden md:flex md:shrink-0 md:self-stretch md:border-r md:border-gray-200 md:bg-surface/95 md:backdrop-blur-xl md:z-40"
+      className="hidden md:flex md:shrink-0 md:self-stretch md:border-r md:border-border-default md:bg-surface/95 md:backdrop-blur-xl md:z-40"
       style={{ height: "calc(100dvh - 3.5rem)" }}
     >
       <div className="flex h-full w-full flex-col md:w-20 lg:w-[280px] xl:w-80">
@@ -318,7 +318,7 @@ export function DesktopSidebar({
             >
               {moreItems.map((item, i) => {
                 if ("divider" in item) {
-                  return <div key={i} className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />;
+                  return <div key={i} className="mx-2 my-1.5 border-t border-border-subtle dark:border-white/10" />;
                 }
                 return (
                   <MenuLink
@@ -332,7 +332,7 @@ export function DesktopSidebar({
               })}
               {isAdmin && (
                 <>
-                  <div className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />
+<div className="mx-2 my-1.5 border-t border-border-subtle dark:border-white/10" />
                   <MenuLink
                     href="/admin"
                     icon={Shield}
@@ -414,7 +414,7 @@ export function DesktopSidebar({
         {/* ─── Profile (fixed bottom) ─── */}
         <div
           ref={profileRef}
-          className="relative shrink-0 border-t border-gray-100 p-2 dark:border-white/10 lg:p-3"
+          className="relative shrink-0 border-t border-border-subtle p-2 dark:border-white/10 lg:p-3"
         >
           <button
             type="button"
@@ -424,7 +424,7 @@ export function DesktopSidebar({
             }}
             aria-expanded={profileOpen}
             aria-haspopup="menu"
-            className="flex w-full items-center gap-3 rounded-xl p-2 transition-all duration-150 hover:bg-gray-100 active:scale-[0.98] md:justify-center lg:justify-start dark:hover:bg-white/10"
+            className="flex w-full items-center gap-3 rounded-xl p-2 transition-all duration-150 hover:bg-surface-secondary active:scale-[0.98] md:justify-center lg:justify-start dark:hover:bg-white/10"
           >
             <span ref={profileAvatarRef} className="inline-flex shrink-0">
               <Avatar
@@ -457,7 +457,7 @@ export function DesktopSidebar({
             caretLeft={11}
             className="w-64"
           >
-            <div className="border-b border-gray-100 px-3 py-2.5 dark:border-white/10">
+            <div className="border-b border-border-subtle px-3 py-2.5 dark:border-white/10">
               <p className="truncate text-[15px] font-bold text-gray-900 dark:text-white">
                 {user?.fullName || "Unnamed user"}
               </p>
@@ -469,8 +469,8 @@ export function DesktopSidebar({
               <MenuLink href="/profile" icon={User} label="View Profile" onNavigate={() => setProfileOpen(false)} />
               <MenuLink href="/settings" icon={Settings} label="Settings" onNavigate={() => setProfileOpen(false)} />
               <MenuLink href="/wallet" icon={Wallet} label="Wallet" onNavigate={() => setProfileOpen(false)} />
-              <div className="mx-2 my-1.5 border-t border-gray-100 dark:border-white/10" />
-              <MenuLink href="/" icon={RefreshCcw} label="Switch Account" disabled />
+<div className="mx-2 my-1.5 border-t border-border-subtle dark:border-white/10" />
+            <MenuLink href="/" icon={RefreshCcw} label="Switch Account" disabled />
               <MenuLink href="/login" icon={LogOut} label="Logout" danger onNavigate={logout} />
             </div>
           </SmartMenu>

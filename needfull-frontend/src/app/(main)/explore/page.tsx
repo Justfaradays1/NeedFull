@@ -87,7 +87,7 @@ function ListSkeleton({ count = 3 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="h-40 w-64 shrink-0 animate-pulse rounded-2xl border border-card-border bg-gray-100 dark:bg-white/5 sm:w-72"
+          className="h-40 w-64 shrink-0 animate-pulse rounded-2xl border border-card-border bg-surface-secondary dark:bg-white/5 sm:w-72"
         />
       ))}
     </div>
@@ -104,7 +104,7 @@ function RunnerCard({ runner, onTap }: { runner: Runner; onTap: () => void }) {
     >
       <div className="relative">
         <Avatar src={runner.profilePictureUrl} name={runner.fullName} size="lg" />
-        <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500" />
+        <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-success" />
       </div>
       <p className="mt-2 w-full truncate text-[13px] font-bold text-gray-900 dark:text-white">
         {runner.fullName}
@@ -293,14 +293,14 @@ export default function ExplorePage() {
         <button
           type="button"
           onClick={openPalette}
-          className="flex h-12 w-full items-center gap-2.5 rounded-2xl border border-card-border bg-surface px-4 text-left shadow-sm transition-all hover:border-brand/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 active:scale-[0.99]"
+          className="search-pill flex h-12 w-full items-center gap-2.5 rounded-full border border-card-border bg-surface px-4 text-left shadow-sm transition-all hover:border-brand/30 hover:shadow-md active:scale-[0.99]"
           aria-label="Search tasks, runners, and categories"
         >
-          <Search className="h-4 w-4 shrink-0 text-gray-400" />
+          <Search className="h-4 w-4 shrink-0 text-foreground-muted" />
           <span className="min-w-0 flex-1 truncate text-sm font-medium text-gray-600 dark:text-gray-300">
             Search tasks, runners, categories...
           </span>
-          <kbd className="hidden shrink-0 rounded-md border border-card-border bg-gray-50 px-1.5 py-0.5 text-[10px] font-semibold text-gray-400 md:inline dark:bg-white/5">
+          <kbd className="hidden shrink-0 rounded-md border border-card-border bg-surface-secondary px-1.5 py-0.5 text-[10px] font-semibold text-foreground-muted md:inline dark:bg-white/5">
             ⌘K
           </kbd>
         </button>
@@ -376,28 +376,28 @@ export default function ExplorePage() {
           {runnersLoading ? (
             <ListSkeleton count={3} />
           ) : geoState === "denied" ? (
-            <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3.5 dark:border-amber-500/30 dark:bg-amber-500/10">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-500/20">
-                <LocateFixed className="h-4 w-4 text-amber-700 dark:text-amber-300" />
+            <div className="flex items-center gap-3 rounded-2xl border border-warning-border bg-warning-bg px-4 py-3.5 dark:border-amber-500/30 dark:bg-amber-500/10">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-warning-bg dark:bg-amber-500/20">
+                <LocateFixed className="h-4 w-4 text-warning-text dark:text-amber-300" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-bold text-amber-900 dark:text-amber-200">
+                <p className="text-[13px] font-bold text-warning-text dark:text-amber-200">
                   Location is off
                 </p>
-                <p className="text-[11px] text-amber-700 dark:text-amber-300/80">
+                <p className="text-[11px] text-warning-text dark:text-amber-300/80">
                   Turn on location to see runners near you — or browse everyone.
                 </p>
               </div>
               <Link
                 href="/helpers"
-                className="shrink-0 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-bold text-white transition-all hover:brightness-105 active:scale-[0.97]"
+                className="shrink-0 rounded-lg bg-warning px-3 py-1.5 text-xs font-bold text-white transition-all hover:brightness-105 active:scale-[0.97]"
               >
                 Browse
               </Link>
             </div>
           ) : runners.length === 0 ? (
             <div className="flex flex-col items-center gap-1 rounded-2xl border border-dashed border-card-border bg-surface px-4 py-8 text-center">
-              <Compass className="h-8 w-8 text-gray-300" />
+              <Compass className="h-8 w-8 text-foreground-muted" />
               <p className="mt-1 text-sm font-bold text-gray-900 dark:text-white">
                 No runners nearby right now
               </p>

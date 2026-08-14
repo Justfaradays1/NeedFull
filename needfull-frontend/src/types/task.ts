@@ -61,11 +61,36 @@ export interface TaskCapabilities {
   canSeeExactLocation: boolean;
 }
 
+// WHAT: Budget-proposal in a task detail payload (mirrors backend API)
+export interface TaskProposal {
+  id: string;
+  proposerId: string;
+  originalBudget: TaskBudget;
+  proposedAmount: TaskBudget;
+  difference: TaskBudget;
+  reason?: string | null;
+  status: string;
+  createdAt: string;
+  respondedAt?: string | null;
+  expiresAt?: string | null;
+  acceptedYear?: string | null;
+}
+
 // WHAT: Detailed task payload returned by GET /tasks/:id
 export interface TaskDetail extends TaskItem {
   posterId: string;
   description: string;
   imageUrl: string | null;
+  agreedAmount: TaskBudget | null;
+  escrowAmount: TaskBudget;
+  additionalFundingRequired: TaskBudget;
+  acceptedProposal?: {
+    id: string;
+    proposedAmount: TaskBudget;
+    difference: TaskBudget;
+    status: string;
+    acceptedYear?: string | null;
+  } | null;
   runner?: {
     id: string;
     fullName: string;
@@ -75,6 +100,12 @@ export interface TaskDetail extends TaskItem {
     id: string;
     status: string;
     proposedAmount: TaskBudget | null;
+    proposal?: {
+      id: string;
+      proposedAmount: TaskBudget;
+      difference: TaskBudget;
+      status: string;
+    } | null;
   } | null;
   posterFull: {
     id: string;

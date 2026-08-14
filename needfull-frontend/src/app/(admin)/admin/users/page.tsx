@@ -107,15 +107,15 @@ export default function AdminUsersPage() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
+    <div className="min-h-screen bg-surface-secondary pb-8">
       {/* Header */}
       <div className="bg-surface px-4 pb-3 pt-3 shadow-sm border-b border-card-border">
         <h1 className="font-display text-lg font-bold text-gray-900">User Management</h1>
 
         {/* Search */}
         <div className="relative mt-2">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or email..." className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-4 text-sm outline-none transition-colors focus:border-brand focus:bg-white" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-muted" />
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or email..." className="search-pill w-full rounded-full border border-border-default bg-surface-secondary py-2.5 pl-9 pr-4 text-sm outline-none transition-colors focus:bg-surface" />
         </div>
 
         {/* Filter chips */}
@@ -123,7 +123,7 @@ export default function AdminUsersPage() {
           {filters.map((f) => (
             <button key={f.key} type="button" onClick={() => setFilter(f.key)}
               className={`tap-target shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                filter === f.key ? 'bg-brand text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                filter === f.key ? 'bg-brand text-white' : 'bg-surface-secondary text-gray-600 hover:bg-surface-elevated'
               }`}
             >{f.label}</button>
           ))}
@@ -136,14 +136,14 @@ export default function AdminUsersPage() {
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-brand-text" /></div>
         ) : users.length === 0 ? (
           <div className="py-12 text-center">
-            <Users className="mx-auto h-8 w-8 text-gray-300" />
+            <Users className="mx-auto h-8 w-8 text-foreground-muted" />
             <p className="mt-2 text-sm font-medium text-gray-500">No users found</p>
           </div>
         ) : (
           users.map((u) => {
             const isExpanded = expandedId === u.id;
             const trustSeg = Math.min(Math.round((u.trustScore / 100) * 100), 100);
-            const trustColor = u.trustScore >= 70 ? 'bg-green-500' : u.trustScore >= 40 ? 'bg-amber-500' : 'bg-red-500';
+            const trustColor = u.trustScore >= 70 ? 'bg-success' : u.trustScore >= 40 ? 'bg-warning' : 'bg-error';
 
             return (
               <div key={u.id} className="rounded-2xl border border-card-border bg-surface shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
@@ -156,7 +156,7 @@ export default function AdminUsersPage() {
                       {u.fullName?.charAt(0)?.toUpperCase() || '?'}
                     </div>
                     {u.isBanned && (
-                      <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500">
+                      <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-danger">
                         <Ban className="h-2.5 w-2.5 text-white" />
                       </div>
                     )}
@@ -172,14 +172,14 @@ export default function AdminUsersPage() {
                     <div className="text-right">
                       <p className="text-xs font-bold text-brand-text">₦{(u.wallet.balanceKobo / 100).toLocaleString()}</p>
                       <span className={`rounded-full px-2 py-[1px] text-[9px] font-bold ${
-                        u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                        u.isBanned ? 'bg-red-100 text-red-600' :
+                        u.role === 'admin' ? 'bg-processing-bg text-processing-text' :
+                        u.isBanned ? 'bg-error-bg text-error-text' :
                         'bg-brand-light text-brand'
                       }`}>
                         {u.isBanned ? 'Banned' : u.role === 'admin' ? 'Admin' : 'Student'}
                       </span>
                     </div>
-                    {isExpanded ? <ChevronUp className="h-4 w-4 text-gray-300" /> : <ChevronDown className="h-4 w-4 text-gray-300" />}
+                    {isExpanded ? <ChevronUp className="h-4 w-4 text-foreground-muted" /> : <ChevronDown className="h-4 w-4 text-foreground-muted" />}
                   </div>
                 </button>
 
@@ -192,7 +192,7 @@ export default function AdminUsersPage() {
                         <span className="flex items-center gap-1"><Star className="h-3 w-3" /> Trust Score</span>
                         <span className="font-bold">{u.trustScore}/100</span>
                       </div>
-                      <div className="mt-1 h-2 rounded-full bg-gray-100">
+                      <div className="mt-1 h-2 rounded-full bg-surface-secondary">
                         <div className={`h-2 rounded-full transition-all ${trustColor}`} style={{ width: `${trustSeg}%` }} />
                       </div>
                     </div>
@@ -212,26 +212,26 @@ export default function AdminUsersPage() {
                     <div className="mt-3 flex flex-wrap gap-2">
                       {u.isBanned ? (
                         <button type="button" onClick={() => handleUnban(u.id)} disabled={submitting}
-                          className="tap-target inline-flex items-center gap-1.5 rounded-xl border border-green-300 px-3 py-2 text-xs font-bold text-green-700 hover:bg-green-50"
+                          className="tap-target inline-flex items-center gap-1.5 rounded-xl border border-success-border px-3 py-2 text-xs font-bold text-success-text hover:bg-success-bg"
                         >
                           <ToggleRight className="h-3.5 w-3.5" /> Unban
                         </button>
                       ) : (
                         <button type="button" onClick={() => setBanConfirmId(u.id)}
-                          className="tap-target inline-flex items-center gap-1.5 rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50"
+                          className="tap-target inline-flex items-center gap-1.5 rounded-xl border border-error-border px-3 py-2 text-xs font-bold text-error-text hover:bg-error-bg"
                         >
                           <Ban className="h-3.5 w-3.5" /> Ban User
                         </button>
                       )}
                       {!u.isVerifiedStudent && (
                         <button type="button" onClick={() => router.push('/admin/verifications')}
-                          className="tap-target inline-flex items-center gap-1.5 rounded-xl border border-green-200 px-3 py-2 text-xs font-bold text-green-700 hover:bg-green-50"
+                          className="tap-target inline-flex items-center gap-1.5 rounded-xl border border-success-border px-3 py-2 text-xs font-bold text-success-text hover:bg-success-bg"
                         >
                           <BadgeCheck className="h-3.5 w-3.5" /> Verify Student
                         </button>
                       )}
                       <button type="button" onClick={() => { setCreditId(u.id); setCreditAmount(''); }}
-                        className="tap-target inline-flex items-center gap-1.5 rounded-xl border border-amber-200 px-3 py-2 text-xs font-bold text-amber-700 hover:bg-amber-50"
+                        className="tap-target inline-flex items-center gap-1.5 rounded-xl border border-warning-border px-3 py-2 text-xs font-bold text-warning-text hover:bg-warning-bg"
                       >
                         <DollarSign className="h-3.5 w-3.5" /> Add Credit
                       </button>
@@ -248,13 +248,13 @@ export default function AdminUsersPage() {
       {totalPages > 1 && (
         <div className="mx-4 mt-3 flex items-center justify-between text-xs text-gray-600">
           <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}
-            className="tap-target inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 font-bold disabled:opacity-40"
+            className="tap-target inline-flex items-center gap-1 rounded-lg border border-border-default px-3 py-1.5 font-bold disabled:opacity-40"
           >
             <ChevronLeft className="h-3.5 w-3.5" /> Prev
           </button>
           <span>Page {page} of {totalPages}</span>
           <button type="button" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
-            className="tap-target inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 font-bold disabled:opacity-40"
+            className="tap-target inline-flex items-center gap-1 rounded-lg border border-border-default px-3 py-1.5 font-bold disabled:opacity-40"
           >
             Next <ChevronRight className="h-3.5 w-3.5" />
           </button>
@@ -265,19 +265,19 @@ export default function AdminUsersPage() {
       {banConfirmId && (
         <div className="glass-overlay fixed inset-0 z-50 flex items-end sm:items-center" onClick={() => setBanConfirmId(null)}>
           <div className="modal-sheet w-full rounded-t-3xl px-4 pb-safe pb-8 pt-1 sm:max-w-md sm:mx-auto sm:rounded-2xl max-h-[92dvh] overflow-y-auto overscroll-contain" onClick={(e) => e.stopPropagation()}>
-            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-gray-300" />
+            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-surface-elevated" />
             <div className="px-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100"><Ban className="h-5 w-5 text-red-600" /></div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-error-bg"><Ban className="h-5 w-5 text-error-text" /></div>
               <div>
                 <h3 className="font-display text-base font-bold text-gray-900">Ban User</h3>
                 <p className="text-xs text-gray-500">This will suspend their account immediately.</p>
               </div>
             </div>
             <div className="mt-5 flex gap-2">
-              <button type="button" onClick={() => setBanConfirmId(null)} className="tap-target flex-1 rounded-xl border border-gray-200 py-3 text-sm font-bold text-gray-600">Cancel</button>
+              <button type="button" onClick={() => setBanConfirmId(null)} className="tap-target flex-1 rounded-xl border border-border-default py-3 text-sm font-bold text-gray-600">Cancel</button>
               <button type="button" onClick={() => handleBan(banConfirmId)} disabled={submitting}
-                className="tap-target flex-1 rounded-xl bg-red-600 py-3 text-sm font-bold text-white disabled:opacity-50"
+                className="tap-target flex-1 rounded-xl bg-danger py-3 text-sm font-bold text-white disabled:opacity-50"
               >
                 {submitting ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : 'Ban User'}
               </button>
@@ -291,23 +291,23 @@ export default function AdminUsersPage() {
       {creditId && (
         <div className="glass-overlay fixed inset-0 z-50 flex items-end sm:items-center" onClick={() => setCreditId(null)}>
           <div className="modal-sheet w-full rounded-t-3xl px-4 pb-safe pb-8 pt-1 sm:max-w-md sm:mx-auto sm:rounded-2xl max-h-[92dvh] overflow-y-auto overscroll-contain" onClick={(e) => e.stopPropagation()}>
-            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-gray-300" />
+            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-surface-elevated" />
             <div className="px-4">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-display text-base font-bold text-gray-900">Add Admin Credit</h3>
-              <button type="button" onClick={() => setCreditId(null)} className="tap-target"><X className="h-5 w-5 text-gray-400" /></button>
+              <button type="button" onClick={() => setCreditId(null)} className="tap-target"><X className="h-5 w-5 text-foreground-muted" /></button>
             </div>
             <p className="text-xs text-gray-500">Enter amount in Naira to credit {users.find((u) => u.id === creditId)?.fullName}&apos;s wallet.</p>
             <div className="relative mt-3">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-400">₦</span>
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-foreground-muted">₦</span>
               <input type="number" value={creditAmount} onChange={(e) => setCreditAmount(e.target.value)} placeholder="0" min="1"
-                className="w-full rounded-xl border border-gray-200 py-3 pl-7 pr-3 text-sm outline-none focus:border-amber-400"
+                className="w-full rounded-xl border border-border-default py-3 pl-7 pr-3 text-sm outline-none focus:border-warning"
               />
             </div>
             <div className="mt-5 flex gap-2">
-              <button type="button" onClick={() => setCreditId(null)} className="tap-target flex-1 rounded-xl border border-gray-200 py-3 text-sm font-bold text-gray-600">Cancel</button>
+              <button type="button" onClick={() => setCreditId(null)} className="tap-target flex-1 rounded-xl border border-border-default py-3 text-sm font-bold text-gray-600">Cancel</button>
               <button type="button" disabled={!creditAmount || parseInt(creditAmount) <= 0}
-                className="tap-target flex-1 rounded-xl bg-amber-600 py-3 text-sm font-bold text-white disabled:opacity-50"
+                className="tap-target flex-1 rounded-xl bg-warning py-3 text-sm font-bold text-white disabled:opacity-50"
               >
                 Add Credit
               </button>

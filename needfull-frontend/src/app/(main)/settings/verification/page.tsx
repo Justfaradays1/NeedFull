@@ -80,11 +80,11 @@ export default function VerificationPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-4 sm:p-6">
+      <div className="min-h-screen bg-surface-secondary p-4 sm:p-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center h-96">
             <div className="animate-pulse text-center">
-              <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <Shield className="w-12 h-12 text-foreground-muted mx-auto mb-4" />
               <p className="text-gray-600">Loading verification status...</p>
             </div>
           </div>
@@ -95,10 +95,10 @@ export default function VerificationPage() {
 
   if (!status) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-4 sm:p-6">
+      <div className="min-h-screen bg-surface-secondary p-4 sm:p-6">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-surface rounded-lg border border-red-200 p-6 text-center">
-            <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
+          <div className="bg-surface rounded-lg border border-error-border p-6 text-center">
+            <AlertCircle className="w-12 h-12 text-error-text mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-gray-900 mb-2">
               Unable to load verification status
             </h2>
@@ -110,12 +110,12 @@ export default function VerificationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-4 sm:p-6">
+    <div className="min-h-screen bg-surface-secondary p-4 sm:p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <Shield className="w-8 h-8 text-green-600" />
+            <Shield className="w-8 h-8 text-success-text" />
             <h1 className="text-3xl font-bold text-gray-900">
               Student Verification
             </h1>
@@ -127,18 +127,18 @@ export default function VerificationPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="bg-error-bg border border-error-border rounded-lg p-4 mb-6">
+            <p className="text-sm text-error-text">{error}</p>
           </div>
         )}
 
         {/* Trust Score Summary */}
         {trustBreakdown && (
-          <div className="bg-linear-to-r from-green-50 to-blue-50 rounded-lg border border-green-200 p-6 mb-8">
+          <div className="bg-info-bg rounded-lg border border-success-border p-6 mb-8">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-2">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
+                  <TrendingUp className="w-5 h-5 text-success-text" />
                   Your Trust Score
                 </h2>
                 <p className="text-gray-600 text-sm mb-4">
@@ -147,35 +147,35 @@ export default function VerificationPage() {
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <p className="text-xs text-gray-600 mb-1">Email</p>
-                    <p className="text-lg font-semibold text-green-600">
+                    <p className="text-lg font-semibold text-success-text">
                       +5 pts
                     </p>
                     {status.email.verified && (
-                      <span className="text-xs text-green-600">✓ Earned</span>
+                      <span className="text-xs text-success-text">✓ Earned</span>
                     )}
                   </div>
                   <div>
                     <p className="text-xs text-gray-600 mb-1">Phone</p>
-                    <p className="text-lg font-semibold text-blue-600">
+                    <p className="text-lg font-semibold text-info-text">
                       +4 pts
                     </p>
                     {status.phone.verified && (
-                      <span className="text-xs text-blue-600">✓ Earned</span>
+                      <span className="text-xs text-info-text">✓ Earned</span>
                     )}
                   </div>
                   <div>
                     <p className="text-xs text-gray-600 mb-1">Student ID</p>
-                    <p className="text-lg font-semibold text-purple-600">
+                    <p className="text-lg font-semibold text-info-text">
                       +6 pts
                     </p>
                     {status.studentId.status === "approved" && (
-                      <span className="text-xs text-purple-600">✓ Earned</span>
+                      <span className="text-xs text-info-text">✓ Earned</span>
                     )}
                   </div>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-4xl font-bold text-green-600">
+                <p className="text-4xl font-bold text-success-text">
                   {trustBreakdown.verification}
                 </p>
                 <p className="text-sm text-gray-600">Verification points</p>
@@ -226,19 +226,19 @@ export default function VerificationPage() {
           <h3 className="font-semibold text-gray-900 mb-4">Why Verify?</h3>
           <ul className="grid sm:grid-cols-2 gap-4 text-sm text-gray-600">
             <li className="flex gap-3">
-              <span className="text-green-600 font-bold">✓</span>
+              <span className="text-success-text font-bold">✓</span>
               <span>Build trust with task posters</span>
             </li>
             <li className="flex gap-3">
-              <span className="text-green-600 font-bold">✓</span>
+              <span className="text-success-text font-bold">✓</span>
               <span>Unlock higher-value tasks</span>
             </li>
             <li className="flex gap-3">
-              <span className="text-green-600 font-bold">✓</span>
+              <span className="text-success-text font-bold">✓</span>
               <span>Get priority in task matching</span>
             </li>
             <li className="flex gap-3">
-              <span className="text-green-600 font-bold">✓</span>
+              <span className="text-success-text font-bold">✓</span>
               <span>Faster wallet withdrawals</span>
             </li>
           </ul>

@@ -69,6 +69,11 @@ export default function CreatePurchaseTaskPage() {
   const [createdTaskId, setCreatedTaskId] = useState<string | null>(null);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // WHAT: Live wallet balance — fetched on mount because the auth store's
+  //       wallet snapshot goes stale once escrow locks or deposits land
+  // WHY: The submit guard must match what the server will check, otherwise
+  //      posting fails with a surprise 400
+  const [liveBalanceKobo, setLiveBalanceKobo] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -80,6 +85,13 @@ export default function CreatePurchaseTaskPage() {
       })
       .catch(() => {})
       .finally(() => setCatLoading(false));
+
+    get<{ success?: boolean; data?: { balance_kobo?: number }; balance_kobo?: number }>("/wallet")
+      .then((res) => {
+        const kobo = res?.data?.balance_kobo ?? res?.balance_kobo;
+        if (typeof kobo === "number") setLiveBalanceKobo(kobo);
+      })
+      .catch(() => {});
   }, [user]);
 
   const selectedCategory = categories.find((c) => c.id === categoryId);
@@ -88,7 +100,7 @@ export default function CreatePurchaseTaskPage() {
   const platformFee = Math.floor(runnerFee * PLATFORM_FEE_PERCENT / 100);
   const maxAdd = parseFloat(maxAdditionalSpendingNaira) || 0;
   const total = estCost + runnerFee + platformFee;
-  const balanceKobo = user?.wallet?.balanceKobo ?? 0;
+  const balanceKobo = liveBalanceKobo ?? user?.wallet?.balanceKobo ?? 0;
   const hasEnough = total === 0 || balanceKobo >= total * 100;
 
   function detectLocation() {
@@ -163,8 +175,13 @@ export default function CreatePurchaseTaskPage() {
       } else {
         setSubmitError("Failed to create purchase task");
       }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Something went wrong";
+    } catch (err: any) {
+      // WHAT: Prefer the server's reason (validation hint, balance check, etc.)
+      // WHY: axios's default "Request failed with status code 400" tells the
+      //      user nothing about what to fix
+      const msg =
+        err?.response?.data?.message ||
+        (err instanceof Error ? err.message : "Something went wrong");
       setSubmitError(msg);
     } finally {
       setSubmitting(false);
@@ -181,7 +198,7 @@ export default function CreatePurchaseTaskPage() {
             <button
               type="button"
               onClick={() => (step > 1 ? prevStep() : router.push("/tasks/create"))}
-              className="tap-target flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-200"
+              className="tap-target flex h-8 w-8 items-center justify-center rounded-full hover:bg-surface-elevated"
             >
               <ChevronLeft className="h-5 w-5 text-gray-600" />
             </button>
@@ -235,7 +252,7 @@ export default function CreatePurchaseTaskPage() {
                     })}
                   </div>
                 )}
-                {errors.categoryId && <p className="mt-1 text-xs text-red-500">{errors.categoryId}</p>}
+                {errors.categoryId && <p className="mt-1 text-xs text-error-text">{errors.categoryId}</p>}
               </div>
 
               <div>
@@ -243,11 +260,11 @@ export default function CreatePurchaseTaskPage() {
                 <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Buy groceries from Shoprite"
                   maxLength={200}
-                  className={`w-full rounded-xl border-2 px-4 py-3 text-sm outline-none placeholder:text-gray-400 ${
-                    errors.title ? "border-red-300" : "border-gray-200 focus:border-brand"
+                  className={`w-full rounded-xl border-2 px-4 py-3 text-sm outline-none placeholder:text-foreground-muted ${
+                    errors.title ? "border-error-border" : "border-border-default focus:border-brand"
                   }`}
                 />
-                {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
+                {errors.title && <p className="mt-1 text-xs text-error-text">{errors.title}</p>}
               </div>
 
               <div>
@@ -255,11 +272,11 @@ export default function CreatePurchaseTaskPage() {
                 <textarea value={description} onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe what items to buy, preferred brands, quantities..."
                   rows={4} maxLength={2000}
-                  className={`w-full resize-none rounded-xl border-2 px-4 py-3 text-sm outline-none placeholder:text-gray-400 ${
-                    errors.description ? "border-red-300" : "border-gray-200 focus:border-brand"
+                  className={`w-full resize-none rounded-xl border-2 px-4 py-3 text-sm outline-none placeholder:text-foreground-muted ${
+                    errors.description ? "border-error-border" : "border-border-default focus:border-brand"
                   }`}
                 />
-                {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
+                {errors.description && <p className="mt-1 text-xs text-error-text">{errors.description}</p>}
               </div>
 
               <div>
@@ -267,10 +284,10 @@ export default function CreatePurchaseTaskPage() {
                   Store <span className="font-normal text-gray-500">(optional)</span>
                 </label>
                 <div className="relative">
-                  <Store className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <Store className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-muted" />
                   <input type="text" value={storeName} onChange={(e) => setStoreName(e.target.value)}
                     placeholder="e.g. Shoprite, Spar, MilkHub"
-                    className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 pl-10 text-sm outline-none focus:border-brand"
+                    className="w-full rounded-xl border-2 border-border-default px-4 py-3 pl-10 text-sm outline-none focus:border-brand"
                   />
                 </div>
               </div>
@@ -289,11 +306,11 @@ export default function CreatePurchaseTaskPage() {
                   <input type="number" value={estimatedItemCostNaira} onChange={(e) => setEstimatedItemCostNaira(e.target.value)}
                     placeholder="e.g. 4300" min={1}
                     className={`w-full rounded-xl border-2 px-8 py-3 pl-10 text-sm outline-none ${
-                      errors.estimatedItemCostNaira ? "border-red-300" : "border-gray-200 focus:border-brand"
+                      errors.estimatedItemCostNaira ? "border-error-border" : "border-border-default focus:border-brand"
                     }`}
                   />
                 </div>
-                {errors.estimatedItemCostNaira && <p className="mt-1 text-xs text-red-500">{errors.estimatedItemCostNaira}</p>}
+                {errors.estimatedItemCostNaira && <p className="mt-1 text-xs text-error-text">{errors.estimatedItemCostNaira}</p>}
               </div>
 
               <div>
@@ -303,11 +320,11 @@ export default function CreatePurchaseTaskPage() {
                   <input type="number" value={runnerFeeNaira} onChange={(e) => setRunnerFeeNaira(e.target.value)}
                     placeholder="e.g. 700" min={50}
                     className={`w-full rounded-xl border-2 px-8 py-3 pl-10 text-sm outline-none ${
-                      errors.runnerFeeNaira ? "border-red-300" : "border-gray-200 focus:border-brand"
+                      errors.runnerFeeNaira ? "border-error-border" : "border-border-default focus:border-brand"
                     }`}
                   />
                 </div>
-                {errors.runnerFeeNaira && <p className="mt-1 text-xs text-red-500">{errors.runnerFeeNaira}</p>}
+                {errors.runnerFeeNaira && <p className="mt-1 text-xs text-error-text">{errors.runnerFeeNaira}</p>}
                 <p className="mt-1 text-[11px] text-gray-500">
                   Platform fee ({PLATFORM_FEE_PERCENT}%): ₦{platformFee.toLocaleString()}
                 </p>
@@ -322,7 +339,7 @@ export default function CreatePurchaseTaskPage() {
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-gray-600">₦</span>
                   <input type="number" value={maxAdditionalSpendingNaira} onChange={(e) => setMaxAdditionalSpendingNaira(e.target.value)}
                     placeholder="e.g. 500" min={0}
-                    className="w-full rounded-xl border-2 border-gray-200 px-8 py-3 pl-10 text-sm outline-none focus:border-brand"
+                    className="w-full rounded-xl border-2 border-border-default px-8 py-3 pl-10 text-sm outline-none focus:border-brand"
                   />
                 </div>
                 <p className="mt-1 text-[11px] text-gray-500">
@@ -352,8 +369,8 @@ export default function CreatePurchaseTaskPage() {
                 <div className="flex gap-2">
                   <input type="text" value={locationLabel} onChange={(e) => setLocationLabel(e.target.value)}
                     placeholder="e.g. New Lecture Hall, Main Campus"
-                    className={`flex-1 rounded-xl border-2 px-4 py-3 text-sm outline-none placeholder:text-gray-400 ${
-                      errors.locationLabel ? "border-red-300 focus:border-red-500" : "border-gray-200 focus:border-brand"
+                    className={`flex-1 rounded-xl border-2 px-4 py-3 text-sm outline-none placeholder:text-foreground-muted ${
+                      errors.locationLabel ? "border-error-border focus:border-error" : "border-border-default focus:border-brand"
                     }`}
                   />
                   <button type="button" onClick={detectLocation} disabled={locating}
@@ -362,8 +379,8 @@ export default function CreatePurchaseTaskPage() {
                     {locating ? <Loader2 className="h-5 w-5 animate-spin" /> : <Crosshair className="h-5 w-5" />}
                   </button>
                 </div>
-                {errors.locationLabel && <p className="mt-1 text-xs text-red-500">{errors.locationLabel}</p>}
-                {geoError && <p className="mt-1 flex items-center gap-1 text-xs text-red-500"><AlertTriangle className="h-3 w-3" />{geoError}</p>}
+                {errors.locationLabel && <p className="mt-1 text-xs text-error-text">{errors.locationLabel}</p>}
+                {geoError && <p className="mt-1 flex items-center gap-1 text-xs text-error-text"><AlertTriangle className="h-3 w-3" />{geoError}</p>}
                 {lat !== null && lng !== null && (
                   <p className="mt-1 flex items-center gap-1 text-xs text-brand-text"><MapPin className="h-3 w-3" />Coordinates detected</p>
                 )}
@@ -372,17 +389,17 @@ export default function CreatePurchaseTaskPage() {
               <div>
                 <label className="mb-1 block text-sm font-bold text-gray-900">Deadline <span className="font-normal text-gray-500">(optional)</span></label>
                 <div className="relative">
-                  <Clock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <Clock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-muted" />
                   <input type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)}
-                    className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 pl-10 text-sm outline-none focus:border-brand"
+                    className="w-full rounded-xl border-2 border-border-default px-4 py-3 pl-10 text-sm outline-none focus:border-brand"
                   />
                 </div>
               </div>
 
               <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-card-border bg-surface px-4 py-3.5 transition-colors hover:border-gold/50">
                 <div className="flex items-center gap-3">
-                  <div className={`flex h-9 w-9 items-center justify-center rounded-full ${isUrgent ? "bg-gold/20" : "bg-gray-200"}`}>
-                    <Zap className={`h-5 w-5 ${isUrgent ? "text-gold" : "text-gray-400"}`} />
+                  <div className={`flex h-9 w-9 items-center justify-center rounded-full ${isUrgent ? "bg-gold/20" : "bg-surface-secondary"}`}>
+                    <Zap className={`h-5 w-5 ${isUrgent ? "text-gold" : "text-foreground-muted"}`} />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-900">Urgent</p>
@@ -491,8 +508,8 @@ export default function CreatePurchaseTaskPage() {
               </div>
 
               {submitError && (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                  <p className="flex items-center gap-1.5 text-sm font-medium text-red-600">
+                <div className="rounded-xl border border-error-border bg-error-bg px-4 py-3">
+                  <p className="flex items-center gap-1.5 text-sm font-medium text-error-text">
                     <AlertTriangle className="h-4 w-4" />{submitError}
                   </p>
                 </div>
@@ -504,7 +521,7 @@ export default function CreatePurchaseTaskPage() {
           <div className="mt-8 flex gap-3">
             {step > 1 && (
               <button type="button" onClick={prevStep}
-                className="tap-target flex w-14 items-center justify-center rounded-xl border-2 border-card-border bg-surface py-3.5 hover:bg-gray-200"
+                className="tap-target flex w-14 items-center justify-center rounded-xl border-2 border-card-border bg-surface py-3.5 hover:bg-surface-elevated"
               >
                 <ChevronLeft className="h-5 w-5 text-gray-600" />
               </button>

@@ -83,7 +83,7 @@ router.post("/reports/:id/resolve",
 
 // Tasks (moderation)
 router.get("/tasks",
-  query("status").optional().isIn(["open", "in_progress", "completed", "cancelled", "disputed"]),
+  query("status").optional().isIn(["open", "in_progress", "completed", "cancelled", "disputed", "awaiting_funding"]),
   query("page").optional().isInt({ min: 1 }).toInt(),
   query("perPage").optional().isInt({ min: 1, max: 100 }).toInt(),
   validate,

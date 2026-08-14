@@ -18,7 +18,7 @@ export default function PurchaseBudgetCard({
   const total = estimatedItemCostNaira + runnerFeeNaira + platformFeeNaira;
 
   return (
-    <div className="space-y-3 rounded-2xl bg-white p-4 shadow-card border border-card-border">
+    <div className="space-y-3 rounded-2xl bg-surface p-4 shadow-card border border-card-border">
       <h3 className="text-sm font-bold text-gray-900">Budget Breakdown</h3>
 
       <div className="space-y-2">
@@ -40,7 +40,7 @@ export default function PurchaseBudgetCard({
             ₦{platformFeeNaira.toLocaleString()}
           </span>
         </div>
-        <hr className="border-gray-100" />
+        <hr className="border-border-subtle" />
         <div className="flex items-center justify-between">
           <span className="text-sm font-bold text-gray-900">Total</span>
           <span className="text-lg font-bold text-gold">
@@ -50,9 +50,9 @@ export default function PurchaseBudgetCard({
       </div>
 
       {maxAdditionalSpendingNaira > 0 && (
-        <div className="flex items-start gap-1.5 rounded-lg bg-amber-50 px-3 py-2">
-          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
-          <p className="text-[11px] leading-relaxed text-amber-800">
+        <div className="flex items-start gap-1.5 rounded-lg bg-warning-bg px-3 py-2">
+          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning-text" />
+          <p className="text-[11px] leading-relaxed text-warning-text">
             Runner can spend up to ₦
             {maxAdditionalSpendingNaira.toLocaleString()} above estimate without
             approval.

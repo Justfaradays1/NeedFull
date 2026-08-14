@@ -31,7 +31,7 @@ export function TrustBadge({
       className={`inline-flex items-center gap-1.5 rounded-full font-semibold ${sizeClasses[size]} ${trustLevel.bg} ${trustLevel.color}`}
     >
       <div
-        className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${trustLevel.color === "text-green-700" || trustLevel.color === "text-green-600" ? "bg-green-600" : trustLevel.color === "text-amber-600" ? "bg-amber-500" : trustLevel.color === "text-blue-600" ? "bg-blue-500" : "bg-red-600"}`}
+        className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${trustLevel.color === "text-success-text" ? "bg-success" : trustLevel.color === "text-warning-text" ? "bg-warning" : trustLevel.color === "text-info-text" ? "bg-processing" : "bg-error"}`}
       />
       {showLabel ? (
         <>

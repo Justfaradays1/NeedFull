@@ -1,9 +1,9 @@
 const FEATURES = [
-  { title: 'Set your own hours', desc: 'Work when it fits your class schedule. Accept tasks between lectures, not the other way around.' },
+  { title: 'Set your own hours', desc: 'Work when it fits your schedule. Accept tasks between classes or around work, not the other way around.' },
   { title: 'Get paid fast', desc: 'Once the task poster confirms completion, escrow releases your payment instantly to your wallet.' },
   { title: 'Build your reputation', desc: 'Every completed task grows your trust score. Higher trust = access to better-paying tasks.' },
   { title: 'No interview needed', desc: 'No CVs, no cover letters. Your trust score and task history speak for themselves.' },
-  { title: 'Campus only', desc: 'All tasks are on your campus. No commuting, no travel costs \u2014 just walk across campus.' },
+  { title: 'Local only', desc: 'Tasks happen right where you are. No commuting, no travel costs \u2014 just steps away.' },
   { title: 'Wide variety of tasks', desc: "Research assistance, delivery, tutoring, graphic design, event help \u2014 find what you're good at." },
 ];
 
@@ -16,12 +16,12 @@ export function EarnSection() {
       <div className="pointer-events-none absolute -left-32 top-1/3 h-64 w-64 rounded-full bg-brand/5 blur-3xl" />
       <div className="mx-auto max-w-6xl relative z-10">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="text-section-label inline-flex items-center rounded-full bg-gold-light px-3.5 py-1" style={{ color: '#B45309' }}>For students who earn</span>
+          <span className="text-section-label inline-flex items-center rounded-full bg-gold-light px-3.5 py-1" style={{ color: '#B45309' }}>For people who earn</span>
           <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>
             Turn free hours into <span className="text-brand-text">flexible income</span>
           </h2>
           <p className="text-section-desc mt-3" style={{ color: 'var(--color-muted)' }}>
-            No CV required. No fixed schedule. Just real tasks from real students, paid fast.
+            No CV required. No fixed schedule. Just real tasks from real people nearby, paid fast.
           </p>
         </div>
 

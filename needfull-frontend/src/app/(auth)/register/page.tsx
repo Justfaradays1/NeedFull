@@ -157,7 +157,7 @@ export default function RegisterPage() {
           {/* Google */}
           <a
             href="/api/auth/google"
-            className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-xl border px-5 py-3 text-sm font-semibold shadow-sm transition-all duration-150 hover:bg-gray-100 active:scale-[0.98]"
+            className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-xl border px-5 py-3 text-sm font-semibold shadow-sm transition-all duration-150 hover:bg-surface-secondary active:scale-[0.98]"
             style={{ borderColor: "var(--color-card-border, #e5e7eb)", color: "var(--color-foreground, #171717)" }}
           >
             <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24">
@@ -231,7 +231,7 @@ export default function RegisterPage() {
                 spellCheck={false}
                 hint={
                   password ? (
-                    <span className={password.length >= 8 ? "text-green-600" : "text-gray-500"}>
+                    <span className={password.length >= 8 ? "text-success-text" : "text-gray-500"}>
                       {password.length >= 8 ? "\u2713 " : ""}At least 8 characters
                     </span>
                   ) : undefined
@@ -259,7 +259,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <label htmlFor="phone" className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-foreground, #171717)" }}>
-                Phone <span className="text-gray-400 font-normal">(optional)</span>
+                Phone <span className="text-foreground-muted font-normal">(optional)</span>
               </label>
               <input
                 id="phone"
@@ -271,7 +271,7 @@ export default function RegisterPage() {
                 placeholder="08012345678"
               />
             </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-error-text">{error}</p>}
             <button
               type="submit"
               disabled={loading}
@@ -326,11 +326,11 @@ export default function RegisterPage() {
                 required
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                className="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-center text-lg font-semibold tracking-[0.5em] outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/20"
+                className="block w-full rounded-xl border border-border-default px-4 py-2.5 text-center text-lg font-semibold tracking-[0.5em] outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/20"
                 placeholder="000000"
               />
             </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-error-text">{error}</p>}
             <button
               type="submit"
               disabled={loading}

@@ -61,32 +61,38 @@ const STATUS_CONFIG: Record<
 > = {
   open: {
     label: "Open",
-    bg: "bg-green-100",
-    text: "text-green-700",
+    bg: "bg-success-bg",
+    text: "text-success-text",
     icon: null,
   },
   in_progress: {
     label: "In Progress",
-    bg: "bg-amber-100",
-    text: "text-amber-700",
+    bg: "bg-warning-bg",
+    text: "text-warning-text",
     icon: null,
   },
   completed: {
     label: "Completed",
-    bg: "bg-green-100",
-    text: "text-green-700",
+    bg: "bg-success-bg",
+    text: "text-success-text",
     icon: CheckCircle2,
   },
   cancelled: {
     label: "Cancelled",
-    bg: "bg-gray-200",
+    bg: "bg-surface-secondary",
     text: "text-gray-500",
     icon: XCircle,
   },
   disputed: {
     label: "Disputed",
-    bg: "bg-red-100",
-    text: "text-red-600",
+    bg: "bg-error-bg",
+    text: "text-error-text",
+    icon: AlertTriangle,
+  },
+  awaiting_funding: {
+    label: "Awaiting Funding",
+    bg: "bg-warning-bg",
+    text: "text-warning-text",
     icon: AlertTriangle,
   },
 };
@@ -94,7 +100,7 @@ const STATUS_CONFIG: Record<
 function StatusBadge({ status }: { status: string }) {
   const cfg = STATUS_CONFIG[status] ?? {
     label: status,
-    bg: "bg-gray-200",
+    bg: "bg-surface-secondary",
     text: "text-gray-500",
     icon: null,
   };
@@ -136,6 +142,12 @@ function PostedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
                 })}
               </span>
             )}
+            {task.status === "awaiting_funding" && (
+              <span className="inline-flex items-center gap-1 font-bold text-gold-dark">
+                <AlertTriangle className="h-3 w-3" />
+                Fund the agreed amount to start
+              </span>
+            )}
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
@@ -158,7 +170,7 @@ function AcceptedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
       onClick={onTap}
       className={`tap-target w-full rounded-2xl border bg-surface p-4 text-left shadow-card transition-shadow duration-200 active:scale-[0.99] hover:border-brand/30 ${
         isActive
-          ? "border-amber-300/60 ring-1 ring-amber-200/40"
+          ? "border-warning-border/60 ring-1 ring-warning-border/40"
           : "border-card-border"
       }`}
     >
@@ -169,7 +181,7 @@ function AcceptedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
               {task.title}
             </h3>
             {task.isUrgent && (
-              <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-bold text-red-700">
+              <span className="shrink-0 rounded-full bg-error-bg px-2 py-0.5 text-[9px] font-bold text-error-text">
                 URGENT
               </span>
             )}
@@ -178,12 +190,18 @@ function AcceptedRow({ task, onTap }: { task: TaskRow; onTap: () => void }) {
             <Avatar name={task.poster?.fullName} size="xs" />
             <span>{task.poster?.fullName || "Unknown"}</span>
             {isActive && (
-              <span className="inline-flex items-center gap-1 font-semibold text-amber-700">
+              <span className="inline-flex items-center gap-1 font-semibold text-warning-text">
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-500" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-warning opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-warning" />
                 </span>
                 Working on this
+              </span>
+            )}
+            {task.status === "awaiting_funding" && (
+              <span className="inline-flex items-center gap-1 font-semibold text-warning-text">
+                <AlertTriangle className="h-3 w-3" />
+                Waiting for poster to secure the agreed amount
               </span>
             )}
           </div>
@@ -325,7 +343,7 @@ export default function MyTasksPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-200 px-4">
+        <div className="flex border-b border-border-subtle px-4">
           {(["posted", "accepted"] as TabType[]).map((t) => (
             <button
               key={t}
@@ -348,8 +366,8 @@ export default function MyTasksPage() {
       <div className="px-4 pb-8 pt-4">
         {/* Error */}
         {error && (
-          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-5 text-center">
-            <p className="text-sm font-medium text-red-600">{error}</p>
+          <div className="mb-4 rounded-xl border border-error-border bg-error-bg p-5 text-center">
+            <p className="text-sm font-medium text-error-text">{error}</p>
             <button
               type="button"
               onClick={fetchTasks}
@@ -382,7 +400,7 @@ export default function MyTasksPage() {
                   className={`tap-target shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
                     postedFilter === f.key
                       ? "bg-brand text-on-brand"
-                      : "bg-gray-200 text-gray-600 hover:bg-gray-200"
+                      : "bg-surface-secondary text-gray-600 hover:bg-surface-secondary"
                   }`}
                 >
                   {f.label}
@@ -392,8 +410,8 @@ export default function MyTasksPage() {
 
             {filteredPosted.length === 0 ? (
               <div className="py-16 text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gray-200">
-                  <Search className="h-6 w-6 text-gray-400" />
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-surface-secondary">
+                  <Search className="h-6 w-6 text-foreground-muted" />
                 </div>
                 <p className="mt-4 font-display text-base font-bold text-gray-900">
                   {posted.length === 0
@@ -429,8 +447,8 @@ export default function MyTasksPage() {
           <>
             {sortedAccepted.length === 0 ? (
               <div className="py-16 text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gray-200">
-                  <Search className="h-6 w-6 text-gray-400" />
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-surface-secondary">
+                  <Search className="h-6 w-6 text-foreground-muted" />
                 </div>
                 <p className="mt-4 font-display text-base font-bold text-gray-900">
                   No accepted tasks yet

@@ -200,7 +200,7 @@ export default function HustlePage() {
         </div>
 
         {/* Search — title, category, location, poster name */}
-        <div className="mt-3 flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-3.5 py-2.5">
+        <div className="search-pill mt-3 flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-2.5">
           <Search className="h-4 w-4 shrink-0 text-white/70" />
           <input
             type="text"
@@ -238,7 +238,7 @@ export default function HustlePage() {
         )}
 
         {/* Category chips + sort — sticky under the app bar */}
-        <div className="sticky top-14 z-20 -mx-4 space-y-2 bg-gray-50 px-4 py-2">
+        <div className="sticky top-14 z-20 -mx-4 space-y-2 bg-surface-secondary px-4 py-2">
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             <button
               type="button"
@@ -329,8 +329,8 @@ export default function HustlePage() {
             ))}
           </div>
         ) : error ? (
-          <div className="rounded-2xl border border-dashed border-gray-200 px-4 py-10 text-center">
-            <CircleDollarSign className="mx-auto h-8 w-8 text-gray-300" />
+          <div className="rounded-2xl border border-dashed border-border-default px-4 py-10 text-center">
+            <CircleDollarSign className="mx-auto h-8 w-8 text-foreground-muted" />
             <p className="mt-2 text-sm font-bold text-gray-900">Couldn&apos;t load tasks</p>
             <p className="text-xs text-gray-500">Check your connection and try again</p>
             <button
@@ -343,8 +343,8 @@ export default function HustlePage() {
             </button>
           </div>
         ) : visible.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-200 px-4 py-10 text-center">
-            <Briefcase className="mx-auto h-8 w-8 text-gray-300" />
+          <div className="rounded-2xl border border-dashed border-border-default px-4 py-10 text-center">
+            <Briefcase className="mx-auto h-8 w-8 text-foreground-muted" />
             <p className="mt-2 text-sm font-bold text-gray-900">
               {search ? `No tasks match “${search.trim()}”` : "No tasks here right now"}
             </p>

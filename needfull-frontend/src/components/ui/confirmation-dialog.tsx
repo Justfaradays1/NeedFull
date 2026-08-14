@@ -38,9 +38,9 @@ export function ConfirmationDialog({
 
   if (!open) return null;
 
-  const iconColor = variant === 'danger' ? 'text-red-500 bg-red-100'
-    : variant === 'warning' ? 'text-amber-500 bg-amber-100'
-    : 'text-blue-500 bg-blue-100';
+  const iconColor = variant === 'danger' ? 'text-error-text bg-error-bg'
+    : variant === 'warning' ? 'text-warning-text bg-warning-bg'
+    : 'text-info-text bg-info-bg';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
@@ -48,7 +48,7 @@ export function ConfirmationDialog({
       <div className="relative w-full max-w-sm rounded-2xl bg-surface p-6 shadow-lifted border border-card-border animate-in fade-in zoom-in-95">
         <button
           type="button" onClick={onCancel}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full text-foreground-muted hover:bg-surface-secondary hover:text-gray-600"
           aria-label="Close"
         >
           <X className="h-4 w-4" />

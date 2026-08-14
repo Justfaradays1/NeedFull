@@ -26,7 +26,7 @@ export function CategorySearch() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search categories..."
           aria-label="Search categories"
-          className="w-full rounded-xl border border-card-border bg-surface py-2.5 pl-9 pr-9 text-sm font-medium outline-none transition-colors placeholder:text-gray-500 focus:border-brand/50 focus:ring-2 focus:ring-brand/15 dark:placeholder:text-gray-400"
+          className="w-full rounded-full border border-card-border bg-surface py-2.5 pl-9 pr-9 text-sm font-medium outline-none transition-colors placeholder:text-gray-500 search-pill dark:placeholder:text-gray-400"
           style={{ color: "var(--color-foreground, #171717)" }}
         />
         {query ? (

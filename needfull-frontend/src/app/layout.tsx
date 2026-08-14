@@ -6,9 +6,9 @@ import { NavigationLoader } from "@/components/ui/NavigationLoader";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "NeedFull - Student Task Marketplace",
+  title: "NeedFull - Local Task Marketplace",
   description:
-    "A campus economy platform for Nigerian students. Post tasks, earn money, build trust — starting at FUOYE.",
+    "The trusted local marketplace. Post tasks, find verified help, earn money — your payment is safe in escrow until the job is done.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -90,7 +90,7 @@ export default function RootLayout({
         <NavigationLoader />
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:inline-flex focus:items-center focus:gap-2 focus:rounded-[10px] focus:bg-brand focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg focus:outline-none"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:inline-flex focus:items-center focus:gap-2 focus:rounded-[10px] focus:bg-brand focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-on-brand focus:shadow-lg focus:outline-none"
         >
           Skip to content
         </a>

@@ -57,6 +57,11 @@ export default function CreateTaskPage() {
   const [step, setStep] = useState(1);
   const [categories, setCategories] = useState<Category[]>([]);
   const [catLoading, setCatLoading] = useState(true);
+  // WHAT: Live wallet balance — fetched on mount because the auth store's
+  //       wallet snapshot goes stale once escrow locks or deposits land
+  // WHY: The submit guard must match what lockEscrow will do server-side,
+  //      otherwise post fails with a surprise 400
+  const [liveBalanceKobo, setLiveBalanceKobo] = useState<number | null>(null);
 
   // Step 1: Category
   const [categoryId, setCategoryId] = useState("");
@@ -108,6 +113,20 @@ export default function CreateTaskPage() {
       .finally(() => setCatLoading(false));
   }, [searchParams]);
 
+  // WHAT: Refresh the wallet balance on mount while posting flow is active
+  // WHY: Escrow locks on every task post, so the store snapshot is only
+  //      accurate at login — always check the live number before enabling
+  //      the Post Task button
+  useEffect(() => {
+    if (!user) return;
+    get<{ success?: boolean; data?: { balance_kobo?: number }; balance_kobo?: number }>("/wallet")
+      .then((res) => {
+        const kobo = res?.data?.balance_kobo ?? res?.balance_kobo;
+        if (typeof kobo === "number") setLiveBalanceKobo(kobo);
+      })
+      .catch(() => {});
+  }, [user]);
+
   // WHAT: Reset the scroll position whenever the active step changes
   // WHY:  All four steps render in the same page; without a reset, continuing
   //       from the bottom of a long step leaves the next step's viewport
@@ -132,7 +151,7 @@ export default function CreateTaskPage() {
   const budgetNum = budgetStepData?.budgetNaira ?? 0;
   const deadline = budgetStepData?.deadline;
   const budgetLocLabel = budgetStepData?.taskLocation.label ?? "";
-  const walletBalanceKobo = user?.wallet?.balanceKobo ?? 0;
+  const walletBalanceKobo = liveBalanceKobo ?? user?.wallet?.balanceKobo ?? 0;
   const totalKobo = (budgetNum + Math.floor(budgetNum * PLATFORM_FEE_PERCENT / 100)) * 100;
   const hasEnoughBalance = totalKobo === 0 || walletBalanceKobo >= totalKobo;
 
@@ -189,8 +208,15 @@ export default function CreateTaskPage() {
       } else {
         setSubmitError("Failed to create task. Please try again.");
       }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+    } catch (err: any) {
+      // WHAT: Prefer the server's reason (validation hint, balance check, etc.)
+      // WHY: axios's default "Request failed with status code 400" tells the
+      //      user nothing about what to fix
+      const msg =
+        err?.response?.data?.message ||
+        (err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.");
       setSubmitError(msg);
     } finally {
       setSubmitting(false);
@@ -224,7 +250,7 @@ export default function CreateTaskPage() {
             <button
               type="button"
               onClick={() => (step > 1 ? prevStep() : router.push("/feed"))}
-              className="tap-target flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-200"
+              className="tap-target flex h-8 w-8 items-center justify-center rounded-full hover:bg-surface-elevated"
             >
               <ChevronLeft className="h-5 w-5 text-gray-600" />
             </button>
@@ -264,7 +290,7 @@ export default function CreateTaskPage() {
                 }}
               />
               {errors.categoryId && (
-                <p className="text-xs text-red-500">{errors.categoryId}</p>
+                <p className="text-xs text-error-text">{errors.categoryId}</p>
               )}
               {categoryId ? (
                 <div className="min-h-[72px]">
@@ -278,7 +304,7 @@ export default function CreateTaskPage() {
                   type="button"
                   onClick={nextStep}
                   disabled={!categoryId}
-                  className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-on-brand shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:bg-gray-200 disabled:text-gray-400"
+                  className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-bold text-on-brand shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:bg-surface-secondary disabled:text-foreground-muted"
                 >
                   Continue to Details
                 </button>
@@ -394,7 +420,7 @@ export default function CreateTaskPage() {
                     ₦{budgetNum.toLocaleString()}
                   </span>
                 </div>
-                <p className="mt-1 text-center text-xs text-gray-400">
+                <p className="mt-1 text-center text-xs text-foreground-muted">
                   Held securely in NeedFull Escrow
                 </p>
 
@@ -417,11 +443,11 @@ export default function CreateTaskPage() {
                 {/* Wallet check */}
                 <div className={`mt-4 rounded-xl px-4 py-3 text-sm ${
                   hasEnoughBalance
-                    ? "bg-green-50 text-green-700"
-                    : "bg-red-50 text-red-600"
+                    ? "bg-success-bg text-success-text"
+                    : "bg-error-bg text-error-text"
                 }`}>
                   <div className="flex items-center gap-2">
-                    <div className={`h-2 w-2 rounded-full ${hasEnoughBalance ? "bg-green-500" : "bg-red-500"}`} />
+                    <div className={`h-2 w-2 rounded-full ${hasEnoughBalance ? "bg-success" : "bg-error"}`} />
                     <span className="text-xs font-semibold">
                       {hasEnoughBalance
                         ? `Wallet Balance: ₦${(walletBalanceKobo / 100).toLocaleString()}`
@@ -440,8 +466,8 @@ export default function CreateTaskPage() {
               </div>
 
               {submitError && (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                  <p className="flex items-center gap-1.5 text-sm font-medium text-red-600">
+                <div className="rounded-xl border border-error-border bg-error-bg px-4 py-3">
+                  <p className="flex items-center gap-1.5 text-sm font-medium text-error-text">
                     <AlertTriangle className="h-4 w-4" />
                     {submitError}
                   </p>
@@ -455,7 +481,7 @@ export default function CreateTaskPage() {
                     type="button"
                     onClick={handleSubmit}
                     disabled={submitting}
-                    className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-gold py-4 text-base font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:bg-gray-200 disabled:text-gray-400"
+                    className="tap-target flex w-full items-center justify-center gap-2 rounded-xl bg-gold py-4 text-base font-bold text-white shadow-sm transition-all hover:brightness-105 active:scale-[0.97] disabled:bg-surface-secondary disabled:text-foreground-muted"
                   >
                     {submitting ? (
                       <><Loader2 className="h-5 w-5 animate-spin" />Posting...</>
@@ -472,7 +498,7 @@ export default function CreateTaskPage() {
                     >
                       Fund Wallet
                     </button>
-                    <p className="text-center text-xs text-gray-400">
+                    <p className="text-center text-xs text-foreground-muted">
                       Insufficient balance to post this task
                     </p>
                   </div>

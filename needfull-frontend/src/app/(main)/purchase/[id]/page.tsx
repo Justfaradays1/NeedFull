@@ -55,19 +55,19 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  pending_payment: "bg-gray-200 text-gray-600",
-  funded: "bg-green-100 text-green-800",
-  accepted: "bg-blue-100 text-blue-800",
-  at_store: "bg-purple-100 text-purple-800",
-  shopping: "bg-indigo-100 text-indigo-800",
-  receipt_uploaded: "bg-teal-100 text-teal-800",
-  needs_budget_approval: "bg-amber-100 text-amber-800",
-  heading_to_delivery: "bg-orange-100 text-orange-800",
-  delivered: "bg-cyan-100 text-cyan-800",
-  completed: "bg-green-100 text-green-800",
-  disputed: "bg-red-100 text-red-800",
-  refunded: "bg-gray-200 text-gray-600",
-  cancelled: "bg-gray-200 text-gray-500",
+  pending_payment: "bg-surface-secondary text-gray-600",
+  funded: "bg-success-bg text-success-text",
+  accepted: "bg-info-bg text-info-text",
+  at_store: "bg-info-bg text-info-text",
+  shopping: "bg-info-bg text-info-text",
+  receipt_uploaded: "bg-info-bg text-success-text",
+  needs_budget_approval: "bg-warning-bg text-warning-text",
+  heading_to_delivery: "bg-warning-bg text-warning-text",
+  delivered: "bg-info-bg text-info-text",
+  completed: "bg-success-bg text-success-text",
+  disputed: "bg-error-bg text-error-text",
+  refunded: "bg-surface-secondary text-gray-600",
+  cancelled: "bg-surface-secondary text-gray-500",
 };
 
 export default function PurchaseTaskDetailPage() {
@@ -261,18 +261,18 @@ export default function PurchaseTaskDetailPage() {
         )}
 
         {detail.purchase.status === "needs_budget_approval" && detail.budgetApprovals.filter((a: any) => a.status === "pending").length > 0 && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-3">
+          <div className="rounded-xl border border-warning-border bg-warning-bg p-4 space-y-3">
             <div className="flex items-start gap-2">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning-text" />
               <div>
-                <p className="text-sm font-semibold text-amber-800">Budget Approval Needed</p>
-                <p className="text-xs text-amber-700 mt-1">
+                <p className="text-sm font-semibold text-warning-text">Budget Approval Needed</p>
+                <p className="text-xs text-warning-text mt-1">
                   The purchase total exceeded your approved budget. Review the request below.
                 </p>
               </div>
             </div>
             {detail.budgetApprovals.filter((a: any) => a.status === "pending").map((approval: any) => (
-              <div key={approval.id} className="rounded-lg bg-white p-3 space-y-2">
+              <div key={approval.id} className="rounded-lg bg-surface p-3 space-y-2">
                 <p className="text-sm">
                   <span className="font-semibold">Excess Amount: </span>
                   ₦{(approval.excess_amount / 100).toLocaleString()}
@@ -313,7 +313,7 @@ export default function PurchaseTaskDetailPage() {
           <div className="flex gap-2">
             <button
               onClick={handleChat}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gray-200 py-3 text-sm font-semibold text-gray-700"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-surface-secondary py-3 text-sm font-semibold text-gray-700"
             >
               <MessageCircle className="h-4 w-4" />
               Chat with Runner
@@ -321,7 +321,7 @@ export default function PurchaseTaskDetailPage() {
             {!showDisputeForm && s !== "disputed" && (
               <button
                 onClick={() => setShowDisputeForm(true)}
-                className="flex items-center justify-center gap-2 rounded-xl border border-red-200 px-4 py-3 text-sm font-medium text-red-600"
+                className="flex items-center justify-center gap-2 rounded-xl border border-error-border px-4 py-3 text-sm font-medium text-error-text"
               >
                 <AlertTriangle className="h-4 w-4" />
                 Report Issue
@@ -331,27 +331,27 @@ export default function PurchaseTaskDetailPage() {
         )}
 
         {showDisputeForm && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 space-y-3">
-            <p className="text-sm font-semibold text-red-800">Report an Issue</p>
+          <div className="rounded-xl border border-error-border bg-error-bg p-4 space-y-3">
+            <p className="text-sm font-semibold text-error-text">Report an Issue</p>
             <textarea
               value={disputeReason}
               onChange={(e) => setDisputeReason(e.target.value)}
               placeholder="Describe the issue with this delivery..."
-              className="w-full rounded-lg border border-red-200 p-3 text-xs focus:border-red-400 focus:outline-none"
+              className="w-full rounded-lg border border-error-border p-3 text-xs focus:border-error focus:outline-none"
               rows={3}
             />
             <textarea
               value={disputeDescription}
               onChange={(e) => setDisputeDescription(e.target.value)}
               placeholder="Additional details (optional)"
-              className="w-full rounded-lg border border-red-200 p-3 text-xs focus:border-red-400 focus:outline-none"
+              className="w-full rounded-lg border border-error-border p-3 text-xs focus:border-error focus:outline-none"
               rows={2}
             />
             <div className="flex gap-2">
               <button
                 onClick={handleOpenDispute}
                 disabled={actionLoading === "dispute"}
-                className="flex-1 rounded-lg bg-red-600 py-2.5 text-xs font-bold text-on-brand disabled:opacity-50"
+                className="flex-1 rounded-lg bg-error py-2.5 text-xs font-bold text-on-brand disabled:opacity-50"
               >
                 {actionLoading === "dispute" ? (
                   <Loader2 className="mx-auto h-4 w-4 animate-spin" />
@@ -423,7 +423,7 @@ export default function PurchaseTaskDetailPage() {
                   </>
                 ) : (
                   <>
-                    <Camera className="h-5 w-5 text-gray-400" />
+                    <Camera className="h-5 w-5 text-foreground-muted" />
                     <span className="text-xs text-gray-500">Tap to upload receipt photo</span>
                   </>
                 )}
@@ -492,10 +492,10 @@ export default function PurchaseTaskDetailPage() {
         )}
 
         {runnerOTP && (
-          <div className="rounded-xl border-2 border-gold bg-amber-50 p-4 text-center">
-            <p className="text-xs text-amber-700 mb-1">Delivery OTP</p>
-            <p className="text-2xl font-bold tracking-widest text-amber-900">{runnerOTP}</p>
-            <p className="text-xs text-amber-600 mt-1">
+          <div className="rounded-xl border-2 border-gold bg-warning-bg p-4 text-center">
+            <p className="text-xs text-warning-text mb-1">Delivery OTP</p>
+            <p className="text-2xl font-bold tracking-widest text-warning-text">{runnerOTP}</p>
+            <p className="text-xs text-warning-text mt-1">
               Share this code with the poster when you arrive
             </p>
           </div>
@@ -533,7 +533,7 @@ export default function PurchaseTaskDetailPage() {
         {s !== "completed" && s !== "cancelled" && s !== "refunded" && s !== "disputed" && s !== "pending_payment" && (
           <button
             onClick={handleChat}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-200 py-3 text-sm font-semibold text-gray-700"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-surface-secondary py-3 text-sm font-semibold text-gray-700"
           >
             <MessageCircle className="h-4 w-4" />
             Chat with Poster
@@ -548,26 +548,26 @@ export default function PurchaseTaskDetailPage() {
     const s = detail.purchase.status;
     if (s === "completed") {
       return (
-        <div className="rounded-xl bg-green-50 p-4 text-center border border-green-200">
-          <CheckCircle2 className="mx-auto mb-1 h-6 w-6 text-green-600" />
-          <p className="text-sm font-bold text-green-800">Payment Released</p>
-          <p className="text-xs text-green-600">Funds have been distributed.</p>
+        <div className="rounded-xl bg-success-bg p-4 text-center border border-success-border">
+          <CheckCircle2 className="mx-auto mb-1 h-6 w-6 text-success-text" />
+          <p className="text-sm font-bold text-success-text">Payment Released</p>
+          <p className="text-xs text-success-text">Funds have been distributed.</p>
         </div>
       );
     }
     if (s === "disputed") {
       return (
-        <div className="rounded-xl bg-red-50 p-4 text-center border border-red-200">
-          <AlertTriangle className="mx-auto mb-1 h-6 w-6 text-red-600" />
-          <p className="text-sm font-bold text-red-800">Payment on Hold</p>
-          <p className="text-xs text-red-600">Awaiting admin review.</p>
+        <div className="rounded-xl bg-error-bg p-4 text-center border border-error-border">
+          <AlertTriangle className="mx-auto mb-1 h-6 w-6 text-error-text" />
+          <p className="text-sm font-bold text-error-text">Payment on Hold</p>
+          <p className="text-xs text-error-text">Awaiting admin review.</p>
         </div>
       );
     }
     if (s === "refunded") {
       return (
-        <div className="rounded-xl bg-gray-200 p-4 text-center border border-gray-200">
-          <XCircle className="mx-auto mb-1 h-6 w-6 text-gray-400" />
+        <div className="rounded-xl bg-surface-secondary p-4 text-center border border-border-default">
+          <XCircle className="mx-auto mb-1 h-6 w-6 text-foreground-muted" />
           <p className="text-sm font-bold text-gray-700">Funds Refunded</p>
           <p className="text-xs text-gray-500">Money returned to your wallet.</p>
         </div>
@@ -598,7 +598,7 @@ export default function PurchaseTaskDetailPage() {
   if (!detail) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center page-shell px-4 text-center">
-        <AlertTriangle className="mb-3 h-12 w-12 text-gray-400" />
+        <AlertTriangle className="mb-3 h-12 w-12 text-foreground-muted" />
         <h2 className="text-lg font-semibold text-gray-900">Purchase task not found</h2>
         <button onClick={() => router.push("/tasks")} className="mt-4 rounded-xl bg-brand px-6 py-2.5 text-sm font-semibold text-on-brand">
           My Tasks
@@ -626,7 +626,7 @@ export default function PurchaseTaskDetailPage() {
     <div className="min-h-screen page-shell">
       <div className="bg-surface px-4 py-3 shadow-sm border-b border-card-border">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-gray-200">
+          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-surface-elevated">
             <ArrowLeft className="h-5 w-5 text-gray-700" />
           </button>
           <h1 className="text-lg font-bold text-gray-900 truncate">{detail.task.title}</h1>
@@ -636,7 +636,7 @@ export default function PurchaseTaskDetailPage() {
       <div className="px-4 py-4 space-y-4">
         {/* Status badge */}
         <div className="flex items-center justify-between">
-          <span className={`rounded-full px-3 py-1 text-xs font-bold ${STATUS_COLORS[s] || "bg-gray-200 text-gray-600"}`}>
+          <span className={`rounded-full px-3 py-1 text-xs font-bold ${STATUS_COLORS[s] || "bg-surface-secondary text-gray-600"}`}>
             {STATUS_LABELS[s] || s}
           </span>
           {detail.purchase.store_name && (
@@ -661,13 +661,13 @@ export default function PurchaseTaskDetailPage() {
             <BudgetRow label="Estimated Item Cost" amountKobo={detail.purchase.estimated_item_cost} />
             <BudgetRow label="Runner Fee" amountKobo={detail.purchase.runner_fee} />
             <BudgetRow label="Platform Fee" amountKobo={detail.purchase.platform_fee} accent />
-            <hr className="border-gray-100" />
+            <hr className="border-border-subtle" />
             <BudgetRow label="Total Escrow" amountKobo={detail.purchase.total_escrow} bold />
           </div>
 
           {detail.purchase.receipt_amount && (
             <>
-              <hr className="border-gray-100" />
+              <hr className="border-border-subtle" />
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-gray-500">ACTUAL RECEIPT</p>
                 <BudgetRow label="Receipt Amount" amountKobo={detail.purchase.receipt_amount} highlight />
@@ -710,7 +710,7 @@ export default function PurchaseTaskDetailPage() {
             </div>
           </div>
           {detail.task.runner && (
-            <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100">
+            <div className="flex items-center gap-3 mt-3 pt-3 border-t border-border-subtle">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber/10 text-sm font-bold text-amber">
                 {detail.task.runner.fullName.charAt(0).toUpperCase()}
               </div>
@@ -726,11 +726,11 @@ export default function PurchaseTaskDetailPage() {
 
         {/* Dispute info */}
         {detail.disputes.length > 0 && !showDisputeForm && (
-          <div className="rounded-xl bg-red-50 p-3 border border-red-200">
-            <p className="text-xs font-semibold text-red-800">
+          <div className="rounded-xl bg-error-bg p-3 border border-error-border">
+            <p className="text-xs font-semibold text-error-text">
               Dispute #{detail.disputes[0].status}
             </p>
-            <p className="text-xs text-red-600 mt-1">{detail.disputes[0].reason}</p>
+            <p className="text-xs text-error-text mt-1">{detail.disputes[0].reason}</p>
           </div>
         )}
 
@@ -739,7 +739,7 @@ export default function PurchaseTaskDetailPage() {
         {isRunner && runnerActions()}
 
         {!isPoster && !isRunner && (
-          <div className="rounded-xl bg-gray-200 p-4 text-center text-sm text-gray-500">
+          <div className="rounded-xl bg-surface-secondary p-4 text-center text-sm text-gray-500">
             You are not part of this task.
           </div>
         )}

@@ -24,8 +24,8 @@ export function EmailVerificationCard({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="bg-green-100 p-3 rounded-lg">
-            <Mail className="w-5 h-5 text-green-700" />
+          <div className="bg-success-bg p-3 rounded-lg">
+            <Mail className="w-5 h-5 text-success-text" />
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">Email Verification</h3>
@@ -33,15 +33,15 @@ export function EmailVerificationCard({
           </div>
         </div>
         {verified && (
-          <div className="flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full">
-            <CheckCircle2 className="w-4 h-4 text-green-700" />
-            <span className="text-sm font-medium text-green-700">Verified</span>
+          <div className="flex items-center gap-2 bg-success-bg px-3 py-1 rounded-full">
+            <CheckCircle2 className="w-4 h-4 text-success-text" />
+            <span className="text-sm font-medium text-success-text">Verified</span>
           </div>
         )}
       </div>
 
       {/* Status Section */}
-      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+      <div className="bg-surface-secondary rounded-lg p-4 mb-4">
         {verified ? (
           <div>
             <p className="text-sm text-gray-700">
@@ -65,7 +65,7 @@ export function EmailVerificationCard({
         <button
           onClick={onResend}
           disabled={isLoading}
-          className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center gap-2 bg-success hover:brightness-105 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           <RotateCcw className="w-4 h-4" />
           {isLoading ? "Sending..." : "Resend Verification Email"}

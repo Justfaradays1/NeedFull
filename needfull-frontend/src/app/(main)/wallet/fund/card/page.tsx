@@ -41,6 +41,8 @@ function CardPaymentInner() {
   const [isInitiating, setIsInitiating] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifiedAmount, setVerifiedAmount] = useState<number | null>(null);
+  const [transactionRef, setTransactionRef] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ amount?: string }>({});
 
   // WHAT: Handle return from Paystack redirect — check for ?reference= in URL
   useEffect(() => {
@@ -52,6 +54,7 @@ function CardPaymentInner() {
     const reference = ref || trxref;
 
     if (reference && !isVerifying && verifiedAmount === null) {
+      setTransactionRef(reference);
       verifyPayment(reference);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,10 +121,12 @@ function CardPaymentInner() {
     // WHAT: Limit to 2 decimal places
     if (parts.length === 2 && parts[1].length > 2) return;
     setAmount(cleaned);
+    setErrors({ amount: undefined });
   }
 
   async function handlePay() {
     if (amountNum < 500) {
+      setErrors({ amount: "Minimum amount is ₦500" });
       toast.error("Minimum amount is ₦500");
       return;
     }
@@ -145,6 +150,7 @@ function CardPaymentInner() {
       });
 
       if (res.success && res.data.authorizationUrl) {
+        setTransactionRef(res.data.reference);
         // WHAT: Redirect to Paystack payment page
         window.location.href = res.data.authorizationUrl;
       } else {
@@ -181,13 +187,13 @@ function CardPaymentInner() {
     return (
       <div className="min-h-screen page-shell safe-all flex items-center justify-center">
         <div className="text-center px-6">
-          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle className="h-10 w-10 text-green-600" />
+          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-success-bg">
+            <CheckCircle className="h-10 w-10 text-success-text" />
           </div>
           <p className="font-display text-2xl font-bold text-gray-900">
             Payment Successful!
           </p>
-          <p className="mt-2 text-lg font-semibold text-green-600">
+          <p className="mt-2 text-lg font-semibold text-success-text">
             {formatCurrency(Math.round(verifiedAmount * 100))} added to your wallet
           </p>
           <p className="mt-1 text-sm text-gray-500">Redirecting to wallet...</p>
@@ -223,18 +229,18 @@ function CardPaymentInner() {
 
       <div className="-mt-2 space-y-4 px-4 pb-8 sm:px-6">
         {/* WHAT: Warning banner about fees */}
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-amber-800">
-                Fees apply: 1.5% + ₦100 per transaction
+<div className="rounded-xl border border-warning-border bg-warning-bg p-4 shadow-sm">
+            <div className="flex items-start gap-2.5">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-warning-text" />
+            <div>
+              <p className="text-sm font-bold text-warning-text">
+                {transactionRef ? "Still pending?" : "Card funding is limited"}
               </p>
-              <p className="mt-0.5 text-xs text-amber-700">
+              <p className="mt-0.5 text-xs text-warning-text">
                 For zero-fee funding,{" "}
                 <Link
                   href="/wallet/fund"
-                  className="font-semibold text-amber-800 underline hover:text-amber-900"
+                  className="font-semibold text-warning-text underline hover:text-warning-text"
                 >
                   use Bank Transfer instead
                 </Link>
@@ -269,11 +275,11 @@ function CardPaymentInner() {
                 value={amount}
                 onChange={(e) => handleAmountChange(e.target.value)}
                 disabled={isInitiating}
-                className={`tap-target w-full rounded-xl border bg-white px-4 py-4 pl-10 text-2xl font-bold tracking-wider focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
-                  amountNum > 0 && amountNum < 500
-                    ? "border-danger"
-                    : "border-gray-300 focus:border-brand"
-                }`}
+className={`tap-target w-full rounded-xl border bg-surface px-4 py-4 pl-10 text-2xl font-bold tracking-wider focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary ${
+                    errors.amount
+                      ? "border-danger"
+                      : "border-border-default focus:border-brand"
+                  }`}
               />
             </div>
             {amountNum > 0 && amountNum < 500 && (
@@ -283,12 +289,12 @@ function CardPaymentInner() {
 
           {/* WHAT: Fee breakdown — updates in real-time */}
           {amountNum >= 500 && (
-            <div className="mt-4 space-y-2 rounded-lg bg-gray-50 p-4">
+            <div className="mt-4 space-y-2 rounded-lg bg-surface-secondary p-4">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600">Fee (1.5% + ₦100)</span>
                 <span className="font-medium text-gray-900">{formatCurrency(Math.round(fee * 100))}</span>
               </div>
-              <div className="border-t border-gray-200 pt-2">
+              <div className="border-t border-border-default pt-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-semibold text-gray-700">
                     Total charged
@@ -298,7 +304,7 @@ function CardPaymentInner() {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600">You&apos;ll receive</span>
-                <span className="font-semibold text-green-700">
+                <span className="font-semibold text-success-text">
                   {formatCurrency(Math.round(amountNum * 100))}
                 </span>
               </div>

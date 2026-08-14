@@ -145,6 +145,11 @@ app.use("/api/availability", availabilityRoutes);
 import applicationsRoutes from "./routes/applications.routes";
 app.use("/api/applications", applicationsRoutes);
 
+// WHAT: Mount budget proposal routes
+// WHY: Auditable runner↔poster budget negotiation records
+import proposalsRoutes from "./routes/proposals.routes";
+app.use("/api", proposalsRoutes);
+
 // WHAT: Mount category routes
 // WHY: Task category listing and management
 import categoriesRoutes from "./routes/categories.routes";

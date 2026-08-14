@@ -57,7 +57,7 @@ export default function PurchaseWorkflowTimeline({
             <div
               key={s.key}
               className={`h-1.5 w-1.5 rounded-full ${
-                s.status === "done" || s.status === "current" ? "bg-brand" : "bg-gray-200"
+                s.status === "done" || s.status === "current" ? "bg-brand" : "bg-surface-secondary"
               }`}
             />
           ))}
@@ -65,7 +65,7 @@ export default function PurchaseWorkflowTimeline({
         <span className="font-medium text-gray-700">
           Step {doneCount + 1} of {WORKFLOW_STEPS.length}
         </span>
-        <span className="text-gray-400">·</span>
+        <span className="text-foreground-muted">·</span>
         <span className="text-gray-600">{current?.label}</span>
       </div>
     );
@@ -83,12 +83,12 @@ export default function PurchaseWorkflowTimeline({
                 <Loader2 className="h-4 w-4 animate-spin text-gold" />
               </div>
             ) : (
-              <Circle className="h-5 w-5 text-gray-300" />
+              <Circle className="h-5 w-5 text-foreground-muted" />
             )}
             {i < steps.length - 1 && (
               <div
                 className={`mt-0.5 w-0.5 flex-1 ${
-                  step.status === "done" ? "bg-brand" : "bg-gray-200"
+                  step.status === "done" ? "bg-brand" : "bg-surface-secondary"
                 }`}
                 style={{ minHeight: "16px" }}
               />
@@ -101,13 +101,13 @@ export default function PurchaseWorkflowTimeline({
                   ? "text-gold"
                   : step.status === "done"
                     ? "text-gray-900"
-                    : "text-gray-400"
+                    : "text-foreground-muted"
               }`}
             >
               {step.label}
             </p>
             {step.timestamp && (
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-foreground-muted">
                 {new Date(step.timestamp).toLocaleString("en-NG")}
               </p>
             )}

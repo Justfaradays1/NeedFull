@@ -21,19 +21,19 @@ interface PurchaseDetail {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending_payment: "bg-gray-100 text-gray-600",
-  funded: "bg-blue-100 text-blue-800",
-  accepted: "bg-indigo-100 text-indigo-800",
-  at_store: "bg-purple-100 text-purple-800",
-  shopping: "bg-purple-100 text-purple-800",
-  receipt_uploaded: "bg-teal-100 text-teal-800",
-  needs_budget_approval: "bg-amber-100 text-amber-800",
-  heading_to_delivery: "bg-orange-100 text-orange-800",
-  delivered: "bg-cyan-100 text-cyan-800",
-  completed: "bg-green-100 text-green-800",
-  disputed: "bg-red-100 text-red-800",
-  refunded: "bg-gray-100 text-gray-600",
-  cancelled: "bg-gray-100 text-gray-500",
+  pending_payment: "bg-surface-secondary text-gray-600",
+  funded: "bg-info-bg text-info-text",
+  accepted: "bg-info-bg text-info-text",
+  at_store: "bg-processing-bg text-processing-text",
+  shopping: "bg-processing-bg text-processing-text",
+  receipt_uploaded: "bg-info-bg text-info-text",
+  needs_budget_approval: "bg-warning-bg text-warning-text",
+  heading_to_delivery: "bg-warning-bg text-warning-text",
+  delivered: "bg-info-bg text-info-text",
+  completed: "bg-success-bg text-success-text",
+  disputed: "bg-error-bg text-error-text",
+  refunded: "bg-surface-secondary text-gray-600",
+  cancelled: "bg-surface-secondary text-gray-500",
 };
 
 export default function AdminPurchaseDetailPage() {
@@ -121,7 +121,7 @@ export default function AdminPurchaseDetailPage() {
         <h1 className="text-lg font-bold text-gray-900 truncate">{t?.title || "Purchase Task"}</h1>
         <span
           className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-            STATUS_COLORS[s] || "bg-gray-100 text-gray-600"
+            STATUS_COLORS[s] || "bg-surface-secondary text-gray-600"
           }`}
         >
           {s?.replace(/_/g, " ")}
@@ -157,7 +157,7 @@ export default function AdminPurchaseDetailPage() {
         </div>
 
         {t?.runner && (
-          <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+          <div className="flex items-center gap-3 pt-2 border-t border-border-subtle">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber/10 text-sm font-bold text-amber">
               {t.runner.fullName?.charAt(0) || "?"}
             </div>
@@ -192,14 +192,14 @@ export default function AdminPurchaseDetailPage() {
               <span className="text-gray-600">Spending Buffer</span>
               <span className="font-medium">₦{(p.max_additional_spending / 100).toLocaleString()}</span>
             </div>
-            <hr className="border-gray-100" />
+            <hr className="border-border-subtle" />
             <div className="flex justify-between">
               <span className="font-bold text-gray-900">Total Escrow</span>
               <span className="font-bold text-gold">₦{(p.total_escrow / 100).toLocaleString()}</span>
             </div>
             {p.receipt_amount && (
               <>
-                <hr className="border-gray-100" />
+                <hr className="border-border-subtle" />
                 <div className="flex justify-between">
                   <span className="text-gray-600">Actual Receipt</span>
                   <span className="font-bold text-gold">₦{(p.receipt_amount / 100).toLocaleString()}</span>
@@ -225,26 +225,26 @@ export default function AdminPurchaseDetailPage() {
 
       {/* Disputes */}
       {detail.disputes.length > 0 && (
-        <div className="rounded-2xl bg-surface p-4 border border-red-200 space-y-3">
-          <h3 className="text-sm font-bold text-red-800 flex items-center gap-1.5">
+        <div className="rounded-2xl bg-surface p-4 border border-error-border space-y-3">
+          <h3 className="text-sm font-bold text-error-text flex items-center gap-1.5">
             <AlertTriangle className="h-4 w-4" /> Disputes
           </h3>
           {detail.disputes.map((dispute: any) => (
-            <div key={dispute.id} className="rounded-lg bg-red-50 p-3 space-y-2">
+            <div key={dispute.id} className="rounded-lg bg-error-bg p-3 space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-red-800">
+                <p className="text-xs font-semibold text-error-text">
                   {dispute.status} · by {dispute.opener?.fullName || "Unknown"}
                 </p>
                 <span className="text-[10px] text-gray-500">
                   {new Date(dispute.created_at).toLocaleDateString()}
                 </span>
               </div>
-              <p className="text-xs text-red-700">{dispute.reason}</p>
+              <p className="text-xs text-error-text">{dispute.reason}</p>
               {dispute.description && (
                 <p className="text-xs text-gray-500">{dispute.description}</p>
               )}
               {dispute.status === "open" || dispute.status === "under_review" ? (
-                <div className="space-y-2 pt-2 border-t border-red-200">
+                <div className="space-y-2 pt-2 border-t border-error-border">
                   <p className="text-xs font-semibold text-gray-700">Resolve Dispute</p>
                   <div className="flex gap-2">
                     {["release_to_runner", "refund_poster", "split"].map((r) => (
@@ -254,7 +254,7 @@ export default function AdminPurchaseDetailPage() {
                         className={`rounded-lg px-3 py-1.5 text-[10px] font-semibold transition-colors ${
                           resolution === r
                             ? "bg-brand text-white"
-                            : "bg-white border border-gray-300 text-gray-600"
+                            : "bg-surface border border-border-default text-gray-600"
                         }`}
                       >
                         {r.replace(/_/g, " ")}
@@ -265,7 +265,7 @@ export default function AdminPurchaseDetailPage() {
                     value={adminNotes}
                     onChange={(e) => setAdminNotes(e.target.value)}
                     placeholder="Internal notes..."
-                    className="w-full rounded-lg border border-gray-300 p-2 text-xs focus:border-brand focus:outline-none"
+                    className="w-full rounded-lg border border-border-default p-2 text-xs focus:border-brand focus:outline-none"
                     rows={2}
                   />
                   <button
@@ -282,7 +282,7 @@ export default function AdminPurchaseDetailPage() {
                   </button>
                 </div>
               ) : (
-                <p className="text-xs font-medium text-green-700">
+                <p className="text-xs font-medium text-success-text">
                   Resolved: {dispute.resolution?.replace(/_/g, " ")}
                 </p>
               )}
@@ -293,15 +293,15 @@ export default function AdminPurchaseDetailPage() {
 
       {/* Budget Approvals */}
       {detail.budgetApprovals.length > 0 && (
-        <div className="rounded-2xl bg-surface p-4 border border-amber-200 space-y-2">
-          <h3 className="text-sm font-bold text-amber-800">Budget Approvals</h3>
+        <div className="rounded-2xl bg-surface p-4 border border-warning-border space-y-2">
+          <h3 className="text-sm font-bold text-warning-text">Budget Approvals</h3>
           {detail.budgetApprovals.map((ba: any) => (
-            <div key={ba.id} className="flex items-center justify-between rounded-lg bg-amber-50 p-2.5">
+            <div key={ba.id} className="flex items-center justify-between rounded-lg bg-warning-bg p-2.5">
               <div>
-                <p className="text-xs font-semibold text-amber-800">
+                <p className="text-xs font-semibold text-warning-text">
                   Excess: ₦{(ba.excess_amount / 100).toLocaleString()}
                 </p>
-                <p className="text-[10px] text-amber-600">Status: {ba.status}</p>
+                <p className="text-[10px] text-warning-text">Status: {ba.status}</p>
               </div>
               <span className="text-[10px] text-gray-500">
                 {new Date(ba.created_at).toLocaleDateString()}
@@ -316,7 +316,7 @@ export default function AdminPurchaseDetailPage() {
         <div className="rounded-2xl bg-surface p-4 border border-card-border space-y-2">
           <h3 className="text-sm font-bold text-gray-900">Wallet Movements</h3>
           {detail.walletMovements.map((wm: any) => (
-            <div key={wm.id} className="flex items-center justify-between rounded-lg bg-gray-50 p-2.5">
+            <div key={wm.id} className="flex items-center justify-between rounded-lg bg-surface-secondary p-2.5">
               <div>
                 <p className="text-xs font-semibold text-gray-700">{wm.type}</p>
                 <p className="text-[10px] text-gray-500">
@@ -337,14 +337,14 @@ export default function AdminPurchaseDetailPage() {
           <h3 className="text-sm font-bold text-gray-900">Audit Log</h3>
           <div className="max-h-48 space-y-1 overflow-y-auto">
             {detail.auditLogs.map((log: any) => (
-              <div key={log.id} className="flex items-center justify-between rounded-lg bg-gray-50 px-2.5 py-1.5">
+              <div key={log.id} className="flex items-center justify-between rounded-lg bg-surface-secondary px-2.5 py-1.5">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-medium text-gray-700">{log.action}</span>
                   {log.actor && (
-                    <span className="text-[10px] text-gray-400">by {log.actor.fullName}</span>
+                    <span className="text-[10px] text-foreground-muted">by {log.actor.fullName}</span>
                   )}
                 </div>
-                <span className="text-[10px] text-gray-400">
+                <span className="text-[10px] text-foreground-muted">
                   {new Date(log.created_at).toLocaleString()}
                 </span>
               </div>

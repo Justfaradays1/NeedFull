@@ -50,15 +50,15 @@ function FactorRow({
         <div className="flex justify-between items-center mb-1">
           <span className="text-sm text-gray-700 font-medium">{label}</span>
           <span
-            className={`text-sm font-semibold ${isNegative ? "text-red-600" : "text-green-600"}`}
+            className={`text-sm font-semibold ${isNegative ? "text-error-text" : "text-success-text"}`}
           >
             {isNegative ? "−" : "+"}
             {Math.abs(points)} pts
           </span>
         </div>
-        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-surface-secondary rounded-full overflow-hidden">
           <div
-            className={`h-full transition-all ${isNegative ? "bg-red-400" : "bg-green-500"}`}
+            className={`h-full transition-all ${isNegative ? "bg-error" : "bg-success"}`}
             style={{ width: `${Math.min(percentage, 100)}%` }}
           />
         </div>
@@ -85,10 +85,10 @@ export function TrustScoreCard({
 
   return (
     <div
-      className={`rounded-2xl border border-gray-100 overflow-hidden shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99] ${className}`}
+      className={`rounded-2xl border border-border-default overflow-hidden shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99] ${className}`}
     >
       {/* Header with gradient background */}
-      <div className={`bg-linear-to-br ${gradient} p-6`}>
+      <div className={`${gradient} p-6`}>
         <div className="flex items-start justify-between gap-4">
           {/* Score display */}
           <div className="flex-grow">
@@ -104,7 +104,7 @@ export function TrustScoreCard({
               className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold ${trustLevel.bg} ${trustLevel.color}`}
             >
               <div
-                className={`w-2 h-2 rounded-full ${trustLevel.color === "text-green-700" || trustLevel.color === "text-green-600" ? "bg-green-600" : trustLevel.color === "text-amber-600" ? "bg-amber-500" : trustLevel.color === "text-blue-600" ? "bg-blue-500" : "bg-red-600"}`}
+                className={`w-2 h-2 rounded-full ${trustLevel.color === "text-success-text" ? "bg-success" : trustLevel.color === "text-warning-text" ? "bg-warning" : trustLevel.color === "text-info-text" ? "bg-processing" : "bg-error"}`}
               />
               {trustLevel.label}
             </div>
@@ -120,7 +120,7 @@ export function TrustScoreCard({
 
         {/* Progress bar */}
         <div className="mt-4 flex items-center gap-3">
-          <div className="flex-grow h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="flex-grow h-2 bg-surface-secondary rounded-full overflow-hidden">
             <div
               className={`h-full transition-all duration-500 ${progressColor}`}
               style={{ width: `${clampedScore}%` }}
@@ -185,7 +185,7 @@ export function TrustScoreCard({
 
       {/* How it works section (optional) */}
       {showHowItWorks && (
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div className="px-6 py-4 border-t border-border-default bg-surface-secondary">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="flex items-center gap-2 text-sm font-semibold text-gray-900 hover:text-brand-text transition-colors w-full"
@@ -225,7 +225,7 @@ export function TrustScoreCard({
                   month (max 10)
                 </li>
               </ul>
-              <p className="mt-2 pt-2 border-t border-gray-200">
+              <p className="mt-2 pt-2 border-t border-border-default">
                 Higher scores unlock access to premium features and better task
                 matching. Build your score by completing tasks consistently,
                 getting verified, and maintaining a clean record.

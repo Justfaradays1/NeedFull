@@ -40,13 +40,13 @@ function timeAgo(dateStr: string): string {
 }
 
 const typeConfig: Record<string, { icon: typeof Clock; bg: string; color: string }> = {
-  task_completed: { icon: CheckCircle, bg: "bg-green-50", color: "#16A34A" },
-  task_posted: { icon: Plus, bg: "bg-blue-50", color: "#2563EB" },
-  escrow_release: { icon: DollarSign, bg: "bg-emerald-50", color: "#1A6B4A" },
-  wallet_funded: { icon: DollarSign, bg: "bg-emerald-50", color: "#1A6B4A" },
-  review_received: { icon: Star, bg: "bg-amber-50", color: "#EAA325" },
-  runner_hired: { icon: UserPlus, bg: "bg-purple-50", color: "#7C3AED" },
-  message_received: { icon: MessageCircle, bg: "bg-blue-50", color: "#2563EB" },
+  task_completed: { icon: CheckCircle, bg: "bg-success-bg", color: "#16A34A" },
+  task_posted: { icon: Plus, bg: "bg-info-bg", color: "#2563EB" },
+  escrow_release: { icon: DollarSign, bg: "bg-success-bg", color: "#1A6B4A" },
+  wallet_funded: { icon: DollarSign, bg: "bg-success-bg", color: "#1A6B4A" },
+  review_received: { icon: Star, bg: "bg-warning-bg", color: "#EAA325" },
+  runner_hired: { icon: UserPlus, bg: "bg-info-bg", color: "#7C3AED" },
+  message_received: { icon: MessageCircle, bg: "bg-info-bg", color: "#2563EB" },
 };
 
 // WHAT: Compact Recent Activity — a clean list, NOT a big card. At most
@@ -59,14 +59,14 @@ export function RecentActivity({
   if (loading) {
     return (
       <section aria-label="Recent activity">
-        <div className="mb-2 h-5 w-28 animate-pulse rounded bg-gray-100" />
+        <div className="mb-2 h-5 w-28 animate-pulse rounded bg-surface-secondary" />
         <div className="space-y-2.5">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex animate-pulse items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-gray-100" />
+              <div className="h-8 w-8 rounded-lg bg-surface-secondary" />
               <div className="flex-1 space-y-1.5">
-                <div className="h-3 w-32 rounded bg-gray-100" />
-                <div className="h-2.5 w-20 rounded bg-gray-100" />
+                <div className="h-3 w-32 rounded bg-surface-secondary" />
+                <div className="h-2.5 w-20 rounded bg-surface-secondary" />
               </div>
             </div>
           ))}
@@ -93,7 +93,7 @@ export function RecentActivity({
 
       <div className="mt-1.5 divide-y divide-card-border">
         {activities.slice(0, limit).map((activity) => {
-          const cfg = typeConfig[activity.type] ?? { icon: Clock, bg: "bg-gray-50", color: "#6B7280" };
+          const cfg = typeConfig[activity.type] ?? { icon: Clock, bg: "bg-surface-secondary", color: "#6B7280" };
           const Icon = cfg.icon;
           return (
             <div key={activity.id} className="flex items-center gap-3 py-2.5">

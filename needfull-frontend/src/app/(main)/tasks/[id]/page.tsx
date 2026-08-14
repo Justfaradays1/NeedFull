@@ -19,6 +19,7 @@ import {
   Users,
   Star,
   PlayCircle,
+  Wallet,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthInit, useIsAuthenticated, useAuthUser } from "@/store";
@@ -30,6 +31,7 @@ import { CelebrationModal } from "@/components/ui/celebration-modal";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { useCelebration } from "@/hooks/useCelebration";
 import { TaskDetailSkeleton } from "@/components/ui/skeletons/TaskDetailSkeleton";
+import { TaskStatusBadge } from "@/components/ui/task-status-badge";
 
 interface TaskCapabilities {
   canEdit: boolean;
@@ -66,20 +68,6 @@ interface TaskDetail {
   applicationCount?: number;
   capabilities?: TaskCapabilities;
 }
-
-const STATUS_BADGES: Record<
-  string,
-  { bg: string; text: string; label: string }
-> = {
-  open: { bg: "bg-green-100", text: "text-green-800", label: "Open" },
-  in_progress: {
-    bg: "bg-amber-100",
-    text: "text-amber-800",
-    label: "In Progress",
-  },
-  completed: { bg: "bg-blue-100", text: "text-blue-800", label: "Completed" },
-  cancelled: { bg: "bg-gray-200", text: "text-gray-600", label: "Cancelled" },
-};
 
 export default function MyTaskDetailPage() {
   const params = useParams();
@@ -211,10 +199,6 @@ export default function MyTaskDetailPage() {
     );
   }
 
-  const badge = task.runnerDoneAt && task.status === "in_progress"
-    ? { bg: "bg-purple-100", text: "text-purple-800", label: "Awaiting Confirmation" }
-    : STATUS_BADGES[task.status] || STATUS_BADGES.open;
-
   return (
     <>
       <div className="min-h-screen page-shell">
@@ -243,13 +227,12 @@ export default function MyTaskDetailPage() {
             )}
             <div className="p-4">
               <div className="mb-3 flex flex-wrap items-center gap-2">
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-bold ${badge.bg} ${badge.text}`}
-                >
-                  {badge.label}
-                </span>
+                <TaskStatusBadge
+                  status={task.status}
+                  runnerDoneAt={task.runnerDoneAt}
+                />
                 {task.isUrgent && (
-                  <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">
+                  <span className="rounded-full border border-error-border bg-error-bg px-3 py-1 text-xs font-bold text-error-text">
                     URGENT
                   </span>
                 )}
@@ -289,7 +272,7 @@ export default function MyTaskDetailPage() {
                 )}
               </div>
 
-              <div className="mb-4 flex items-center gap-3 rounded-xl bg-gray-200 p-3">
+              <div className="mb-4 flex items-center gap-3 rounded-xl bg-surface-secondary p-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand-text">
                   {(task.runner?.fullName ?? task.poster.fullName)
                     .charAt(0)
@@ -317,8 +300,35 @@ export default function MyTaskDetailPage() {
               </div>
 
 {task.status === "in_progress" && (
-                  <div className="mb-4 rounded-xl bg-amber-50 p-3 text-center text-sm font-semibold text-amber-800">
+                  <div className="mb-4 rounded-xl border border-warning-border bg-warning-bg p-3 text-center text-sm font-semibold text-warning-text">
                     Escrow locked — view live progress &amp; instructions
+                  </div>
+                )}
+
+                {task.status === "awaiting_funding" && isPoster && (
+                  <div className="mb-4 rounded-xl border border-gold/30 bg-gold-light/50 p-4 text-center">
+                    <p className="text-sm font-bold text-gold-dark">
+                      Additional funding required
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-gray-600">
+                      The agreed amount exceeds what&apos;s secured in escrow —
+                      fund the remaining to start the task.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/feed/${taskId}`)}
+                      className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-gold px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-gold/25 active:scale-[0.98]"
+                    >
+                      <Wallet className="h-4 w-4" />
+                      Fund Now
+                    </button>
+                  </div>
+                )}
+
+                {task.status === "awaiting_funding" && isRunner && (
+                  <div className="mb-4 rounded-xl border border-warning-border bg-warning-bg p-3 text-center text-sm font-semibold text-warning-text">
+                    You&apos;re hired! Waiting for the poster to secure the
+                    agreed amount — you can start once funded.
                   </div>
                 )}
 
@@ -348,7 +358,7 @@ export default function MyTaskDetailPage() {
                   <button
                     onClick={() => setCancelConfirmOpen(true)}
                     disabled={actionLoading === "cancel"}
-                    className="flex items-center justify-center gap-2 rounded-xl border border-red-300 py-3 text-sm font-semibold text-red-600 disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 rounded-xl border border-error-border py-3 text-sm font-semibold text-error-text disabled:opacity-50"
                   >
                     {actionLoading === "cancel" ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -383,7 +393,7 @@ export default function MyTaskDetailPage() {
                   <button
                     onClick={handleMarkAsDone}
                     disabled={actionLoading === "done"}
-                    className="flex items-center justify-center gap-2 rounded-xl bg-green-600 py-3 text-sm font-bold text-white disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 rounded-xl bg-success py-3 text-sm font-bold text-white disabled:opacity-50"
                   >
                     {actionLoading === "done" ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -397,7 +407,7 @@ export default function MyTaskDetailPage() {
                 {task.capabilities?.canChat && (
                   <button
                     onClick={handleChat}
-                    className="flex items-center justify-center gap-2 rounded-xl bg-gray-200 py-3 text-sm font-semibold text-gray-700"
+                    className="flex items-center justify-center gap-2 rounded-xl border border-border-default bg-surface-secondary py-3 text-sm font-semibold text-foreground-secondary"
                   >
                     <MessageCircle className="h-4 w-4" />
                     Open Chat

@@ -31,7 +31,7 @@ interface TaskCardProps {
 function WorkModeBadge({ mode, locationLabel }: { mode: WorkMode | null | undefined; locationLabel?: string | null }) {
   if (mode === "remote") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-2 py-0.5 text-[9px] font-bold text-sky-700">
+      <span className="inline-flex items-center gap-1 rounded-full bg-info-bg px-2 py-0.5 text-[9px] font-bold text-info-text">
         <Wifi className="h-2.5 w-2.5" />
         REMOTE
       </span>
@@ -79,12 +79,12 @@ export default function TaskCard({ task, featured = false }: TaskCardProps) {
             )}
             <WorkModeBadge mode={task.workMode} locationLabel={task.locationLabel} />
             {task.isUrgent && (
-              <span className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-bold text-red-700">
+              <span className="rounded-full bg-error-bg px-2 py-0.5 text-[9px] font-bold text-error-text">
                 URGENT
               </span>
             )}
             {isNew(task.createdAt) && (
-              <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[9px] font-bold text-teal-700">
+              <span className="rounded-full bg-info-bg px-2 py-0.5 text-[9px] font-bold text-info-text">
                 NEW
               </span>
             )}
@@ -118,7 +118,7 @@ export default function TaskCard({ task, featured = false }: TaskCardProps) {
               </span>
             )}
             {due && (
-              <span className="inline-flex items-center gap-1 text-red-600">
+              <span className="inline-flex items-center gap-1 text-error-text">
                 <Clock className="h-3 w-3" />
                 {due}
               </span>
@@ -132,7 +132,7 @@ export default function TaskCard({ task, featured = false }: TaskCardProps) {
               {task.poster?.fullName || "Poster"}
             </span>
             {task.poster?.isVerifiedStudent && (
-              <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-blue-500" />
+              <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-info-text" />
             )}
             {typeof task.poster?.trustScore === "number" && (
               <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-gray-500">

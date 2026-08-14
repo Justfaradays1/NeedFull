@@ -14,19 +14,19 @@ export function TransactionRow({ type, amountKobo, note, createdAt }: Transactio
       case "deposit":
       case "transfer_in":
       case "refund":
-        return <ArrowDownLeft className="w-5 h-5 text-green-600" />;
+        return <ArrowDownLeft className="w-5 h-5 text-success-text" />;
       case "withdrawal":
       case "transfer_out":
       case "payment":
-        return <ArrowUpRight className="w-5 h-5 text-red-600" />;
+        return <ArrowUpRight className="w-5 h-5 text-error-text" />;
       case "escrow_lock":
-        return <Lock className="w-5 h-5 text-orange-600" />;
+        return <Lock className="w-5 h-5 text-warning-text" />;
       case "escrow_release":
-        return <Unlock className="w-5 h-5 text-blue-600" />;
+        return <Unlock className="w-5 h-5 text-info-text" />;
       case "escrow_refund":
-        return <RefreshCw className="w-5 h-5 text-green-600" />;
+        return <RefreshCw className="w-5 h-5 text-success-text" />;
       default:
-        return <Clock className="w-5 h-5 text-gray-400" />;
+        return <Clock className="w-5 h-5 text-foreground-muted" />;
     }
   };
 
@@ -37,12 +37,12 @@ export function TransactionRow({ type, amountKobo, note, createdAt }: Transactio
       case "refund":
       case "escrow_refund":
       case "escrow_release":
-        return "text-green-600";
+        return "text-success-text";
       case "withdrawal":
       case "transfer_out":
       case "payment":
       case "escrow_lock":
-        return "text-red-600";
+        return "text-error-text";
       default:
         return "text-gray-900";
     }
@@ -52,9 +52,9 @@ export function TransactionRow({ type, amountKobo, note, createdAt }: Transactio
   const prefix = ["deposit", "transfer_in", "refund", "escrow_refund", "escrow_release"].includes(type) ? "+" : "-";
   
   return (
-    <div className="flex items-center justify-between p-4 border-b border-gray-100 last:border-0 hover:bg-gray-100 transition-colors">
+    <div className="flex items-center justify-between p-4 border-b border-border-subtle last:border-0 hover:bg-surface-secondary transition-colors">
       <div className="flex items-center space-x-4">
-        <div className="p-2 bg-gray-100 rounded-full">
+        <div className="p-2 bg-surface-secondary rounded-full">
           {getIcon()}
         </div>
         <div>

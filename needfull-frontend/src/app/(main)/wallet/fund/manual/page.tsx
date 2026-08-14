@@ -334,8 +334,8 @@ export default function ManualFundPage() {
           {/* WHAT: Success content */}
           <div className="px-4 py-8 sm:px-6">
             {/* Checkmark animation */}
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
-              <CheckCircle className="h-10 w-10 text-green-600" />
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-success-bg">
+              <CheckCircle className="h-10 w-10 text-success-text" />
             </div>
 
             {/* Amount highlight */}
@@ -386,8 +386,8 @@ export default function ManualFundPage() {
 
                 {/* Status step: Pending */}
                 <div className="flex items-start gap-3">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100">
-                    <Clock className="h-3.5 w-3.5 text-amber-600" />
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-warning-bg">
+                    <Clock className="h-3.5 w-3.5 text-warning-text" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-gray-900">
@@ -401,7 +401,7 @@ export default function ManualFundPage() {
 
                 {/* Status step: Credit (upcoming) */}
                 <div className="flex items-start gap-3 opacity-40">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-200">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-secondary">
                     <Wallet className="h-3.5 w-3.5 text-gray-400" />
                   </div>
                   <div className="min-w-0">
@@ -414,7 +414,7 @@ export default function ManualFundPage() {
               </div>
 
               {/* Reference */}
-              <div className="mt-4 rounded-lg bg-gray-50 px-3 py-2">
+              <div className="mt-4 rounded-lg bg-surface-secondary px-3 py-2">
                 <p className="text-xs text-gray-500">Reference</p>
                 <p className="text-sm font-medium text-gray-900">
                   {submittedTransfer.bankReference}
@@ -476,7 +476,7 @@ export default function ManualFundPage() {
 
         {/* WHAT: Step 1 — Bank details */}
         <div className="mx-4 -mt-4 sm:mx-6">
-          <div className="rounded-2xl border border-gray-200 bg-surface p-5 shadow-sm transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
+          <div className="rounded-2xl border border-border-default bg-surface p-5 shadow-sm transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
             <div className="mb-1 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <h2 className="font-display text-sm font-bold text-gray-900">
@@ -486,7 +486,7 @@ export default function ManualFundPage() {
                   Recommended
                 </span>
               </div>
-              <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-bold text-green-700">
+              <span className="inline-flex items-center rounded-full bg-success-bg px-2.5 py-0.5 text-[11px] font-bold text-success-text">
                 FREE
               </span>
             </div>
@@ -501,7 +501,7 @@ export default function ManualFundPage() {
             </div>
 
             {/* Account number with copy */}
-            <div className="mt-2 flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+            <div className="mt-2 flex items-center gap-3 rounded-lg border border-border-default bg-surface-secondary px-4 py-3">
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium text-gray-600">
                   Account Number
@@ -513,10 +513,10 @@ export default function ManualFundPage() {
               <button
                 type="button"
                 onClick={copyAccountNumber}
-                className="tap-target flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-surface shadow-sm transition-colors hover:bg-gray-100"
+                className="tap-target flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border-default bg-surface shadow-sm transition-colors hover:bg-surface-secondary"
               >
                 {copied ? (
-                  <Check className="h-5 w-5 text-green-600" />
+                  <Check className="h-5 w-5 text-success-text" />
                 ) : (
                   <Copy className="h-5 w-5 text-gray-600" />
                 )}
@@ -524,7 +524,7 @@ export default function ManualFundPage() {
             </div>
 
             {/* Account name */}
-            <div className="mt-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+            <div className="mt-2 rounded-lg border border-border-default bg-surface-secondary px-4 py-3">
               <p className="text-xs font-medium text-gray-600">Account Name</p>
               <p className="text-sm font-semibold text-gray-900">
                 {ACCOUNT_NAME}
@@ -532,8 +532,8 @@ export default function ManualFundPage() {
             </div>
 
             {/* Callout: no charges */}
-            <div className="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3">
-              <p className="text-center text-sm font-semibold text-green-800">
+            <div className="mt-4 rounded-lg border border-success-border bg-success-bg px-4 py-3">
+              <p className="text-center text-sm font-semibold text-success-text">
                 No charges &mdash; 100% of your transfer goes to your wallet
               </p>
             </div>
@@ -551,7 +551,7 @@ export default function ManualFundPage() {
           onSubmit={handleSubmit}
           className="mt-4 space-y-4 px-4 pb-8 sm:px-6"
         >
-          <div className="rounded-2xl border border-gray-200 bg-surface p-5 shadow-sm transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
+          <div className="rounded-2xl border border-border-default bg-surface p-5 shadow-sm transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
             <h2 className="font-display text-sm font-bold text-gray-900">
               Confirm your transfer
             </h2>
@@ -581,10 +581,10 @@ export default function ManualFundPage() {
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     disabled={pageState === "submitting"}
-                    className={`tap-target w-full rounded-lg border bg-white px-8 py-3 pl-10 text-lg font-bold focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
+                    className={`tap-target w-full rounded-lg border bg-surface px-8 py-3 pl-10 text-lg font-bold focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary ${
                       errors.amount
                         ? "border-danger"
-                        : "border-gray-300 focus:border-brand"
+                        : "border-border-default focus:border-brand"
                     }`}
                   />
                 </div>
@@ -609,10 +609,10 @@ export default function ManualFundPage() {
                   value={bankReference}
                   onChange={(e) => setBankReference(e.target.value)}
                   disabled={pageState === "submitting"}
-                  className={`tap-target w-full rounded-lg border bg-white px-4 py-3 text-sm focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
-                    errors.bankReference
+className={`tap-target w-full rounded-lg border bg-surface px-4 py-3 text-sm focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary ${
+                    errors.reference
                       ? "border-danger"
-                      : "border-gray-300 focus:border-brand"
+                      : "border-border-default focus:border-brand"
                   }`}
                 />
                 {errors.bankReference && (
@@ -634,11 +634,11 @@ export default function ManualFundPage() {
                     value={senderBank}
                     onChange={(e) => setSenderBank(e.target.value)}
                     disabled={pageState === "submitting"}
-                    className={`tap-target w-full appearance-none rounded-lg border bg-white px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
-                      errors.senderBank
-                        ? "border-danger"
-                        : "border-gray-300 focus:border-brand"
-                    }`}
+className={`tap-target w-full appearance-none rounded-lg border bg-surface px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary ${
+                    errors.bank
+                      ? "border-danger"
+                      : "border-border-default focus:border-brand"
+                  }`}
                   >
                     <option value="">Select your bank</option>
                     {NIGERIAN_BANKS.map((bank) => (
@@ -669,10 +669,10 @@ export default function ManualFundPage() {
                   value={senderName}
                   onChange={(e) => setSenderName(e.target.value)}
                   disabled={pageState === "submitting"}
-                  className={`tap-target w-full rounded-lg border bg-white px-4 py-3 text-sm focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 ${
+                  className={`tap-target w-full rounded-lg border bg-surface px-4 py-3 text-sm focus:ring-2 focus:ring-brand/20 disabled:bg-surface-secondary ${
                     errors.senderName
                       ? "border-danger"
-                      : "border-gray-300 focus:border-brand"
+                      : "border-border-default focus:border-brand"
                   }`}
                 />
                 {errors.senderName && (
@@ -688,17 +688,17 @@ export default function ManualFundPage() {
                 </label>
 
                 {receiptPreview ? (
-                  <div className="relative overflow-hidden rounded-lg border border-gray-200">
+                  <div className="relative overflow-hidden rounded-lg border border-border-default">
                     <img
                       src={receiptPreview}
                       alt="Receipt preview"
-                      className="max-h-48 w-full object-contain bg-gray-50"
+                      className="max-h-48 w-full object-contain bg-surface-secondary"
                     />
                     <button
                       type="button"
                       onClick={removeReceipt}
                       disabled={pageState === "submitting"}
-                      className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow transition-colors hover:bg-danger hover:text-white"
+                      className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-surface text-gray-600 shadow transition-colors hover:bg-danger hover:text-white"
                     >
                       &times;
                     </button>
@@ -707,8 +707,8 @@ export default function ManualFundPage() {
                   <label
                     className={`tap-target flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed py-6 transition-colors ${
                       pageState === "submitting"
-                        ? "border-gray-200 bg-gray-50"
-                        : "border-gray-300 bg-surface hover:border-brand hover:bg-brand-light"
+                        ? "border-border-default bg-surface-secondary"
+                        : "border-border-default bg-surface hover:border-brand hover:bg-brand-light"
                     }`}
                   >
                     <Upload className="h-6 w-6 text-gray-400" />

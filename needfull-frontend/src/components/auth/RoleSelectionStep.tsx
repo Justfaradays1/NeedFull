@@ -50,7 +50,7 @@ export function RoleSelectionStep({ onSelect, onSkip, loading }: RoleSelectionSt
               className={`w-full rounded-2xl border-2 p-4 text-left transition-all duration-150 ${
                 isSelected
                   ? 'border-brand bg-brand-light/20 shadow-sm'
-                  : 'border-gray-200 bg-surface hover:border-gray-300'
+                  : 'border-border-default bg-surface hover:border-border-strong'
               }`}
             >
               <div className="flex items-start gap-3">
@@ -73,8 +73,8 @@ export function RoleSelectionStep({ onSelect, onSkip, loading }: RoleSelectionSt
                     <span
                       className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                         role.value === 'both'
-                          ? 'bg-amber-100 text-amber-700'
-                          : 'bg-green-100 text-green-700'
+                          ? 'bg-warning-bg text-warning-text'
+                          : 'bg-success-bg text-success-text'
                       }`}
                     >
                       {role.badge}
@@ -84,7 +84,7 @@ export function RoleSelectionStep({ onSelect, onSkip, loading }: RoleSelectionSt
                 </div>
                 <div
                   className={`mt-2 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
-                    isSelected ? 'border-brand bg-brand' : 'border-gray-300'
+                    isSelected ? 'border-brand bg-brand' : 'border-border-default'
                   }`}
                 >
                   {isSelected && <div className="h-2 w-2 rounded-full bg-white" />}
@@ -96,9 +96,9 @@ export function RoleSelectionStep({ onSelect, onSkip, loading }: RoleSelectionSt
       </div>
 
       {selected === 'both' && (
-        <div className="flex items-start gap-2 rounded-xl bg-amber-50 px-3 py-2.5">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-          <p className="text-xs text-amber-700">
+        <div className="flex items-start gap-2 rounded-xl bg-warning-bg px-3 py-2.5">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-warning-text" />
+          <p className="text-xs text-warning-text">
             You will need to complete your profile and get approved by an admin before you
             can start applying for tasks.
           </p>
@@ -110,7 +110,7 @@ export function RoleSelectionStep({ onSelect, onSkip, loading }: RoleSelectionSt
           type="button"
           onClick={onSkip}
           disabled={loading}
-          className="flex-1 rounded-[10px] border border-gray-300 bg-surface px-5 py-3 text-sm font-semibold text-gray-600 transition-all duration-150 hover:bg-gray-100 active:scale-[0.97] disabled:opacity-50"
+          className="flex-1 rounded-[10px] border border-border-default bg-surface px-5 py-3 text-sm font-semibold text-gray-600 transition-all duration-150 hover:bg-surface-secondary active:scale-[0.97] disabled:opacity-50"
         >
           Skip for now
         </button>

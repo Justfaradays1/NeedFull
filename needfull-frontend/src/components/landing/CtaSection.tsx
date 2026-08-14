@@ -5,10 +5,10 @@ export function CtaSection() {
       <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.15) 1px, transparent 1px)`, backgroundSize: "48px 48px" }} />
       <div className="relative z-10 mx-auto max-w-2xl text-center">
         <h2 className="font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>
-          Ready to turn campus time into real income?
+          Ready to turn spare time into real income?
         </h2>
         <p className="text-section-desc mt-3" style={{ color: 'var(--color-muted)' }}>
-          Join students already earning on NeedFull.
+          Join people already earning on NeedFull.
           Set up your profile in 2 minutes. Start today.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">

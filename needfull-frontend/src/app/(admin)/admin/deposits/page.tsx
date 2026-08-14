@@ -117,17 +117,17 @@ export default function AdminDepositsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
+    <div className="min-h-screen bg-surface-secondary pb-8">
       {/* Header */}
       <div className="bg-surface px-4 pb-3 pt-3 shadow-sm border-b border-card-border">
         <h1 className="font-display text-lg font-bold text-gray-900">Manual Deposits</h1>
       </div>
 
       {/* Important notice banner */}
-      <div className="mx-4 mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
+      <div className="mx-4 mt-3 rounded-xl border border-warning-border bg-warning-bg p-3">
         <div className="flex items-start gap-2">
-          <Shield className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-          <div className="text-xs text-amber-800">
+          <Shield className="mt-0.5 h-4 w-4 shrink-0 text-warning-text" />
+          <div className="text-xs text-warning-text">
             <p className="font-bold">Always verify the transfer on your GTBank/Opay dashboard before confirming.</p>
             <p className="mt-0.5">Confirming a transfer adds real money to the user&apos;s wallet.</p>
           </div>
@@ -135,7 +135,7 @@ export default function AdminDepositsPage() {
       </div>
 
       {/* Filter tabs */}
-      <div className="mx-4 mt-3 flex gap-1 rounded-xl bg-gray-100 p-1">
+      <div className="mx-4 mt-3 flex gap-1 rounded-xl bg-surface-secondary p-1">
         {(['pending', 'confirmed', 'rejected'] as Tab[]).map((t) => (
           <button key={t} type="button" onClick={() => setTab(t)}
             className={`tap-target flex-1 rounded-lg py-2 text-xs font-bold uppercase tracking-wider transition-colors ${
@@ -153,7 +153,7 @@ export default function AdminDepositsPage() {
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-brand-text" /></div>
         ) : deposits.length === 0 ? (
           <div className="py-12 text-center">
-            <Banknote className="mx-auto h-8 w-8 text-gray-300" />
+            <Banknote className="mx-auto h-8 w-8 text-foreground-muted" />
             <p className="mt-2 text-sm font-medium text-gray-500">No {tab} deposits</p>
           </div>
         ) : (
@@ -163,7 +163,7 @@ export default function AdminDepositsPage() {
                 {userRow(d)}
                 <div className="text-right shrink-0">
                   <p className="font-display text-lg font-black text-brand-text">₦{depositNaira(d).toLocaleString()}</p>
-                  <p className="text-[10px] text-gray-400">{timeAgo(d.created_at)}</p>
+                  <p className="text-[10px] text-foreground-muted">{timeAgo(d.created_at)}</p>
                 </div>
               </div>
 
@@ -196,12 +196,12 @@ export default function AdminDepositsPage() {
               {d.status === 'pending' && (
                 <div className="mt-3 flex gap-2">
                   <button type="button" onClick={() => setConfirmId(d.id)}
-                    className="tap-target flex-1 rounded-xl bg-green-600 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-green-700"
+                    className="tap-target flex-1 rounded-xl bg-success py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:brightness-105"
                   >
                     <CheckCircle2 className="mr-1 inline h-3.5 w-3.5" /> Confirm
                   </button>
                   <button type="button" onClick={() => { setRejectId(d.id); setRejectReason(''); }}
-                    className="tap-target flex-1 rounded-xl border border-red-300 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50"
+                    className="tap-target flex-1 rounded-xl border border-error-border py-2.5 text-xs font-bold text-error-text hover:bg-error-bg"
                   >
                     <XCircle className="mr-1 inline h-3.5 w-3.5" /> Reject
                   </button>
@@ -210,13 +210,13 @@ export default function AdminDepositsPage() {
 
               {/* Status for confirmed/rejected */}
               {d.status === 'confirmed' && (
-                <div className="mt-2 flex items-center gap-1.5 text-xs font-bold text-green-600">
+                <div className="mt-2 flex items-center gap-1.5 text-xs font-bold text-success-text">
                   <CheckCircle2 className="h-3.5 w-3.5" /> Confirmed
                 </div>
               )}
               {d.status === 'rejected' && (
                 <div className="mt-2">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-red-600">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-error-text">
                     <XCircle className="h-3.5 w-3.5" /> Rejected
                   </div>
                   {d.rejection_reason && <p className="mt-0.5 text-[11px] text-gray-500">Reason: {d.rejection_reason}</p>}
@@ -231,18 +231,18 @@ export default function AdminDepositsPage() {
       {confirmId && (
         <div className="glass-overlay fixed inset-0 z-50 flex items-end sm:items-center" onClick={() => setConfirmId(null)}>
           <div className="modal-sheet w-full rounded-t-3xl px-4 pb-safe pb-8 pt-1 sm:max-w-md sm:mx-auto sm:rounded-2xl max-h-[92dvh] overflow-y-auto overscroll-contain" onClick={(e) => e.stopPropagation()}>
-            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-gray-300" />
+            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-surface-elevated" />
             <div className="px-4">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-display text-base font-bold text-gray-900">Confirm Transfer</h3>
-              <button type="button" onClick={() => setConfirmId(null)} className="tap-target"><X className="h-5 w-5 text-gray-400" /></button>
+              <button type="button" onClick={() => setConfirmId(null)} className="tap-target"><X className="h-5 w-5 text-foreground-muted" /></button>
             </div>
             {(() => {
               const d = deposits.find((x) => x.id === confirmId);
               if (!d) return null;
               return (
                 <>
-                  <div className="rounded-xl bg-amber-50 p-3 text-xs text-amber-800">
+                  <div className="rounded-xl bg-warning-bg p-3 text-xs text-warning-text">
                     <div className="flex items-start gap-2">
                       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                       <p>This will add <strong>₦{depositNaira(d).toLocaleString()}</strong> to <strong>{d.user.fullName}</strong>&apos;s wallet. Have you verified this transfer on your bank dashboard?</p>
@@ -255,9 +255,9 @@ export default function AdminDepositsPage() {
                     <p><strong>Amount:</strong> ₦{depositNaira(d).toLocaleString()}</p>
                   </div>
                   <div className="mt-5 flex gap-2">
-                    <button type="button" onClick={() => setConfirmId(null)} className="tap-target flex-1 rounded-xl border border-gray-200 py-3 text-sm font-bold text-gray-600">Cancel</button>
+                    <button type="button" onClick={() => setConfirmId(null)} className="tap-target flex-1 rounded-xl border border-border-default py-3 text-sm font-bold text-gray-600">Cancel</button>
                     <button type="button" onClick={handleConfirm} disabled={submitting}
-                      className="tap-target flex-1 rounded-xl bg-green-600 py-3 text-sm font-bold text-white disabled:opacity-50"
+                      className="tap-target flex-1 rounded-xl bg-success py-3 text-sm font-bold text-white disabled:opacity-50"
                     >
                       {submitting ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : 'Yes, Confirm'}
                     </button>
@@ -274,23 +274,23 @@ export default function AdminDepositsPage() {
       {rejectId && (
         <div className="glass-overlay fixed inset-0 z-50 flex items-end sm:items-center" onClick={() => setRejectId(null)}>
           <div className="modal-sheet w-full rounded-t-3xl px-4 pb-safe pb-8 pt-1 sm:max-w-md sm:mx-auto sm:rounded-2xl max-h-[92dvh] overflow-y-auto overscroll-contain" onClick={(e) => e.stopPropagation()}>
-            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-gray-300" />
+            <div className="mx-auto mb-4 mt-2 h-1 w-10 rounded-full bg-surface-elevated" />
             <div className="px-4">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-display text-base font-bold text-gray-900">Reject Transfer</h3>
-              <button type="button" onClick={() => setRejectId(null)} className="tap-target"><X className="h-5 w-5 text-gray-400" /></button>
+              <button type="button" onClick={() => setRejectId(null)} className="tap-target"><X className="h-5 w-5 text-foreground-muted" /></button>
             </div>
             <p className="text-xs text-gray-500">Provide a reason for rejection — this will be shown to the user.</p>
             <textarea
               value={rejectReason} onChange={(e) => setRejectReason(e.target.value)}
               placeholder="e.g. Transfer reference not found in bank statement"
               rows={3}
-              className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-red-400"
+              className="mt-3 w-full rounded-xl border border-border-default px-3 py-2 text-sm outline-none focus:border-error"
             />
             <div className="mt-5 flex gap-2">
-              <button type="button" onClick={() => setRejectId(null)} className="tap-target flex-1 rounded-xl border border-gray-200 py-3 text-sm font-bold text-gray-600">Cancel</button>
+              <button type="button" onClick={() => setRejectId(null)} className="tap-target flex-1 rounded-xl border border-border-default py-3 text-sm font-bold text-gray-600">Cancel</button>
               <button type="button" onClick={handleReject} disabled={!rejectReason.trim() || submitting}
-                className="tap-target flex-1 rounded-xl bg-red-600 py-3 text-sm font-bold text-white disabled:opacity-50"
+                className="tap-target flex-1 rounded-xl bg-danger py-3 text-sm font-bold text-white disabled:opacity-50"
               >
                 {submitting ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : 'Reject'}
               </button>

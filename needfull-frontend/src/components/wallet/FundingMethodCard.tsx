@@ -27,7 +27,7 @@ export function FundingMethodCard({ method, title, description, selected, onClic
       )}
       
       <div className="flex items-start space-x-4">
-        <div className={`p-3 rounded-full ${selected ? "bg-primary/20 text-primary" : "bg-gray-100 text-gray-500"}`}>
+        <div className={`p-3 rounded-full ${selected ? "bg-brand/15 text-brand-text" : "bg-surface-secondary text-foreground-muted"}`}>
           <Icon className="w-6 h-6" />
         </div>
         <div>

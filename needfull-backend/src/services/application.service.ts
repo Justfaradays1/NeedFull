@@ -3,7 +3,6 @@
 // FUTURE: Add auto-accept for trusted runners, add application deadline, add interview/question flow
 
 import db, { queryOne, withTransaction } from "../config/db";
-import { lockEscrow, refundEscrow } from "./wallet.service";
 import { notifyUser, notifyMany } from "./notification.service";
 import { getOrCreateTaskConversation } from "./conversation.service";
 import {
@@ -12,7 +11,9 @@ import {
   assertValidTransition,
   RunnerPhase,
 } from "./task-states";
+import { insertProposal, acceptAtAmount } from "./proposal.service";
 import { v4 as uuidv4 } from "uuid";
+import { MIN_TASK_BUDGET_KOBO } from "../config/constants";
 
 // WHAT: Application row shape from the database
 interface ApplicationRow {
@@ -34,6 +35,7 @@ interface TaskRow {
   poster_id: string;
   title: string;
   budget_kobo: number;
+  escrow_amount_kobo: number;
   status: string;
   runner_id: string | null;
   runner_done_at: string | null;
@@ -41,6 +43,9 @@ interface TaskRow {
 }
 
 // WHAT: Apply to a task — runner submits application with optional proposed amount
+// WHY: When the proposed amount differs from the original budget, an auditable
+//      task_budget_proposals record is created atomically with the application.
+//      The original budget is NEVER overwritten.
 export async function apply(
   userId: string,
   params: {
@@ -51,7 +56,7 @@ export async function apply(
 ): Promise<any> {
   // WHAT: Validate task exists and is published (open)
   const task = await queryOne<TaskRow>(
-    `SELECT id, poster_id, title, budget_kobo, status, assigned_to as runner_id, runner_done_at, runner_phase FROM tasks WHERE id = $1`,
+    `SELECT id, poster_id, title, budget_kobo, escrow_amount_kobo, status, assigned_to as runner_id, runner_done_at, runner_phase FROM tasks WHERE id = $1`,
     [params.taskId],
   );
 
@@ -79,22 +84,53 @@ export async function apply(
     ? Math.floor(params.proposedAmountNaira * 100)
     : null;
 
-  // WHAT: Create application
+  if (proposedAmountKobo !== null) {
+    // WHAT: Server-side amount validation (the client is untrusted)
+    if (!Number.isFinite(proposedAmountKobo) || proposedAmountKobo <= 0) {
+      throw new Error("Proposed amount must be a positive amount");
+    }
+    if (proposedAmountKobo < MIN_TASK_BUDGET_KOBO) {
+      throw new Error(
+        `The proposed amount must be at least ₦${(MIN_TASK_BUDGET_KOBO / 100).toFixed(0)}`,
+      );
+    }
+  }
+
+  // WHAT: Create application + (if negotiating) proposal — atomically
   const applicationId = uuidv4();
   const now = new Date().toISOString();
-  const application = await queryOne<ApplicationRow>(
-    `INSERT INTO task_applications
-     (id, task_id, applicant_id, runner_id, message, proposed_amount_kobo, status, created_at, updated_at)
-     VALUES ($1, $2, $3, $3, $4, $5, 'pending', $6, $6)
-     RETURNING *`,
-    [applicationId, params.taskId, userId, params.message.trim(), proposedAmountKobo, now],
-  );
+  const application = await withTransaction(async (client) => {
+    const app = await client.query<ApplicationRow>(
+      `INSERT INTO task_applications
+       (id, task_id, applicant_id, runner_id, message, proposed_amount_kobo, status, created_at, updated_at)
+       VALUES ($1, $2, $3, $3, $4, $5, 'pending', $6, $6)
+       RETURNING *`,
+      [applicationId, params.taskId, userId, params.message.trim(), proposedAmountKobo, now],
+    );
+
+    // WHAT: Record the negotiation separately — the task budget stays intact
+    if (proposedAmountKobo !== null && proposedAmountKobo !== task.budget_kobo) {
+      await insertProposal(client, {
+        taskId: params.taskId,
+        applicationId,
+        proposerId: userId,
+        amountKobo: proposedAmountKobo,
+        reason: null,
+      });
+    }
+
+    return app.rows[0];
+  });
 
   // WHAT: Notify poster
+  const proposalNote =
+    proposedAmountKobo && proposedAmountKobo !== task.budget_kobo
+      ? ` They proposed ₦${(proposedAmountKobo / 100).toLocaleString()} (original budget ₦${(task.budget_kobo / 100).toLocaleString()}).`
+      : "";
   await notifyUser(task.poster_id, {
-    type: "new_application",
-    title: "New Application",
-    body: `A runner applied to "${task.title}"`,
+    type: proposedAmountKobo && proposedAmountKobo !== task.budget_kobo ? "budget_proposal_sent" : "new_application",
+    title: proposedAmountKobo && proposedAmountKobo !== task.budget_kobo ? "New Budget Proposal" : "New Application",
+    body: `A runner applied to "${task.title}".${proposalNote}`,
     taskId: params.taskId,
     conversationId: undefined,
     actorId: userId,
@@ -127,7 +163,11 @@ async function createTaskChatAfterHire(
   }
 }
 
-// WHAT: Accept an application — poster chooses a runner, locks escrow, updates task
+// WHAT: Accept an application — poster chooses a runner. If the agreed amount
+//       (proposal/counter) differs from the escrowed amount, the hire is
+//       routed through the auditable proposal pipeline:
+//         higher → AWAITING_FUNDING (poster must fund the difference first)
+//         lower  → hired; the excess stays in escrow until settlement
 export async function acceptApplication(
   applicationId: string,
   posterId: string,
@@ -137,7 +177,7 @@ export async function acceptApplication(
     `SELECT
       a.id as app_id, a.task_id, a.runner_id, a.proposed_amount_kobo, a.counter_amount_kobo,
       a.agreed_amount_kobo, a.status as app_status,
-      t.poster_id, t.title, t.budget_kobo, t.status as task_status, t.assigned_to as task_runner_id,
+      t.id as id, t.poster_id, t.title, t.budget_kobo, t.escrow_amount_kobo, t.status as task_status, t.assigned_to as task_runner_id,
       t.runner_done_at, t.runner_phase
      FROM task_applications a
      JOIN tasks t ON a.task_id = t.id
@@ -173,30 +213,26 @@ export async function acceptApplication(
   const taskId = appAndTask.task_id;
   const taskTitle = appAndTask.title;
 
-  // WHAT: Atomic accept — top up escrow, update task, update applications
-  // WHY: createTask already locked the posted budget at publication time, so
-  //      escrow must be adjusted to the agreed amount — never budget + agreed
-  await withTransaction(async (client) => {
-    // WHAT: Lock only the difference above the posted budget (or refund below it)
-    // WHY: Prevents the double-lock where escrow = budget + agreed
-    if (agreedAmountKobo > appAndTask.budget_kobo) {
-      await lockEscrow(
-        client,
-        posterId,
-        agreedAmountKobo - appAndTask.budget_kobo,
-        taskId,
-      );
-    } else if (agreedAmountKobo < appAndTask.budget_kobo) {
-      await refundEscrow(
-        client,
-        posterId,
-        appAndTask.budget_kobo - agreedAmountKobo,
-        taskId,
-      );
-    }
+  // WHAT: Negotiated amount — route through the auditable proposal pipeline
+  // WHY: The original budget and negotiated amount are different concepts.
+  //      Accepting a HIGHER amount NEVER auto-starts the task: the poster must
+  //      fund the difference (idempotently) before the runner can begin.
+  if (agreedAmountKobo !== appAndTask.budget_kobo) {
+    return acceptAtAmount({
+      task: appAndTask,
+      applicationId,
+      agreedAmountKobo,
+      posterId,
+      reason:
+        appAndTask.counter_amount_kobo !== null
+          ? "Counter offer agreed"
+          : "Accepted application proposed amount",
+    });
+  }
 
-    // WHAT: Update task to in_progress with runner and agreed amount
-    // WHY: Poster hired a runner → task is now MATCHED (runner confirms later)
+  // WHAT: Agreed amount equals the original budget — direct hire, no
+  //       negotiation, no extra escrow movement (already locked at publish)
+  await withTransaction(async (client) => {
     await client.query(
       `UPDATE tasks
        SET status = 'in_progress', assigned_to = $1, agreed_amount_kobo = $2,
@@ -207,7 +243,6 @@ export async function acceptApplication(
 
     // WHAT: Mark runner BUSY — they now have a task in flight and cannot be
     // matched or notified about new nearby tasks
-    // WHY: Availability is a real state machine (OFF/ONLINE/BUSY), not just a toggle
     await client.query(
       `UPDATE users SET runner_busy = true, updated_at = NOW() WHERE id = $1`,
       [runnerId],
@@ -372,7 +407,7 @@ export async function acceptCounterOffer(
   const app = await queryOne<any>(
     `SELECT
       a.id as app_id, a.task_id, a.runner_id, a.counter_amount_kobo, a.status as app_status,
-      t.poster_id, t.title, t.budget_kobo, t.status as task_status,
+      t.id as id, t.poster_id, t.title, t.budget_kobo, t.escrow_amount_kobo, t.status as task_status,
       t.runner_done_at, t.runner_phase
      FROM task_applications a
      JOIN tasks t ON a.task_id = t.id
@@ -392,41 +427,33 @@ export async function acceptCounterOffer(
     throw new Error("No counter offer amount found");
   }
 
-  // WHAT: Treat counter_amount as agreed — proceed to full acceptApplication logic
-  // We reuse acceptApplication but substitute the agreed amount
+  // WHAT: Treat counter_amount as agreed — proceed to acceptApplication logic
   const agreedAmountKobo = app.counter_amount_kobo;
   const taskId = app.task_id;
   const taskTitle = app.title;
   const posterId = app.poster_id;
 
   // WHAT: Validate task is published (open) — guard via state machine
-  // WHY: Runner confirming the hire moves the task to canonical MATCHED
-  //      (granular runner_phase records that the runner accepted)
   const taskCanonical = canonicalStatus(app.task_status, {
     runnerDoneAt: app.runner_done_at,
     runnerPhase: app.runner_phase,
   });
   assertValidTransition(taskCanonical, TaskStatus.MATCHED, "accept counter offer");
 
-  await withTransaction(async (client) => {
-    // WHAT: Adjust escrow to the counter-agreed amount (delta vs posted budget)
-    // WHY: createTask already locked the budget; locking again would double it
-    if (agreedAmountKobo > app.budget_kobo) {
-      await lockEscrow(
-        client,
-        posterId,
-        agreedAmountKobo - app.budget_kobo,
-        taskId,
-      );
-    } else if (agreedAmountKobo < app.budget_kobo) {
-      await refundEscrow(
-        client,
-        posterId,
-        app.budget_kobo - agreedAmountKobo,
-        taskId,
-      );
-    }
+  // WHAT: Negotiated amount — route through the auditable proposal pipeline
+  // WHY: Accepting a HIGHER counter never auto-starts the task: the poster
+  //      must fund the difference (idempotently) before work can begin
+  if (agreedAmountKobo !== app.budget_kobo) {
+    return acceptAtAmount({
+      task: app,
+      applicationId,
+      agreedAmountKobo,
+      posterId,
+      reason: "Counter offer agreed by runner",
+    });
+  }
 
+  await withTransaction(async (client) => {
     await client.query(
       `UPDATE tasks
        SET status = 'in_progress', assigned_to = $1, agreed_amount_kobo = $2,

@@ -56,24 +56,24 @@ export default function AdminTransactionsPage() {
   const types = ["all", "deposit", "withdrawal", "escrow_lock", "escrow_release", "earnings", "fee", "refund"];
 
   const typeColors: Record<string, string> = {
-    deposit: "bg-green-100 text-green-800",
-    withdrawal: "bg-red-100 text-red-800",
-    escrow_lock: "bg-amber-100 text-amber-800",
-    escrow_release: "bg-blue-100 text-blue-800",
-    earnings: "bg-green-100 text-green-800",
-    fee: "bg-purple-100 text-purple-800",
-    refund: "bg-gray-100 text-gray-800",
-    platform_fee: "bg-purple-100 text-purple-800",
-    card_deposit: "bg-green-100 text-green-800",
+    deposit: "bg-success-bg text-success-text",
+    withdrawal: "bg-error-bg text-error-text",
+    escrow_lock: "bg-warning-bg text-warning-text",
+    escrow_release: "bg-info-bg text-info-text",
+    earnings: "bg-success-bg text-success-text",
+    fee: "bg-processing-bg text-processing-text",
+    refund: "bg-surface-secondary text-gray-800",
+    platform_fee: "bg-processing-bg text-processing-text",
+    card_deposit: "bg-success-bg text-success-text",
   };
 
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-secondary">
       <header className="sticky top-0 z-10 bg-surface px-4 py-3 shadow-sm border-b border-card-border">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-gray-100">
+          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-surface-secondary">
             <ArrowLeft className="h-5 w-5 text-gray-700" />
           </button>
           <h1 className="text-lg font-bold text-gray-900">Transactions</h1>
@@ -82,7 +82,7 @@ export default function AdminTransactionsPage() {
 
       <div className="flex gap-2 overflow-x-auto px-4 py-3">
         {types.map((t) => (
-          <button key={t} onClick={() => { setTypeFilter(t); setPage(1); }} className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${typeFilter === t ? "bg-brand text-white" : "bg-gray-200 text-gray-600"}`}>
+          <button key={t} onClick={() => { setTypeFilter(t); setPage(1); }} className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${typeFilter === t ? "bg-brand text-white" : "bg-surface-secondary text-gray-600"}`}>
             {t === "escrow_lock" ? "Escrow Lock" : t === "escrow_release" ? "Escrow Release" : t === "platform_fee" ? "Fee" : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
@@ -92,7 +92,7 @@ export default function AdminTransactionsPage() {
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-brand-text" /></div>
         ) : txns.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-12 text-foreground-muted">
             <ListChecks className="mb-2 h-12 w-12" />
             <p className="text-sm">No transactions found</p>
           </div>
@@ -102,25 +102,25 @@ export default function AdminTransactionsPage() {
               <div key={tx.id} className="rounded-xl bg-surface px-4 py-3 shadow-sm border border-card-border">
                 <div className="flex items-start justify-between">
                   <div>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${typeColors[tx.type] || "bg-gray-100 text-gray-600"}`}>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${typeColors[tx.type] || "bg-surface-secondary text-gray-600"}`}>
                       {tx.type.replace(/_/g, " ")}
                     </span>
                     <p className="mt-1 text-xs text-gray-500">{tx.note || "—"}</p>
-                    {tx.reference && <p className="text-[10px] text-gray-400">Ref: {tx.reference}</p>}
+                    {tx.reference && <p className="text-[10px] text-foreground-muted">Ref: {tx.reference}</p>}
                   </div>
                   <div className="text-right">
-                    <p className={`text-sm font-bold ${tx.amount.kobo > 0 ? "text-green-600" : "text-red-600"}`}>
+                    <p className={`text-sm font-bold ${tx.amount.kobo > 0 ? "text-success-text" : "text-error-text"}`}>
                       {tx.amount.kobo > 0 ? "+" : ""}₦{tx.amount.naira.toLocaleString()}
                     </p>
-                    <p className="text-[10px] text-gray-400">{new Date(tx.createdAt).toLocaleDateString()}</p>
+                    <p className="text-[10px] text-foreground-muted">{new Date(tx.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
               </div>
             ))}
             <div className="flex items-center justify-between pt-2">
-              <button disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} className="rounded-lg bg-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 disabled:opacity-30">Previous</button>
+              <button disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} className="rounded-lg bg-surface-secondary px-4 py-2 text-xs font-semibold text-gray-700 disabled:opacity-30">Previous</button>
               <span className="text-xs text-gray-500">Page {page} of {totalPages}</span>
-              <button disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="rounded-lg bg-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 disabled:opacity-30">Next</button>
+              <button disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="rounded-lg bg-surface-secondary px-4 py-2 text-xs font-semibold text-gray-700 disabled:opacity-30">Next</button>
             </div>
           </div>
         )}

@@ -109,7 +109,7 @@ export function CategorySelectionStep({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search categories..."
-            className="w-full rounded-xl border-2 border-border-default bg-surface-primary py-2.5 pl-10 pr-4 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-brand"
+            className="w-full rounded-full border border-border-default bg-surface-primary py-2.5 pl-10 pr-4 text-sm outline-none transition-colors placeholder:text-gray-400 search-pill"
           />
         </div>
       </div>

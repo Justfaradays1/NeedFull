@@ -71,10 +71,10 @@ export function HelperSuggestions({ categoryId }: { categoryId: string }) {
                   <span className="flex items-center gap-1 text-xs font-bold text-gray-900">
                     <span className="truncate">{offer.runner?.fullName}</span>
                     {offer.runner?.isVerifiedStudent && (
-                      <BadgeCheck className="h-3 w-3 shrink-0 text-blue-500" />
+                      <BadgeCheck className="h-3 w-3 shrink-0 text-info-text" />
                     )}
                     {offer.isOnlineToday && (
-                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
                     )}
                   </span>
                   <span className="flex items-center gap-1.5 text-[10px] text-gray-500">
@@ -94,7 +94,7 @@ export function HelperSuggestions({ categoryId }: { categoryId: string }) {
                     <span>· Travels {offer.maxTravelKm}km</span>
                   </span>
                 </span>
-                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-gray-300" />
+                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-foreground-muted" />
               </Link>
             );
           })}

@@ -104,11 +104,11 @@ export default function AdminVerificationsPage() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-secondary">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-surface px-4 py-3 shadow-sm border-b border-card-border">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-gray-100">
+          <button onClick={() => router.back()} className="tap-target rounded-lg p-2 hover:bg-surface-secondary">
             <ArrowLeft className="h-5 w-5 text-gray-700" />
           </button>
           <h1 className="text-lg font-bold text-gray-900">Student ID Verifications</h1>
@@ -117,10 +117,10 @@ export default function AdminVerificationsPage() {
 
       <div className="px-4 py-4">
         {/* Guidelines panel */}
-        <div className="mb-4 overflow-hidden rounded-xl border border-amber-200 bg-amber-50">
+        <div className="mb-4 overflow-hidden rounded-xl border border-warning-border bg-warning-bg">
           <button
             onClick={() => setShowGuidelines(!showGuidelines)}
-            className="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-amber-800"
+            className="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-warning-text"
           >
             <span className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
@@ -129,12 +129,12 @@ export default function AdminVerificationsPage() {
             {showGuidelines ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
           {showGuidelines && (
-            <div className="border-t border-amber-200 px-4 py-3">
-              <p className="mb-2 text-xs font-semibold text-amber-700">Check the following before approving:</p>
+            <div className="border-t border-warning-border px-4 py-3">
+              <p className="mb-2 text-xs font-semibold text-warning-text">Check the following before approving:</p>
               <ul className="space-y-1">
                 {GUIDELINES.map((g, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-amber-800">
-                    <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" />
+                  <li key={i} className="flex items-start gap-2 text-xs text-warning-text">
+                    <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-warning" />
                     {g}
                   </li>
                 ))}
@@ -152,11 +152,11 @@ export default function AdminVerificationsPage() {
               className={`rounded-full px-4 py-1.5 text-xs font-semibold capitalize transition-colors ${
                 filter === tab
                   ? tab === "pending"
-                    ? "bg-amber-100 text-amber-800"
+                    ? "bg-warning-bg text-warning-text"
                     : tab === "approved"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                      ? "bg-success-bg text-success-text"
+                      : "bg-error-bg text-error-text"
+                  : "bg-surface-secondary text-gray-500 hover:bg-surface-elevated"
               }`}
             >
               {tab}
@@ -168,7 +168,7 @@ export default function AdminVerificationsPage() {
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-brand-text" /></div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-12 text-foreground-muted">
             <Shield className="mb-2 h-12 w-12" />
             <p className="text-sm">No {filter} verifications</p>
           </div>
@@ -182,14 +182,14 @@ export default function AdminVerificationsPage() {
                     <p className="font-semibold text-gray-900">{v.fullName}</p>
                     <p className="text-xs text-gray-500">{v.email}</p>
                     {(v.school || v.department) && (
-                      <p className="mt-0.5 text-xs text-gray-400">
+                      <p className="mt-0.5 text-xs text-foreground-muted">
                         {[v.school, v.department].filter(Boolean).join(" · ")}
                       </p>
                     )}
                     {v.matricNumber && (
-                      <p className="mt-0.5 text-xs text-gray-400">Matric: {v.matricNumber}</p>
+                      <p className="mt-0.5 text-xs text-foreground-muted">Matric: {v.matricNumber}</p>
                     )}
-                    <p className="mt-1 text-xs text-gray-400">
+                    <p className="mt-1 text-xs text-foreground-muted">
                       Submitted {new Date(v.createdAt).toLocaleDateString("en-NG", {
                         day: "numeric", month: "short", year: "numeric",
                         hour: "2-digit", minute: "2-digit",
@@ -197,9 +197,9 @@ export default function AdminVerificationsPage() {
                     </p>
                   </div>
                   <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                    v.status === "pending" ? "bg-amber-100 text-amber-800"
-                    : v.status === "approved" ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
+                    v.status === "pending" ? "bg-warning-bg text-warning-text"
+                    : v.status === "approved" ? "bg-success-bg text-success-text"
+                    : "bg-error-bg text-error-text"
                   }`}>
                     {v.status}
                   </span>
@@ -210,7 +210,7 @@ export default function AdminVerificationsPage() {
                   <div className="mb-3">
                     <div
                       onClick={() => setZoomImage(v.idUrl)}
-                      className="relative cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-gray-100 transition-colors hover:border-brand"
+                      className="relative cursor-pointer overflow-hidden rounded-lg border border-border-default bg-surface-secondary transition-colors hover:border-brand"
                     >
                       <img src={v.idUrl} alt="Student ID card" className="max-h-56 w-full object-contain" />
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity hover:opacity-100">
@@ -224,7 +224,7 @@ export default function AdminVerificationsPage() {
 
                 {/* Rejection note */}
                 {v.status === "rejected" && v.note && (
-                  <div className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+                  <div className="mb-3 rounded-lg bg-error-bg px-3 py-2 text-xs text-error-text">
                     <span className="font-semibold">Reason: </span>{v.note}
                   </div>
                 )}
@@ -235,7 +235,7 @@ export default function AdminVerificationsPage() {
                     <button
                       onClick={() => handleApprove(v.id)}
                       disabled={processingId === v.id}
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-green-600 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-green-700 disabled:opacity-50"
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-success py-2.5 text-sm font-semibold text-white transition-all hover:brightness-105 disabled:opacity-50"
                     >
                       {processingId === v.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                       Approve
@@ -243,7 +243,7 @@ export default function AdminVerificationsPage() {
                     <button
                       onClick={() => { setRejectId(v.id); setRejectNote(""); }}
                       disabled={processingId === v.id}
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-danger py-2.5 text-sm font-semibold text-white transition-all hover:brightness-105 disabled:opacity-50"
                     >
                       {processingId === v.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
                       Reject
@@ -261,7 +261,7 @@ export default function AdminVerificationsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="w-full max-w-sm rounded-2xl bg-surface p-5 shadow-xl border border-card-border">
             <div className="mb-4 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 shrink-0 text-red-600" />
+              <AlertTriangle className="h-5 w-5 shrink-0 text-error-text" />
               <h3 className="font-semibold text-gray-900">Reject Verification</h3>
             </div>
             <p className="mb-3 text-xs text-gray-500">
@@ -271,24 +271,24 @@ export default function AdminVerificationsPage() {
               value={rejectNote}
               onChange={(e) => setRejectNote(e.target.value)}
               placeholder="e.g. Image is blurry, please resubmit with a clearer photo"
-              className="mb-4 w-full rounded-xl border border-gray-300 p-3 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+              className="mb-4 w-full rounded-xl border border-border-default p-3 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
               rows={3}
               autoFocus
             />
             {rejectNote.trim().length > 0 && rejectNote.trim().length < 10 && (
-              <p className="-mt-3 mb-3 text-xs text-red-500">Please provide a detailed reason (at least 10 characters)</p>
+              <p className="-mt-3 mb-3 text-xs text-error-text">Please provide a detailed reason (at least 10 characters)</p>
             )}
             <div className="flex gap-2">
               <button
                 onClick={() => { setRejectId(null); setRejectNote(""); }}
-                className="flex-1 rounded-xl bg-gray-100 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-200"
+                className="flex-1 rounded-xl bg-surface-secondary py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-surface-elevated"
               >
                 Cancel
               </button>
               <button
                 onClick={handleReject}
                 disabled={!rejectNote.trim() || rejectNote.trim().length < 10 || processingId === rejectId}
-                className="flex-1 rounded-xl bg-red-600 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+                className="flex-1 rounded-xl bg-danger py-2.5 text-sm font-semibold text-white transition-all hover:brightness-105 disabled:opacity-50"
               >
                 {processingId === rejectId ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : "Reject"}
               </button>

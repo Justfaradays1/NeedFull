@@ -197,13 +197,18 @@ export async function debitWallet(
   }
 }
 
-// WHAT: Lock task budget in escrow when task is posted
+// WHAT: Lock task budget in escrow when task is posted (or lock additional
+//       funding after a proposal is accepted)
 // WHY: Reserve funds for task without releasing until runner completes it
+// NOTE: Also keeps tasks.escrow_amount_kobo (per-task mirror) in sync — the
+//       mirror is ONLY ever changed here, inside the same transaction that
+//       moves the wallet escrow, so the two can never drift apart.
 export async function lockEscrow(
   client: PoolClient,
   posterId: string,
   amountKobo: number,
   taskId: string,
+  opts?: { idempotencyKey?: string; reference?: string; note?: string },
 ): Promise<Wallet> {
   try {
     // WHAT: Lock wallet for exclusive access
@@ -220,6 +225,20 @@ export async function lockEscrow(
 
     const walletRow = wallet.rows[0];
     const balanceBefore = Number(walletRow.balance_kobo);
+
+    // WHAT: Check idempotency key if provided
+    // WHY: Prevent duplicate escrow locks from retried funding requests —
+    //      a single funding action must never lock the amount twice
+    if (opts?.idempotencyKey) {
+      const existing = await client.query(
+        `SELECT id FROM wallet_transactions 
+         WHERE wallet_id = $1 AND idempotency_key = $2`,
+        [walletRow.id, opts.idempotencyKey],
+      );
+      if (existing.rows.length > 0) {
+        return { ...walletRow, walletTxId: existing.rows[0].id };
+      }
+    }
 
     // WHAT: Check sufficient balance for escrow lock
     // WHY: Prevent locking funds that don't exist
@@ -241,13 +260,20 @@ export async function lockEscrow(
       [amountKobo, walletRow.id],
     );
 
+    // WHAT: Keep the per-task escrow mirror in sync (same transaction)
+    await client.query(
+      `UPDATE tasks SET escrow_amount_kobo = escrow_amount_kobo + $1, updated_at = NOW()
+       WHERE id = $2`,
+      [amountKobo, taskId],
+    );
+
     // WHAT: Record escrow lock transaction
     // WHY: Maintain audit trail of escrow movements
     await client.query(
       `INSERT INTO wallet_transactions 
        (wallet_id, type, amount, balance_before, balance_after, 
-        task_id, note, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
+        task_id, reference, idempotency_key, note, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
       [
         walletRow.id,
         "escrow_lock",
@@ -255,7 +281,9 @@ export async function lockEscrow(
         balanceBefore,
         balanceBefore - amountKobo,
         taskId,
-        `Task budget locked for task ${taskId}`,
+        opts?.reference || null,
+        opts?.idempotencyKey || null,
+        opts?.note || `Task budget locked for task ${taskId}`,
       ],
     );
 
@@ -276,6 +304,7 @@ export async function releaseEscrow(
   amountKobo: number,
   taskId: string,
   feePct: number = PLATFORM_FEE_PERCENT,
+  opts?: { idempotencyKey?: string; note?: string },
 ): Promise<{ posterWallet: Wallet; runnerWallet: Wallet }> {
   try {
     // WHAT: Calculate platform fee and runner payout
@@ -310,6 +339,20 @@ export async function releaseEscrow(
     const posterEscrowBefore = Number(posterWalletRow.escrow_kobo);
     const runnerEarningsBefore = Number(runnerWalletRow.earnings_kobo);
 
+    // WHAT: Check idempotency key if provided
+    // WHY: A duplicate settlement request must never release the same escrow
+    //      twice — return the (pre-settlement) state, not a second payout
+    if (opts?.idempotencyKey) {
+      const existing = await client.query(
+        `SELECT id FROM wallet_transactions 
+         WHERE wallet_id = $1 AND idempotency_key = $2`,
+        [posterWalletRow.id, opts.idempotencyKey],
+      );
+      if (existing.rows.length > 0) {
+        return { posterWallet: posterWalletRow, runnerWallet: runnerWalletRow };
+      }
+    }
+
     // WHAT: Release escrow from poster's wallet
     // WHY: Remove from escrow hold, funds go to platform
     const posterUpdated = await client.query<Wallet>(
@@ -318,6 +361,13 @@ export async function releaseEscrow(
        WHERE id = $2 
        RETURNING ${WALLET_SELECT}`,
       [amountKobo, posterWalletRow.id],
+    );
+
+    // WHAT: Keep the per-task escrow mirror in sync (same transaction)
+    await client.query(
+      `UPDATE tasks SET escrow_amount_kobo = escrow_amount_kobo - $1, updated_at = NOW()
+       WHERE id = $2`,
+      [amountKobo, taskId],
     );
 
     // WHAT: Credit runner's earnings bucket — NOT the spendable balance
@@ -337,8 +387,8 @@ export async function releaseEscrow(
     await client.query(
       `INSERT INTO wallet_transactions 
        (wallet_id, type, amount, balance_before, balance_after, 
-        task_id, note, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
+        task_id, idempotency_key, note, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
       [
         runnerWalletRow.id,
         "earnings",
@@ -346,7 +396,8 @@ export async function releaseEscrow(
         runnerEarningsBefore,
         runnerEarningsBefore + runnerReceives,
         taskId,
-        `Available earnings from task ${taskId}`,
+        opts?.idempotencyKey ? `${opts.idempotencyKey}_runner` : null,
+        opts?.note || `Available earnings from task ${taskId}`,
       ],
     );
 
@@ -355,8 +406,8 @@ export async function releaseEscrow(
     await client.query(
       `INSERT INTO wallet_transactions 
        (wallet_id, type, amount, balance_before, balance_after, 
-        task_id, note, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
+        task_id, idempotency_key, note, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
       [
         posterWalletRow.id,
         "platform_fee",
@@ -364,7 +415,10 @@ export async function releaseEscrow(
         posterEscrowBefore,
         posterEscrowBefore - amountKobo,
         taskId,
-        `Platform fee (${feePct}%) for task ${taskId}`,
+        opts?.idempotencyKey ? `${opts.idempotencyKey}_fee` : null,
+        opts?.note
+          ? `${opts.note} — Platform fee (${feePct}%)`
+          : `Platform fee (${feePct}%) for task ${taskId}`,
       ],
     );
 
@@ -380,12 +434,15 @@ export async function releaseEscrow(
 }
 
 // WHAT: Refund locked escrow back to poster's balance
-// WHY: Cancel task and return funds to available balance
+// WHY: Cancel task and return funds to available balance (also refunds the
+//      EXCESS escrow after settlement when the agreed amount was LOWER than
+//      the originally secured amount — see §6 of the negotiation rules)
 export async function refundEscrow(
   client: PoolClient,
   posterId: string,
   amountKobo: number,
   taskId: string,
+  opts?: { idempotencyKey?: string; note?: string },
 ): Promise<Wallet> {
   try {
     // WHAT: Lock wallet for exclusive access
@@ -402,6 +459,19 @@ export async function refundEscrow(
 
     const walletRow = wallet.rows[0];
     const escrowBefore = Number(walletRow.escrow_kobo);
+
+    // WHAT: Check idempotency key if provided
+    // WHY: Prevent duplicate refunds from retried requests
+    if (opts?.idempotencyKey) {
+      const existing = await client.query(
+        `SELECT id FROM wallet_transactions 
+         WHERE wallet_id = $1 AND idempotency_key = $2`,
+        [walletRow.id, opts.idempotencyKey],
+      );
+      if (existing.rows.length > 0) {
+        return { ...walletRow, walletTxId: existing.rows[0].id };
+      }
+    }
 
     // WHAT: Check sufficient escrow to refund
     // WHY: Prevent refunding more than was locked
@@ -423,13 +493,20 @@ export async function refundEscrow(
       [amountKobo, walletRow.id],
     );
 
+    // WHAT: Keep the per-task escrow mirror in sync (same transaction)
+    await client.query(
+      `UPDATE tasks SET escrow_amount_kobo = escrow_amount_kobo - $1, updated_at = NOW()
+       WHERE id = $2`,
+      [amountKobo, taskId],
+    );
+
     // WHAT: Record escrow refund transaction
     // WHY: Maintain audit trail of refunds
     await client.query(
       `INSERT INTO wallet_transactions 
        (wallet_id, type, amount, balance_before, balance_after, 
-        task_id, note, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
+        task_id, idempotency_key, note, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
       [
         walletRow.id,
         "escrow_refund",
@@ -437,7 +514,8 @@ export async function refundEscrow(
         Number(walletRow.balance_kobo),
         Number(walletRow.balance_kobo) + amountKobo,
         taskId,
-        `Escrow refunded for cancelled task ${taskId}`,
+        opts?.idempotencyKey || null,
+        opts?.note || `Escrow refunded for cancelled task ${taskId}`,
       ],
     );
 

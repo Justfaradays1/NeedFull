@@ -142,13 +142,13 @@ function timeAgo(dateStr: string): string {
 }
 
 const typeConfig: Record<string, { icon: typeof Clock; bg: string; color: string }> = {
-  task_completed: { icon: CheckCircle, bg: "bg-green-50", color: "#16A34A" },
-  task_posted: { icon: Plus, bg: "bg-blue-50", color: "#2563EB" },
-  escrow_release: { icon: DollarSign, bg: "bg-emerald-50", color: "#1A6B4A" },
-  wallet_funded: { icon: DollarSign, bg: "bg-emerald-50", color: "#1A6B4A" },
-  review_received: { icon: Star, bg: "bg-amber-50", color: "#EAA325" },
-  runner_hired: { icon: UserPlus, bg: "bg-purple-50", color: "#7C3AED" },
-  message_received: { icon: MessageCircle, bg: "bg-blue-50", color: "#2563EB" },
+  task_completed: { icon: CheckCircle, bg: "bg-success-bg", color: "#16A34A" },
+  task_posted: { icon: Plus, bg: "bg-info-bg", color: "#2563EB" },
+  escrow_release: { icon: DollarSign, bg: "bg-success-bg", color: "#1A6B4A" },
+  wallet_funded: { icon: DollarSign, bg: "bg-success-bg", color: "#1A6B4A" },
+  review_received: { icon: Star, bg: "bg-warning-bg", color: "#EAA325" },
+  runner_hired: { icon: UserPlus, bg: "bg-info-bg", color: "#7C3AED" },
+  message_received: { icon: MessageCircle, bg: "bg-info-bg", color: "#2563EB" },
 };
 
 function RecentActivityPanel() {
@@ -161,7 +161,7 @@ function RecentActivityPanel() {
       ) : (
         <div className="divide-y divide-card-border">
           {activities.slice(0, 3).map((activity) => {
-            const cfg = typeConfig[activity.type] ?? { icon: Clock, bg: "bg-gray-50", color: "#6B7280" };
+            const cfg = typeConfig[activity.type] ?? { icon: Clock, bg: "bg-surface-secondary", color: "#6B7280" };
             const Icon = cfg.icon;
             return (
               <div key={activity.id} className="flex items-center gap-2.5 py-2.5">
@@ -224,7 +224,7 @@ export function DesktopContextPanel({ pathname }: { pathname: string }) {
 
   return (
     <aside
-      className="hidden xl:flex xl:w-80 xl:shrink-0 xl:sticky xl:top-14 xl:self-stretch xl:flex-col xl:border-l xl:border-gray-200 xl:bg-surface/60 xl:backdrop-blur-xl"
+      className="hidden xl:flex xl:w-80 xl:shrink-0 xl:sticky xl:top-14 xl:self-stretch xl:flex-col xl:border-l xl:border-border-default xl:bg-surface/60 xl:backdrop-blur-xl"
       style={{ height: "calc(100dvh - 3.5rem)" }}
       aria-label="Page context panel"
     >

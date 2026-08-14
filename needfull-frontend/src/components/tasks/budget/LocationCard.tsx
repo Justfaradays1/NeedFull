@@ -31,7 +31,7 @@ export function LocationCard({
     <div className="rounded-2xl border-2 border-border-default bg-surface-primary p-4 transition-all duration-200 focus-within:border-brand">
       <div className="flex items-center gap-2">
         <MapPin
-          className="h-4 w-4 text-red-500"
+          className="h-4 w-4 text-location"
         />
         <span className="text-xs font-bold uppercase tracking-wider text-gray-900">
           {type === "task" ? "Task Location" : "Completion Location"}
@@ -50,14 +50,14 @@ export function LocationCard({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder ?? `e.g. Block D Hostel, FUOYE`}
-          className="flex-1 rounded-xl border border-border-default px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-brand"
+          className="flex-1 rounded-xl border border-border-default px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus:border-brand"
         />
         {onDetect && (
           <button
             type="button"
             onClick={onDetect}
             disabled={locating}
-            className="tap-target flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-default text-gray-400 hover:border-brand hover:text-brand-text disabled:opacity-50"
+            className="tap-target flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-default text-foreground-muted hover:border-brand hover:text-brand-text disabled:opacity-50"
           >
             {locating ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -79,7 +79,7 @@ export function LocationCard({
       )}
 
       {geoError && (
-        <p className="mt-1 text-xs text-red-500">{geoError}</p>
+        <p className="mt-1 text-xs text-error-text">{geoError}</p>
       )}
     </div>
   );

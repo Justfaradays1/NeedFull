@@ -30,7 +30,7 @@ function ResetPasswordForm() {
   if (!token && !success) {
     return (
       <div className="w-full max-w-sm text-center">
-        <h2 className="mb-2 text-xl font-bold text-gray-900">
+        <h2 className="mb-2 text-xl font-bold text-foreground-strong">
           Invalid or expired link
         </h2>
         <p className="mb-6 text-sm text-gray-500">
@@ -38,7 +38,7 @@ function ResetPasswordForm() {
         </p>
         <a
           href="/forgot-password"
-          className="inline-block rounded-[10px] bg-brand px-5 py-3 text-sm font-semibold text-white shadow-card transition-all hover:bg-brand-mid"
+          className="inline-block rounded-[10px] bg-brand px-5 py-3 text-sm font-semibold text-on-brand shadow-card transition-all hover:bg-brand-mid"
         >
           Request new link
         </a>
@@ -49,10 +49,10 @@ function ResetPasswordForm() {
   if (success) {
     return (
       <div className="w-full max-w-sm text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
-          <CheckCircle2 className="h-7 w-7 text-green-600" aria-hidden="true" />
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-success-bg">
+          <CheckCircle2 className="h-7 w-7 text-success-text" aria-hidden="true" />
         </div>
-        <h2 className="mb-2 text-xl font-bold text-gray-900">
+        <h2 className="mb-2 text-xl font-bold text-foreground-strong">
           Password reset successful
         </h2>
         <p className="mb-6 text-sm text-gray-500">
@@ -61,7 +61,7 @@ function ResetPasswordForm() {
         </p>
         <a
           href="/login"
-          className="inline-block rounded-[10px] bg-brand px-5 py-3 text-sm font-semibold text-white shadow-card transition-all hover:bg-brand-mid"
+          className="inline-block rounded-[10px] bg-brand px-5 py-3 text-sm font-semibold text-on-brand shadow-card transition-all hover:bg-brand-mid"
         >
           Sign in
         </a>
@@ -94,7 +94,7 @@ function ResetPasswordForm() {
 
   return (
     <div className="w-full max-w-sm">
-      <h2 className="mb-2 text-xl font-bold text-gray-900">Set new password</h2>
+      <h2 className="mb-2 text-xl font-bold text-foreground-strong">Set new password</h2>
       <p className="mb-6 text-sm text-gray-500">
         Choose a new password for your account.
       </p>
@@ -102,7 +102,7 @@ function ResetPasswordForm() {
         <div className="space-y-1.5">
           <label
             htmlFor="password"
-            className="text-sm font-medium text-gray-700"
+            className="text-sm font-medium text-foreground-secondary"
           >
             New password
           </label>
@@ -117,7 +117,7 @@ function ResetPasswordForm() {
             className={`block w-full rounded-[10px] border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 ${
               password && !passwordRegex.test(password)
                 ? "border-danger focus:border-danger"
-                : "border-gray-300 focus:border-brand"
+                : "border-border-default focus:border-brand"
             }`}
           />
           <PasswordStrength password={password} />
@@ -125,7 +125,7 @@ function ResetPasswordForm() {
         <div className="space-y-1.5">
           <label
             htmlFor="confirmPassword"
-            className="text-sm font-medium text-gray-700"
+            className="text-sm font-medium text-foreground-secondary"
           >
             Confirm password
           </label>
@@ -139,7 +139,7 @@ function ResetPasswordForm() {
             className={`block w-full rounded-[10px] border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 ${
               confirmError
                 ? "border-danger focus:border-danger"
-                : "border-gray-300 focus:border-brand"
+                : "border-border-default focus:border-brand"
             }`}
           />
           {confirmError && (
@@ -155,7 +155,7 @@ function ResetPasswordForm() {
             </p>
           )}
           {confirmPassword && !confirmError && password === confirmPassword && (
-            <p className="flex items-center gap-1 text-sm text-green-600">
+            <p className="flex items-center gap-1 text-sm text-success-text">
               <CheckCircle2
                 className="h-3.5 w-3.5 shrink-0"
                 aria-hidden="true"
@@ -176,7 +176,7 @@ function ResetPasswordForm() {
         <button
           type="submit"
           disabled={isSubmitting || !isValid}
-          className="w-full rounded-[10px] bg-brand px-5 py-3 text-sm font-semibold text-white shadow-card transition-all hover:bg-brand-mid disabled:opacity-50"
+          className="w-full rounded-[10px] bg-brand px-5 py-3 text-sm font-semibold text-on-brand shadow-card transition-all hover:bg-brand-mid disabled:opacity-50"
         >
           {isSubmitting ? (
             <span className="flex items-center justify-center gap-2">
@@ -203,7 +203,7 @@ export default function ResetPasswordPage() {
       className="auth-page flex min-h-screen flex-col"
       style={{ backgroundColor: "var(--color-background, #ffffff)" }}
     >
-      <div className="border-b border-gray-200 px-4 py-6 sm:px-6">
+      <div className="border-b border-border-default px-4 py-6 sm:px-6">
         <Link
           href="/"
           className="inline-flex items-center gap-2.5"
@@ -290,7 +290,7 @@ export default function ResetPasswordPage() {
               <circle cx="16" cy="21" r="1.5" fill="#1A6B4A" />
             </svg>
           </div>
-          <span className="font-bold text-xl font-display text-gray-900">
+          <span className="font-bold text-xl font-display text-foreground-strong">
             NeedFull
           </span>
         </Link>

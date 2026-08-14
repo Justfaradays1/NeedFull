@@ -84,12 +84,12 @@ function formatLastSeen(dateStr: string | null): string {
 function TaskSkeleton() {
   return (
     <div className="w-45 shrink-0 animate-pulse space-y-2 rounded-xl bg-surface p-3 shadow-sm">
-      <div className="h-2 w-10 rounded bg-gray-100" />
-      <div className="h-3 w-full rounded bg-gray-100" />
-      <div className="h-3 w-2/3 rounded bg-gray-100" />
+      <div className="h-2 w-10 rounded bg-surface-secondary" />
+      <div className="h-3 w-full rounded bg-surface-secondary" />
+      <div className="h-3 w-2/3 rounded bg-surface-secondary" />
       <div className="flex gap-1.5">
-        <div className="h-2 w-8 rounded bg-gray-100" />
-        <div className="h-2 w-8 rounded bg-gray-100" />
+        <div className="h-2 w-8 rounded bg-surface-secondary" />
+        <div className="h-2 w-8 rounded bg-surface-secondary" />
       </div>
     </div>
   );
@@ -240,7 +240,7 @@ export default function ChatPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search conversations..."
-            className="w-full rounded-2xl bg-white/12 py-3.5 pl-11 pr-4 text-sm text-white outline-none backdrop-blur-md placeholder:text-white/45 border border-white/15 transition-all duration-200 focus:bg-white/18 focus:border-white/30 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.08)]"
+            className="w-full rounded-full bg-white/12 py-3.5 pl-11 pr-4 text-sm text-white outline-none backdrop-blur-md placeholder:text-white/45 border border-white/15 transition-all duration-200 focus:bg-white/18 search-pill"
           />
         </div>
       </div>
@@ -252,8 +252,8 @@ export default function ChatPage() {
         ) : filtered.length === 0 && search ? (
           /* No search results */
           <div className="flex flex-col items-center py-16 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-              <Search className="h-8 w-8 text-gray-400" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-secondary">
+              <Search className="h-8 w-8 text-foreground-muted" />
             </div>
             <p className="mt-4 font-display text-lg font-bold text-gray-900">
               No results found
@@ -285,7 +285,7 @@ export default function ChatPage() {
                 </Link>
                 <Link
                   href="/tasks"
-                  className="tap-target inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-surface px-5 py-3 text-sm font-bold text-gray-600 shadow-sm transition-all hover:bg-gray-100 active:scale-[0.97]"
+                  className="tap-target inline-flex items-center gap-2 rounded-xl border border-border-default bg-surface px-5 py-3 text-sm font-bold text-foreground-secondary shadow-sm transition-all hover:bg-surface-secondary active:scale-[0.97]"
                 >
                   <SendHorizontal className="h-4 w-4" />
                   My Tasks
@@ -334,11 +334,11 @@ export default function ChatPage() {
                     >
                       <div className="mb-1.5 flex items-center gap-1.5">
                         {task.isUrgent && (
-                          <span className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-bold text-red-700">
+                          <span className="rounded-full bg-error-bg px-2 py-0.5 text-[9px] font-bold text-error-text">
                             URGENT
                           </span>
                         )}
-                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[9px] font-medium text-gray-600">
+                        <span className="rounded-full bg-surface-secondary px-2 py-0.5 text-[9px] font-medium text-foreground-secondary">
                           {task.category?.name ? getCategoryDisplayName(task.category.name) : "General"}
                         </span>
                       </div>
@@ -407,7 +407,7 @@ export default function ChatPage() {
                     name={c.otherUser.fullName}
                     size="lg"
                   />
-                  <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500" />
+                  <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-surface bg-success" />
                 </div>
 
                 {/* Content */}
@@ -429,7 +429,7 @@ export default function ChatPage() {
                       <span className="truncate text-[11px] text-brand-text">
                         📋 {c.task.title}
                       </span>
-                      <span className="shrink-0 rounded-full bg-gray-100 px-1.5 py-0.5 text-[9px] font-bold capitalize text-gray-600">
+                      <span className="shrink-0 rounded-full bg-surface-secondary px-1.5 py-0.5 text-[9px] font-bold capitalize text-foreground-secondary">
                         {c.task.status === "in_progress"
                           ? "In progress"
                           : c.task.status === "completed"

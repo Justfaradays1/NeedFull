@@ -67,7 +67,7 @@ function Bubble({ msg, isMine }: { msg: Message; isMine: boolean }) {
         className={`relative max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed ${
           isMine
             ? "rounded-br-md bg-brand text-on-brand"
-            : "rounded-bl-md bg-gray-100 text-gray-900"
+            : "rounded-bl-md bg-surface-secondary text-gray-900"
         }`}
       >
         <p className="whitespace-pre-wrap wrap-break-word">{msg.content}</p>
@@ -91,17 +91,17 @@ function Bubble({ msg, isMine }: { msg: Message; isMine: boolean }) {
 function TypingDots() {
   return (
     <div className="flex justify-start px-4 py-1">
-      <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md bg-gray-100 px-4 py-2.5">
+      <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md bg-surface-secondary px-4 py-2.5">
         <span
-          className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+          className="h-2 w-2 animate-bounce rounded-full bg-foreground-muted"
           style={{ animationDelay: "0ms" }}
         />
         <span
-          className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+          className="h-2 w-2 animate-bounce rounded-full bg-foreground-muted"
           style={{ animationDelay: "150ms" }}
         />
         <span
-          className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+          className="h-2 w-2 animate-bounce rounded-full bg-foreground-muted"
           style={{ animationDelay: "300ms" }}
         />
       </div>
@@ -287,7 +287,7 @@ export default function ChatThreadPage() {
 
   if (notFound || !conv) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center bg-gray-50 px-4 text-center">
+      <div className="flex h-screen flex-col items-center justify-center bg-surface px-4 text-center">
         <h2 className="text-lg font-semibold text-gray-900">
           Conversation not found
         </h2>
@@ -303,7 +303,7 @@ export default function ChatThreadPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-gray-50">
+    <div className="flex h-screen flex-col bg-surface">
       {/* Top bar */}
       <div className="flex items-center gap-2 border-b border-card-border bg-surface px-2 py-2 shadow-sm">
         <button
@@ -318,7 +318,7 @@ export default function ChatThreadPage() {
           <img
             src={conv.otherUser.profilePictureUrl}
             alt=""
-            className="h-9 w-9 rounded-full border border-gray-200 object-cover"
+            className="h-9 w-9 rounded-full border border-border-default object-cover"
           />
         ) : (
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-light text-xs font-bold text-brand">
@@ -354,7 +354,7 @@ export default function ChatThreadPage() {
                     setMenuOpen(false);
                     router.push(viewTaskHref);
                   }}
-                  className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+                  className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-surface-secondary"
                 >
                   <Flag className="h-3.5 w-3.5" /> View Task
                 </button>
@@ -363,7 +363,7 @@ export default function ChatThreadPage() {
                   onClick={() => {
                     setMenuOpen(false); /* TODO: open dispute modal */
                   }}
-                  className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50"
+                  className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-error-text hover:bg-error-bg"
                 >
                   <X className="h-3.5 w-3.5" /> Dispute
                 </button>
@@ -398,7 +398,7 @@ export default function ChatThreadPage() {
       {/* Input bar */}
       <div className="border-t border-card-border bg-surface px-3 py-2">
         {conversationClosed ? (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-center text-xs font-semibold text-amber-800">
+          <div className="rounded-xl border border-warning-border bg-warning-bg px-4 py-2.5 text-center text-xs font-semibold text-warning-text">
             This task is {task?.status === "completed" ? "complete" : task?.status?.replace("_", " ")} — chat is now read-only.
           </div>
         ) : (
@@ -409,7 +409,7 @@ export default function ChatThreadPage() {
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none transition-colors focus:border-brand focus:bg-white"
+            className="flex-1 rounded-xl border border-border-default bg-surface-secondary px-4 py-2.5 text-sm outline-none transition-colors focus:border-brand focus:bg-surface"
             maxLength={2000}
             disabled={conversationClosed}
           />

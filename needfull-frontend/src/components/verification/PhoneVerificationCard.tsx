@@ -66,8 +66,8 @@ export function PhoneVerificationCard({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="bg-blue-100 p-3 rounded-lg">
-            <Phone className="w-5 h-5 text-blue-700" />
+          <div className="bg-info-bg p-3 rounded-lg">
+            <Phone className="w-5 h-5 text-info-text" />
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">Phone Verification</h3>
@@ -75,15 +75,15 @@ export function PhoneVerificationCard({
           </div>
         </div>
         {verified && (
-          <div className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full">
-            <CheckCircle2 className="w-4 h-4 text-blue-700" />
-            <span className="text-sm font-medium text-blue-700">Verified</span>
+          <div className="flex items-center gap-2 bg-info-bg px-3 py-1 rounded-full">
+            <CheckCircle2 className="w-4 h-4 text-info-text" />
+            <span className="text-sm font-medium text-info-text">Verified</span>
           </div>
         )}
       </div>
 
       {/* Status Section */}
-      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+      <div className="bg-surface-secondary rounded-lg p-4 mb-4">
         {verified ? (
           <div>
             <p className="text-sm text-gray-700">
@@ -122,14 +122,14 @@ export function PhoneVerificationCard({
                     setPhoneInput(e.target.value);
                     setError(null);
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 border border-border-default rounded-lg focus:ring-2 focus:ring-processing focus:border-transparent outline-none"
                   disabled={isLoading}
                 />
               </div>
               <button
                 onClick={handleSendOtp}
                 disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 bg-processing hover:brightness-105 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <>
@@ -162,7 +162,7 @@ export function PhoneVerificationCard({
                     setError(null);
                   }}
                   maxLength={6}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-center text-2xl tracking-widest"
+                  className="w-full px-4 py-2 border border-border-default rounded-lg focus:ring-2 focus:ring-processing focus:border-transparent outline-none text-center text-2xl tracking-widest"
                   disabled={isLoading}
                 />
                 <p className="text-xs text-gray-500 text-center mt-2">
@@ -177,14 +177,14 @@ export function PhoneVerificationCard({
                     setError(null);
                   }}
                   disabled={isLoading}
-                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
+                  className="flex-1 bg-surface-secondary hover:bg-surface-elevated text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
                 >
                   Back
                 </button>
                 <button
                   onClick={handleVerifyOtp}
                   disabled={isLoading || otpInput.length !== 6}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="flex-1 bg-processing hover:brightness-105 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   {isLoading ? "Verifying..." : "Verify OTP"}
                 </button>
@@ -193,8 +193,8 @@ export function PhoneVerificationCard({
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p className="text-sm text-red-700">{error}</p>
+            <div className="bg-error-bg border border-error-border rounded-lg p-3">
+              <p className="text-sm text-error-text">{error}</p>
             </div>
           )}
         </div>

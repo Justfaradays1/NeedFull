@@ -110,21 +110,21 @@ function isPositive(type: string): boolean {
 function TxIcon({ type }: { type: string }) {
   const cat = getTxCategory(type);
   if (type === "escrow_lock" || type === "escrow_release") {
-    return <Lock className="h-4 w-4 text-amber-600" />;
+    return <Lock className="h-4 w-4 text-warning-text" />;
   }
   if (cat === "credit") {
-    return <ArrowDownLeft className="h-4 w-4 text-green-600" />;
+    return <ArrowDownLeft className="h-4 w-4 text-success-text" />;
   }
-  return <ArrowUpRight className="h-4 w-4 text-red-600" />;
+  return <ArrowUpRight className="h-4 w-4 text-error-text" />;
 }
 
 // WHAT: Background colour for the icon circle
 function TxIconBg({ type }: { type: string }) {
   const cat = getTxCategory(type);
   if (type === "escrow_lock" || type === "escrow_release")
-    return "bg-amber-100";
-  if (cat === "credit") return "bg-green-100";
-  return "bg-red-100";
+    return "bg-warning-bg";
+  if (cat === "credit") return "bg-success-bg";
+  return "bg-error-bg";
 }
 
 // WHAT: Format ISO date to readable
@@ -436,13 +436,13 @@ export default function WalletPage() {
                 const cat = getTxCategory(tx.type);
                 const expanded = expandedTx.has(tx.id);
 
-                let amountColor = "text-green-600";
+                let amountColor = "text-success-text";
                 let prefix = "+";
                 if (cat === "debit") {
-                  amountColor = "text-red-600";
+                  amountColor = "text-error-text";
                   prefix = "-";
                 } else if (cat === "escrow") {
-                  amountColor = "text-amber-600";
+                  amountColor = "text-warning-text";
                   prefix = "";
                 }
 
@@ -452,7 +452,7 @@ export default function WalletPage() {
                     <button
                       type="button"
                       onClick={() => toggleExpand(tx.id)}
-                      className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-gray-100"
+                      className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-surface-secondary"
                     >
                       {/* Icon */}
                       <div
@@ -486,7 +486,7 @@ export default function WalletPage() {
 
                     {/* Expanded detail panel */}
                     {expanded && (
-                      <div className="border-t border-gray-50 bg-gray-50/50 px-5 py-4">
+                      <div className="border-t border-border-subtle bg-surface-secondary/50 px-5 py-4">
                         <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm">
                           {tx.reference && (
                             <>

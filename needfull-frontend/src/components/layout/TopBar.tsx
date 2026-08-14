@@ -35,56 +35,52 @@ export function TopBar({
           <BrandMark wordmarkClass="text-white hidden sm:inline" />
         </Link>
 
-        {/* Right cluster — search + category discovery, notifications, user */}
+        {/* Right cluster — pill search, category discovery, notifications, user */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Global search + Categories — one attached control, Spotify-style:
-              [ Search tasks, NeedRunners, categories... | ▦ ] */}
-          <div className="hidden overflow-hidden rounded-xl border border-white/15 bg-white/10 transition-colors hover:border-white/25 md:flex">
-            <button
-              type="button"
-              onClick={onOpenPalette}
-              className="flex h-10 min-h-[44px] items-center gap-2.5 px-3.5 text-white/80 transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold/60"
-              aria-label="Search tasks, NeedRunners, and categories"
-            >
-              <Search className="h-4 w-4 shrink-0" />
-              <span className="text-sm font-medium text-white/90">
-                Search
-                <span className="ml-2 hidden text-xs font-normal text-white/45 lg:inline">
-                  tasks, NeedRunners, categories
-                </span>
+          {/* Global search — Spotify-style standalone pill: subtle filled
+              surface, fully rounded ends, icon left, shortcut right. */}
+          <button
+            type="button"
+            onClick={onOpenPalette}
+            className="hidden h-10 min-h-[44px] items-center gap-2.5 rounded-full px-4 text-white/80 transition-colors hover:bg-white/15 search-pill glass-search md:flex"
+            aria-label="Search tasks, NeedRunners, and categories"
+          >
+            <Search className="h-4 w-4 shrink-0" />
+            <span className="text-sm font-medium text-white/90">
+              Search
+              <span className="ml-2 hidden text-xs font-normal text-white/45 lg:inline">
+                tasks, NeedRunners, categories
               </span>
-              <kbd className="hidden rounded-md border border-white/15 bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold text-white/50 xl:inline">
-                ⌘K
-              </kbd>
-            </button>
+            </span>
+            <kbd className="hidden rounded-md border border-white/15 bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold text-white/50 xl:inline">
+              ⌘K
+            </kbd>
+          </button>
 
-            <span aria-hidden className="my-3 w-px bg-white/15" />
-
-            {/* Category discovery — dedicated browse page */}
-            <Link
-              href="/categories"
-              aria-label="Browse categories"
-              title="Browse categories"
-              aria-current={onCategories ? "page" : undefined}
-              className={`group flex h-10 min-h-[44px] w-12 min-w-[44px] items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold/60 ${
-                onCategories
-                  ? "bg-brand-mid text-white hover:bg-brand-mid hover:text-white"
-                  : "text-white/80 hover:bg-white/15 hover:text-white"
+          {/* Category discovery — compact standalone pill icon button */}
+          <Link
+            href="/categories"
+            aria-label="Browse categories"
+            title="Browse categories"
+            aria-current={onCategories ? "page" : undefined}
+            className={`hidden h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 md:inline-flex ${
+              onCategories
+                ? "border-transparent bg-brand-mid text-white hover:bg-brand-mid hover:text-white"
+                : "border-white/15 bg-white/10 text-white/80 hover:bg-white/20 hover:text-white"
+            }`}
+          >
+            <LayoutGrid
+              className={`h-5 w-5 transition-transform duration-150 ${
+                onCategories ? "scale-110" : "hover:scale-105"
               }`}
-            >
-              <LayoutGrid
-                className={`h-5 w-5 transition-transform duration-150 ${
-                  onCategories ? "scale-110" : "group-hover:scale-105"
-                }`}
-              />
-            </Link>
-          </div>
+            />
+          </Link>
 
           {/* Mobile: search + categories as compact icon controls */}
           <button
             type="button"
             onClick={onOpenPalette}
-            className="inline-flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/15 bg-white/10 text-white/80 transition hover:bg-white/20 md:hidden"
+            className="inline-flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/15 bg-white/10 text-white/80 transition hover:bg-white/20 md:hidden"
             aria-label="Open search"
           >
             <Search className="h-5 w-5" />
@@ -93,7 +89,7 @@ export function TopBar({
             href="/categories"
             aria-label="Browse categories"
             aria-current={onCategories ? "page" : undefined}
-            className={`inline-flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 md:hidden ${
+            className={`inline-flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 md:hidden ${
               onCategories
                 ? "border-transparent bg-brand-mid text-white"
                 : "border-white/15 bg-white/10 text-white/80 hover:bg-white/20"
@@ -104,7 +100,7 @@ export function TopBar({
           <button
             type="button"
             onClick={onOpenNotifications}
-            className="relative tap-target inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-white/80 transition hover:bg-white/20"
+            className="relative tap-target inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white/80 transition hover:bg-white/20"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5" />

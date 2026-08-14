@@ -28,7 +28,7 @@ export function ProgressSteps({ steps, currentStep, className }: ProgressStepsPr
                 <div
                   className={cn(
                     'flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-bold transition-all duration-300',
-                    isCompleted && 'border-green-500 bg-green-500 text-white',
+                    isCompleted && 'border-success bg-success text-white',
                     isCurrent && 'border-brand bg-brand text-on-brand shadow-md',
                     !isCompleted && !isCurrent && 'border-border-strong bg-surface-primary text-gray-500',
                   )}
@@ -52,7 +52,7 @@ export function ProgressSteps({ steps, currentStep, className }: ProgressStepsPr
               {!isLast && (
                 <div className={cn(
                   'mt-4 h-0.5 flex-1 mx-2 transition-colors duration-300',
-                  isCompleted ? 'bg-green-500' : 'bg-gray-200',
+                  isCompleted ? 'bg-success' : 'bg-surface-secondary',
                 )} />
               )}
             </div>

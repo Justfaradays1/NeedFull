@@ -217,8 +217,8 @@ export default function ProfilePage() {
   if (fetchError || !profile) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-          <svg className="h-6 w-6 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-error-bg">
+          <svg className="h-6 w-6 text-error-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
         </div>
         <p className="text-sm font-semibold text-gray-900">Could not load profile</p>
         <p className="text-xs text-gray-500 text-center max-w-xs">{fetchError || 'An unexpected error occurred'}</p>
@@ -288,7 +288,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Tab bar */}
-      <div className="mx-4 mt-4 flex gap-1 rounded-xl bg-gray-100 p-1">
+      <div className="mx-4 mt-4 flex gap-1 rounded-xl bg-surface-secondary p-1">
         {(['overview', 'reviews', 'activity', 'settings'] as TabKey[]).map((t) => (
           <button key={t} type="button" onClick={() => setActiveTab(t)}
             className={`tap-target flex-1 rounded-lg py-2 text-xs font-bold uppercase tracking-wider transition-colors ${activeTab === t ? 'bg-surface text-brand-text shadow-sm' : 'text-gray-500'}`}
@@ -327,14 +327,14 @@ export default function ProfilePage() {
                   disabledHint={profile.trustScore < 30 ? 'Need trust score ≥ 30' : undefined}
                 />
               ) : profile.runnerStatus === 'pending' ? (
-                <div className="flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                <div className="flex items-center justify-between rounded-xl border border-warning-border bg-warning-bg px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100">
-                      <Clock className="h-5 w-5 text-amber-600" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-warning-bg">
+                      <Clock className="h-5 w-5 text-warning-text" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-amber-800">Runner Application Pending</p>
-                      <p className="text-xs text-amber-600">Your request is being reviewed</p>
+                      <p className="text-sm font-semibold text-warning-text">Runner Application Pending</p>
+                      <p className="text-xs text-warning-text">Your request is being reviewed</p>
                     </div>
                   </div>
                 </div>
@@ -369,7 +369,7 @@ export default function ProfilePage() {
           <div>
             {reviews.length === 0 ? (
               <div className="py-12 text-center">
-                <Star className="mx-auto h-8 w-8 text-gray-300" />
+                <Star className="mx-auto h-8 w-8 text-foreground-muted" />
                 <p className="mt-2 text-sm text-gray-500">No reviews yet</p>
               </div>
             ) : (
@@ -397,7 +397,7 @@ export default function ProfilePage() {
           <div>
             {activity.length === 0 ? (
               <div className="py-12 text-center">
-                <Clock className="mx-auto h-8 w-8 text-gray-300" />
+                <Clock className="mx-auto h-8 w-8 text-foreground-muted" />
                 <p className="mt-2 text-sm text-gray-500">No completed tasks yet</p>
               </div>
             ) : (
@@ -409,7 +409,7 @@ export default function ProfilePage() {
                       <p className="text-[11px] text-gray-500">{t.category?.name ? getCategoryDisplayName(t.category.name) : 'General'} · {new Date(t.createdAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">Done</span>
+                      <span className="rounded-full bg-success-bg px-2 py-0.5 text-[10px] font-bold text-success-text">Done</span>
                       <span className="text-xs font-bold text-brand-text">₦{t.budget.naira.toLocaleString()}</span>
                     </div>
                   </div>
@@ -441,23 +441,23 @@ export default function ProfilePage() {
             {/* Account */}
             <div>
               <h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-500">Account</h4>
-              <Link href="/wallet" className="tap-target flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100">
-                <span className="flex items-center gap-3"><Award className="h-5 w-5 text-gray-400" /> Wallet</span>
-                <ChevronRight className="h-4 w-4 text-gray-300" />
+              <Link href="/wallet" className="tap-target flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-surface-secondary">
+                <span className="flex items-center gap-3"><Award className="h-5 w-5 text-foreground-muted" /> Wallet</span>
+                <ChevronRight className="h-4 w-4 text-foreground-muted" />
               </Link>
-              <Link href="/settings/verification" className="tap-target flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100">
-                <span className="flex items-center gap-3"><Settings className="h-5 w-5 text-gray-400" /> Settings</span>
-                <ChevronRight className="h-4 w-4 text-gray-300" />
+              <Link href="/settings/verification" className="tap-target flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-surface-secondary">
+                <span className="flex items-center gap-3"><Settings className="h-5 w-5 text-foreground-muted" /> Settings</span>
+                <ChevronRight className="h-4 w-4 text-foreground-muted" />
               </Link>
-              <button type="button" onClick={() => setEditOpen(true)} className="tap-target flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100">
-                <span className="flex items-center gap-3"><Pencil className="h-5 w-5 text-gray-400" /> Edit Profile</span>
-                <ChevronRight className="h-4 w-4 text-gray-300" />
+              <button type="button" onClick={() => setEditOpen(true)} className="tap-target flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-surface-secondary">
+                <span className="flex items-center gap-3"><Pencil className="h-5 w-5 text-foreground-muted" /> Edit Profile</span>
+                <ChevronRight className="h-4 w-4 text-foreground-muted" />
               </button>
             </div>
 
             {/* Logout */}
             <button type="button" onClick={handleLogout}
-              className="tap-target flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-100"
+              className="tap-target flex w-full items-center justify-center gap-2 rounded-xl border border-error-border bg-error-bg px-4 py-3 text-sm font-bold text-error-text hover:bg-error-bg"
             >
               <LogOut className="h-4 w-4" /> Log Out
             </button>
@@ -473,22 +473,22 @@ export default function ProfilePage() {
             <div className="px-4">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-display text-base font-bold text-gray-900">Edit Profile</h3>
-              <button type="button" onClick={() => setEditOpen(false)} className="tap-target"><X className="h-5 w-5 text-gray-400" /></button>
+              <button type="button" onClick={() => setEditOpen(false)} className="tap-target"><X className="h-5 w-5 text-foreground-muted" /></button>
             </div>
             <div className="space-y-3">
               {(['fullName', 'phone', 'department', 'level', 'hostel', 'bio'] as const).map((f) => (
                 <div key={f}>
                   <label className="mb-0.5 block text-xs font-semibold text-gray-500 uppercase tracking-wider">{f === 'fullName' ? 'Full Name' : f.charAt(0).toUpperCase() + f.slice(1)}</label>
                   {f === 'bio' ? (
-                    <textarea rows={3} value={editForm[f]} onChange={(e) => setEditForm((p) => ({ ...p, [f]: e.target.value }))} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand" />
+                    <textarea rows={3} value={editForm[f]} onChange={(e) => setEditForm((p) => ({ ...p, [f]: e.target.value }))} className="w-full rounded-lg border border-border-default px-3 py-2 text-sm outline-none focus:border-brand" />
                   ) : (
-                    <input type={f === 'phone' ? 'tel' : 'text'} value={editForm[f]} onChange={(e) => setEditForm((p) => ({ ...p, [f]: e.target.value }))} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand" />
+                    <input type={f === 'phone' ? 'tel' : 'text'} value={editForm[f]} onChange={(e) => setEditForm((p) => ({ ...p, [f]: e.target.value }))} className="w-full rounded-lg border border-border-default px-3 py-2 text-sm outline-none focus:border-brand" />
                   )}
                 </div>
               ))}
             </div>
             <div className="mt-5 flex gap-2">
-              <button type="button" onClick={() => setEditOpen(false)} className="tap-target flex-1 rounded-xl border border-gray-200 py-3 text-sm font-bold text-gray-600">Cancel</button>
+              <button type="button" onClick={() => setEditOpen(false)} className="tap-target flex-1 rounded-xl border border-border-default py-3 text-sm font-bold text-gray-600">Cancel</button>
               <button type="button" onClick={handleEditSave} className="tap-target flex-1 rounded-xl bg-brand py-3 text-sm font-bold text-on-brand">Save</button>
             </div>
             </div>
@@ -509,7 +509,7 @@ function VerificationRow({ icon, label, verified, detail, onVerify, uploading }:
   return (
     <div className="flex items-center justify-between rounded-2xl border border-card-border bg-surface p-4 shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
       <div className="flex items-center gap-3">
-        <div className={`flex h-8 w-8 items-center justify-center rounded-full ${verified ? 'bg-success-light text-success' : 'bg-gray-100 text-gray-400'}`}>
+        <div className={`flex h-8 w-8 items-center justify-center rounded-full ${verified ? 'bg-success-light text-success' : 'bg-surface-secondary text-foreground-muted'}`}>
           {icon}
         </div>
         <div>
@@ -518,7 +518,7 @@ function VerificationRow({ icon, label, verified, detail, onVerify, uploading }:
         </div>
       </div>
       {verified ? (
-        <span className="flex items-center gap-1 text-xs font-bold text-green-600">
+        <span className="flex items-center gap-1 text-xs font-bold text-success-text">
           <CheckCircle2 className="h-3.5 w-3.5" /> Verified
         </span>
       ) : onVerify ? (

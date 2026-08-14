@@ -37,7 +37,7 @@ export const ALL_FAQ: FaqItem[] = [
     title: "Who can use NeedFull?",
     content: (
       <div className="space-y-2">
-        <p>Any university student can use NeedFull. Whether you need help with a task or want to earn money in your free time, NeedFull is built for students, by people who understand campus life. We are currently live at FUOYE and expanding to more universities.</p>
+        <p>Anyone can use NeedFull. Whether you need help with a task or want to earn money in your free time, NeedFull is built for people, by people who understand local life. We are currently live in selected communities and expanding across Nigeria.</p>
       </div>
     ),
   },

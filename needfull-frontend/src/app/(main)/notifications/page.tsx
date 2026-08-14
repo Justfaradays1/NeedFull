@@ -94,15 +94,15 @@ function notifMeta(type: string): { icon: React.ReactNode; bg: string } {
     type.startsWith("manual_transfer_") ||
     type === "nuban"
   ) {
-    return { icon: <Banknote size={size} />, bg: "bg-amber-50 text-gold-dark" };
+    return { icon: <Banknote size={size} />, bg: "bg-warning-bg text-gold-dark" };
   }
   if (type.startsWith("verification_")) {
-    return { icon: <Shield size={size} />, bg: "bg-blue-50 text-info" };
+    return { icon: <Shield size={size} />, bg: "bg-info-bg text-info" };
   }
   if (type === "new_report") {
-    return { icon: <AlertTriangle size={size} />, bg: "bg-red-50 text-danger" };
+    return { icon: <AlertTriangle size={size} />, bg: "bg-error-bg text-danger" };
   }
-  return { icon: <Bell size={size} />, bg: "bg-gray-100 text-gray-500" };
+  return { icon: <Bell size={size} />, bg: "bg-surface-secondary text-gray-500" };
 }
 
 function notifNavigate(n: Notification, router: ReturnType<typeof useRouter>) {
@@ -229,8 +229,8 @@ export default function NotificationsPage() {
         ) : list.length === 0 ? (
           <div className="flex flex-col items-center pt-16 text-center">
             <div className="relative mb-6">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-50">
-                <CheckCheck className="h-10 w-10 text-green-400" />
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-success-bg">
+                <CheckCheck className="h-10 w-10 text-success-text" />
               </div>
               <div className="absolute -bottom-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full bg-surface shadow-md border border-card-border">
                 <Bell className="h-5 w-5 text-brand-text" />
@@ -277,7 +277,7 @@ export default function NotificationsPage() {
                         onTouchEnd={handleTouchEnd}
                         onTouchMove={handleTouchEnd}
                         data-notif-id={n.id}
-                        className={`tap-target w-full rounded-xl border p-3 text-left transition-all active:scale-[0.98] ${showUnread ? "border-brand/10 bg-surface shadow-sm" : "border-transparent bg-gray-50/50"}`}
+                        className={`tap-target w-full rounded-xl border p-3 text-left transition-all active:scale-[0.98] ${showUnread ? "border-brand/10 bg-surface shadow-sm" : "border-transparent bg-surface-secondary/50"}`}
                       >
                         <div className="flex gap-3">
                           <div
@@ -320,7 +320,7 @@ export default function NotificationsPage() {
                               <button
                                 type="button"
                                 onClick={() => handleMarkRead(n.id)}
-                                className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100"
+                                className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-surface-secondary"
                               >
                                 <CheckCheck className="h-3.5 w-3.5 text-brand-text" />{" "}
                                 Mark as read
@@ -329,14 +329,14 @@ export default function NotificationsPage() {
                             <button
                               type="button"
                               onClick={() => handleDelete(n.id)}
-                              className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50"
+                              className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-error-text hover:bg-error-bg"
                             >
                               <Trash2 className="h-3.5 w-3.5" /> Delete
                             </button>
                             <button
                               type="button"
                               onClick={() => setMenuId(null)}
-                              className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-500 hover:bg-gray-100"
+                              className="tap-target flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-500 hover:bg-surface-secondary"
                             >
                               <X className="h-3.5 w-3.5" /> Cancel
                             </button>

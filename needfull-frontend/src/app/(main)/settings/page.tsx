@@ -109,7 +109,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.back()}
-            className="tap-target rounded-lg p-2 hover:bg-gray-100"
+            className="tap-target rounded-lg p-2 hover:bg-surface-secondary"
             aria-label="Back"
           >
             <ArrowLeft className="h-5 w-5 text-gray-500" />
@@ -152,7 +152,7 @@ export default function SettingsPage() {
           <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
             <div className="flex items-center justify-between px-4 py-3.5">
               <div className="flex items-center gap-3">
-                <Globe className="h-5 w-5 text-gray-400" />
+                <Globe className="h-5 w-5 text-foreground-muted" />
                 <span className="text-sm font-medium text-gray-900">Google</span>
               </div>
               {googleLinked === null ? (
@@ -160,7 +160,7 @@ export default function SettingsPage() {
               ) : googleLinked ? (
                 <button
                   onClick={handleUnlinkGoogle}
-                  className="rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                  className="rounded-lg px-3 py-1.5 text-xs font-medium text-error-text transition-colors hover:bg-error-bg"
                 >
                   Unlink
                 </button>
@@ -281,7 +281,7 @@ export default function SettingsPage() {
             <button
               onClick={handleLogout}
               disabled={loggingOut}
-              className="flex w-full items-center gap-3 px-4 py-3.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
+              className="flex w-full items-center gap-3 px-4 py-3.5 text-sm font-medium text-error-text transition-colors hover:bg-error-bg disabled:opacity-50"
             >
               <LogOut className="h-5 w-5" />
               {loggingOut ? "Logging out..." : "Log out"}
@@ -311,13 +311,13 @@ function SettingsLink({
   return (
     <Link
       href={href}
-      className="flex items-center justify-between px-4 py-3.5 transition-colors hover:bg-gray-100"
+      className="flex items-center justify-between px-4 py-3.5 transition-colors hover:bg-surface-secondary"
     >
       <div className="flex items-center gap-3">
-        <Icon className="h-5 w-5 text-gray-400" />
+        <Icon className="h-5 w-5 text-foreground-muted" />
         <span className="text-sm font-medium text-gray-900">{label}</span>
       </div>
-      <ChevronRight className="h-4 w-4 text-gray-400" />
+      <ChevronRight className="h-4 w-4 text-foreground-muted" />
     </Link>
   );
 }

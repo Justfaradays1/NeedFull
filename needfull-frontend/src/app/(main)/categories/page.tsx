@@ -40,14 +40,14 @@ export default function CategoriesPage() {
 
         {/* Category search */}
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-muted" />
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search categories..."
             aria-label="Search categories"
-            className="w-full rounded-2xl border border-card-border bg-surface py-3 pl-10 pr-10 text-sm font-medium outline-none transition-colors placeholder:text-gray-500 focus:border-brand/50 focus:ring-2 focus:ring-brand/15 dark:placeholder:text-gray-400"
+            className="w-full rounded-full border border-card-border bg-surface py-3 pl-10 pr-10 text-sm font-medium outline-none transition-colors placeholder:text-gray-500 search-pill dark:placeholder:text-gray-400"
             style={{ color: "var(--color-foreground, #171717)" }}
           />
           {query ? (
@@ -55,7 +55,7 @@ export default function CategoriesPage() {
               type="button"
               onClick={() => setQuery("")}
               aria-label="Clear search"
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-foreground-muted transition-colors hover:bg-surface-secondary hover:text-gray-600 dark:hover:bg-gray-800"
             >
               <X className="h-4 w-4" />
             </button>
@@ -87,7 +87,7 @@ export default function CategoriesPage() {
               <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 {query ? "Search results" : "Popular Categories"}
               </h2>
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-foreground-muted">
                 {filtered.length} {filtered.length === 1 ? "category" : "categories"}
               </span>
             </div>

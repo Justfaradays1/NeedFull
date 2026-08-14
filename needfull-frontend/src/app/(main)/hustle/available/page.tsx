@@ -234,7 +234,7 @@ export default function AvailabilityPage() {
                     className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
                       categoryId === c.id
                         ? "text-white shadow-sm"
-                        : "border border-card-border bg-gray-50 text-gray-700"
+                        : "border border-card-border bg-surface-secondary text-gray-700"
                     }`}
                     style={categoryId === c.id ? { backgroundColor: getCategoryColor(c.name) } : undefined}
                   >
@@ -251,7 +251,7 @@ export default function AvailabilityPage() {
 
             <div>
               <label className="mb-1 block text-xs font-bold text-gray-700">
-                Short note <span className="font-medium text-gray-400">(optional)</span>
+                Short note <span className="font-medium text-foreground-muted">(optional)</span>
               </label>
               <textarea
                 value={note}
@@ -259,9 +259,9 @@ export default function AvailabilityPage() {
                 maxLength={200}
                 rows={2}
                 placeholder="e.g. Errands around Oye hostels, quick and careful"
-                className="w-full rounded-xl border border-gray-300 p-3 text-sm focus:border-brand focus:outline-none"
+                className="w-full rounded-xl border border-border-default p-3 text-sm focus:border-brand focus:outline-none"
               />
-              <p className="mt-1 text-right text-[10px] text-gray-400">
+              <p className="mt-1 text-right text-[10px] text-foreground-muted">
                 {note.length}/200
               </p>
             </div>
@@ -280,7 +280,7 @@ export default function AvailabilityPage() {
                       className={`rounded-lg px-2.5 py-1.5 text-xs font-bold transition-colors ${
                         travel === opt.value
                           ? "bg-gold text-white shadow-sm"
-                          : "border border-card-border bg-gray-50 text-gray-600"
+                          : "border border-card-border bg-surface-secondary text-gray-600"
                       }`}
                     >
                       {opt.label}
@@ -290,7 +290,7 @@ export default function AvailabilityPage() {
               </div>
               <div>
                 <label className="mb-1 flex items-center gap-1 text-xs font-bold text-gray-700">
-                  <CalendarDays className="h-3.5 w-3.5 text-gray-400" />
+                  <CalendarDays className="h-3.5 w-3.5 text-foreground-muted" />
                   Available until
                 </label>
                 <input
@@ -298,9 +298,9 @@ export default function AvailabilityPage() {
                   value={until}
                   min={minDate}
                   onChange={(e) => setUntil(e.target.value)}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs focus:border-brand focus:outline-none"
+                  className="w-full rounded-xl border border-border-default px-3 py-2 text-xs focus:border-brand focus:outline-none"
                 />
-                <p className="mt-1 text-[10px] text-gray-400">Leave blank = open-ended</p>
+                <p className="mt-1 text-[10px] text-foreground-muted">Leave blank = open-ended</p>
               </div>
             </div>
 
@@ -310,8 +310,8 @@ export default function AvailabilityPage() {
               disabled={geolocating}
               className={`flex w-full items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-bold transition-colors ${
                 hasLocation
-                  ? "border-green-300 bg-green-50 text-green-700"
-                  : "border-card-border bg-gray-50 text-gray-600"
+                  ? "border-success-border bg-success-bg text-success-text"
+                  : "border-card-border bg-surface-secondary text-gray-600"
               }`}
             >
               {geolocating ? (
@@ -329,7 +329,7 @@ export default function AvailabilityPage() {
               )}
             </button>
 
-            <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-card-border bg-gray-50 px-4 py-3">
+            <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-card-border bg-surface-secondary px-4 py-3">
               <span>
                 <span className="block text-xs font-bold text-gray-800">Online today</span>
                 <span className="block text-[11px] text-gray-500">
@@ -379,8 +379,8 @@ export default function AvailabilityPage() {
               <div className="h-14 skeleton rounded-xl" />
             </div>
           ) : offers.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-gray-200 px-4 py-8 text-center">
-              <Wifi className="mx-auto h-6 w-6 text-gray-300" />
+            <div className="rounded-2xl border border-dashed border-border-default px-4 py-8 text-center">
+              <Wifi className="mx-auto h-6 w-6 text-foreground-muted" />
               <p className="mt-2 text-sm font-bold text-gray-900">No active offers</p>
               <p className="mx-auto mt-1 max-w-[16rem] text-xs text-gray-500">
                 Create an offer above and nearby posters will start finding you.
@@ -405,8 +405,8 @@ export default function AvailabilityPage() {
                         ? getCategoryDisplayName(offer.category.name)
                         : "Help"}
                       {offer.isOnlineToday && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-1.5 py-0.5 text-[9px] font-bold text-green-700">
-                          <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                        <span className="inline-flex items-center gap-1 rounded-full bg-success-bg px-1.5 py-0.5 text-[9px] font-bold text-success-text">
+                          <span className="h-1.5 w-1.5 rounded-full bg-success" />
                           ONLINE
                         </span>
                       )}
@@ -440,7 +440,7 @@ export default function AvailabilityPage() {
           )}
         </div>
 
-        <p className="pt-1 text-center text-[11px] text-gray-400">
+        <p className="pt-1 text-center text-[11px] text-foreground-muted">
           While you wait, find something to do now →{" "}
           <button
             type="button"

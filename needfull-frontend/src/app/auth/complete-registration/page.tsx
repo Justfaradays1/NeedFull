@@ -96,8 +96,8 @@ function CompleteRegistrationForm() {
     return (
       <div className="auth-page flex min-h-screen flex-col items-center justify-center bg-white px-4">
         <div className="w-full max-w-md text-center">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-success-bg">
+            <svg className="h-8 w-8 text-success-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
@@ -134,7 +134,7 @@ function CompleteRegistrationForm() {
                 <p className="text-sm font-medium text-gray-900 truncate">{name || "Loading..."}</p>
                 <p className="text-xs text-gray-500 truncate">{email}</p>
               </div>
-              <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">
+              <span className="shrink-0 rounded-full bg-success-bg px-2 py-0.5 text-[10px] font-semibold text-success-text">
                 Verified
               </span>
             </div>
@@ -153,7 +153,7 @@ function CompleteRegistrationForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
                 hint={password ? (
-                  <span className={password.length >= 8 ? "text-green-600" : "text-gray-500"}>
+                  <span className={password.length >= 8 ? "text-success-text" : "text-gray-500"}>
                     {password.length >= 8 ? "\u2713 " : ""}At least 8 characters
                   </span>
                 ) : undefined}
@@ -216,7 +216,7 @@ function CompleteRegistrationForm() {
             </div>
 
             {error && (
-              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="rounded-xl border border-error-border bg-error-bg px-4 py-3 text-sm text-error-text">
                 {error}
               </div>
             )}

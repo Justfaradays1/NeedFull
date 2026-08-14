@@ -14,7 +14,7 @@ export function RouteSummary({
   if (!taskLocation && !completionLocation) return null;
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+    <div className="rounded-2xl border border-border-default bg-surface-secondary p-4">
       <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-500">
         Task Flow
       </p>
@@ -26,27 +26,27 @@ export function RouteSummary({
             {taskLocation ? (
               <p className="text-sm font-medium text-gray-800">{taskLocation}</p>
             ) : (
-              <p className="text-sm italic text-gray-400">Start location not set</p>
+              <p className="text-sm italic text-foreground-muted">Start location not set</p>
             )}
-            <p className="text-[11px] text-gray-400">Start</p>
+            <p className="text-[11px] text-foreground-muted">Start</p>
           </div>
         </div>
 
         <div className="flex items-center justify-center py-1">
-          <ArrowDown className="h-4 w-4 text-gray-300" />
+          <ArrowDown className="h-4 w-4 text-foreground-muted" />
         </div>
 
         <div className="flex items-start gap-3">
-          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-warning-text" />
           <div>
             {completionLocation ? (
               <p className="text-sm font-medium text-gray-800">
                 {completionLocation}
               </p>
             ) : (
-              <p className="text-sm italic text-gray-400">Finish location not set</p>
+              <p className="text-sm italic text-foreground-muted">Finish location not set</p>
             )}
-            <p className="text-[11px] text-gray-400">Finish</p>
+            <p className="text-[11px] text-foreground-muted">Finish</p>
           </div>
         </div>
       </div>

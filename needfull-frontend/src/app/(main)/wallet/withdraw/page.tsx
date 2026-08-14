@@ -80,20 +80,20 @@ function maskAccount(acc: string): string {
 function StatusBadge({ status }: { status: string }) {
   if (status === "completed") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-bold text-green-700">
+      <span className="inline-flex items-center gap-1 rounded-full bg-success-bg px-2 py-0.5 text-[11px] font-bold text-success-text">
         <CheckCircle className="h-3 w-3" /> Completed
       </span>
     );
   }
   if (status === "failed") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-bold text-red-700">
+      <span className="inline-flex items-center gap-1 rounded-full bg-error-bg px-2 py-0.5 text-[11px] font-bold text-error-text">
         <XCircle className="h-3 w-3" /> Failed
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-700">
+    <span className="inline-flex items-center gap-1 rounded-full bg-warning-bg px-2 py-0.5 text-[11px] font-bold text-warning-text">
       <Clock className="h-3 w-3" /> Pending
     </span>
   );
@@ -334,8 +334,8 @@ export default function WithdrawPage() {
 
           <div className="mx-4 -mt-4 sm:mx-6">
             <div className="rounded-2xl border border-card-border bg-surface p-5 text-center shadow-card transition-shadow duration-200 hover:shadow-lifted active:scale-[0.99]">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
-                <CheckCircle className="h-10 w-10 text-green-600" />
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-success-bg">
+                <CheckCircle className="h-10 w-10 text-success-text" />
               </div>
               <p className="font-display text-xl font-bold text-gray-900">
                 Withdrawal Request Submitted
@@ -396,48 +396,48 @@ export default function WithdrawPage() {
                 Review Details
               </h2>
               <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3">
+                <div className="flex items-center justify-between rounded-lg bg-surface-secondary px-4 py-3">
                   <span className="text-sm text-gray-600">Amount</span>
                   <span className="text-sm font-bold text-gray-900">
                     {formatCurrency(Math.round(amountNum * 100))}
                   </span>
                 </div>
-                <div className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3">
+                <div className="flex items-center justify-between rounded-lg bg-surface-secondary px-4 py-3">
                   <span className="text-sm text-gray-600">Fee</span>
                   <span className="text-sm font-bold text-gray-900">
                     {formatCurrency(WITHDRAWAL_FEE_NAIRA * 100)}
                   </span>
                 </div>
-                <div className="flex items-center justify-between rounded-lg bg-amber-50 px-4 py-3">
-                  <span className="text-sm font-medium text-amber-700">
+                <div className="flex items-center justify-between rounded-lg bg-warning-bg px-4 py-3">
+                  <span className="text-sm font-medium text-warning-text">
                     Total Deducted
                   </span>
-                  <span className="text-sm font-bold text-amber-700">
+                  <span className="text-sm font-bold text-warning-text">
                     {formatCurrency(Math.round(totalDeduction * 100))}
                   </span>
                 </div>
-                <div className="flex items-center justify-between rounded-lg bg-green-50 px-4 py-3">
-                  <span className="text-sm font-medium text-green-700">
+                <div className="flex items-center justify-between rounded-lg bg-success-bg px-4 py-3">
+                  <span className="text-sm font-medium text-success-text">
                     You&apos;ll Receive
                   </span>
-                  <span className="text-sm font-bold text-green-700">
+                  <span className="text-sm font-bold text-success-text">
                     {formatCurrency(Math.round(netReceived * 100))}
                   </span>
                 </div>
-                <hr className="border-gray-200" />
-                <div className="rounded-lg bg-gray-50 px-4 py-3">
+                <hr className="border-border-default" />
+                <div className="rounded-lg bg-surface-secondary px-4 py-3">
                   <p className="text-xs text-gray-500">Bank</p>
                   <p className="text-sm font-semibold text-gray-900">
                     {selectedBank?.name}
                   </p>
                 </div>
-                <div className="rounded-lg bg-gray-50 px-4 py-3">
+                <div className="rounded-lg bg-surface-secondary px-4 py-3">
                   <p className="text-xs text-gray-500">Account Number</p>
                   <p className="text-sm font-semibold text-gray-900">
                     {accountNumber}
                   </p>
                 </div>
-                <div className="rounded-lg bg-gray-50 px-4 py-3">
+                <div className="rounded-lg bg-surface-secondary px-4 py-3">
                   <p className="text-xs text-gray-500">Account Name</p>
                   <p className="text-sm font-semibold text-gray-900">
                     {accountName}
@@ -521,11 +521,11 @@ export default function WithdrawPage() {
 
         <div className="space-y-4 px-4 pb-8 sm:px-6 -mt-2">
           {!user?.emailVerified && (
-            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-              <p className="text-sm font-medium text-amber-800">
+            <div className="rounded-xl border border-warning-border bg-warning-bg px-4 py-3">
+              <p className="text-sm font-medium text-warning-text">
                 Verify your email before withdrawing.
               </p>
-              <p className="mt-1 text-xs text-amber-600">
+              <p className="mt-1 text-xs text-warning-text">
                 Check your inbox or{" "}
                 <Link href="/verify-email" className="underline font-medium">
                   resend verification
@@ -561,10 +561,10 @@ export default function WithdrawPage() {
                     setAmount(e.target.value);
                     setErrors((prev) => ({ ...prev, amount: "" }));
                   }}
-                  className={`tap-target w-full rounded-xl border bg-white px-4 py-4 pl-10 text-2xl font-bold focus:ring-2 focus:ring-brand/20 ${
+                  className={`tap-target w-full rounded-xl border bg-surface px-4 py-4 pl-10 text-2xl font-bold focus:ring-2 focus:ring-brand/20 ${
                     errors.amount
                       ? "border-danger"
-                      : "border-gray-300 focus:border-brand"
+                      : "border-border-default focus:border-brand"
                   }`}
                 />
               </div>
@@ -580,7 +580,7 @@ export default function WithdrawPage() {
                     {formatCurrency(Math.round(balanceNaira * 100))}
                   </span>
                   {totalDeduction <= balanceNaira ? (
-                    <span className="ml-2 text-green-600">✓ Sufficient</span>
+                    <span className="ml-2 text-success-text">✓ Sufficient</span>
                   ) : (
                     <span className="ml-2 text-danger">
                       Insufficient — you need {formatCurrency(Math.round(totalDeduction * 100))}
@@ -592,7 +592,7 @@ export default function WithdrawPage() {
 
             {/* Fee breakdown */}
             {amountNum >= 100 && totalDeduction <= balanceNaira && (
-              <div className="mt-4 rounded-lg bg-gray-50 p-4">
+              <div className="mt-4 rounded-lg bg-surface-secondary p-4">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Fee (₦50 flat)</span>
                   <span className="font-medium text-gray-900">
@@ -601,7 +601,7 @@ export default function WithdrawPage() {
                 </div>
                 <div className="mt-1 flex items-center justify-between text-sm">
                   <span className="text-gray-600">You&apos;ll receive</span>
-                  <span className="font-semibold text-green-700">
+                  <span className="font-semibold text-success-text">
                     {formatCurrency(Math.round(netReceived * 100))}
                   </span>
                 </div>
@@ -633,8 +633,8 @@ export default function WithdrawPage() {
                       if (e.key === "Enter")
                         setBankDropdownOpen(!bankDropdownOpen);
                     }}
-                    className={`tap-target flex w-full items-center gap-2 rounded-lg border bg-white px-4 py-3 text-sm focus:ring-2 focus:ring-brand/20 ${
-                      errors.bank ? "border-danger" : "border-gray-300"
+                    className={`search-pill tap-target flex w-full items-center gap-2 rounded-full border bg-surface px-4 py-3 text-sm ${
+                      errors.bank ? "border-danger" : "border-border-default"
                     }`}
                   >
                     <Search className="h-4 w-4 shrink-0 text-gray-400" />
@@ -704,10 +704,10 @@ export default function WithdrawPage() {
                   maxLength={10}
                   value={accountNumber}
                   onChange={(e) => handleAccountNumberChange(e.target.value)}
-                  className={`tap-target w-full rounded-lg border bg-white px-4 py-3 text-lg font-bold tracking-widest focus:ring-2 focus:ring-brand/20 ${
+                  className={`tap-target w-full rounded-lg border bg-surface px-4 py-3 text-lg font-bold tracking-widest focus:ring-2 focus:ring-brand/20 ${
                     errors.accountNumber
                       ? "border-danger"
-                      : "border-gray-300 focus:border-brand"
+                      : "border-border-default focus:border-brand"
                   }`}
                 />
                 {errors.accountNumber && (
@@ -737,24 +737,24 @@ export default function WithdrawPage() {
                       setAccountName(e.target.value);
                       setErrors((prev) => ({ ...prev, accountName: "" }));
                     }}
-                    className={`tap-target w-full rounded-lg border bg-white px-4 py-3 text-sm focus:ring-2 focus:ring-brand/20 ${
+                    className={`tap-target w-full rounded-lg border bg-surface px-4 py-3 text-sm focus:ring-2 focus:ring-brand/20 ${
                       errors.accountName
                         ? "border-danger"
-                        : "border-gray-300 focus:border-brand"
+                        : "border-border-default focus:border-brand"
                     }`}
                   />
                   {accountNameLoading && (
                     <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-brand-text" />
                   )}
                   {!accountNameLoading && accountName && (
-                    <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-600" />
+                    <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-success-text" />
                   )}
                 </div>
                 {errors.accountName && (
                   <p className="text-xs text-danger">{errors.accountName}</p>
                 )}
                 {accountName && !errors.accountName && (
-                  <p className="text-xs text-green-600">Account verified ✓</p>
+                  <p className="text-xs text-success-text">Account verified ✓</p>
                 )}
               </div>
             </div>
@@ -770,8 +770,8 @@ export default function WithdrawPage() {
           </button>
 
           {/* Fee note */}
-          <div className="rounded-xl bg-amber-50 border border-amber-200 px-5 py-3">
-            <p className="text-xs font-medium text-amber-700">
+          <div className="rounded-xl bg-warning-bg border border-warning-border px-5 py-3">
+            <p className="text-xs font-medium text-warning-text">
               ₦50 flat withdrawal fee applies. You&apos;ll receive the full
               amount after fee deduction. Withdrawals are processed and sent to
               your bank within 24 hours.
@@ -805,18 +805,18 @@ export default function WithdrawPage() {
                     <div
                       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
                         w.status === "completed"
-                          ? "bg-green-100"
+                          ? "bg-success-bg"
                           : w.status === "failed"
-                            ? "bg-red-100"
-                            : "bg-amber-100"
+                            ? "bg-error-bg"
+                            : "bg-warning-bg"
                       }`}
                     >
                       {w.status === "completed" ? (
-                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <CheckCircle className="h-4 w-4 text-success-text" />
                       ) : w.status === "failed" ? (
-                        <XCircle className="h-4 w-4 text-red-600" />
+                        <XCircle className="h-4 w-4 text-error-text" />
                       ) : (
-                        <Clock className="h-4 w-4 text-amber-600" />
+                        <Clock className="h-4 w-4 text-warning-text" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">

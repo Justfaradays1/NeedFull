@@ -15,7 +15,7 @@ const iconMap: Record<CelebrationIcon, { icon: typeof CheckCircle2; bg: string; 
   celebration: { icon: Sparkles, bg: 'bg-brand-light', fg: 'text-brand' },
   success: { icon: CheckCircle2, bg: 'bg-brand-light', fg: 'text-brand' },
   verified: { icon: BadgeCheck, bg: 'bg-gold-light', fg: 'text-gold' },
-  payment: { icon: Banknote, bg: 'bg-green-100', fg: 'text-green-600' },
+  payment: { icon: Banknote, bg: 'bg-success-bg', fg: 'text-success-text' },
 };
 
 export function CelebrationModal({ open, onClose, config }: CelebrationModalProps) {
@@ -99,7 +99,7 @@ export function CelebrationModal({ open, onClose, config }: CelebrationModalProp
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-foreground-muted hover:bg-surface-secondary hover:text-gray-600"
           aria-label="Close"
         >
           <X className="h-4 w-4" />
@@ -136,7 +136,7 @@ export function CelebrationModal({ open, onClose, config }: CelebrationModalProp
             <button
               type="button"
               onClick={handleSecondary}
-              className="tap-target w-full rounded-xl border border-gray-300 bg-surface py-3.5 text-base font-semibold text-gray-600 hover:bg-gray-100"
+              className="tap-target w-full rounded-xl border border-border-default bg-surface py-3.5 text-base font-semibold text-gray-600 hover:bg-surface-secondary"
             >
               {config.secondaryLabel}
             </button>

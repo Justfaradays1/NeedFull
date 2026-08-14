@@ -176,6 +176,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     refreshChatUnread();
   }, [pathname, refreshChatUnread]);
 
+  // Mirror the active role onto <html data-role> so global CSS (e.g. the
+  // search-pill focus ring) can theme poster (green) vs runner (gold).
+  useEffect(() => {
+    const role = activeRole === "runner" ? "runner" : "poster";
+    document.documentElement.setAttribute("data-role", role);
+  }, [activeRole]);
+
   // Open the command palette from the right context panel's search bar
   useEffect(() => {
     const onOpen = () => setIsPaletteOpen(true);
@@ -195,7 +202,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             size="lg"
           />
           <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-gray-900">
+            <p className="truncate text-sm font-bold text-foreground-strong">
               {user?.fullName || "Unnamed user"}
             </p>
             <p className="truncate text-[11px] text-gray-500">
@@ -219,7 +226,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <p className="text-xs uppercase tracking-[0.24em] text-gray-500">
               Switch role
             </p>
-            <div className="flex rounded-xl border border-gray-200 bg-gray-50 p-0.5 dark:border-gray-700 dark:bg-amber-950/20">
+            <div className="flex rounded-xl border border-border-default bg-surface-secondary p-0.5 dark:border-gray-700 dark:bg-amber-950/20">
               {roles.map((role) => (
                 <button
                   key={role}
@@ -259,8 +266,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   }}
                   className={`flex-1 rounded-[10px] px-3 py-2 text-center text-sm font-medium transition-all ${
                     role === activeRole
-                      ? "bg-white text-brand shadow-sm dark:bg-amber-950/60 dark:text-amber-300"
-                      : "text-gray-600 hover:text-gray-900 dark:text-amber-400/70 dark:hover:text-amber-200 disabled:opacity-60"
+                      ? "bg-surface text-brand shadow-sm dark:bg-amber-950/60 dark:text-amber-300"
+                      : "text-foreground-secondary hover:text-foreground-strong dark:text-amber-400/70 dark:hover:text-amber-200 disabled:opacity-60"
                   }`}
                 >
                   {switchingRole === role
@@ -413,7 +420,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 key={href}
                 href={href}
                 className={`tap-target relative flex flex-1 flex-col items-center justify-center gap-1 rounded-3xl px-2 py-2 transition-all duration-200 ${
-                  isActive ? activeColor : "text-slate-600"
+                  isActive ? activeColor : "text-foreground-secondary"
                 }`}
                 aria-label={label}
               >
@@ -424,7 +431,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 >
                   <NavIcon
                     icon={icon}
-                    className={`h-6 w-6 transition-all duration-200 ${isActive ? activeIconColor : "text-slate-500"}`}
+                    className={`h-6 w-6 transition-all duration-200 ${isActive ? activeIconColor : "text-foreground-muted"}`}
                   />
                   {label === "Chat" && chatUnreadCount > 0 ? (
                     <span className="absolute -right-1.5 -top-1 flex min-w-4 items-center justify-center rounded-full bg-danger px-1 py-px text-[9px] font-bold leading-none text-white">
@@ -436,7 +443,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   className={`text-[11px] transition-all duration-200 ${
                     isActive
                       ? `font-semibold ${activeText}`
-                      : "font-semibold text-slate-600"
+                      : "font-semibold text-foreground-secondary"
                   }`}
                 >
                   {label}

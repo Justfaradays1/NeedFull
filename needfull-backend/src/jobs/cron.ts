@@ -2,6 +2,7 @@ import cron from "node-cron";
 import db, { withTransaction } from "../config/db";
 import { refundEscrow } from "../services/wallet.service";
 import { notifyUser } from "../services/notification.service";
+import { expireProposals } from "../services/proposal.service";
 
 export function initCronJobs() {
   console.log("Initializing cron jobs...");
@@ -15,13 +16,14 @@ export function initCronJobs() {
         UPDATE tasks 
         SET status = 'cancelled', updated_at = NOW()
         WHERE status = 'open' AND deadline < NOW()
-        RETURNING id, poster_id, budget_kobo, title
+        RETURNING id, poster_id, escrow_amount_kobo, budget_kobo, title
       `);
       
       for (const row of result.rows) {
-        // Refund escrow if any was locked
+        // Refund escrow if any was locked (escrow == budget for open tasks)
+        const escrowKobo = row.escrow_amount_kobo ?? row.budget_kobo;
         await withTransaction(async (client) => {
-          await refundEscrow(client, row.poster_id, row.budget_kobo, row.id);
+          await refundEscrow(client, row.poster_id, escrowKobo, row.id);
         });
 
         await notifyUser(row.poster_id, {
@@ -37,6 +39,20 @@ export function initCronJobs() {
       }
     } catch (error) {
       console.error("[Cron] Error processing expired tasks:", error);
+    }
+  });
+
+  // Expire budget proposals that were never answered (PENDING → EXPIRED)
+  // Run every 30 minutes — proposal lifetime is 24h
+  cron.schedule("*/30 * * * *", async () => {
+    try {
+      console.log("[Cron] Running budget proposal expiry...");
+      const expired = await expireProposals();
+      if (expired > 0) {
+        console.log(`[Cron] Expired ${expired} budget proposals.`);
+      }
+    } catch (error) {
+      console.error("[Cron] Error expiring proposals:", error);
     }
   });
 

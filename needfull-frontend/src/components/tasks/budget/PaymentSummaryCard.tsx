@@ -52,7 +52,7 @@ export function PaymentSummaryCard({
           <Row
             label="Wallet Balance"
             value={formatNaira(balanceNaira)}
-            icon={<Wallet className="h-3 w-3 text-gray-400" />}
+            icon={<Wallet className="h-3 w-3 text-foreground-muted" />}
           />
         </div>
       </div>
@@ -67,9 +67,9 @@ export function PaymentSummaryCard({
       >
         <div className="flex items-start gap-2">
           {hasEnough ? (
-            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success-text" />
           ) : (
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-error-text" />
           )}
           <div>
             {hasEnough ? (
@@ -94,7 +94,7 @@ export function PaymentSummaryCard({
       {/* Helper text */}
       <div className="mt-4 space-y-2">
         <div className="flex items-start gap-2">
-          <Info className="mt-0.5 h-3 w-3 shrink-0 text-gray-400" />
+          <Info className="mt-0.5 h-3 w-3 shrink-0 text-foreground-muted" />
           <p className="text-[11px] leading-relaxed text-gray-500">
             The platform fee helps cover secure payments, fraud protection,
             customer support, and platform maintenance.
