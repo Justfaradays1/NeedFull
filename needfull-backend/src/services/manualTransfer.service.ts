@@ -65,18 +65,22 @@ export async function submitManualTransfer(
       throw new Error("Amount must be greater than ₦0");
     }
 
-    // WHAT: Check for duplicate bank reference
-    // WHY: Prevent accidental duplicate submissions or duplicate confirmations
+    // WHAT: Check for duplicate bank reference (same user + same amount)
+    // WHY: Prevent accidental double-submissions. A reference alone is not
+    //      globally unique — many users legitimately type "deposit" or
+    //      "payment", and the same description with a different amount is a
+    //      new transfer. Only an identical reference + amount by the same
+    //      user is a true duplicate.
     const existing = await db.query<{ id: string }>(
       `SELECT id FROM manual_transfers 
-       WHERE bank_reference = $1 AND status != 'rejected'
+       WHERE user_id = $1 AND bank_reference = $2 AND amount_kobo = $3 AND status != 'rejected'
        LIMIT 1`,
-      [params.bankReference],
+      [userId, params.bankReference, amountKobo],
     );
 
     if (existing.rows.length > 0) {
       throw new Error(
-        `A transfer with bank reference ${params.bankReference} is already pending or confirmed`,
+        `You already have a ${params.bankReference} transfer of ₦${params.amountNaira.toLocaleString()} pending verification. Check your transfer history or wait for admin confirmation.`,
       );
     }
 

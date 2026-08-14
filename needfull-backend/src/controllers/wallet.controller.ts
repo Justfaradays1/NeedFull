@@ -64,7 +64,7 @@ export async function submitManualTransferHandler(req: Request, res: Response): 
 
     // WHAT: Known business-rule failures → meaningful 4xx responses (safe to show users)
     // WHY: Duplicate submissions and amount rejections are expected flows, not server faults
-    if (msg.includes("already pending or confirmed")) {
+    if (msg.includes("already have a")) {
       res.status(409).json({ success: false, message: msg });
       return;
     }
