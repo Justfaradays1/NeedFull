@@ -363,7 +363,7 @@ export default function CreateTaskPage() {
 
                 <div>
                   <span className="text-xs text-gray-500">Title</span>
-                  <p className="mt-0.5 text-sm font-medium text-gray-900">{taskTitle}</p>
+                  <p className="mt-0.5 text-base font-bold uppercase tracking-tight text-gray-900">{taskTitle}</p>
                 </div>
                 <hr className="border-border-subtle" />
 
