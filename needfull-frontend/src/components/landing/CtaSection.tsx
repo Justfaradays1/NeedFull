@@ -1,29 +1,40 @@
+// WHAT: Final action — one clear path into the product
+// WHY: Ends the page with the single most important next step instead of
+//      repeating feature claims.
+
+"use client";
+
+import { ArrowRight } from "lucide-react";
+import { useAuthDestinations } from "./authDestinations";
+
 export function CtaSection() {
+  const { postTask } = useAuthDestinations();
+
   return (
-    <section id="cta" className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-background)' }}>
-      {/* Faint grid */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.15) 1px, transparent 1px)`, backgroundSize: "48px 48px" }} />
-      <div className="relative z-10 mx-auto max-w-2xl text-center">
-        <h2 className="font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>
-          Ready to turn spare time into real income?
+    <section id="cta" className="border-t border-border-subtle bg-surface-primary">
+      <div className="mx-auto max-w-2xl px-4 py-16 text-center sm:px-6 lg:px-8 lg:py-24">
+        <h2 className="font-display text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
+          Ready to get something done?
         </h2>
-        <p className="text-section-desc mt-3" style={{ color: 'var(--color-muted)' }}>
-          Join people already earning on NeedFull.
-          Set up your profile in 2 minutes. Start today.
+        <p className="mt-3 text-[15px] leading-relaxed text-muted sm:text-base">
+          Post your first task or set up your profile and start earning.
+          Your payment is protected either way.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <a href="/register" className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-brand px-8 py-3.5 text-[15px] font-bold text-on-brand shadow-card transition-all duration-150 hover:bg-brand-mid active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2">
-            Create free account
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+          <a
+            href={postTask}
+            className="inline-flex h-[52px] w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-gold px-7 text-[15px] font-bold text-white shadow-card transition-all duration-150 hover:brightness-105 active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+          >
+            Post a task
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </a>
-          <a href="/login" className="rounded-[10px] border px-8 py-3.5 text-[15px] font-semibold transition-all duration-150 hover:bg-white/10 active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-brand/50" style={{ borderColor: 'var(--color-border)', color: 'var(--color-foreground)' }}>
-            Sign in
+          <a
+            href="/register"
+            className="inline-flex h-[52px] w-full max-w-xs items-center justify-center rounded-xl border-[1.5px] border-border-strong bg-surface px-7 text-[15px] font-semibold text-foreground transition-colors duration-150 hover:bg-surface-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+          >
+            Create an account
           </a>
         </div>
-        <p className="mt-4 text-xs" style={{ color: 'var(--color-muted)' }}>
-          No subscription fees. No hidden charges.
-          NeedFull only earns when you earn.
-        </p>
       </div>
     </section>
   );

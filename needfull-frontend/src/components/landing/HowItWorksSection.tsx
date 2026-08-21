@@ -1,50 +1,78 @@
+// WHAT: How it works — tabbed poster/runner 4-step grid
+// WHY: Single explanatory section after hero. Heading + tabs share one row on desktop.
+
+"use client";
+
+import { FilePlus2, UserCheck, BadgeCheck, Wallet, Search, CheckCircle2, ClipboardCheck, Coins } from "lucide-react";
+import { useRole } from "./RoleContext";
+
+const POSTER_STEPS = [
+  { n: "1", title: "Post a task", desc: "Tell us what you need, set your budget, and publish it.", icon: FilePlus2 },
+  { n: "2", title: "Get matched", desc: "A nearby Runner accepts your task and gets to work.", icon: UserCheck },
+  { n: "3", title: "Get it done", desc: "Track the task while your payment stays protected.", icon: BadgeCheck },
+  { n: "4", title: "Payment is released", desc: "Confirm completion and the Runner gets paid.", icon: Wallet },
+];
+
+const RUNNER_STEPS = [
+  { n: "1", title: "Find a task", desc: "Browse nearby tasks that match what you can do.", icon: Search },
+  { n: "2", title: "Accept it", desc: "Choose tasks that fit your time, skills, and location.", icon: CheckCircle2 },
+  { n: "3", title: "Complete the work", desc: "Follow the task details and get it done.", icon: ClipboardCheck },
+  { n: "4", title: "Get paid", desc: "Once completion is confirmed, your earnings are released.", icon: Coins },
+];
+
 export function HowItWorksSection() {
+  const { role, setRole } = useRole();
+  const isPoster = role === "poster";
+  const steps = isPoster ? POSTER_STEPS : RUNNER_STEPS;
+
   return (
-    <section id="how-it-works" className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-background)' }}>
-      {/* Faint grid */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.15) 1px, transparent 1px)`, backgroundSize: "48px 48px" }} />
-      {/* Subtle glow */}
-      <div className="pointer-events-none absolute -right-32 -top-32 h-72 w-72 rounded-full bg-gold/5 blur-3xl" />
-      <div className="mx-auto max-w-6xl relative z-10">
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="text-section-label inline-flex items-center rounded-full bg-brand-light px-3.5 py-1 text-brand">How it works</span>
-          <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>
-            Three steps to your first gig
+    <section id="how-it-works" className="border-b border-border-subtle bg-surface-primary">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        {/* Header row: heading left, tabs right */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="font-display text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl whitespace-nowrap">
+            How it works
           </h2>
-          <p className="text-section-desc mt-3" style={{ color: 'var(--color-muted)' }}>
-            Whether you&apos;re earning or hiring, getting started
-            takes less than 5 minutes.
-          </p>
+          <div
+            className="inline-flex gap-1 rounded-full p-1 self-start sm:self-auto shrink-0"
+            role="tablist"
+            aria-label="How it works audience"
+            style={{ backgroundColor: "var(--color-surface-2)", border: "1px solid var(--color-border)" }}
+          >
+            <button
+              role="tab"
+              aria-selected={isPoster}
+              onClick={() => setRole("poster")}
+              className={`whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${isPoster ? "shadow-sm" : "hover:text-foreground"}`}
+              style={isPoster ? { backgroundColor: "var(--color-success)", color: "white" } : { color: "var(--color-muted)" }}
+            >
+              For posters
+            </button>
+            <button
+              role="tab"
+              aria-selected={!isPoster}
+              onClick={() => setRole("runner")}
+              className={`whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${!isPoster ? "shadow-sm" : "hover:text-foreground"}`}
+              style={!isPoster ? { backgroundColor: "var(--color-success)", color: "white" } : { color: "var(--color-muted)" }}
+            >
+              For runners
+            </button>
+          </div>
         </div>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {[
-            {
-              step: '01', title: 'Sign up & verify',
-              desc: 'Sign up with your student email in under 2 minutes. Verify your student status to unlock full access to the NeedFull marketplace.',
-              icon: <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>,
-            },
-            {
-              step: '02', title: 'Browse or post',
-              desc: 'Find tasks near you that match your skills and schedule, or post what you need done and let runners apply.',
-              icon: <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>,
-            },
-            {
-              step: '03', title: 'Complete & get paid',
-              desc: 'Task done? Payment is released from escrow instantly. Your money is always protected until both sides are satisfied.',
-              icon: <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-            },
-          ].map((item) => (
-            <div key={item.step} className="group rounded-2xl border p-6 shadow-card transition-all duration-200 hover:shadow-lifted active:scale-[0.99]" style={{ backgroundColor: 'var(--color-card-bg)', borderColor: 'var(--color-card-border)' }}>
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-light text-brand transition-colors group-hover:bg-brand group-hover:text-white">
-                {item.icon}
+        <ol className="mt-10 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+          {steps.map((step, i) => (
+            <li key={step.n} className="relative">
+              {i < steps.length - 1 && <span className="absolute left-9 top-0 hidden h-px w-[calc(100%-3rem)] bg-border-strong lg:block" aria-hidden="true" />}
+              <div className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-border-default bg-surface text-brand">
+                <step.icon className="h-4.5 w-4.5" aria-hidden="true" />
               </div>
-              <span className="text-[13px] font-bold tracking-widest text-brand-text/60 sm:text-sm">{item.step}</span>
-              <h3 className="mt-1.5 font-display text-lg font-bold sm:text-xl" style={{ color: 'var(--color-foreground)' }}>{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed sm:text-base" style={{ color: 'var(--color-muted)' }}>{item.desc}</p>
-            </div>
+              <span className="mt-4 block text-[13px] font-bold tracking-widest text-foreground-muted">Step {step.n}</span>
+              <h3 className="mt-1 font-display text-lg font-bold text-foreground">{step.title}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted">{step.desc}</p>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

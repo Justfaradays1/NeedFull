@@ -1,8 +1,11 @@
-'use client';
+// WHAT: Student stories — a static, readable selection of testimonials
+// WHY: An infinite auto-scrolling marquee is hard to read, duplicates
+//      content, and breaks reduced-motion expectations. A clean grid
+//      keeps the social proof without the motion.
 
 const TESTIMONIALS = [
   {
-    quote: "I made over \u20A635,000 last semester just running errands between lectures. NeedFull replaced my need for a part-time job off campus.",
+    quote: "I made over ₦35,000 last semester just running errands between lectures. NeedFull replaced my need for a part-time job off campus.",
     name: "Chioma A.",
     role: "300 Level, Mass Comm",
   },
@@ -12,12 +15,7 @@ const TESTIMONIALS = [
     role: "400 Level, Engineering",
   },
   {
-    quote: "As a fresher, I didn\u2019t know where to find campus work. NeedFull made it easy to start earning without any experience or connections.",
-    name: "Esther O.",
-    role: "100 Level, Sciences",
-  },
-  {
-    quote: "I needed someone to deliver a textbook from the library while I was stuck in a practical session. Found a runner on NeedFull in under 5 minutes. Honestly saved my grade.",
+    quote: "I needed someone to deliver a textbook from the library while I was stuck in a practical session. Found a runner on NeedFull in under 5 minutes.",
     name: "Akanbi Ayomide O.",
     role: "300 Level, Computer Science",
   },
@@ -27,12 +25,7 @@ const TESTIMONIALS = [
     role: "200 Level, Economics",
   },
   {
-    quote: "I use NeedFull to offer graphic design services to students who need flyers and banners for events. The trust score system makes clients confident to hire me even if we\u2019ve never met.",
-    name: "Tobiloba F.",
-    role: "400 Level, Fine Arts",
-  },
-  {
-    quote: "I was sceptical at first \u2014 handing money to a stranger feels risky. But with escrow, the money stays locked until the task is done. I\u2019ve used it five times now, zero issues.",
+    quote: "I was sceptical at first — handing money to a stranger feels risky. But with escrow, the money stays locked until the task is done. I've used it five times now, zero issues.",
     name: "Samuel K.",
     role: "300 Level, Political Science",
   },
@@ -43,77 +36,34 @@ const TESTIMONIALS = [
   },
 ];
 
-function TestimonialCard({ t }: { t: typeof TESTIMONIALS[number] }) {
-  return (
-    <div className="flex w-[320px] shrink-0 flex-col rounded-2xl border border-on-brand/10 bg-on-brand/5 p-6 backdrop-blur-sm transition-colors hover:bg-on-brand/10">
-      <div className="mb-3 flex gap-1" aria-hidden="true">
-        {[...Array(5)].map((_, i) => (
-          <svg key={i} className="h-4 w-4 text-gold" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-          </svg>
-        ))}
-      </div>
-      <p className="flex-1 text-sm leading-relaxed text-on-brand/80">
-        <span aria-hidden="true">&ldquo;</span>{t.quote}<span aria-hidden="true">&rdquo;</span>
-      </p>
-      <div className="mt-4 border-t border-on-brand/10 pt-4">
-        <div className="text-sm font-bold text-on-brand">{t.name}</div>
-        <div className="text-[13px] text-on-brand/50">{t.role}</div>
-      </div>
-    </div>
-  );
-}
-
 export function TestimonialsSection() {
   return (
-    <section id="testimonials" className="relative overflow-hidden bg-brand-dark py-20 text-on-brand">
-      {/* Faint grid */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: `linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)`, backgroundSize: "48px 48px" }} />
-      <div className="pointer-events-none absolute -left-32 -top-32 h-80 w-80 rounded-full bg-gold/5 blur-3xl" />
-      <div className="relative z-10 px-4 text-center sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl">
-          <span className="inline-flex items-center rounded-full bg-on-brand/10 px-3.5 py-1 text-[13px] font-semibold tracking-wide text-on-brand/80 backdrop-blur-sm sm:text-sm">
-            What people say
-          </span>
-          <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight">
-            Trusted by busy people
-          </h2>
-          <p className="text-section-desc mt-3 text-on-brand/60">
-            Real experiences from real users.
-          </p>
-        </div>
-      </div>
+    <section id="testimonials" className="border-b border-border-subtle bg-surface-primary">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        <h2 className="font-display text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
+          Students on campus use it every day
+        </h2>
+        <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-muted sm:text-base">
+          What posters and Runners say about getting tasks done on campus.
+        </p>
 
-      <div
-        className="group/scroller mt-14 [mask-image:linear-gradient(to_right,transparent_0%,black_8%,black_92%,transparent_100%)]"
-        onMouseEnter={(e) => {
-          (e.currentTarget.querySelector('.testimonial-track') as HTMLElement)?.style.setProperty('animation-play-state', 'paused');
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget.querySelector('.testimonial-track') as HTMLElement)?.style.setProperty('animation-play-state', 'running');
-        }}
-      >
-        <div
-          className="testimonial-track flex w-max gap-6 pe-6"
-          style={{
-            animation: 'scroll-left 50s linear infinite',
-          }}
-        >
-          {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
-            <TestimonialCard key={`${t.name}-${i}`} t={t} />
+        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {TESTIMONIALS.map((t) => (
+            <li
+              key={t.name}
+              className="flex flex-col rounded-xl border border-border-default bg-surface p-5 shadow-sm"
+            >
+              <p className="flex-1 text-sm leading-relaxed text-foreground-secondary">
+                “{t.quote}”
+              </p>
+              <footer className="mt-4 border-t border-border-subtle pt-3.5">
+                <p className="text-sm font-bold text-foreground">{t.name}</p>
+                <p className="text-[13px] text-foreground-muted">{t.role}</p>
+              </footer>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
-
-      <style>{`
-        @keyframes scroll-left {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-        .testimonial-track {
-          will-change: transform;
-        }
-      `}</style>
     </section>
   );
 }

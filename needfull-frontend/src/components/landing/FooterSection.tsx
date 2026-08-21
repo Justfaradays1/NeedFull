@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function FooterSection() {
   return (
     <footer
@@ -10,7 +12,7 @@ export function FooterSection() {
       <div className="mx-auto max-w-6xl">
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <a
+            <Link
               href="/"
               className="flex items-center gap-2"
               aria-label="NeedFull home"
@@ -102,7 +104,7 @@ export function FooterSection() {
               >
                 NeedFull
               </span>
-            </a>
+            </Link>
             <p
               className="mt-3 text-sm leading-relaxed"
               style={{ color: "var(--color-muted)" }}

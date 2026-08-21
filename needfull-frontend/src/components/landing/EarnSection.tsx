@@ -1,41 +1,74 @@
-const FEATURES = [
-  { title: 'Set your own hours', desc: 'Work when it fits your schedule. Accept tasks between classes or around work, not the other way around.' },
-  { title: 'Get paid fast', desc: 'Once the task poster confirms completion, escrow releases your payment instantly to your wallet.' },
-  { title: 'Build your reputation', desc: 'Every completed task grows your trust score. Higher trust = access to better-paying tasks.' },
-  { title: 'No interview needed', desc: 'No CVs, no cover letters. Your trust score and task history speak for themselves.' },
-  { title: 'Local only', desc: 'Tasks happen right where you are. No commuting, no travel costs \u2014 just steps away.' },
-  { title: 'Wide variety of tasks', desc: "Research assistance, delivery, tutoring, graphic design, event help \u2014 find what you're good at." },
+// WHAT: Runner side of the marketplace — turn free time into income
+// WHY: The landing page sells the Poster problem first; this section
+//      introduces the earning opportunity with a real CTA.
+
+"use client";
+
+import { ArrowRight, Wallet, Clock, Star } from "lucide-react";
+import { useAuthDestinations } from "./authDestinations";
+
+const POINTS = [
+  {
+    icon: Wallet,
+    title: "Get paid for real tasks",
+    desc: "Laundry, delivery, printing, errands — money is released to your wallet when the poster confirms the task.",
+  },
+  {
+    icon: Clock,
+    title: "Work around your timetable",
+    desc: "Pick up tasks between classes. No fixed schedule, no interview, no CV.",
+  },
+  {
+    icon: Star,
+    title: "Build a rating that counts",
+    desc: "Every completed task earns a rating. A stronger profile wins better tasks.",
+  },
 ];
 
 export function EarnSection() {
+  const { startEarning } = useAuthDestinations();
+
   return (
-    <section id="features" className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--color-section-alt)' }}>
-      {/* Faint grid */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.15) 1px, transparent 1px)`, backgroundSize: "48px 48px" }} />
-      {/* Glow accents */}
-      <div className="pointer-events-none absolute -left-32 top-1/3 h-64 w-64 rounded-full bg-brand/5 blur-3xl" />
-      <div className="mx-auto max-w-6xl relative z-10">
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="text-section-label inline-flex items-center rounded-full bg-gold-light px-3.5 py-1" style={{ color: '#B45309' }}>For people who earn</span>
-          <h2 className="mt-4 font-display text-[clamp(1.5rem,4vw,2.25rem)] font-extrabold tracking-tight" style={{ color: 'var(--color-foreground)' }}>
-            Turn free hours into <span className="text-brand-text">flexible income</span>
+    <section id="features" className="border-b border-border-subtle bg-surface-primary">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:py-20 lg:px-8">
+        <div>
+          <h2 className="font-display text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
+            Turn your free time into income.
           </h2>
-          <p className="text-section-desc mt-3" style={{ color: 'var(--color-muted)' }}>
-            No CV required. No fixed schedule. Just real tasks from real people nearby, paid fast.
+          <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-muted sm:text-base">
+            See what students around you need done, complete the tasks you
+            can handle, and earn. Payments are protected for both sides —
+            you get paid when the work is done.
           </p>
+          <a
+            href={startEarning}
+            className="mt-7 inline-flex h-[52px] items-center justify-center gap-2 rounded-xl bg-brand px-7 text-[15px] font-bold text-on-brand shadow-card transition-colors duration-150 hover:bg-brand-mid focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+          >
+            Start earning
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </a>
         </div>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f) => (
-            <div key={f.title} className="rounded-2xl border p-5 shadow-card transition-all duration-200 hover:shadow-lifted" style={{ backgroundColor: 'var(--color-card-bg)', borderColor: 'var(--color-card-border)' }}>
-              <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10">
-                <svg className="h-4 w-4 text-brand-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+        <ul className="space-y-4">
+          {POINTS.map((point) => (
+            <li
+              key={point.title}
+              className="flex gap-4 rounded-xl border border-border-default bg-surface p-5 shadow-sm"
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-light text-brand">
+                <point.icon className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <div>
+                <h3 className="font-display text-base font-bold text-foreground">
+                  {point.title}
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted">
+                  {point.desc}
+                </p>
               </div>
-              <h3 className="font-display text-base font-bold sm:text-lg" style={{ color: 'var(--color-foreground)' }}>{f.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed sm:text-base" style={{ color: 'var(--color-muted)' }}>{f.desc}</p>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );
